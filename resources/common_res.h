@@ -1,0 +1,2 @@
+#define IDR_VERTEX_SHADER 101
+#define RECT_MOVE_V2_0 257

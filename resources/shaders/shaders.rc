@@ -1,0 +1,3 @@
+#include <common_res.h>
+
+RECT_MOVE_V2_0 IDR_VERTEX_SHADER "shaders/vs_2_0/rect_move.obj"

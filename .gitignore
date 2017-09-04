@@ -1,0 +1,4 @@
+tests/*/current
+.idea
+gtest
+cmake-build-*
