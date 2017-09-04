@@ -1,6 +1,5 @@
 #ifndef DIRECTGRAPH_MAINLOOP_H
 #define DIRECTGRAPH_MAINLOOP_H
-//#gtest <directgraph_d2d_export.h>
 #include <windows.h>
 
 enum DirectGraphEvent{
