@@ -2,6 +2,7 @@
 #include <testlib/testlib_funcs.h>
 #include <dx9/DX9WindowFactory.h>
 #include <include/directgraph_mainloop.h>
+#include <main/ThreadController.h>
 
 using namespace directgraph;
 using namespace directgraph_testlib;
@@ -34,60 +35,55 @@ void init_factory(){
     }
 }
 
+static float WIDTH = 200;
+static float HEIGHT = 300;
+
 IMG_TEST_F(BarTest, SimpleBar){
     init_factory();
-    float width = 200;
-    float height = 300;
-    MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", width, height);
+    MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
     win->show();
-    win->getRenderer()->setcolor(0x00BBFF);
-    win->getRenderer()->bar(width/4, height/4, width/4*3, height/4*3);
-    win->getRenderer()->repaint();
-    BitmapWrap *ret = new BitmapWrap(win->getHWND());
-    delete win;
-    return ret;
+    ThreadController tc(win);
+    tc.init();
+    tc.setcolor(0x00BBFF);
+    tc.bar(WIDTH/4, HEIGHT/4, WIDTH/4*3, HEIGHT/4*3);
+    tc.repaint();
+    return new BitmapWrap(win->getHWND());
 }
 
 IMG_TEST_F(BarTest, InverseCoords){
     init_factory();
-    float width = 200;
-    float height = 300;
-    MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", width, height);
+    MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
     win->show();
-    win->getRenderer()->setcolor(0x00BBFF);
-    win->getRenderer()->bar(width/4*3, height/4*3, width/4, height/4);
-    win->getRenderer()->repaint();
-    BitmapWrap *ret = new BitmapWrap(win->getHWND());
-    delete win;
-    return ret;
+    ThreadController tc(win);
+    tc.init();
+    tc.setcolor(0x00BBFF);
+    tc.bar(WIDTH/4*3, HEIGHT/4*3, WIDTH/4, HEIGHT/4);
+    tc.repaint();
+    return new BitmapWrap(win->getHWND());
 }
 
 IMG_TEST_F(BarTest, OnePixel){
     init_factory();
-    float width = 200;
-    float height = 300;
-    MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", width, height);
+    MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
     win->show();
-    win->getRenderer()->setcolor(0);
-    win->getRenderer()->bar(width/4, height/4, width/4 + 1, height/4 + 1);
-    win->getRenderer()->repaint();
-    BitmapWrap *ret = new BitmapWrap(win->getHWND());
-    delete win;
-    return ret;
+    ThreadController tc(win);
+    tc.init();
+    tc.setcolor(0);
+    tc.bar(WIDTH/4, HEIGHT/4, WIDTH/4 + 1, HEIGHT/4 + 1);
+    tc.repaint();
+    return new BitmapWrap(win->getHWND());
 }
 
 IMG_TEST_F(BarTest, OnePxBorder){
     init_factory();
-    float width = 200;
-    float height = 300;
-    MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", width, height);
+    MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
     win->show();
-    win->getRenderer()->setcolor(0x0000FF);
-    win->getRenderer()->bar(0,0,width,height);
-    win->getRenderer()->setcolor(0x00FFFF);
-    win->getRenderer()->bar(1,1,width - 1 ,height - 1);
-    win->getRenderer()->repaint();
-    BitmapWrap *ret = new BitmapWrap(win->getHWND());
-    delete win;
-    return ret;
+    ThreadController tc(win);
+    tc.init();
+    tc.setcolor(0x0000FF);
+    tc.bar(0,0,WIDTH,HEIGHT);
+    tc.setcolor(0x00FFFF);
+    tc.bar(1,1,WIDTH - 1 ,HEIGHT - 1);
+    tc.repaint();
+    return new BitmapWrap(win->getHWND());
 }

@@ -1,7 +1,6 @@
 #include <resource.h>
-#include "../../resources/common_res.h"
-#include <cstdio>
-#include <iostream>
+#include <resources/common_res.h>
+#include <Queue.h>
 #include "DX9Renderer.h"
 
 namespace directgraph {
@@ -18,45 +17,12 @@ namespace directgraph {
     void DX9Renderer::setWindow(HWND hwnd) {
         _hwnd = hwnd;
         createDeviceRes();
-        clear();
     }
 
     void DX9Renderer::setcolor(uint_fast32_t color) {
         _color[0] = static_cast<float>(color&0xFF)/0xFF;
         _color[1] = static_cast<float>((color>>8)&0xFF)/0xFF;
         _color[2] = static_cast<float>((color>>16)&0xFF)/0xFF;
-    }
-
-    void DX9Renderer::bar(float left, float top, float right, float bottom) {
-        _device->SetRenderTarget(0, _backBuffer);
-        _device->SetStreamSource(0, _rectVertBuffer, 0, sizeof(RectVertex));
-        _device->SetVertexShader(_rectMoveShader);
-        _device->SetVertexDeclaration(_rectVertexDecl);
-        float shaderData[3*REGISTER_SIZE] = {
-                static_cast<float>(_helper->toPixelsX(left)),
-                static_cast<float>(_helper->toPixelsY(top)),
-                static_cast<float>(_helper->toPixelsX(right)),
-                static_cast<float>(_helper->toPixelsY(bottom)),
-                _color[0],_color[1],_color[2],0,
-                static_cast<float>(_helper->toPixelsX(_width)),
-                static_cast<float>(_helper->toPixelsY(_height)),
-                0, 0
-        };
-        _device->SetVertexShaderConstantF(0, shaderData, 3);
-        _device->BeginScene();
-        const UINT NUM_TRIANGLES = 2;
-        _device->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_TRIANGLES);
-        _device->EndScene();
-    }
-
-    void DX9Renderer::clear() {
-        _device->SetRenderTarget(0, _backBuffer);
-        _device->Clear(
-                0, NULL, D3DCLEAR_TARGET,
-                D3DCOLOR_COLORVALUE(1.0, 1.0, 1.0, 1.0),
-                1.0f,
-                0
-        );
     }
 
     void DX9Renderer::repaint() {
@@ -101,5 +67,58 @@ namespace directgraph {
         _rectMoveShader->Release();
         _common->deleteSwapChain(_swapChain);
         delete _helper;
+    }
+
+    void DX9Renderer::draw(QueueReader *reader, CommonProps *props) {
+        QueueItem &firstItem = reader->getAt(0);
+        if(firstItem.type == QueueItem::CLEAR){
+            reader->endReading(1);
+            _device->SetRenderTarget(0, _backBuffer);
+            _device->Clear(
+                    0, NULL, D3DCLEAR_TARGET,
+                    D3DCOLOR_COLORVALUE(1.0, 1.0, 1.0, 1.0),
+                    1.0f,
+                    0
+            );
+        } else {
+            uint_fast32_t size = reader->getSize();
+            uint_fast32_t readIndex = 0;
+            for(readIndex = 0; readIndex < size; readIndex++){
+                QueueItem &item = reader->getAt(readIndex);
+                if(item.type == QueueItem::BAR){
+                } else if(item.type != QueueItem::SETCOLOR){
+                    break;
+                }
+            }
+            if(readIndex != 0) {
+                _device->SetVertexShader(_rectMoveShader);
+                _device->SetVertexDeclaration(_rectVertexDecl);
+                _device->SetStreamSource(0, _rectVertBuffer, 0, sizeof(RectVertex));
+                _device->BeginScene();
+                const UINT NUM_TRIANGLES = 2;
+                for (uint_fast32_t i = 0; i < readIndex; i++){
+                    QueueItem &item = reader->getAt(i);
+                    if(item.type == QueueItem::BAR) {
+                        float shaderData[3 * REGISTER_SIZE] = {
+                                static_cast<float>(_helper->toPixelsX(item.data.bar.left)),
+                                static_cast<float>(_helper->toPixelsY(item.data.bar.top)),
+                                static_cast<float>(_helper->toPixelsX(item.data.bar.right)),
+                                static_cast<float>(_helper->toPixelsY(item.data.bar.bottom)),
+                                _color[0], _color[1], _color[2], 0,
+                                static_cast<float>(_helper->toPixelsX(_width)),
+                                static_cast<float>(_helper->toPixelsY(_height)),
+                                0, 0
+                        };
+                        _device->SetVertexShaderConstantF(0, shaderData, 3);
+                        _device->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_TRIANGLES);
+                    } else {
+                        props->color = item.data.setcolor.color;
+                        setcolor(item.data.setcolor.color);
+                    }
+                }
+                reader->endReading(readIndex);
+                _device->EndScene();
+            }
+        }
     }
 }

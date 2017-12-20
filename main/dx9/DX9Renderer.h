@@ -37,11 +37,9 @@ namespace directgraph {
 
         virtual void setcolor(uint_fast32_t color);
 
-        virtual void bar(float left, float right, float top, float bottom);
-
-        virtual void clear();
-
         virtual void repaint();
+
+        virtual void draw(QueueReader *reader, CommonProps *props);
     };
 }
 

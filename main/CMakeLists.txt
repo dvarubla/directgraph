@@ -27,7 +27,7 @@ set(COMMON_FILES
     resource.cpp
     resource.h
         WException.cpp WException.h IWindowFactory.h DPIConverter.cpp DPIConverter.h
-)
+        Queue.cpp Queue.h ThreadController.cpp ThreadController.h QueueReader.cpp QueueReader.h CommonProps.cpp CommonProps.h)
 
 set(INCLUDE_FILES
     ${CMAKE_SOURCE_DIR}/include/directgraph_mainloop.h
@@ -39,7 +39,7 @@ set(LIB_DX9_FILES ${INCLUDE_FILES} ${COMMON_FILES} ${DX9_FILES})
 
 set(LIB_D2D_FILES ${INCLUDE_FILES} ${COMMON_FILES} ${D2D_FILES})
 
-set(LIB_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/include" "." "${CMAKE_BINARY_DIR}")
+set(LIB_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/include" "." "${CMAKE_BINARY_DIR}" "${CMAKE_SOURCE_DIR}")
 
 add_library(directgraph_dx9 STATIC ${LIB_DX9_FILES})
 add_library(directgraph_d2d STATIC ${LIB_D2D_FILES})
