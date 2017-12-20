@@ -7,8 +7,20 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8)
 endif()
 
 option(XPCOMPAT "Enable compatibility with XP" OFF)
+option(IA32COMPAT "Don't use enhanced instructions" OFF)
 
-set(COMMON_COMPILE_FLAGS "/MTd /D_UNICODE /DUNICODE /WX")
+set(COMMON_COMPILE_FLAGS "/D_UNICODE /DUNICODE /WX")
+
+if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+    set(COMMON_COMPILE_FLAGS "${COMMON_COMPILE_FLAGS} /MTd")
+else()
+    set(COMMON_COMPILE_FLAGS "${COMMON_COMPILE_FLAGS} /MT")
+endif()
+
+if(IA32COMPAT)
+    message("Enhanced instructions are not used")
+    set(COMMON_COMPILE_FLAGS "${COMMON_COMPILE_FLAGS} /arch:IA32")
+endif()
 
 set(EXTRA_LINK_FLAGS)
 if(XPCOMPAT)
