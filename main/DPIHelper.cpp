@@ -10,12 +10,12 @@ namespace directgraph {
     const float DPIHelper::DEFAULT_DPIX = 96.0f;
     const float DPIHelper::DEFAULT_DPIY = 96.0f;
 
-    uint_fast32_t DPIHelper::toPixelsX(float dip) {
-        return static_cast<uint_fast32_t>(std::round(dip * _dpiX / DEFAULT_DPIX));
+    int_fast32_t DPIHelper::toPixelsX(float dip) {
+        return static_cast<int_fast32_t>(std::round(dip * _dpiX / DEFAULT_DPIX));
     }
 
-    uint_fast32_t DPIHelper::toPixelsY(float dip) {
-        return static_cast<uint_fast32_t>(std::round(dip * _dpiY / DEFAULT_DPIY));
+    int_fast32_t DPIHelper::toPixelsY(float dip) {
+        return static_cast<int_fast32_t>(std::round(dip * _dpiY / DEFAULT_DPIY));
     }
 
     DPIHelper::DPIHelper() {

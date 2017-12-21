@@ -18,9 +18,9 @@ namespace directgraph {
 
         DPIHelper(float dpiX, float dpiY);
 
-        uint_fast32_t toPixelsX(float dip);
+        int_fast32_t toPixelsX(float dip);
 
-        uint_fast32_t toPixelsY(float dip);
+        int_fast32_t toPixelsY(float dip);
 
         void setDpiX(float dpiX);
 

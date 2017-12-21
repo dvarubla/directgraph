@@ -62,6 +62,30 @@ IMG_TEST_F(BarTest, InverseCoords){
     return new BitmapWrap(win->getHWND());
 }
 
+IMG_TEST_F(BarTest, OutsideScreen){
+    init_factory();
+    MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
+    win->show();
+    ThreadController tc(win);
+    tc.init();
+    tc.setcolor(0x00BBFF);
+    tc.bar(-WIDTH/4, -HEIGHT/4, WIDTH/4*3, HEIGHT/4*3);
+    tc.repaint();
+    return new BitmapWrap(win->getHWND());
+}
+
+IMG_TEST_F(BarTest, OutsideScreenFull){
+    init_factory();
+    MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
+    win->show();
+    ThreadController tc(win);
+    tc.init();
+    tc.setcolor(0x00BBFF);
+    tc.bar(-WIDTH/4, -HEIGHT/4, -WIDTH/4*3, -HEIGHT/4*3);
+    tc.repaint();
+    return new BitmapWrap(win->getHWND());
+}
+
 IMG_TEST_F(BarTest, OnePixel){
     init_factory();
     MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
