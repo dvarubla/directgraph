@@ -56,64 +56,50 @@ namespace directgraph {
             uint_fast32_t size = reader->getSize();
             uint_fast32_t readIndex = 0;
             uint_fast32_t totalNumVertices = 0;
+            int_fast32_t prevX = 0, prevY = 0;
             bool isFirst = true;
             for(readIndex = 0; readIndex < size; readIndex++){
                 QueueItem &item = reader->getAt(readIndex);
-                if(item.type == QueueItem::BAR && props->fillStyle == SOLID_FILL){
+                if(item.type == QueueItem::SINGLE_PIXEL ||
+                        (item.type == QueueItem::BAR && props->fillStyle == SOLID_FILL)){
                     uint_fast32_t curNumVertices = (isFirst) ? 4 : 6;
                     if((totalNumVertices + curNumVertices) >= VERTEX_BUFFER_SIZE){
                         break;
                     }
-                    uint_fast32_t barIndex = totalNumVertices;
+                    RectVertex *rectVectMem = _rectVertMem + totalNumVertices;
                     if(!isFirst) {
-                        _rectVertMem[barIndex] = {
-                            static_cast<float>(_helper->toPixelsX(_rectVertMem[barIndex - 1].x)) - 0.5f,
-                            static_cast<float>(_helper->toPixelsY(_rectVertMem[barIndex - 1].y)) - 0.5f,
-                            0.0f,
-                            1.0f,
-                            D3DCOLOR_ARGB(0, 0, 0, 0)
-                        };
-                        barIndex++;
-                        _rectVertMem[barIndex] = {
-                            static_cast<float>(_helper->toPixelsX(item.data.bar.left)) - 0.5f,
-                            static_cast<float>(_helper->toPixelsY(item.data.bar.top)) - 0.5f,
-                            0.0f,
-                            1.0f,
-                            D3DCOLOR_ARGB(0, 0, 0, 0)
-                        };
-                        barIndex++;
+                        rectVectMem = genDegenerate(
+                                rectVectMem,
+                                prevX, prevY,
+                                ((item.type == QueueItem::SINGLE_PIXEL) ?
+                                 static_cast<int_fast32_t>(item.data.singlePixel.x) :
+                                 _helper->toPixelsX(item.data.bar.left)),
+                                ((item.type == QueueItem::SINGLE_PIXEL) ?
+                                 static_cast<int_fast32_t>(item.data.singlePixel.y):
+                                 _helper->toPixelsY(item.data.bar.top))
+                        );
                     }
-                    _rectVertMem[barIndex] = {
-                            static_cast<float>(_helper->toPixelsX(item.data.bar.left)) - 0.5f,
-                            static_cast<float>(_helper->toPixelsY(item.data.bar.top)) - 0.5f,
-                            0.0f,
-                            1.0f,
-                            swapColor(props->color)
-                    };
-                    barIndex++;
-                    _rectVertMem[barIndex] = {
-                            static_cast<float>(_helper->toPixelsX(item.data.bar.right)) - 0.5f,
-                            static_cast<float>(_helper->toPixelsY(item.data.bar.top)) - 0.5f,
-                            0.0f,
-                            1.0f,
-                            swapColor(props->color)
-                    };
-                    barIndex++;
-                    _rectVertMem[barIndex] = {
-                            static_cast<float>(_helper->toPixelsX(item.data.bar.left)) - 0.5f,
-                            static_cast<float>(_helper->toPixelsY(item.data.bar.bottom)) - 0.5f,
-                            0.0f,
-                            1.0f,
-                            swapColor(props->color)
-                    };
-                    barIndex++;
-                    _rectVertMem[barIndex] = {
-                            static_cast<float>(_helper->toPixelsX(item.data.bar.right)) - 0.5f,
-                            static_cast<float>(_helper->toPixelsY(item.data.bar.bottom)) - 0.5f,
-                            0.0f,
-                            1.0f,
-                            swapColor(props->color)
-                    };
+                    if(item.type == QueueItem::SINGLE_PIXEL){
+                        genQuad(rectVectMem,
+                                item.data.singlePixel.x,
+                                item.data.singlePixel.y,
+                                item.data.singlePixel.x + 1,
+                                item.data.singlePixel.y + 1,
+                                item.data.singlePixel.color
+                        );
+                        prevX = item.data.singlePixel.x + 1;
+                        prevY = item.data.singlePixel.y + 1;
+                    } else {
+                        genQuad(rectVectMem,
+                                _helper->toPixelsX(item.data.bar.left),
+                                _helper->toPixelsY(item.data.bar.top),
+                                _helper->toPixelsX(item.data.bar.right),
+                                _helper->toPixelsY(item.data.bar.bottom),
+                                props->color
+                        );
+                        prevX = _helper->toPixelsX(item.data.bar.right);
+                        prevY = _helper->toPixelsY(item.data.bar.bottom);
+                    }
                     isFirst = false;
                     totalNumVertices += curNumVertices;
                 } else if(item.type == QueueItem::SETFILLSTYLE){
@@ -123,8 +109,8 @@ namespace directgraph {
                     break;
                 }
             }
-            reader->endReading(readIndex);
             if(readIndex != 0) {
+                reader->endReading(readIndex);
                 void* voidPointer;
                 _rectVertBuffer->Lock(0, totalNumVertices * sizeof(RectVertex), &voidPointer, D3DLOCK_DISCARD);
                 memcpy(voidPointer, _rectVertMem, totalNumVertices * sizeof(RectVertex));
@@ -140,5 +126,72 @@ namespace directgraph {
 
     uint_fast32_t DX9Renderer::swapColor(uint_fast32_t color) {
         return (color & 0x00FF00) | ((color & 0xFF) << 16) | ((color & 0xFF0000) >> 16);
+    }
+
+    DX9Renderer::RectVertex *
+    DX9Renderer::genDegenerate(
+            DX9Renderer::RectVertex *vertices,
+            int_fast32_t startX, int_fast32_t startY,
+            int_fast32_t endX, int_fast32_t endY
+    ) {
+        *vertices = {
+                static_cast<float>(startX) - 0.5f,
+                static_cast<float>(startY) - 0.5f,
+                0.0f,
+                1.0f,
+                D3DCOLOR_ARGB(0, 0, 0, 0)
+        };
+        vertices++;
+        *vertices = {
+                static_cast<float>(endX) - 0.5f,
+                static_cast<float>(endY) - 0.5f,
+                0.0f,
+                1.0f,
+                D3DCOLOR_ARGB(0, 0, 0, 0)
+        };
+        vertices++;
+        return vertices;
+    }
+
+    DX9Renderer::RectVertex *
+    DX9Renderer::genQuad(
+            DX9Renderer::RectVertex *vertices,
+            int_fast32_t startX, int_fast32_t startY,
+            int_fast32_t endX, int_fast32_t endY,
+            uint_fast32_t color
+    ) {
+        *vertices = {
+                static_cast<float>(startX) - 0.5f,
+                static_cast<float>(startY) - 0.5f,
+                0.0f,
+                1.0f,
+                swapColor(color)
+        };
+        vertices++;
+        *vertices = {
+                static_cast<float>(endX) - 0.5f,
+                static_cast<float>(startY) - 0.5f,
+                0.0f,
+                1.0f,
+                swapColor(color)
+        };
+        vertices++;
+        *vertices = {
+                static_cast<float>(startX) - 0.5f,
+                static_cast<float>(endY) - 0.5f,
+                0.0f,
+                1.0f,
+                swapColor(color)
+        };
+        vertices++;
+        *vertices = {
+                static_cast<float>(endX) - 0.5f,
+                static_cast<float>(endY) - 0.5f,
+                0.0f,
+                1.0f,
+                swapColor(color)
+        };
+        vertices++;
+        return vertices;
     }
 }

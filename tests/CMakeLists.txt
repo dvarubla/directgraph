@@ -6,15 +6,21 @@ set(TESTS_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/main" "${CMAKE
 
 add_executable(dx9_bar dx9/dx9_bar.cpp ${SHADERS_RES_FILE})
 add_executable(dx9_threads_bar dx9/dx9_threads_bar.cpp ${SHADERS_RES_FILE})
+add_executable(dx9_single_pixel dx9/dx9_single_pixel.cpp ${SHADERS_RES_FILE})
 
 target_include_directories(dx9_bar BEFORE PUBLIC ${TESTS_INCLUDE_DIRS})
 target_include_directories(dx9_threads_bar BEFORE PUBLIC ${TESTS_INCLUDE_DIRS})
-set_target_properties(dx9_bar dx9_threads_bar PROPERTIES
+target_include_directories(dx9_single_pixel BEFORE PUBLIC ${TESTS_INCLUDE_DIRS})
+
+set_target_properties(
+        dx9_bar dx9_threads_bar dx9_single_pixel
+        PROPERTIES
         COMPILE_FLAGS "${COMMON_COMPILE_FLAGS}"
         LINK_FLAGS "/ENTRY:wmainCRTStartup /subsystem:console ${EXTRA_LINK_FLAGS}")
 
 target_link_libraries(dx9_bar directgraph_dx9 directgraph_testlib)
 target_link_libraries(dx9_threads_bar directgraph_dx9 directgraph_testlib)
+target_link_libraries(dx9_single_pixel directgraph_dx9 directgraph_testlib)
 set_source_files_properties(
         "${SHADERS_RES_FILE}"
         PROPERTIES

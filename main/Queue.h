@@ -9,7 +9,8 @@ namespace directgraph {
         enum {
             CLEAR = 0,
             SETFILLSTYLE,
-            BAR
+            BAR,
+            SINGLE_PIXEL
         } type;
         union{
             struct{
@@ -19,6 +20,10 @@ namespace directgraph {
             struct {
                 float left, top, right, bottom;
             } bar;
+            struct{
+                uint32_t x, y;
+                uint32_t color;
+            } singlePixel;
         } data;
     };
     class Queue {

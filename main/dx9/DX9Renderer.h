@@ -38,6 +38,19 @@ namespace directgraph {
 
         virtual void repaint();
 
+        RectVertex * genDegenerate(
+                RectVertex *vertices,
+                int_fast32_t startX, int_fast32_t startY,
+                int_fast32_t endX, int_fast32_t endY
+        );
+
+        RectVertex * genQuad(
+                RectVertex *vertices,
+                int_fast32_t startX, int_fast32_t startY,
+                int_fast32_t endX, int_fast32_t endY,
+                uint_fast32_t color
+        );
+
         virtual void draw(QueueReader *reader, CommonProps *props);
     };
 }

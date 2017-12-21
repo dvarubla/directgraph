@@ -1,4 +1,5 @@
 #include "ThreadController.h"
+#include "Queue.h"
 
 namespace directgraph{
 
@@ -43,6 +44,13 @@ namespace directgraph{
                 fillStyle,
                 color
         };
+        writeItemHelper(item);
+    }
+
+    void ThreadController::putpixel(int_fast32_t x, int_fast32_t y, uint_fast32_t color) {
+        QueueItem item;
+        item.type = QueueItem::SINGLE_PIXEL;
+        item.data.singlePixel = {static_cast<uint32_t>(x), static_cast<uint32_t>(y), color};
         writeItemHelper(item);
     }
 
