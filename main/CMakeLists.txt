@@ -27,7 +27,7 @@ set(COMMON_FILES
     resource.cpp
     resource.h
         WException.cpp WException.h IWindowFactory.h DPIConverter.cpp DPIConverter.h
-        Queue.cpp Queue.h ThreadController.cpp ThreadController.h QueueReader.cpp QueueReader.h CommonProps.cpp CommonProps.h)
+        Queue.cpp Queue.h ThreadController.cpp ThreadController.h QueueReader.cpp QueueReader.h CommonProps.cpp CommonProps.h ../include/graphics_const.h graphics_const_internal.h)
 
 set(INCLUDE_FILES
     ${CMAKE_SOURCE_DIR}/include/directgraph_mainloop.h

@@ -36,10 +36,11 @@ namespace directgraph{
         writeItemHelper(item);
     }
 
-    void ThreadController::setcolor(uint_fast32_t color) {
+    void ThreadController::setfillstyle(uint_fast8_t fillStyle, uint_fast32_t color) {
         QueueItem item;
-        item.type = QueueItem::SETCOLOR;
-        item.data.setcolor = {
+        item.type = QueueItem::SETFILLSTYLE;
+        item.data.setfillstyle = {
+                fillStyle,
                 color
         };
         writeItemHelper(item);

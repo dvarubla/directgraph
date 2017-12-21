@@ -8,13 +8,14 @@ namespace directgraph {
     struct QueueItem{
         enum {
             CLEAR = 0,
-            SETCOLOR,
+            SETFILLSTYLE,
             BAR
         } type;
         union{
             struct{
+                uint8_t fillStyle;
                 uint32_t color;
-            } setcolor;
+            } setfillstyle;
             struct {
                 float left, top, right, bottom;
             } bar;

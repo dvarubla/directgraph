@@ -34,7 +34,7 @@ namespace directgraph {
         void init();
         void clear();
         void bar(float left, float top, float right, float bottom);
-        void setcolor(uint_fast32_t color);
+        void setfillstyle(uint_fast8_t fillStyle, uint_fast32_t color);
         void repaint();
     };
 }

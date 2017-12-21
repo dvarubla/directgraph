@@ -1,6 +1,7 @@
 #include <resource.h>
 #include <Queue.h>
 #include "DX9Renderer.h"
+#include <graphics_const_internal.h>
 
 namespace directgraph {
     DX9Renderer::DX9Renderer(DX9Common *common, DPIHelper *helper, float width, float height) {
@@ -58,7 +59,7 @@ namespace directgraph {
             bool isFirst = true;
             for(readIndex = 0; readIndex < size; readIndex++){
                 QueueItem &item = reader->getAt(readIndex);
-                if(item.type == QueueItem::BAR){
+                if(item.type == QueueItem::BAR && props->fillStyle == SOLID_FILL){
                     uint_fast32_t curNumVertices = (isFirst) ? 4 : 6;
                     if((totalNumVertices + curNumVertices) >= VERTEX_BUFFER_SIZE){
                         break;
@@ -115,8 +116,9 @@ namespace directgraph {
                     };
                     isFirst = false;
                     totalNumVertices += curNumVertices;
-                } else if(item.type == QueueItem::SETCOLOR){
-                    props->color = item.data.setcolor.color;
+                } else if(item.type == QueueItem::SETFILLSTYLE){
+                    props->color = item.data.setfillstyle.color;
+                    props->fillStyle = item.data.setfillstyle.fillStyle;
                 } else {
                     break;
                 }

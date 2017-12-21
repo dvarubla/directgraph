@@ -3,6 +3,7 @@
 #include <dx9/DX9WindowFactory.h>
 #include <include/directgraph_mainloop.h>
 #include <main/ThreadController.h>
+#include <include/graphics_const.h>
 
 using namespace directgraph;
 using namespace directgraph_testlib;
@@ -44,7 +45,7 @@ IMG_TEST_F(BarTest, SimpleBar){
     win->show();
     ThreadController tc(win);
     tc.init();
-    tc.setcolor(0x00BBFF);
+    tc.setfillstyle(SOLID_FILL, 0x00BBFF);
     tc.bar(WIDTH/4, HEIGHT/4, WIDTH/4*3, HEIGHT/4*3);
     tc.repaint();
     return new BitmapWrap(win->getHWND());
@@ -56,7 +57,7 @@ IMG_TEST_F(BarTest, InverseCoords){
     win->show();
     ThreadController tc(win);
     tc.init();
-    tc.setcolor(0x00BBFF);
+    tc.setfillstyle(SOLID_FILL, 0x00BBFF);
     tc.bar(WIDTH/4*3, HEIGHT/4*3, WIDTH/4, HEIGHT/4);
     tc.repaint();
     return new BitmapWrap(win->getHWND());
@@ -68,7 +69,7 @@ IMG_TEST_F(BarTest, OutsideScreen){
     win->show();
     ThreadController tc(win);
     tc.init();
-    tc.setcolor(0x00BBFF);
+    tc.setfillstyle(SOLID_FILL, 0x00BBFF);
     tc.bar(-WIDTH/4, -HEIGHT/4, WIDTH/4*3, HEIGHT/4*3);
     tc.repaint();
     return new BitmapWrap(win->getHWND());
@@ -80,7 +81,7 @@ IMG_TEST_F(BarTest, OutsideScreenFull){
     win->show();
     ThreadController tc(win);
     tc.init();
-    tc.setcolor(0x00BBFF);
+    tc.setfillstyle(SOLID_FILL, 0x00BBFF);
     tc.bar(-WIDTH/4, -HEIGHT/4, -WIDTH/4*3, -HEIGHT/4*3);
     tc.repaint();
     return new BitmapWrap(win->getHWND());
@@ -92,7 +93,7 @@ IMG_TEST_F(BarTest, OnePixel){
     win->show();
     ThreadController tc(win);
     tc.init();
-    tc.setcolor(0);
+    tc.setfillstyle(SOLID_FILL, 0);
     tc.bar(WIDTH/4, HEIGHT/4, WIDTH/4 + 1, HEIGHT/4 + 1);
     tc.repaint();
     return new BitmapWrap(win->getHWND());
@@ -104,9 +105,9 @@ IMG_TEST_F(BarTest, OnePxBorder){
     win->show();
     ThreadController tc(win);
     tc.init();
-    tc.setcolor(0x0000FF);
+    tc.setfillstyle(SOLID_FILL, 0x0000FF);
     tc.bar(0,0,WIDTH,HEIGHT);
-    tc.setcolor(0x00FFFF);
+    tc.setfillstyle(SOLID_FILL, 0x00FFFF);
     tc.bar(1,1,WIDTH - 1 ,HEIGHT - 1);
     tc.repaint();
     return new BitmapWrap(win->getHWND());

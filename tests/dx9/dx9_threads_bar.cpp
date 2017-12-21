@@ -3,6 +3,7 @@
 #include <dx9/DX9WindowFactory.h>
 #include <include/directgraph_mainloop.h>
 #include <main/ThreadController.h>
+#include <include/graphics_const.h>
 
 using namespace directgraph;
 using namespace directgraph_testlib;
@@ -47,7 +48,7 @@ IMG_TEST_F(ThreadsBarTest, BarOneThread){
     bool continueLoop = true;
     for(uint_fast32_t i = 0; i < HEIGHT && continueLoop; i++){
         for(uint_fast32_t j = 0; j < WIDTH; j++, cnt++){
-            tc.setcolor(cnt % 0xFF);
+            tc.setfillstyle(SOLID_FILL, cnt % 0xFF);
             tc.bar((float)j, (float)i, (float)j + 1, (float)i + 1);
         }
         if(i == 20) {
@@ -84,7 +85,7 @@ IMG_TEST_F(ThreadsBarTest, BarTwoThreadsLongInterval){
     bool continueLoop = true;
     for(uint_fast32_t i = 0; i < HEIGHT && continueLoop; i++){
         for(uint_fast32_t j = 0; j < WIDTH; j++, cnt++){
-            tc.setcolor(cnt % 0xFF);
+            tc.setfillstyle(SOLID_FILL, cnt % 0xFF);
             tc.bar((float)j, (float)i, (float)j + 1, (float)i + 1);
             Sleep(rand() % 5);
         }
@@ -125,7 +126,7 @@ IMG_TEST_F(ThreadsBarTest, BarTwoThreadsShortInterval){
     bool continueLoop = true;
     for(uint_fast32_t i = 0; i < HEIGHT && continueLoop; i++){
         for(uint_fast32_t j = 0; j < WIDTH; j++, cnt++){
-            tc.setcolor(cnt % 0xFF);
+            tc.setfillstyle(SOLID_FILL, cnt % 0xFF);
             tc.bar((float)j, (float)i, (float)j + 1, (float)i + 1);
             Sleep(rand() % 5);
         }
