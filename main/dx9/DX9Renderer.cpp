@@ -1,5 +1,4 @@
 #include <resource.h>
-#include <resources/common_res.h>
 #include <Queue.h>
 #include "DX9Renderer.h"
 
@@ -8,21 +7,12 @@ namespace directgraph {
         _helper = helper;
         _width = width;
         _height = height;
-        _color[0] = 0;
-        _color[1] = 0;
-        _color[2] = 0;
         _common = common;
     }
 
     void DX9Renderer::setWindow(HWND hwnd) {
         _hwnd = hwnd;
         createDeviceRes();
-    }
-
-    void DX9Renderer::setcolor(uint_fast32_t color) {
-        _color[0] = static_cast<float>(color&0xFF)/0xFF;
-        _color[1] = static_cast<float>((color>>8)&0xFF)/0xFF;
-        _color[2] = static_cast<float>((color>>16)&0xFF)/0xFF;
     }
 
     void DX9Renderer::repaint() {
@@ -35,38 +25,19 @@ namespace directgraph {
         _swapChain->GetDevice(&_device);
         _swapChain->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &_backBuffer);
 
-        uint_fast32_t size;
-        void *buffer;
-        load_resource(RECT_MOVE_V2_0, IDR_VERTEX_SHADER, size, buffer);
-        _device->CreateVertexShader(static_cast<DWORD*>(buffer), &_rectMoveShader);
-
-        const int NUM_RECT_VERTICES = 4;
-        RectVertex vertices[NUM_RECT_VERTICES] = {-0.25f, -1.0f, 0.25f,  1.0f};
-
-        _device->CreateVertexBuffer(NUM_RECT_VERTICES * sizeof(RectVertex),
-                                          D3DDECLMETHOD_DEFAULT,
+        _device->CreateVertexBuffer(VERTEX_BUFFER_SIZE * sizeof(RectVertex),
+                                          D3DUSAGE_DYNAMIC,
                                           0,
                                           D3DPOOL_DEFAULT,
                                           &_rectVertBuffer, NULL);
-
-        void* void_pointer;
-        _rectVertBuffer->Lock(0, 0, &void_pointer, 0);
-        memcpy(void_pointer, vertices, NUM_RECT_VERTICES * sizeof(RectVertex));
-        _rectVertBuffer->Unlock();
-
-        D3DVERTEXELEMENT9 decl[] = {
-                { 0, 0 , D3DDECLTYPE_FLOAT1, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
-                D3DDECL_END()
-        };
-        _device->CreateVertexDeclaration(decl, &_rectVertexDecl);
+        _rectVertMem = new RectVertex[VERTEX_BUFFER_SIZE];
     }
 
     DX9Renderer::~DX9Renderer() {
-        _rectVertexDecl->Release();
         _rectVertBuffer->Release();
-        _rectMoveShader->Release();
         _common->deleteSwapChain(_swapChain);
         delete _helper;
+        delete [] _rectVertMem;
     }
 
     void DX9Renderer::draw(QueueReader *reader, CommonProps *props) {
@@ -83,42 +54,89 @@ namespace directgraph {
         } else {
             uint_fast32_t size = reader->getSize();
             uint_fast32_t readIndex = 0;
+            uint_fast32_t totalNumVertices = 0;
+            bool isFirst = true;
             for(readIndex = 0; readIndex < size; readIndex++){
                 QueueItem &item = reader->getAt(readIndex);
                 if(item.type == QueueItem::BAR){
-                } else if(item.type != QueueItem::SETCOLOR){
+                    uint_fast32_t curNumVertices = (isFirst) ? 4 : 6;
+                    if((totalNumVertices + curNumVertices) >= VERTEX_BUFFER_SIZE){
+                        break;
+                    }
+                    uint_fast32_t barIndex = totalNumVertices;
+                    if(!isFirst) {
+                        _rectVertMem[barIndex] = {
+                            static_cast<float>(_helper->toPixelsX(_rectVertMem[barIndex - 1].x)) - 0.5f,
+                            static_cast<float>(_helper->toPixelsY(_rectVertMem[barIndex - 1].y)) - 0.5f,
+                            0.0f,
+                            1.0f,
+                            D3DCOLOR_ARGB(0, 0, 0, 0)
+                        };
+                        barIndex++;
+                        _rectVertMem[barIndex] = {
+                            static_cast<float>(_helper->toPixelsX(item.data.bar.left)) - 0.5f,
+                            static_cast<float>(_helper->toPixelsY(item.data.bar.top)) - 0.5f,
+                            0.0f,
+                            1.0f,
+                            D3DCOLOR_ARGB(0, 0, 0, 0)
+                        };
+                        barIndex++;
+                    }
+                    _rectVertMem[barIndex] = {
+                            static_cast<float>(_helper->toPixelsX(item.data.bar.left)) - 0.5f,
+                            static_cast<float>(_helper->toPixelsY(item.data.bar.top)) - 0.5f,
+                            0.0f,
+                            1.0f,
+                            swapColor(props->color)
+                    };
+                    barIndex++;
+                    _rectVertMem[barIndex] = {
+                            static_cast<float>(_helper->toPixelsX(item.data.bar.right)) - 0.5f,
+                            static_cast<float>(_helper->toPixelsY(item.data.bar.top)) - 0.5f,
+                            0.0f,
+                            1.0f,
+                            swapColor(props->color)
+                    };
+                    barIndex++;
+                    _rectVertMem[barIndex] = {
+                            static_cast<float>(_helper->toPixelsX(item.data.bar.left)) - 0.5f,
+                            static_cast<float>(_helper->toPixelsY(item.data.bar.bottom)) - 0.5f,
+                            0.0f,
+                            1.0f,
+                            swapColor(props->color)
+                    };
+                    barIndex++;
+                    _rectVertMem[barIndex] = {
+                            static_cast<float>(_helper->toPixelsX(item.data.bar.right)) - 0.5f,
+                            static_cast<float>(_helper->toPixelsY(item.data.bar.bottom)) - 0.5f,
+                            0.0f,
+                            1.0f,
+                            swapColor(props->color)
+                    };
+                    isFirst = false;
+                    totalNumVertices += curNumVertices;
+                } else if(item.type == QueueItem::SETCOLOR){
+                    props->color = item.data.setcolor.color;
+                } else {
                     break;
                 }
             }
+            reader->endReading(readIndex);
             if(readIndex != 0) {
-                _device->SetVertexShader(_rectMoveShader);
-                _device->SetVertexDeclaration(_rectVertexDecl);
+                void* voidPointer;
+                _rectVertBuffer->Lock(0, totalNumVertices * sizeof(RectVertex), &voidPointer, D3DLOCK_DISCARD);
+                memcpy(voidPointer, _rectVertMem, totalNumVertices * sizeof(RectVertex));
+                _rectVertBuffer->Unlock();
                 _device->SetStreamSource(0, _rectVertBuffer, 0, sizeof(RectVertex));
+                _device->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
                 _device->BeginScene();
-                const UINT NUM_TRIANGLES = 2;
-                for (uint_fast32_t i = 0; i < readIndex; i++){
-                    QueueItem &item = reader->getAt(i);
-                    if(item.type == QueueItem::BAR) {
-                        float shaderData[3 * REGISTER_SIZE] = {
-                                static_cast<float>(_helper->toPixelsX(item.data.bar.left)),
-                                static_cast<float>(_helper->toPixelsY(item.data.bar.top)),
-                                static_cast<float>(_helper->toPixelsX(item.data.bar.right)),
-                                static_cast<float>(_helper->toPixelsY(item.data.bar.bottom)),
-                                _color[0], _color[1], _color[2], 0,
-                                static_cast<float>(_helper->toPixelsX(_width)),
-                                static_cast<float>(_helper->toPixelsY(_height)),
-                                0, 0
-                        };
-                        _device->SetVertexShaderConstantF(0, shaderData, 3);
-                        _device->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_TRIANGLES);
-                    } else {
-                        props->color = item.data.setcolor.color;
-                        setcolor(item.data.setcolor.color);
-                    }
-                }
-                reader->endReading(readIndex);
+                _device->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, totalNumVertices - 2);
                 _device->EndScene();
             }
         }
+    }
+
+    uint_fast32_t DX9Renderer::swapColor(uint_fast32_t color) {
+        return (color & 0x00FF00) | ((color & 0xFF) << 16) | ((color & 0xFF0000) >> 16);
     }
 }

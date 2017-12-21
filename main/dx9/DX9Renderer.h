@@ -9,6 +9,7 @@ namespace directgraph {
     class DX9Renderer : public IRenderer {
     private:
         const static int REGISTER_SIZE = 4;
+        const static int VERTEX_BUFFER_SIZE = 256;
         IDirect3D9* _d3d;
         IDirect3DDevice9* _device;
         IDirect3DSwapChain9 *_swapChain;
@@ -17,15 +18,13 @@ namespace directgraph {
         DPIHelper *_helper;
         HWND _hwnd;
         float _width, _height;
-        float _color[4];
 
-        struct RectVertex
-        {
-            FLOAT param;
+        struct RectVertex{
+            float x, y, z, rhw;
+            DWORD color;
         };
-        IDirect3DVertexShader9 *_rectMoveShader;
         IDirect3DVertexBuffer9 *_rectVertBuffer;
-        IDirect3DVertexDeclaration9* _rectVertexDecl;
+        RectVertex *_rectVertMem;
 
         void createDeviceRes();
 
@@ -35,7 +34,7 @@ namespace directgraph {
 
         virtual void setWindow(HWND hwnd);
 
-        virtual void setcolor(uint_fast32_t color);
+        virtual uint_fast32_t swapColor(uint_fast32_t color);
 
         virtual void repaint();
 
