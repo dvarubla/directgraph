@@ -17,7 +17,7 @@ namespace directgraph {
 
         virtual void repaint() = 0;
 
-        virtual void draw(QueueReader *reader, CommonProps *props) = 0;
+        virtual void draw(IQueueReader *reader, CommonProps *props) = 0;
     };
 }
 #endif //DIRECTGRAPH_IRENDERER_H

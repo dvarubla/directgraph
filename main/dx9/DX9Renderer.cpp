@@ -41,7 +41,7 @@ namespace directgraph {
         delete [] _rectVertMem;
     }
 
-    void DX9Renderer::draw(QueueReader *reader, CommonProps *props) {
+    void DX9Renderer::draw(IQueueReader *reader, CommonProps *props) {
         QueueItem &firstItem = reader->getAt(0);
         if(firstItem.type == QueueItem::CLEAR){
             reader->endReading(1);

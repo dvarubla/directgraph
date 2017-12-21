@@ -2,9 +2,10 @@
 #define PROJECT_QUEUEREADER_H
 
 #include "Queue.h"
+#include "IQueueReader.h"
 
 namespace directgraph {
-    class QueueReader {
+    class QueueReader: public IQueueReader{
     private:
         Queue *_queue;
         uint_fast32_t _getIndex;

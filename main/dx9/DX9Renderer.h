@@ -51,7 +51,7 @@ namespace directgraph {
                 uint_fast32_t color
         );
 
-        virtual void draw(QueueReader *reader, CommonProps *props);
+        virtual void draw(IQueueReader *reader, CommonProps *props);
     };
 }
 

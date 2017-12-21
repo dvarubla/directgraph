@@ -4,9 +4,9 @@ set(SHADERS_RES_FILE "${CMAKE_BINARY_DIR}/resources/shaders.res")
 
 set(TESTS_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/main" "${CMAKE_SOURCE_DIR}/include" "${CMAKE_BINARY_DIR}")
 
-add_executable(dx9_bar dx9/dx9_bar.cpp ${SHADERS_RES_FILE})
+add_executable(dx9_bar dx9/dx9_bar.cpp ${SHADERS_RES_FILE} stubs/QueueReaderStub.cpp stubs/QueueReaderStub.h dx9/common.h)
 add_executable(dx9_threads_bar dx9/dx9_threads_bar.cpp ${SHADERS_RES_FILE})
-add_executable(dx9_single_pixel dx9/dx9_single_pixel.cpp ${SHADERS_RES_FILE})
+add_executable(dx9_single_pixel dx9/dx9_single_pixel.cpp ${SHADERS_RES_FILE} stubs/QueueReaderStub.cpp stubs/QueueReaderStub.h dx9/common.h)
 
 target_include_directories(dx9_bar BEFORE PUBLIC ${TESTS_INCLUDE_DIRS})
 target_include_directories(dx9_threads_bar BEFORE PUBLIC ${TESTS_INCLUDE_DIRS})
