@@ -11,7 +11,7 @@ find_package(GTest REQUIRED)
 
 target_link_libraries(directgraph_gtest_lib INTERFACE GTest::GTest)
 
-set(TESTS_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/main" "${CMAKE_SOURCE_DIR}/include" "${CMAKE_BINARY_DIR}")
+set(TESTS_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/tests/stubs" "${CMAKE_SOURCE_DIR}/main" "${CMAKE_SOURCE_DIR}/include" "${CMAKE_BINARY_DIR}")
 
 target_include_directories(directgraph_gtest_lib INTERFACE ${TESTS_INCLUDE_DIRS})
 

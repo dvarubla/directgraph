@@ -3,7 +3,7 @@
 
 namespace directgraph{
 
-    ThreadController::ThreadController(MyWindow *window)
+    ThreadController::ThreadController(IMyWindow *window)
             : _window(window), _queue(), _reader(&_queue, &_queueCS),
               _threadStarted(0) {
         _currentProps.color = 0xFFFFFF;

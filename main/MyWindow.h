@@ -4,9 +4,10 @@
 #include <IRenderer.h>
 #include <windows.h>
 #include <string>
+#include "IMyWindow.h"
 
 namespace directgraph {
-    class MyWindow {
+    class MyWindow : public IMyWindow{
     private:
         HWND _hwnd;
         IRenderer *_renderer;

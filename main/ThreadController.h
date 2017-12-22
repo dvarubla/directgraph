@@ -14,7 +14,7 @@ namespace directgraph {
             REPLY = 65535
         };
         friend DWORD WINAPI repaintFunc(LPVOID ctrl);
-        MyWindow *_window;
+        IMyWindow *_window;
         Queue _queue;
         QueueReader _reader;
         LONG volatile _threadStarted;
@@ -29,7 +29,7 @@ namespace directgraph {
         void stopRepaintThread();
         void writeItemHelper(const QueueItem &item);
     public:
-        ThreadController(MyWindow *window);
+        ThreadController(IMyWindow *window);
         ~ThreadController();
         void init();
         void clear();
