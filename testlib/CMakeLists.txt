@@ -10,6 +10,10 @@ find_package(GTest REQUIRED)
 
 target_link_libraries(directgraph_testlib GTest::GTest)
 
+set(TESTS_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/main" "${CMAKE_SOURCE_DIR}/include" "${CMAKE_BINARY_DIR}")
+
+target_include_directories(directgraph_testlib PUBLIC ${TESTS_INCLUDE_DIRS})
+
 target_include_directories(directgraph_testlib BEFORE PRIVATE ".")
 target_link_libraries(directgraph_testlib gdiplus)
 set_target_properties(directgraph_testlib PROPERTIES
