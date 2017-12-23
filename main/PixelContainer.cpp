@@ -10,9 +10,22 @@ namespace directgraph{
     ): _direction(NO_DIRECTION),
        _buffer(new ContainerType[maxWidth * maxHeight]),
        _firstX(firstX), _firstY(firstY), _lastX(secondX), _lastY(secondY),
-       _maxWidth(maxWidth), _maxHeight(maxHeight),
-       _width(2), _height(1), _lastWidth(2)
+       _maxWidth(maxWidth), _maxHeight(maxHeight)
     {
+        if(firstX == secondX){
+            if(secondY > firstY){
+                _direction = Direction::LEFT_RIGHT_TOP_DOWN;
+            } else {
+                _direction = Direction::LEFT_RIGHT_BOTTOM_UP;
+            }
+            _height = 2;
+            _width = 1;
+            _lastWidth = 1;
+        } else {
+            _height = 1;
+            _width = 2;
+            _lastWidth = 2;
+        }
         setPixel(firstX, firstY, firstColor);
         setPixel(secondX, secondY, secondColor);
     }

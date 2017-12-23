@@ -18,7 +18,10 @@ namespace directgraph{
             uint_fast32_t secondColor
     ) {
         ContainerOpt result;
-        if(firstY == secondY && firstX + 1 == secondX){
+        if(
+                (firstY == secondY && firstX + 1 == secondX) ||
+                (firstX == secondX && (firstY + 1 == secondY || firstY == secondY + 1) )
+        ){
             result.containerCreated = true;
             switch(_format){
                 case IPixelContainer::R8G8B8:

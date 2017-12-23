@@ -46,6 +46,63 @@ IMG_TEST_F(DX9PixelContainerTest, TwoPixels){
     return afterTestSimple(win, &_readerStub);
 }
 
+IMG_TEST_F(DX9PixelContainerTest, TwoPixelsVertical){
+    init_factory();
+    MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
+    win->show();
+    QueueReaderStub _readerStub;
+    QueueItem items[2];
+    items[0].type = QueueItem::CLEAR;
+    items[1].type = QueueItem::PIXEL_CONTAINER;
+    IPixelContainer *pixelContainer = win->getRenderer()->getPixContFactory()->tryGetContainer(
+            0, 1, 0x0000FF,
+            0, 2, 0x0000FF
+    ).container;
+    items[1].data.pixelContainer = pixelContainer;
+    _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
+    return afterTestSimple(win, &_readerStub);
+}
+
+IMG_TEST_F(DX9PixelContainerTest, VerticalTopDown){
+    init_factory();
+    MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
+    win->show();
+    QueueReaderStub _readerStub;
+    QueueItem items[2];
+    items[0].type = QueueItem::CLEAR;
+    items[1].type = QueueItem::PIXEL_CONTAINER;
+    IPixelContainer *pixelContainer = win->getRenderer()->getPixContFactory()->tryGetContainer(
+            2, 1, 0x0000FF,
+            2, 2, 0x0000BB
+    ).container;
+    for(uint_fast32_t j = 3; j <= 10; j++) {
+        pixelContainer->tryAddPixel(2, j, (j % 2 == 1) ? 0x0000FF : 0x0000BB);
+    }
+    items[1].data.pixelContainer = pixelContainer;
+    _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
+    return afterTestSimple(win, &_readerStub);
+}
+
+IMG_TEST_F(DX9PixelContainerTest, VerticalBottomUp){
+    init_factory();
+    MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
+    win->show();
+    QueueReaderStub _readerStub;
+    QueueItem items[2];
+    items[0].type = QueueItem::CLEAR;
+    items[1].type = QueueItem::PIXEL_CONTAINER;
+    IPixelContainer *pixelContainer = win->getRenderer()->getPixContFactory()->tryGetContainer(
+            2, 10, 0x0000BB,
+            2, 9, 0x0000FF
+    ).container;
+    for(uint_fast32_t j = 8; j >= 1; j--) {
+        pixelContainer->tryAddPixel(2, j, (j % 2 == 1) ? 0x0000FF : 0x0000BB);
+    }
+    items[1].data.pixelContainer = pixelContainer;
+    _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
+    return afterTestSimple(win, &_readerStub);
+}
+
 IMG_TEST_F(DX9PixelContainerTest, RedSquare5x5TopDown){
     init_factory();
     MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);

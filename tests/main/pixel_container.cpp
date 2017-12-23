@@ -52,6 +52,35 @@ TEST_F(PixelContainerTest, AddTrueSimple){
     compareContainers(pc, params);
 }
 
+TEST_F(PixelContainerTest, AddTrueVerticalSimple){
+    PCont pc(100, 100, 0, 100, 101, 0, WIDTH, HEIGHT);
+    EXPECT_TRUE(pc.tryAddPixel(100, 102, 0));
+    PContParams params = {100, 100, 100, 102, sizeof(uint32_t), sizeof(uint32_t), 3};
+    compareContainers(pc, params);
+}
+
+TEST_F(PixelContainerTest, AddTrueVerticalTopDown){
+    PCont pc(100, 100, 0, 100, 101, 0, WIDTH, HEIGHT);
+    EXPECT_TRUE(pc.tryAddPixel(100, 102, 0));
+    pc.tryAddPixel(100, 103, 0);
+    pc.tryAddPixel(100, 104, 0);
+    pc.tryAddPixel(100, 105, 0);
+    pc.tryAddPixel(100, 106, 0);
+    PContParams params = {100, 100, 100, 106, sizeof(uint32_t), sizeof(uint32_t), 7};
+    compareContainers(pc, params);
+}
+
+TEST_F(PixelContainerTest, AddTrueVerticalBottomUp){
+    PCont pc(100, 100, 0, 100, 99, 0, WIDTH, HEIGHT);
+    EXPECT_TRUE(pc.tryAddPixel(100, 98, 0));
+    pc.tryAddPixel(100, 97, 0);
+    pc.tryAddPixel(100, 96, 0);
+    pc.tryAddPixel(100, 95, 0);
+    pc.tryAddPixel(100, 94, 0);
+    PContParams params = {100, 94, 100, 100, sizeof(uint32_t), sizeof(uint32_t), 7};
+    compareContainers(pc, params);
+}
+
 TEST_F(PixelContainerTest, AddFalseSimple){
     PCont pc(100, 100, 0, 101, 100, 0, WIDTH, HEIGHT);
     EXPECT_FALSE(pc.tryAddPixel(103, 100, 0));
