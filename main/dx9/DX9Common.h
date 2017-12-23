@@ -9,6 +9,7 @@ namespace directgraph {
     private:
         IDirect3D9 *_d3d;
         IDirect3DDevice9 *_device;
+        D3DFORMAT _format;
 
         void checkCaps(D3DDEVTYPE &devType, DWORD &flags);
 
@@ -17,6 +18,8 @@ namespace directgraph {
         D3DPRESENT_PARAMETERS _d3dpp;
     public:
         DX9Common();
+
+        D3DFORMAT getFormat();
 
         void getDpi(float &dpiX, float &dpiY);
 

@@ -30,7 +30,7 @@ set(INCLUDE_FILES
 
 include(GenerateExportHeader)
 
-set(COMMON_LIB_FILES ${INCLUDE_FILES} ${COMMON_FILES} IMyWindow.h)
+set(COMMON_LIB_FILES ${INCLUDE_FILES} ${COMMON_FILES} IMyWindow.h util.cpp util.h PixelContainerFactory.cpp PixelContainerFactory.h)
 add_library(directgraph_common ${COMMON_LIB_FILES})
 set_target_properties(
         directgraph_common PROPERTIES

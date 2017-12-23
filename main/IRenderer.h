@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include "QueueReader.h"
 #include "CommonProps.h"
+#include "PixelContainerFactory.h"
 
 namespace directgraph {
     IFACE IRenderer {
@@ -18,6 +19,8 @@ namespace directgraph {
         virtual void repaint() = 0;
 
         virtual void draw(IQueueReader *reader, CommonProps *props) = 0;
+
+        virtual PixelContainerFactory* getPixContFactory() = 0;
     };
 }
 #endif //DIRECTGRAPH_IRENDERER_H

@@ -29,10 +29,12 @@ namespace {
         virtual void TearDown() {
         }
         void compareContainers(PCont &l, PContParams &r){
-            EXPECT_EQ(l.getLeft(), r.left);
-            EXPECT_EQ(l.getRight(), r.right);
-            EXPECT_EQ(l.getTop(), r.top);
-            EXPECT_EQ(l.getBottom(), r.bottom);
+            Rectangle firstCoords = l.getFirstCoords();
+            Rectangle lastCoords = l.getLastCoords();
+            EXPECT_EQ(firstCoords.left, r.left);
+            EXPECT_EQ(firstCoords.right, r.right);
+            EXPECT_EQ(std::min(firstCoords.top, lastCoords.top), r.top);
+            EXPECT_EQ(std::max(firstCoords.bottom, lastCoords.bottom), r.bottom);
             EXPECT_EQ(l.getStride(), r.stride);
             EXPECT_EQ(l.getLastStride(), r.lastStride);
             EXPECT_EQ(l.getHeight(), r.height);

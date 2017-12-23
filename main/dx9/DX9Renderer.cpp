@@ -2,6 +2,12 @@
 #include <Queue.h>
 #include "DX9Renderer.h"
 #include <graphics_const_internal.h>
+#include <cmath>
+#include <main/QueueItem.h>
+#include <algorithm>
+
+#undef max
+#undef min
 
 namespace directgraph {
     DX9Renderer::DX9Renderer(DX9Common *common, DPIHelper *helper, float width, float height) {
@@ -22,28 +28,47 @@ namespace directgraph {
     }
 
     void DX9Renderer::createDeviceRes() {
-        _swapChain = _common->createSwapChain(_hwnd, _helper->toPixelsX(_width), _helper->toPixelsX(_height));
+        uint_fast32_t pxWidth = static_cast<uint_fast32_t>(_helper->toPixelsX(_width));
+        uint_fast32_t pxHeight = static_cast<uint_fast32_t>(_helper->toPixelsY(_height));
+        _swapChain = _common->createSwapChain(_hwnd, pxWidth, pxHeight);
         _swapChain->GetDevice(&_device);
         _swapChain->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &_backBuffer);
+
+        _pixelTextureWidth = static_cast<uint_fast32_t>(1 << (uint_fast32_t) ceil(log2(pxWidth)));
+        _pixelTextureHeight = static_cast<uint_fast32_t>(1 << (uint_fast32_t) ceil(log2(pxHeight)));
+
+        _device->CreateTexture(
+                _pixelTextureWidth, _pixelTextureHeight, 1, 0,
+                _common->getFormat(), D3DPOOL_MANAGED, &_pixelTexture, NULL
+        );
+
+        IPixelContainer::Format format = IPixelContainer::R8G8B8;
+        switch(_common->getFormat()){
+            case D3DFMT_R8G8B8: format = IPixelContainer::R8G8B8; break;
+            default: break;
+        }
+        _pixContFactory = new PixelContainerFactory(pxWidth, pxHeight, format);
 
         _device->CreateVertexBuffer(VERTEX_BUFFER_SIZE * sizeof(RectVertex),
                                           D3DUSAGE_DYNAMIC,
                                           0,
                                           D3DPOOL_DEFAULT,
-                                          &_rectVertBuffer, NULL);
-        _rectVertMem = new RectVertex[VERTEX_BUFFER_SIZE];
+                                          &_vertBuffer, NULL);
+        _vertMem = malloc(VERTEX_BUFFER_SIZE * sizeof(RectVertex));
     }
 
     DX9Renderer::~DX9Renderer() {
-        _rectVertBuffer->Release();
+        _pixelTexture->Release();
+        _vertBuffer->Release();
         _common->deleteSwapChain(_swapChain);
         delete _helper;
-        delete [] _rectVertMem;
+        delete _pixContFactory;
+        free(_vertMem);
     }
 
     void DX9Renderer::draw(IQueueReader *reader, CommonProps *props) {
         QueueItem &firstItem = reader->getAt(0);
-        if(firstItem.type == QueueItem::CLEAR){
+        if (firstItem.type == QueueItem::CLEAR) {
             reader->endReading(1);
             _device->SetRenderTarget(0, _backBuffer);
             _device->Clear(
@@ -52,6 +77,78 @@ namespace directgraph {
                     1.0f,
                     0
             );
+        } else if(firstItem.type == QueueItem::PIXEL_CONTAINER) {
+            IPixelContainer *cont = firstItem.data.pixelContainer;
+            reader->endReading(1);
+            bool haveLastLine = cont->getLastStride() != cont->getStride();
+            Rectangle firstCoords = cont->getFirstCoords();
+            Rectangle lastCoords = cont->getLastCoords();
+            firstCoords.right++;
+            firstCoords.bottom++;
+            lastCoords.right++;
+            lastCoords.bottom++;
+            RECT lockRect = {
+                    static_cast<LONG>(firstCoords.left),
+                    static_cast<LONG>(std::min(firstCoords.top, lastCoords.top)),
+                    static_cast<LONG>(firstCoords.right),
+                    static_cast<LONG>(std::max(firstCoords.bottom, lastCoords.top))
+            };
+            uint_fast32_t pxHeight = cont->getHeight();
+            if(haveLastLine){
+                pxHeight--;
+            }
+            uint_fast32_t stride = cont->getStride();
+            uint_fast32_t nextLineOffset = cont->getNextLineOffset();
+            char *contBuffer = static_cast<char *>(cont->getBuffer()) + cont->getStartOffset();
+            D3DLOCKED_RECT outRect;
+            _pixelTexture->LockRect(0, &outRect, &lockRect, 0);
+            char *textBuffer = static_cast<char *>(outRect.pBits);
+            if(firstCoords.top > lastCoords.top){
+                memcpy(textBuffer, contBuffer, cont->getLastStride());
+                textBuffer += outRect.Pitch;
+                contBuffer += nextLineOffset;
+            }
+            for (uint_fast32_t y = 0; y < pxHeight; ++y) {
+                memcpy(textBuffer, contBuffer, stride);
+                textBuffer += outRect.Pitch;
+                contBuffer += nextLineOffset;
+            }
+            if(firstCoords.bottom < lastCoords.bottom){
+                memcpy(textBuffer, contBuffer, cont->getLastStride());
+            }
+            _pixelTexture->UnlockRect(0);
+            TexturedVertex *texVertMem = static_cast<TexturedVertex *>(_vertMem);
+            uint_fast32_t numVertices = 4;
+            if(_height != 0) {
+                texVertMem = genTexQuad(
+                        texVertMem,
+                        firstCoords.left, firstCoords.top, firstCoords.right, firstCoords.bottom,
+                        _pixelTextureWidth, _pixelTextureHeight
+                );
+            }
+            if(haveLastLine) {
+                numVertices += 4;
+                genTexQuad(
+                        texVertMem,
+                        lastCoords.left, lastCoords.top, lastCoords.right, lastCoords.bottom,
+                        _pixelTextureWidth, _pixelTextureHeight
+                );
+            }
+            void* voidPointer;
+            _vertBuffer->Lock(0, numVertices * sizeof(TexturedVertex), &voidPointer, D3DLOCK_DISCARD);
+            memcpy(voidPointer, _vertMem, numVertices * sizeof(TexturedVertex));
+            _vertBuffer->Unlock();
+            _device->SetStreamSource(0, _vertBuffer, 0, sizeof(TexturedVertex));
+            _device->SetTexture(0, _pixelTexture);
+            _device->SetFVF(TEXTURED_VERTEX_FVF);
+            _device->BeginScene();
+            _device->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, TRIANGLES_IN_QUAD);
+            if(haveLastLine){
+                _device->DrawPrimitive(D3DPT_TRIANGLESTRIP, VERTICES_IN_QUAD, TRIANGLES_IN_QUAD);
+            }
+            _device->EndScene();
+            delete cont;
+            _device->SetTexture(0, NULL);
         } else {
             uint_fast32_t size = reader->getSize();
             uint_fast32_t readIndex = 0;
@@ -62,11 +159,15 @@ namespace directgraph {
                 QueueItem &item = reader->getAt(readIndex);
                 if(item.type == QueueItem::SINGLE_PIXEL ||
                         (item.type == QueueItem::BAR && props->fillStyle == SOLID_FILL)){
-                    uint_fast32_t curNumVertices = (isFirst) ? 4 : 6;
+                    uint_fast32_t curNumVertices =
+                            (isFirst) ?
+                            VERTICES_IN_QUAD :
+                            VERTICES_IN_QUAD * 2 - VERTICES_TRIANGLES_DIFF
+                    ;
                     if((totalNumVertices + curNumVertices) >= VERTEX_BUFFER_SIZE){
                         break;
                     }
-                    RectVertex *rectVectMem = _rectVertMem + totalNumVertices;
+                    RectVertex *rectVectMem = static_cast<RectVertex *>(_vertMem) + totalNumVertices;
                     if(!isFirst) {
                         rectVectMem = genDegenerate(
                                 rectVectMem,
@@ -112,20 +213,16 @@ namespace directgraph {
             if(readIndex != 0) {
                 reader->endReading(readIndex);
                 void* voidPointer;
-                _rectVertBuffer->Lock(0, totalNumVertices * sizeof(RectVertex), &voidPointer, D3DLOCK_DISCARD);
-                memcpy(voidPointer, _rectVertMem, totalNumVertices * sizeof(RectVertex));
-                _rectVertBuffer->Unlock();
-                _device->SetStreamSource(0, _rectVertBuffer, 0, sizeof(RectVertex));
-                _device->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
+                _vertBuffer->Lock(0, totalNumVertices * sizeof(RectVertex), &voidPointer, D3DLOCK_DISCARD);
+                memcpy(voidPointer, _vertMem, totalNumVertices * sizeof(RectVertex));
+                _vertBuffer->Unlock();
+                _device->SetStreamSource(0, _vertBuffer, 0, sizeof(RectVertex));
+                _device->SetFVF(RECT_VERTEX_FVF);
                 _device->BeginScene();
-                _device->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, totalNumVertices - 2);
+                _device->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, totalNumVertices - VERTICES_TRIANGLES_DIFF);
                 _device->EndScene();
             }
         }
-    }
-
-    uint_fast32_t DX9Renderer::swapColor(uint_fast32_t color) {
-        return (color & 0x00FF00) | ((color & 0xFF) << 16) | ((color & 0xFF0000) >> 16);
     }
 
     DX9Renderer::RectVertex *
@@ -165,7 +262,7 @@ namespace directgraph {
                 static_cast<float>(startY) - 0.5f,
                 0.0f,
                 1.0f,
-                swapColor(color)
+                swap_color(color)
         };
         vertices++;
         *vertices = {
@@ -173,7 +270,7 @@ namespace directgraph {
                 static_cast<float>(startY) - 0.5f,
                 0.0f,
                 1.0f,
-                swapColor(color)
+                swap_color(color)
         };
         vertices++;
         *vertices = {
@@ -181,7 +278,7 @@ namespace directgraph {
                 static_cast<float>(endY) - 0.5f,
                 0.0f,
                 1.0f,
-                swapColor(color)
+                swap_color(color)
         };
         vertices++;
         *vertices = {
@@ -189,9 +286,43 @@ namespace directgraph {
                 static_cast<float>(endY) - 0.5f,
                 0.0f,
                 1.0f,
-                swapColor(color)
+                swap_color(color)
         };
         vertices++;
         return vertices;
+    }
+
+    DX9Renderer::TexturedVertex *
+    DX9Renderer::genTexQuad(
+            DX9Renderer::TexturedVertex *vertices,
+            int_fast32_t startX, int_fast32_t startY,
+            int_fast32_t endX, int_fast32_t endY,
+            uint_fast32_t maxX, uint_fast32_t maxY
+    ) {
+        *vertices = {
+                startX - 0.5f, startY - 0.5f, 0.0f, 1.0f,
+                static_cast<float>(startX) / maxX, static_cast<float>(startY) / maxY
+        };
+        vertices++;
+        *vertices = {
+                endX - 0.5f, startY - 0.5f, 0.0f, 1.0f,
+                static_cast<float>(endX) / maxX, static_cast<float>(startY) / maxY
+        };
+        vertices++;
+        *vertices = {
+                startX - 0.5f, endY - 0.5f, 0.0f, 1.0f,
+                static_cast<float>(startX) / maxX, static_cast<float>(endY) / maxY
+        };
+        vertices++;
+        *vertices = {
+                endX - 0.5f, endY - 0.5f, 0.0f, 1.0f,
+                static_cast<float>(endX) / maxX, static_cast<float>(endY) / maxY
+        };
+        vertices++;
+        return vertices;
+    }
+
+    PixelContainerFactory *DX9Renderer::getPixContFactory() {
+        return _pixContFactory;
     }
 }

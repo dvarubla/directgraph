@@ -2,6 +2,7 @@
 #define PROJECT_PIXELCONTAINER_H
 
 #include "IPixelContainer.h"
+#include "util.h"
 
 namespace directgraph {
     template <uint_fast32_t DispMode>
@@ -13,7 +14,7 @@ namespace directgraph {
     public:
         typedef uint32_t ContainerType;
         static ContainerType convert(uint32_t color){
-            return color;
+            return swap_color(color);
         }
     };
 
@@ -48,13 +49,9 @@ namespace directgraph {
 
         void *getBuffer();
 
-        uint_fast32_t getLeft();
+        Rectangle getFirstCoords();
 
-        uint_fast32_t getTop();
-
-        uint_fast32_t getRight();
-
-        uint_fast32_t getBottom();
+        Rectangle getLastCoords();
 
         uint_fast32_t getStride();
 

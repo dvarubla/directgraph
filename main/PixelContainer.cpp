@@ -28,31 +28,27 @@ namespace directgraph{
     }
 
     template<uint_fast32_t DispMode>
-    uint_fast32_t PixelContainer<DispMode>::getLeft() {
-        return _firstX;
-    }
-
-    template<uint_fast32_t DispMode>
-    uint_fast32_t PixelContainer<DispMode>::getTop() {
+    Rectangle PixelContainer<DispMode>::getFirstCoords() {
+        Rectangle result;
+        result.left = _firstX;
+        result.right = _firstX + _width - 1;
         if(_direction == LEFT_RIGHT_TOP_DOWN){
-            return _firstY;
+            result.top = _firstY;
+            result.bottom = (_lastWidth == _width) ? _lastY : _lastY - 1;
         } else {
-            return _lastY;
+            result.top = (_lastWidth == _width) ? _lastY : _lastY + 1;
+            result.bottom = _firstY;
         }
+        return result;
     }
 
     template<uint_fast32_t DispMode>
-    uint_fast32_t PixelContainer<DispMode>::getRight() {
-        return _lastX;
-    }
-
-    template<uint_fast32_t DispMode>
-    uint_fast32_t PixelContainer<DispMode>::getBottom() {
-        if(_direction == LEFT_RIGHT_TOP_DOWN){
-            return _lastY;
-        } else {
-            return _firstY;
-        }
+    Rectangle PixelContainer<DispMode>::getLastCoords() {
+        Rectangle result;
+        result.left = _firstX;
+        result.right = _lastX;
+        result.top = result.bottom = _lastY;
+        return result;
     }
 
     template<uint_fast32_t DispMode>
@@ -72,7 +68,8 @@ namespace directgraph{
 
     template<uint_fast32_t DispMode>
     uint_fast32_t PixelContainer<DispMode>::getStartOffset() {
-        return (getTop() * _width + getLeft()) * sizeof(ContainerType);
+        uint_fast32_t top = (_direction == LEFT_RIGHT_TOP_DOWN) ? _firstY : _lastY;
+        return (top * _maxWidth + _firstX) * sizeof(ContainerType);
     }
 
     template<uint_fast32_t DispMode>
@@ -93,8 +90,6 @@ namespace directgraph{
             }
             _lastWidth++;
         } else if(_firstX == x && _lastWidth == _width){
-            _lastWidth = 1;
-            _lastX = _firstX;
             Direction curDirection;
             if(_lastY + 1== y){
                 curDirection = LEFT_RIGHT_TOP_DOWN;
@@ -110,6 +105,8 @@ namespace directgraph{
                     status = false;
                 }
                 if(status){
+                    _lastWidth = 1;
+                    _lastX = _firstX;
                     if(_direction == LEFT_RIGHT_TOP_DOWN){
                         _lastY++;
                     } else {

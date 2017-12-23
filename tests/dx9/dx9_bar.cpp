@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <dx9/DX9WindowFactory.h>
-#include <include/graphics_const.h>
+#include <graphics_const_internal.h>
 #include <tests/stubs/QueueReaderStub.h>
 
 namespace {

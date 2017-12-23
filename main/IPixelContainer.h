@@ -2,6 +2,7 @@
 #define PROJECT_IPIXELCONTAINER_H
 
 #include <stdint.h>
+#include "util.h"
 
 namespace directgraph {
     class IPixelContainer {
@@ -13,10 +14,8 @@ namespace directgraph {
         virtual void* getBuffer() = 0;
         virtual uint_fast32_t getStartOffset() = 0;
         virtual uint_fast32_t getNextLineOffset() = 0;
-        virtual uint_fast32_t getLeft() = 0;
-        virtual uint_fast32_t getTop() = 0;
-        virtual uint_fast32_t getRight() = 0;
-        virtual uint_fast32_t getBottom() = 0;
+        virtual Rectangle getFirstCoords() = 0;
+        virtual Rectangle getLastCoords() = 0;
         virtual uint_fast32_t getStride() = 0;
         virtual uint_fast32_t getLastStride() = 0;
         virtual uint_fast32_t getHeight() = 0;

@@ -41,7 +41,8 @@ namespace directgraph {
         checkCaps(devType, flags);
         D3DDISPLAYMODE displayMode = {};
         _d3d->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &displayMode);
-        _d3dpp.BackBufferFormat = displayMode.Format;
+        _format = displayMode.Format;
+        _d3dpp.BackBufferFormat = _format;
         _d3dpp.Windowed = TRUE;
         _d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
         _d3dpp.BackBufferWidth = width;
@@ -77,6 +78,10 @@ namespace directgraph {
 
     void DX9Common::deleteSwapChain(IDirect3DSwapChain9 *swapChain) {
         swapChain->Release();
+    }
+
+    D3DFORMAT DX9Common::getFormat() {
+        return _format;
     }
 
 }

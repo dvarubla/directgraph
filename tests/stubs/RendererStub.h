@@ -11,6 +11,7 @@ namespace directgraph{
         std::vector<QueueItem> _data;
         CommonProps *_props;
     public:
+        PixelContainerFactory *getPixContFactory();
 
         std::vector<QueueItem> & getData();
 

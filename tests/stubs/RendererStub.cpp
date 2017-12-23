@@ -23,4 +23,8 @@ namespace directgraph{
     CommonProps *RendererStub::getProps() {
         return _props;
     }
+
+    PixelContainerFactory *RendererStub::getPixContFactory() {
+        return NULL;
+    }
 }
