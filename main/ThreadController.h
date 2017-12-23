@@ -21,9 +21,12 @@ namespace directgraph {
 
         CRITICAL_SECTION _addCS;
         CRITICAL_SECTION _queueCS;
+        CRITICAL_SECTION _lastElemCS;
 
         DWORD _drawThreadId;
         CommonProps _currentProps;
+
+        PixelContainerFactory *_pixContFactory;
 
         void repaintThread();
         void stopRepaintThread();

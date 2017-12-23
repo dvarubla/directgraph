@@ -1,7 +1,8 @@
 #include <gtest/gtest.h>
 #include <main/ThreadController.h>
-#include <include/graphics_const.h>
+#include <graphics_const_internal.h>
 #include <RendererStub.h>
+#include <tests/stubs/QueueItemUtils.h>
 #include <tests/stubs/MyWindowStub.h>
 
 using namespace directgraph;
@@ -60,29 +61,6 @@ protected:
 
 
 static const int MSG_CODE = WM_USER + 6000;
-
-namespace directgraph {
-    bool operator==(QueueItem l, QueueItem r) {
-        if (l.type != r.type) {
-            return false;
-        }
-        if(l.type == QueueItem::CLEAR){
-            return true;
-        }
-        if (l.type == QueueItem::BAR) {
-            return
-                    l.data.bar.left == r.data.bar.left &&
-                    l.data.bar.right == r.data.bar.right &&
-                    l.data.bar.top == r.data.bar.top &&
-                    l.data.bar.bottom == r.data.bar.bottom;
-        } else if (l.type == QueueItem::SETFILLSTYLE) {
-            return
-                    l.data.setfillstyle.fillStyle == r.data.setfillstyle.fillStyle &&
-                    l.data.setfillstyle.color == r.data.setfillstyle.color;
-        }
-        return false;
-    }
-}
 
 TEST_F(ThreadsSimpleTest, BarOneThread){
     ThreadController tc(win);
@@ -200,22 +178,6 @@ static DWORD WINAPI BarDrawHelper(LPVOID param){
     PostThreadMessage(msg.wParam, MSG_CODE, 0, 0);
     return 0;
 }
-
-struct Comparator {
-    bool operator() (QueueItem l, QueueItem r){
-        if(l.type != r.type) {
-            return l.type < r.type;
-        } else if(l.type == QueueItem::BAR){
-            if(l.data.bar.left != r.data.bar.left){
-                return l.data.bar.left < r.data.bar.left;
-            } else {
-                return l.data.bar.top < r.data.bar.top;
-            }
-        } else {
-            return l.data.setfillstyle.color < r.data.setfillstyle.color;
-        }
-    }
-};
 
 TEST_F(ThreadsSimpleTest, BarMultDrawMultRep){
     InitializeCriticalSection(&crit);

@@ -13,8 +13,8 @@ namespace directgraph{
         return static_cast<uint_fast32_t>(InterlockedCompareExchange(&_putIndex, 0, 0));
     }
 
-    uint_fast32_t Queue::transformIndex(uint_fast32_t index) {
-        return index % _size;
+    uint_fast32_t Queue::transformIndex(int_fast32_t index) {
+        return (_size + index) % _size;
     }
 
     QueueItem &Queue::getItemAt(uint_fast32_t index) {
@@ -50,7 +50,7 @@ namespace directgraph{
     }
 
     uint_fast32_t Queue::getReadSize() {
-        return transformIndex(_size - getGetIndex() + getPutIndex());
+        return transformIndex(getPutIndex() - getGetIndex());
     }
 
     void Queue::advanceGetIndex(uint_fast32_t num) {

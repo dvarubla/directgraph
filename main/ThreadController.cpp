@@ -1,14 +1,16 @@
 #include "ThreadController.h"
 #include "Queue.h"
+#include "QueueItem.h"
 
 namespace directgraph{
 
     ThreadController::ThreadController(IMyWindow *window)
-            : _window(window), _queue(), _reader(&_queue, &_queueCS),
-              _threadStarted(0) {
+            : _window(window), _queue(), _reader(&_queue, &_queueCS, &_lastElemCS),
+              _threadStarted(0), _pixContFactory(_window->getRenderer()->getPixContFactory()) {
         _currentProps.color = 0xFFFFFF;
         InitializeCriticalSection(&_addCS);
         InitializeCriticalSection(&_queueCS);
+        InitializeCriticalSection(&_lastElemCS);
     }
 
     void ThreadController::writeItemHelper(const QueueItem &item) {
@@ -48,10 +50,41 @@ namespace directgraph{
     }
 
     void ThreadController::putpixel(int_fast32_t x, int_fast32_t y, uint_fast32_t color) {
-        QueueItem item;
-        item.type = QueueItem::SINGLE_PIXEL;
-        item.data.singlePixel = {static_cast<uint32_t>(x), static_cast<uint32_t>(y), color};
-        writeItemHelper(item);
+        if(x < 0 || y < 0){
+            return;
+        }
+
+        bool addSinglePixel = true;
+        EnterCriticalSection(&_lastElemCS);
+        if(_queue.getReadSize() != 0) {
+            QueueItem &prevItem = _queue.getItemAt(_queue.transformIndex((int_fast32_t) _queue.getPutIndex() - 1));
+            if (prevItem.type == QueueItem::SINGLE_PIXEL) {
+                PixelContainerFactory::ContainerOpt contOpt = _pixContFactory->tryGetContainer(
+                        prevItem.data.singlePixel.x,
+                        prevItem.data.singlePixel.y,
+                        prevItem.data.singlePixel.color,
+                        static_cast<uint_fast32_t>(x), static_cast<uint_fast32_t>(y), color
+                );
+                if (contOpt.containerCreated) {
+                    addSinglePixel = false;
+                    prevItem.type = QueueItem::PIXEL_CONTAINER;
+                    prevItem.data.pixelContainer = contOpt.container;
+                }
+            } else if (prevItem.type == QueueItem::PIXEL_CONTAINER) {
+                addSinglePixel = !prevItem.data.pixelContainer->tryAddPixel(
+                        static_cast<uint_fast32_t>(x), static_cast<uint_fast32_t>(y), color
+                );
+            }
+        }
+        LeaveCriticalSection(&_lastElemCS);
+
+
+        if(addSinglePixel) {
+            QueueItem item;
+            item.type = QueueItem::SINGLE_PIXEL;
+            item.data.singlePixel = {static_cast<uint32_t>(x), static_cast<uint32_t>(y), color};
+            writeItemHelper(item);
+        }
     }
 
     void ThreadController::repaint() {

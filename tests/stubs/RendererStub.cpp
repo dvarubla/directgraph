@@ -25,6 +25,20 @@ namespace directgraph{
     }
 
     PixelContainerFactory *RendererStub::getPixContFactory() {
-        return NULL;
+        return _pixContFact;
+    }
+
+    void RendererStub::setPixContFactory(PixelContainerFactory *pixContFact) {
+        _pixContFact = pixContFact;
+    }
+
+    RendererStub::RendererStub(): _pixContFact(NULL) {
+
+    }
+
+    RendererStub::~RendererStub() {
+        if(_pixContFact != NULL){
+            delete(_pixContFact);
+        }
     }
 }

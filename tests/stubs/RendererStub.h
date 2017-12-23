@@ -9,11 +9,18 @@ namespace directgraph{
     class RendererStub: public IRenderer {
     private:
         std::vector<QueueItem> _data;
+        PixelContainerFactory *_pixContFact;
         CommonProps *_props;
     public:
+        RendererStub();
+
+        ~RendererStub();
+
         PixelContainerFactory *getPixContFactory();
 
         std::vector<QueueItem> & getData();
+
+        void setPixContFactory(PixelContainerFactory *pixContFact);
 
         void setWindow(HWND hwnd);
 
