@@ -4,15 +4,15 @@
 #include <tests/stubs/QueueReaderStub.h>
 
 namespace {
-    class BarTest : public ::testing::Test {
+    class DX9BarTest : public ::testing::Test {
     public:
 
     protected:
 
-        BarTest() {
+        DX9BarTest() {
         }
 
-        virtual ~BarTest() {
+        virtual ~DX9BarTest() {
         }
 
         virtual void SetUp() {
@@ -28,7 +28,7 @@ namespace {
 static float WIDTH = 200;
 static float HEIGHT = 300;
 
-IMG_TEST_F(BarTest, SimpleBar){
+IMG_TEST_F(DX9BarTest, SimpleBar){
     init_factory();
     MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
     win->show();
@@ -43,7 +43,7 @@ IMG_TEST_F(BarTest, SimpleBar){
     return afterTestSimple(win, &_readerStub);
 }
 
-IMG_TEST_F(BarTest, InverseCoords){
+IMG_TEST_F(DX9BarTest, InverseCoords){
     init_factory();
     MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
     win->show();
@@ -58,7 +58,7 @@ IMG_TEST_F(BarTest, InverseCoords){
     return afterTestSimple(win, &_readerStub);
 }
 
-IMG_TEST_F(BarTest, OutsideScreen){
+IMG_TEST_F(DX9BarTest, OutsideScreen){
     init_factory();
     MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
     win->show();
@@ -73,7 +73,7 @@ IMG_TEST_F(BarTest, OutsideScreen){
     return afterTestSimple(win, &_readerStub);
 }
 
-IMG_TEST_F(BarTest, OutsideScreenFull){
+IMG_TEST_F(DX9BarTest, OutsideScreenFull){
     init_factory();
     MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
     win->show();
@@ -88,7 +88,7 @@ IMG_TEST_F(BarTest, OutsideScreenFull){
     return afterTestSimple(win, &_readerStub);
 }
 
-IMG_TEST_F(BarTest, OnePixel){
+IMG_TEST_F(DX9BarTest, OnePixel){
     init_factory();
     MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
     win->show();
@@ -103,7 +103,7 @@ IMG_TEST_F(BarTest, OnePixel){
     return afterTestSimple(win, &_readerStub);
 }
 
-IMG_TEST_F(BarTest, OnePxBorder){
+IMG_TEST_F(DX9BarTest, OnePxBorder){
     init_factory();
     MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
     win->show();

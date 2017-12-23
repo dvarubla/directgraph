@@ -2,15 +2,15 @@
 #include <tests/stubs/QueueReaderStub.h>
 
 namespace {
-    class SinglePixelTest : public ::testing::Test {
+    class DX9SinglePixelTest : public ::testing::Test {
     public:
 
     protected:
 
-        SinglePixelTest() {
+        DX9SinglePixelTest() {
         }
 
-        virtual ~SinglePixelTest() {
+        virtual ~DX9SinglePixelTest() {
         }
 
         virtual void SetUp() {
@@ -26,7 +26,7 @@ namespace {
 static float WIDTH = 200;
 static float HEIGHT = 300;
 
-IMG_TEST_F(SinglePixelTest, OnePixel){
+IMG_TEST_F(DX9SinglePixelTest, OnePixel){
     init_factory();
     MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
     win->show();
@@ -39,7 +39,7 @@ IMG_TEST_F(SinglePixelTest, OnePixel){
     return afterTestSimple(win, &_readerStub);
 }
 
-IMG_TEST_F(SinglePixelTest, PixelLine){
+IMG_TEST_F(DX9SinglePixelTest, PixelLine){
     init_factory();
     MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
     win->show();

@@ -5,15 +5,15 @@
 #include <graphics_const_internal.h>
 
 namespace {
-    class PixelContainerTest : public ::testing::Test {
+    class DX9PixelContainerTest : public ::testing::Test {
     public:
 
     protected:
 
-        PixelContainerTest() {
+        DX9PixelContainerTest() {
         }
 
-        virtual ~PixelContainerTest() {
+        virtual ~DX9PixelContainerTest() {
         }
 
         virtual void SetUp() {
@@ -29,7 +29,7 @@ namespace {
 static float WIDTH = 200;
 static float HEIGHT = 300;
 
-IMG_TEST_F(PixelContainerTest, TwoPixels){
+IMG_TEST_F(DX9PixelContainerTest, TwoPixels){
     init_factory();
     MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
     win->show();
@@ -46,7 +46,7 @@ IMG_TEST_F(PixelContainerTest, TwoPixels){
     return afterTestSimple(win, &_readerStub);
 }
 
-IMG_TEST_F(PixelContainerTest, RedSquare5x5TopDown){
+IMG_TEST_F(DX9PixelContainerTest, RedSquare5x5TopDown){
     init_factory();
     MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
     win->show();
@@ -69,7 +69,7 @@ IMG_TEST_F(PixelContainerTest, RedSquare5x5TopDown){
     return afterTestSimple(win, &_readerStub);
 }
 
-IMG_TEST_F(PixelContainerTest, RedSquareAndBar){
+IMG_TEST_F(DX9PixelContainerTest, RedSquareAndBar){
     init_factory();
     MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
     win->show();
@@ -96,7 +96,7 @@ IMG_TEST_F(PixelContainerTest, RedSquareAndBar){
     return afterTestSimple(win, &_readerStub);
 }
 
-IMG_TEST_F(PixelContainerTest, RedSquare5x5BottomUp){
+IMG_TEST_F(DX9PixelContainerTest, RedSquare5x5BottomUp){
     init_factory();
     MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
     win->show();
@@ -119,7 +119,7 @@ IMG_TEST_F(PixelContainerTest, RedSquare5x5BottomUp){
     return afterTestSimple(win, &_readerStub);
 }
 
-IMG_TEST_F(PixelContainerTest, ExtraLineTopDown){
+IMG_TEST_F(DX9PixelContainerTest, ExtraLineTopDown){
     init_factory();
     MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
     win->show();
@@ -145,7 +145,7 @@ IMG_TEST_F(PixelContainerTest, ExtraLineTopDown){
     return afterTestSimple(win, &_readerStub);
 }
 
-IMG_TEST_F(PixelContainerTest, ExtraLineBottomUp){
+IMG_TEST_F(DX9PixelContainerTest, ExtraLineBottomUp){
     init_factory();
     MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
     win->show();
