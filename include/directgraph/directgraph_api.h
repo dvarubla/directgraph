@@ -5,6 +5,10 @@
 #include "export_header.h"
 #include "directgraph_constants.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void DIRECTGRAPH_EXPORT bar(float left, float top, float right, float bottom);
 
 void DIRECTGRAPH_EXPORT putpixel(uint32_t x, uint32_t y, uint32_t color);
@@ -34,6 +38,10 @@ DWORD WINAPI directgraph_thread(LPVOID){
 int main(){
     CreateThread(NULL, 0, directgraph_thread, NULL, 0, NULL);
     directgraph_mainloop();
+}
+#endif
+
+#ifdef __cplusplus
 }
 #endif
 
