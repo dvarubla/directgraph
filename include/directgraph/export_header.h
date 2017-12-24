@@ -7,6 +7,7 @@
 #else
 #  ifdef DIRECTGRAPH_EXPORTS
 #    define DIRECTGRAPH_EXPORT __declspec(dllexport)
+#    define DIRECTGRAPH_NOMAIN
 #  else
 #    define DIRECTGRAPH_EXPORT __declspec(dllimport)
 #  endif

@@ -1,6 +1,6 @@
 ﻿#include "MyWindow.h"
 #include <map>
-#include <directgraph/directgraph_api.h>
+#include <graphics_const_internal.h>
 #include <common.h>
 
 namespace directgraph {
@@ -22,7 +22,7 @@ namespace directgraph {
                     EndPaint(hwnd, &s);
                     break;
                 case WM_CLOSE:
-                    PostMessageW(NULL, DIRECTGRAPH_WND_QUIT, 0, 0);
+                    PostThreadMessageW(GetCurrentThreadId(), DIRECTGRAPH_WND_QUIT, 0, 0);
                     break;
                 default:
                     break;
@@ -37,7 +37,7 @@ namespace directgraph {
         rect.right = (long)width;
         rect.bottom = (long)height;
         AdjustWindowRect(&rect, WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, false);
-        PostMessageW(NULL, DIRECTGRAPH_WND_CREATE, 0, 0);
+        PostThreadMessageW(GetCurrentThreadId(), DIRECTGRAPH_WND_CREATED, 0, 0);
         _hwnd = CreateWindowExW(
                 WS_EX_APPWINDOW,
                 CLASS_NAME.c_str(),

@@ -1,6 +1,13 @@
 #ifndef PROJECT_GRAPHICS_CONST_H
 #define PROJECT_GRAPHICS_CONST_H
 
+enum DirectGraphEvent{
+    DIRECTGRAPH_WND_CREATED = 60000,
+    DIRECTGRAPH_WND_CREATE,
+    DIRECTGRAPH_WND_QUIT,
+    DIRECTGRAPH_REPLY
+};
+
 enum fill_patterns {
     EMPTY_FILL,      // использовать цвет фона
     SOLID_FILL,      // использовать цвет закраски

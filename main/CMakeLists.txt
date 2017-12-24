@@ -22,7 +22,7 @@ set(COMMON_FILES
     resource.cpp
     resource.h
         WException.cpp WException.h IWindowFactory.h DPIConverter.cpp DPIConverter.h
-        Queue.cpp Queue.h ThreadController.cpp ThreadController.h QueueReader.cpp QueueReader.h CommonProps.cpp CommonProps.h ../include/directgraph/graphics_const.h graphics_const_internal.h IPixelContainer.h PixelContainer.cpp PixelContainer.h)
+        Queue.cpp Queue.h ThreadController.cpp ThreadController.h QueueReader.cpp QueueReader.h CommonProps.cpp CommonProps.h ../include/directgraph/directgraph_constants.h graphics_const_internal.h IPixelContainer.h PixelContainer.cpp PixelContainer.h)
 
 set(INCLUDE_FILES
     ${CMAKE_SOURCE_DIR}/include/directgraph/directgraph_api.h

@@ -2,7 +2,7 @@
 #define PROJECT_GRAPHICS_CONST_INTERNAL_H
 
 namespace directgraph{
-#include <directgraph/graphics_const.h>
+#include <directgraph/directgraph_constants.h>
 }
 
 #endif //PROJECT_GRAPHICS_CONST_INTERNAL_H
