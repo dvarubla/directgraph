@@ -92,9 +92,6 @@ namespace directgraph{
 
     template<uint_fast32_t DispMode>
     bool PixelContainer<DispMode>::tryAddPixel(uint_fast32_t x, uint_fast32_t y, uint_fast32_t color) {
-        if(x > _maxWidth || y > _maxHeight){
-            return true;
-        }
         bool status = true;
         if(_lastY == y && (_lastX + 1) == x && (_height == 1 || _lastWidth < _width)){
             _lastX++;

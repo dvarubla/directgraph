@@ -24,6 +24,8 @@ namespace directgraph {
                 uint_fast32_t secondY,
                 uint_fast32_t secondColor
         );
+        uint_fast32_t getMaxWidth();
+        uint_fast32_t getMaxHeight();
     };
 }
 

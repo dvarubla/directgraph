@@ -45,4 +45,12 @@ namespace directgraph{
         }
         return result;
     }
+
+    uint_fast32_t PixelContainerFactory::getMaxWidth() {
+        return _maxWidth;
+    }
+
+    uint_fast32_t PixelContainerFactory::getMaxHeight() {
+        return _maxHeight;
+    }
 }
