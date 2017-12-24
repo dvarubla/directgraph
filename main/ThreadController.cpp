@@ -107,7 +107,7 @@ namespace directgraph{
         while(true) {
             GetMessage(&msg, NULL, 0, 0);
             if(msg.message == STOP){
-                PostThreadMessage(msg.wParam, REPLY, 0, 0);
+                PostThreadMessage(static_cast<DWORD>(msg.wParam), REPLY, 0, 0);
                 break;
             }
             while(true) {
@@ -121,7 +121,7 @@ namespace directgraph{
                 _window->getRenderer()->draw(&_reader, &_currentProps);
             }
             _window->getRenderer()->repaint();
-            PostThreadMessage(msg.wParam, REPLY, 0, 0);
+            PostThreadMessage(static_cast<DWORD>(msg.wParam), REPLY, 0, 0);
         }
     }
 

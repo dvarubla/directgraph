@@ -7,6 +7,7 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8)
 endif()
 
 option(XPCOMPAT "Enable compatibility with XP" OFF)
+option(XP64COMPAT "Enable compatibility with XP x64" OFF)
 option(IA32COMPAT "Don't use enhanced instructions" OFF)
 
 set(COMMON_COMPILE_FLAGS "/D_UNICODE /DUNICODE /WX")
@@ -26,6 +27,9 @@ set(EXTRA_LINK_FLAGS)
 if(XPCOMPAT)
     message("Compatibility with XP enabled")
     set(EXTRA_LINK_FLAGS "/SUBSYSTEM:CONSOLE,5.01")
+elseif(XP64COMPAT)
+    message("Compatibility with XP x64 enabled")
+    set(EXTRA_LINK_FLAGS "/SUBSYSTEM:CONSOLE,5.02")
 endif()
 
 add_subdirectory(resources)
