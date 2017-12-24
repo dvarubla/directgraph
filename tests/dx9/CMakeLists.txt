@@ -12,9 +12,9 @@ set_target_properties(
         COMPILE_FLAGS "${COMMON_COMPILE_FLAGS}"
         LINK_FLAGS "/ENTRY:wmainCRTStartup /subsystem:console ${EXTRA_LINK_FLAGS}")
 
-target_link_libraries(dx9_bar PUBLIC directgraph_dx9 directgraph_testlib)
-target_link_libraries(dx9_single_pixel PUBLIC directgraph_dx9 directgraph_testlib)
-target_link_libraries(dx9_pixel_container PUBLIC directgraph_dx9 directgraph_testlib)
+target_link_libraries(dx9_bar PUBLIC directgraph_dx9_int directgraph_testlib)
+target_link_libraries(dx9_single_pixel PUBLIC directgraph_dx9_int directgraph_testlib)
+target_link_libraries(dx9_pixel_container PUBLIC directgraph_dx9_int directgraph_testlib)
 set_source_files_properties(
         "${SHADERS_RES_FILE}"
         PROPERTIES

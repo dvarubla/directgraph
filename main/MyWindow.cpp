@@ -1,7 +1,6 @@
 ﻿#include "MyWindow.h"
-#include <iostream>
 #include <map>
-#include <directgraph_mainloop.h>
+#include <directgraph/directgraph_api.h>
 #include <common.h>
 
 namespace directgraph {
@@ -89,7 +88,7 @@ namespace directgraph {
             windowClass.cbSize = sizeof(WNDCLASSEX);
             windowClass.style = CS_HREDRAW | CS_VREDRAW;
             windowClass.lpfnWndProc = window_proc;
-            windowClass.hInstance = GetModuleHandle(NULL);
+            windowClass.hInstance = HINST_THISCOMPONENT;
             windowClass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
             windowClass.hCursor = LoadCursor(NULL, IDC_ARROW);
             windowClass.lpszMenuName = NULL;
