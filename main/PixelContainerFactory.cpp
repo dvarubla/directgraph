@@ -30,6 +30,14 @@ namespace directgraph{
                             secondX, secondY, secondColor,
                             _maxWidth, _maxHeight
                     );
+                break;
+                case IPixelContainer::R5G6B5:
+                    result.container = new PixelContainer<IPixelContainer::R5G6B5>(
+                            firstX, firstY, firstColor,
+                            secondX, secondY, secondColor,
+                            _maxWidth, _maxHeight
+                    );
+                break;
                 default: break;
             }
         } else {

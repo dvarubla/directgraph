@@ -143,4 +143,5 @@ namespace directgraph{
     }
 
     template class PixelContainer<IPixelContainer::R8G8B8>;
+    template class PixelContainer<IPixelContainer::R5G6B5>;
 }

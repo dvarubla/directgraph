@@ -42,9 +42,13 @@ namespace directgraph {
                 _common->getFormat(), D3DPOOL_MANAGED, &_pixelTexture, NULL
         );
 
-        IPixelContainer::Format format = IPixelContainer::R8G8B8;
+        IPixelContainer::Format format = IPixelContainer::R5G6B5;
+
         switch(_common->getFormat()){
-            case D3DFMT_R8G8B8: format = IPixelContainer::R8G8B8; break;
+            case D3DFMT_R8G8B8: case D3DFMT_X8R8G8B8: case D3DFMT_A8R8G8B8:
+                format = IPixelContainer::R8G8B8;
+            break;
+            case D3DFMT_R5G6B5: format = IPixelContainer::R5G6B5; break;
             default: break;
         }
         _pixContFactory = new PixelContainerFactory(pxWidth, pxHeight, format);

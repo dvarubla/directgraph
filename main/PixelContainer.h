@@ -18,6 +18,20 @@ namespace directgraph {
         }
     };
 
+    template <>
+    class FormatFinder<IPixelContainer::R5G6B5>{
+    public:
+        typedef uint16_t ContainerType;
+        static ContainerType convert(uint32_t color){
+            return
+                    static_cast<uint16_t>
+                        ((((color & 0xFF) / 8) << 11) |
+                        ((((color >> 8) & 0xFF) / 8) << 6) |
+                        ((((color >> 16) & 0xFF)) / 8))
+                    ;
+        }
+    };
+
     template <uint_fast32_t DispMode>
     class PixelContainer: public IPixelContainer {
     private:
