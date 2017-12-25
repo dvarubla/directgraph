@@ -39,7 +39,7 @@ test_script:
     - ctest -C %CONFIGURATION% -LE "dx9" --output-on-failure
 
 artifacts:
-    - path: /directgraph-.*\.zip/
+    - path: directgraph-*.zip
 
 deploy:
     provider: GitHub
