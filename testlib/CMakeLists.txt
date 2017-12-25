@@ -6,10 +6,9 @@ add_library(directgraph_testlib STATIC ${LIB_FILES})
 add_library(directgraph_gtest_lib INTERFACE)
 
 enable_testing()
-set(GTEST_ROOT "${CMAKE_SOURCE_DIR}/gtest")
-find_package(GTest REQUIRED)
 
-target_link_libraries(directgraph_gtest_lib INTERFACE GTest::GTest)
+target_link_libraries(directgraph_gtest_lib INTERFACE gtest)
+target_include_directories(directgraph_gtest_lib INTERFACE ${CMAKE_SOURCE_DIR}/gtest/googletest/include)
 
 set(TESTS_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/tests/stubs" "${CMAKE_SOURCE_DIR}/main" "${CMAKE_SOURCE_DIR}/include" "${CMAKE_BINARY_DIR}")
 
