@@ -24,3 +24,12 @@ set_source_files_properties(
 add_dependencies(dx9_bar static_res)
 add_dependencies(dx9_single_pixel static_res)
 add_dependencies(dx9_pixel_container static_res)
+
+add_test(NAME dx9_bar WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/previous
+        COMMAND $<TARGET_FILE:dx9_bar> .)
+
+add_test(NAME dx9_single_pixel WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/previous
+        COMMAND $<TARGET_FILE:dx9_single_pixel> .)
+
+add_test(NAME dx9_pixel_container WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/previous
+        COMMAND $<TARGET_FILE:dx9_pixel_container> .)

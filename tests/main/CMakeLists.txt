@@ -14,3 +14,7 @@ set_target_properties(
 target_link_libraries(pixel_container PUBLIC directgraph_common directgraph_testlib)
 target_link_libraries(threads_simple PUBLIC directgraph_common directgraph_testlib)
 target_link_libraries(threads_last PUBLIC directgraph_common directgraph_testlib)
+
+add_test(NAME pixel_container COMMAND $<TARGET_FILE:pixel_container> .)
+add_test(NAME threads_simple COMMAND $<TARGET_FILE:threads_simple> .)
+add_test(NAME threads_last COMMAND $<TARGET_FILE:threads_last> .)

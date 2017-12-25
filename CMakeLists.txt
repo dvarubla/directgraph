@@ -32,6 +32,8 @@ elseif(XP64COMPAT)
     set(EXTRA_LINK_FLAGS "/SUBSYSTEM:CONSOLE,5.02")
 endif()
 
+enable_testing()
+
 set(OLD_CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMMON_COMPILE_FLAGS}")
 add_subdirectory("gtest/googletest" EXCLUDE_FROM_ALL)
