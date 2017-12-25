@@ -49,3 +49,9 @@ set_target_properties(
 )
 target_link_libraries(directgraph_dx9 directgraph_common directgraph_dx9_renderer)
 target_compile_definitions(directgraph_dx9 PUBLIC DIRECTGRAPH_EXPORTS)
+
+add_custom_command(TARGET directgraph_dx9
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE_DIR:directgraph_dx9>/directgraph_dx9.dll ${CMAKE_BINARY_DIR}
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE_DIR:directgraph_dx9>/directgraph_dx9.lib ${CMAKE_BINARY_DIR}
+)
