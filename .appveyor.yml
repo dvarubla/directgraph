@@ -36,7 +36,7 @@ build_script:
     - 7z a ..\directgraph.zip directgraph_dx9.dll directgraph_dx9.lib ..\include
 
 test_script:
-    - ctest -C %CONFIGURATION% --output-on-failure
+    - ctest -C %CONFIGURATION% -LE "dx9" --output-on-failure
 
 artifacts:
     - path: directgraph.zip

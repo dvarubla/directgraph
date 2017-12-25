@@ -33,3 +33,5 @@ add_test(NAME dx9_single_pixel WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/pre
 
 add_test(NAME dx9_pixel_container WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/previous
         COMMAND $<TARGET_FILE:dx9_pixel_container> .)
+
+set_tests_properties(dx9_bar dx9_pixel_container dx9_single_pixel PROPERTIES LABELS "dx9" )
