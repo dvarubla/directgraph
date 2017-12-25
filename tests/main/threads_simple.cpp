@@ -91,7 +91,7 @@ static DWORD WINAPI BarRepHelper(LPVOID param){
     while(true){
         MSG msg;
         if(PeekMessage(&msg, NULL, MSG_CODE, MSG_CODE, PM_REMOVE)){
-            PostThreadMessage(msg.wParam, MSG_CODE, 0, 0);
+            PostThreadMessage(static_cast<DWORD>(msg.wParam), MSG_CODE, 0, 0);
             break;
         }
         p->controller->repaint();
@@ -175,7 +175,7 @@ static DWORD WINAPI BarDrawHelper(LPVOID param){
     }
     MSG msg;
     GetMessage(&msg, NULL, MSG_CODE, MSG_CODE);
-    PostThreadMessage(msg.wParam, MSG_CODE, 0, 0);
+    PostThreadMessage(static_cast<DWORD>(msg.wParam), MSG_CODE, 0, 0);
     return 0;
 }
 

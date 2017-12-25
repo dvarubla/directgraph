@@ -94,7 +94,7 @@ static DWORD WINAPI ContainerRepHelper(LPVOID param){
     while(true){
         MSG msg;
         if(PeekMessage(&msg, NULL, MSG_CODE, MSG_CODE, PM_REMOVE)){
-            PostThreadMessage(msg.wParam, MSG_CODE, 0, 0);
+            PostThreadMessage(static_cast<DWORD>(msg.wParam), MSG_CODE, 0, 0);
             break;
         }
         p->controller->repaint();

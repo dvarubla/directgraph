@@ -6,7 +6,7 @@ namespace directgraph{
     }
 
     uint_fast32_t QueueReaderStub::getSize() {
-        return data.size();
+        return static_cast<uint_fast32_t>(data.size());
     }
 
     void QueueReaderStub::endReading(uint_fast32_t numRead) {
