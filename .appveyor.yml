@@ -33,7 +33,7 @@ build_script:
     - cd build
     - cmake .. %CMAKE_CONFIGURE_FLAGS%
     - cmake --build . %CMAKE_BUILD_FLAGS%
-    - 7z a ..\directgraph.zip directgraph_dx9.dll directgraph_dx9.lib ..\include
+    - 7z a ..\directgraph-%PLATFORM%.zip directgraph_dx9.dll directgraph_dx9.lib ..\include
 
 test_script:
     - ctest -C %CONFIGURATION% -LE "dx9" --output-on-failure
@@ -48,7 +48,7 @@ deploy:
     auth_token:
         secure: +FpMrNlMtzVMaNzdqZiyDH61Qpd2yi117JElo0HXVX1qZqJEH3ZPBwtsnkw73+m/
 
-    artifact: directgraph.zip
+    artifact: /directgraph-.*\.zip/
     force_update: true
 
     on:
