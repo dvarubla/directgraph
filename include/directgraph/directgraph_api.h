@@ -29,7 +29,8 @@ void DIRECTGRAPH_EXPORT directgraph_wait_for_main_thread();
 
 #ifndef DIRECTGRAPH_NOMAIN
 void mainx();
-DWORD WINAPI directgraph_thread(LPVOID){
+DWORD WINAPI directgraph_thread(LPVOID param){
+    (void)(param);
     directgraph_wait_for_main_thread();
     mainx();
     directgraph_repaint();

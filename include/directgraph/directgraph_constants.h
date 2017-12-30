@@ -1,14 +1,14 @@
-#ifndef PROJECT_GRAPHICS_CONST_H
-#define PROJECT_GRAPHICS_CONST_H
+#ifndef DIRECTGRAPH_GRAPHICS_CONST_H
+#define DIRECTGRAPH_GRAPHICS_CONST_H
 
-enum DirectGraphEvent{
+typedef enum DirectGraphEvent{
     DIRECTGRAPH_WND_CREATED = 60000,
     DIRECTGRAPH_WND_CREATE,
     DIRECTGRAPH_WND_QUIT,
     DIRECTGRAPH_REPLY
-};
+} DirectGraphEvent;
 
-enum fill_patterns {
+typedef enum fill_patterns {
     EMPTY_FILL,      // использовать цвет фона
     SOLID_FILL,      // использовать цвет закраски
     LINE_FILL,       // ---
@@ -22,6 +22,6 @@ enum fill_patterns {
     WIDE_DOT_FILL,   // Widely spaced dot
     CLOSE_DOT_FILL,  // Closely spaced dot
     USER_FILL        // User-defined fill
-};
+} fill_patterns;
 
-#endif //PROJECT_GRAPHICS_CONST_H
+#endif //DIRECTGRAPH_GRAPHICS_CONST_H
