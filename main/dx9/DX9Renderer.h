@@ -22,6 +22,7 @@ namespace directgraph {
         DPIHelper *_helper;
         HWND _hwnd;
         float _width, _height;
+        CRITICAL_SECTION _repaintCS;
 
         struct RectVertex{
             float x, y, z, rhw;

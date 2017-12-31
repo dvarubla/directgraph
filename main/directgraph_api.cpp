@@ -21,7 +21,6 @@ static void createWindow(const wchar_t *name, float width, float height){
     win->show();
     directgraph::ThreadController *localLastController = new directgraph::ThreadController(win);
     localLastController->init();
-    localLastController->repaint();
     InterlockedExchangePointer(&lastController, localLastController);
 }
 
@@ -58,6 +57,9 @@ void DIRECTGRAPH_EXPORT directgraph_create_window(const wchar_t *name, float wid
             CreateWinMsg createMsg = {name, width, height, GetCurrentThreadId()};
             PostThreadMessage(mainThreadId, DIRECTGRAPH_WND_CREATE, reinterpret_cast<WPARAM>(&createMsg), 0);
             GetMessage(&msg, NULL, DIRECTGRAPH_REPLY, DIRECTGRAPH_REPLY);
+            static_cast<directgraph::ThreadController *>(
+                    InterlockedCompareExchangePointer(&lastController, NULL, NULL)
+            )->repaint();
         } else {
             createWindow(name, width, height);
         }

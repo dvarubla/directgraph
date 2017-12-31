@@ -15,6 +15,7 @@ namespace directgraph {
         _width = width;
         _height = height;
         _common = common;
+        InitializeCriticalSection(&_repaintCS);
     }
 
     void DX9Renderer::setWindow(HWND hwnd) {
@@ -23,8 +24,9 @@ namespace directgraph {
     }
 
     void DX9Renderer::repaint() {
-        _device->SetRenderTarget(0, _backBuffer);
+        EnterCriticalSection(&_repaintCS);
         _swapChain->Present(NULL, NULL, NULL, NULL, 0);
+        LeaveCriticalSection(&_repaintCS);
     }
 
     void DX9Renderer::createDeviceRes() {
@@ -65,6 +67,7 @@ namespace directgraph {
         _pixelTexture->Release();
         _vertBuffer->Release();
         _common->deleteSwapChain(_swapChain);
+        DeleteCriticalSection(&_repaintCS);
         delete _helper;
         delete _pixContFactory;
         free(_vertMem);
@@ -142,6 +145,7 @@ namespace directgraph {
             _vertBuffer->Lock(0, numVertices * sizeof(TexturedVertex), &voidPointer, D3DLOCK_DISCARD);
             memcpy(voidPointer, _vertMem, numVertices * sizeof(TexturedVertex));
             _vertBuffer->Unlock();
+            _device->SetRenderTarget(0, _backBuffer);
             _device->SetStreamSource(0, _vertBuffer, 0, sizeof(TexturedVertex));
             _device->SetTexture(0, _pixelTexture);
             _device->SetFVF(TEXTURED_VERTEX_FVF);
@@ -220,6 +224,7 @@ namespace directgraph {
                 _vertBuffer->Lock(0, totalNumVertices * sizeof(RectVertex), &voidPointer, D3DLOCK_DISCARD);
                 memcpy(voidPointer, _vertMem, totalNumVertices * sizeof(RectVertex));
                 _vertBuffer->Unlock();
+                _device->SetRenderTarget(0, _backBuffer);
                 _device->SetStreamSource(0, _vertBuffer, 0, sizeof(RectVertex));
                 _device->SetFVF(RECT_VERTEX_FVF);
                 _device->BeginScene();
