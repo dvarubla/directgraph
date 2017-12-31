@@ -27,8 +27,12 @@ void DIRECTGRAPH_EXPORT directgraph_create_window(const wchar_t *name, float wid
 
 void DIRECTGRAPH_EXPORT directgraph_wait_for_main_thread();
 
+#ifdef __cplusplus
+}
+#endif
+
 #ifndef DIRECTGRAPH_NOMAIN
-void mainx();
+extern void mainx();
 DWORD WINAPI directgraph_thread(LPVOID param){
     (void)(param);
     directgraph_wait_for_main_thread();
@@ -36,13 +40,20 @@ DWORD WINAPI directgraph_thread(LPVOID param){
     directgraph_repaint();
     return 0;
 }
-int main(){
+int
+#if defined(UNICODE) || defined(_UNICODE)
+WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, INT nCmdShow)
+#else
+WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine, INT nCmdShow)
+#endif
+{
+    (void)hInstance;
+    (void)hPrevInstance;
+    (void)pCmdLine;
+    (void)nCmdShow;
     CreateThread(NULL, 0, directgraph_thread, NULL, 0, NULL);
     directgraph_mainloop();
-}
-#endif
-
-#ifdef __cplusplus
+    return 0;
 }
 #endif
 
