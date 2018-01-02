@@ -1,7 +1,7 @@
 #ifndef DIRECTGRAPH_GRAPHICS_CONST_H
 #define DIRECTGRAPH_GRAPHICS_CONST_H
 
-typedef enum DirectGraphEvent{
+typedef enum DirectgraphEvent{
     DIRECTGRAPH_WND_CREATED = 60000,
     DIRECTGRAPH_WND_CREATE,
     DIRECTGRAPH_WND_QUIT,
