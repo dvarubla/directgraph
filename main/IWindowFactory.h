@@ -8,9 +8,9 @@ namespace directgraph {
     public:
         virtual ~IWindowFactory() {}
 
-        virtual MyWindow *createDPIWindow(const wchar_t *name, float width, float height) = 0;
+        virtual IMyWindow *createDPIWindow(const wchar_t *name, float width, float height) = 0;
 
-        virtual MyWindow *createPixelWindow(const wchar_t *name, float width, float height) = 0;
+        virtual IMyWindow *createPixelWindow(const wchar_t *name, float width, float height) = 0;
     };
 }
 

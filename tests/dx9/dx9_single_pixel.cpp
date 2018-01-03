@@ -28,7 +28,7 @@ static float HEIGHT = 300;
 
 IMG_TEST_F(DX9SinglePixelTest, OnePixel){
     init_factory();
-    MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
+    IMyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
     win->show();
     QueueReaderStub _readerStub;
     QueueItem items[2];
@@ -41,7 +41,7 @@ IMG_TEST_F(DX9SinglePixelTest, OnePixel){
 
 IMG_TEST_F(DX9SinglePixelTest, PixelLine){
     init_factory();
-    MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
+    IMyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
     win->show();
     QueueReaderStub _readerStub;
     QueueItem item;

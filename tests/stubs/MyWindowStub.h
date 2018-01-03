@@ -11,6 +11,9 @@ namespace directgraph {
         MyWindowStub(IRenderer *renderer);
         ~MyWindowStub();
         IRenderer *getRenderer();
+        void show();
+        void hide();
+        void addListener(IWindowListener *listener, void *param);
     };
 }
 

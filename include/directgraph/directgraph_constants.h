@@ -4,9 +4,20 @@
 typedef enum DirectgraphEvent{
     DIRECTGRAPH_WND_CREATED = 60000,
     DIRECTGRAPH_WND_CREATE,
-    DIRECTGRAPH_WND_QUIT,
+    DIRECTGRAPH_WND_DESTROY,
+    DIRECTGRAPH_WND_DESTROYED,
     DIRECTGRAPH_REPLY
 } DirectGraphEvent;
+
+typedef enum DirectgraphRenderer{
+    DIRECTGRAPH_DX9_RENDERER = 0
+} DirectgraphRendererType;
+
+typedef enum DirectgraphController{
+    DIRECTGRAPH_MULT_THREAD_CTRL = 0
+} DirectgraphControllerType;
+
+typedef uint32_t DirectgraphWinIndex;
 
 typedef enum fill_patterns {
     EMPTY_FILL,      // использовать цвет фона

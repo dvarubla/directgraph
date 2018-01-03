@@ -82,7 +82,6 @@ namespace directgraph{
         }
         LeaveCriticalSection(&_lastElemCS);
 
-
         if(addSinglePixel) {
             QueueItem item;
             item.type = QueueItem::SINGLE_PIXEL;
@@ -126,6 +125,9 @@ namespace directgraph{
     }
 
     void ThreadController::stopRepaintThread() {
+        while(!InterlockedCompareExchange(&_threadStarted, 0, 0)){
+            Sleep(100);
+        }
         MSG msg;
         PostThreadMessage(_drawThreadId, STOP, GetCurrentThreadId(), 0);
         GetMessage(&msg, NULL, REPLY, REPLY);

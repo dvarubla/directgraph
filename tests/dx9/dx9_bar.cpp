@@ -30,7 +30,7 @@ static float HEIGHT = 300;
 
 IMG_TEST_F(DX9BarTest, SimpleBar){
     init_factory();
-    MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
+    IMyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
     win->show();
     QueueReaderStub _readerStub;
     QueueItem items[3];
@@ -45,7 +45,7 @@ IMG_TEST_F(DX9BarTest, SimpleBar){
 
 IMG_TEST_F(DX9BarTest, InverseCoords){
     init_factory();
-    MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
+    IMyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
     win->show();
     QueueReaderStub _readerStub;
     QueueItem items[3];
@@ -60,7 +60,7 @@ IMG_TEST_F(DX9BarTest, InverseCoords){
 
 IMG_TEST_F(DX9BarTest, OutsideScreen){
     init_factory();
-    MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
+    IMyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
     win->show();
     QueueReaderStub _readerStub;
     QueueItem items[3];
@@ -75,7 +75,7 @@ IMG_TEST_F(DX9BarTest, OutsideScreen){
 
 IMG_TEST_F(DX9BarTest, OutsideScreenFull){
     init_factory();
-    MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
+    IMyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
     win->show();
     QueueReaderStub _readerStub;
     QueueItem items[3];
@@ -90,7 +90,7 @@ IMG_TEST_F(DX9BarTest, OutsideScreenFull){
 
 IMG_TEST_F(DX9BarTest, OnePixel){
     init_factory();
-    MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
+    IMyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
     win->show();
     QueueReaderStub _readerStub;
     QueueItem items[3];
@@ -105,7 +105,7 @@ IMG_TEST_F(DX9BarTest, OnePixel){
 
 IMG_TEST_F(DX9BarTest, OnePxBorder){
     init_factory();
-    MyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
+    IMyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
     win->show();
     QueueReaderStub _readerStub;
     QueueItem items[5];

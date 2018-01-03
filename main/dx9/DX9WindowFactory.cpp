@@ -12,14 +12,14 @@ namespace directgraph{
     DX9WindowFactory::~DX9WindowFactory() {
     }
 
-    MyWindow *DX9WindowFactory::createDPIWindow(const wchar_t *name, float width, float height) {
+    IMyWindow *DX9WindowFactory::createDPIWindow(const wchar_t *name, float width, float height) {
         float dpiX, dpiY;
         _common->getDpi(dpiX, dpiY);
         DPIHelper *helper = new DPIHelper(dpiX, dpiY);
         return commonCreateWindow(helper, name, width, height);
     }
 
-    MyWindow *DX9WindowFactory::createPixelWindow(const wchar_t *name, float width, float height) {
+    IMyWindow *DX9WindowFactory::createPixelWindow(const wchar_t *name, float width, float height) {
         DPIHelper *helper = new DPIHelper(DPIHelper::DEFAULT_DPIX, DPIHelper::DEFAULT_DPIY);
         return commonCreateWindow(helper, name, width, height);
     }

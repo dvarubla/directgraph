@@ -10,6 +10,7 @@ namespace directgraph {
             if (_d3d == NULL) {
                 throw DX9Exception(std::wstring(L"Error in Direct3DCreate9"));
             }
+            InitializeCriticalSection(&_mainCS);
         } catch (...) {
             throw;
         }
@@ -82,6 +83,14 @@ namespace directgraph {
 
     D3DFORMAT DX9Common::getFormat() {
         return _format;
+    }
+
+    void DX9Common::lock() {
+        EnterCriticalSection(&_mainCS);
+    }
+
+    void DX9Common::unlock() {
+        LeaveCriticalSection(&_mainCS);
     }
 
 }

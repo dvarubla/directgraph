@@ -14,13 +14,13 @@ void init_factory(){
     }
 }
 
-BitmapWrap* afterTestSimple(MyWindow *win, IQueueReader *reader){
+BitmapWrap* afterTestSimple(IMyWindow *win, IQueueReader *reader){
     CommonProps props;
     while(reader->getSize() != 0) {
         win->getRenderer()->draw(reader, &props);
     }
     win->getRenderer()->repaint();
-    BitmapWrap *wrap = new BitmapWrap(win->getHWND());
+    BitmapWrap *wrap = new BitmapWrap(dynamic_cast<MyWindow*>(win)->getHWND());
     delete win;
     return wrap;
 }

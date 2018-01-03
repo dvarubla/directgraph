@@ -15,7 +15,6 @@ namespace directgraph {
         _width = width;
         _height = height;
         _common = common;
-        InitializeCriticalSection(&_repaintCS);
     }
 
     void DX9Renderer::setWindow(HWND hwnd) {
@@ -24,9 +23,9 @@ namespace directgraph {
     }
 
     void DX9Renderer::repaint() {
-        EnterCriticalSection(&_repaintCS);
+        _common->lock();
         _swapChain->Present(NULL, NULL, NULL, NULL, 0);
-        LeaveCriticalSection(&_repaintCS);
+        _common->unlock();
     }
 
     void DX9Renderer::createDeviceRes() {
@@ -67,7 +66,6 @@ namespace directgraph {
         _pixelTexture->Release();
         _vertBuffer->Release();
         _common->deleteSwapChain(_swapChain);
-        DeleteCriticalSection(&_repaintCS);
         delete _helper;
         delete _pixContFactory;
         free(_vertMem);

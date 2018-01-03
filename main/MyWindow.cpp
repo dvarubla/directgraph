@@ -7,13 +7,18 @@ namespace directgraph {
     const static std::wstring CLASS_NAME = L"directgraph";
     static WNDCLASSEXW windowClass = {};
 
-    typedef std::map<HWND, IRenderer *> WindowMap;
+    typedef std::map<HWND, MyWindow *> WindowMap;
+    static CRITICAL_SECTION windowMapCS;
     static WindowMap windowMap;
 
     LRESULT CALLBACK window_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+        EnterCriticalSection(&windowMapCS);
         WindowMap::iterator it = windowMap.find(hwnd);
         if (it != windowMap.end()) {
-            IRenderer *renderer = it->second;
+            MyWindow *win = it->second;
+            LeaveCriticalSection(&windowMapCS);
+            IRenderer *renderer = win->getRenderer();
+            std::vector<MyWindow::ListenerData> listenerData = win->getListeners();
             switch (message) {
                 case WM_PAINT:
                     PAINTSTRUCT s;
@@ -22,11 +27,15 @@ namespace directgraph {
                     EndPaint(hwnd, &s);
                     break;
                 case WM_CLOSE:
-                    PostThreadMessageW(GetCurrentThreadId(), DIRECTGRAPH_WND_QUIT, 0, 0);
+                    for(uint_fast32_t i = 0; i < listenerData.size(); i++){
+                        listenerData[i].listener->onClose(listenerData[i].param);
+                    }
                     break;
                 default:
                     break;
             }
+        } else {
+            LeaveCriticalSection(&windowMapCS);
         }
         return DefWindowProcW(hwnd, message, wParam, lParam);
     }
@@ -65,7 +74,9 @@ namespace directgraph {
     void MyWindow::setRenderer(IRenderer *renderer) {
         _renderer = renderer;
         _renderer->setWindow(_hwnd);
-        windowMap.insert(std::pair<HWND, IRenderer *>(_hwnd, _renderer));
+        EnterCriticalSection(&windowMapCS);
+        windowMap.insert(std::pair<HWND, MyWindow *>(_hwnd, this));
+        LeaveCriticalSection(&windowMapCS);
     }
 
     IRenderer *MyWindow::getRenderer() {
@@ -74,11 +85,23 @@ namespace directgraph {
 
     MyWindow::~MyWindow() {
         delete _renderer;
+        EnterCriticalSection(&windowMapCS);
+        windowMap.erase(_hwnd);
+        LeaveCriticalSection(&windowMapCS);
         DestroyWindow(_hwnd);
     }
 
     HWND MyWindow::getHWND() {
         return _hwnd;
+    }
+
+    void MyWindow::addListener(IWindowListener *listener, void *param) {
+        ListenerData data = {listener, param};
+        _listeners.push_back(data);
+    }
+
+    std::vector<MyWindow::ListenerData>& MyWindow::getListeners() {
+        return _listeners;
     }
 
     static volatile LONG canCreateWinClass = 1;
@@ -96,6 +119,7 @@ namespace directgraph {
             windowClass.hIconSm = NULL;
 
             RegisterClassExW(&windowClass);
+            InitializeCriticalSection(&windowMapCS);
         }
     }
 }

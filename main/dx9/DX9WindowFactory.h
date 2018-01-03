@@ -15,8 +15,8 @@ namespace directgraph {
 
         ~DX9WindowFactory();
 
-        MyWindow *createDPIWindow(const wchar_t *name, float width, float height);
-        MyWindow *createPixelWindow(const wchar_t *name, float width, float height);
+        IMyWindow *createDPIWindow(const wchar_t *name, float width, float height);
+        IMyWindow *createPixelWindow(const wchar_t *name, float width, float height);
     };
 }
 

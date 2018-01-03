@@ -4,9 +4,10 @@
 #include "MyWindow.h"
 #include "Queue.h"
 #include "CommonProps.h"
+#include "IController.h"
 
 namespace directgraph {
-    class ThreadController {
+    class ThreadController: public IController{
     private:
         enum ThreadCtrlMsg{
             REPAINT = WM_USER+1,
