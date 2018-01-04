@@ -23,6 +23,8 @@ WPARAM DIRECTGRAPH_EXPORT directgraph_mainloop();
 
 void DIRECTGRAPH_EXPORT directgraph_repaint();
 
+void DIRECTGRAPH_EXPORT directgraph_repaintw(DirectgraphWinIndex index);
+
 DirectgraphWinIndex DIRECTGRAPH_EXPORT directgraph_create_window(const wchar_t *name, float width, float height);
 
 void DIRECTGRAPH_EXPORT directgraph_destroy_window(DirectgraphWinIndex index);

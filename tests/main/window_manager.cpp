@@ -64,3 +64,13 @@ TEST_F(WindowManagerTest, MultWindowsCurNull){
     EXPECT_EQ(m->getCurrentWindowAndLock().controller, (IController*)NULL);
     m->releaseCurrentWindowLock();
 }
+
+TEST_F(WindowManagerTest, WindowGetCtrl){
+    DirectgraphWinParams p = {100, 100, L"Test", DIRECTGRAPH_MULT_THREAD_CTRL, DIRECTGRAPH_DX9_RENDERER};
+    DirectgraphWinIndex ind1 = m->createWindow(p);
+    IController *ctrl = m->getCurrentWindowAndLock().controller;
+    m->releaseCurrentWindowLock();
+    EXPECT_EQ(ctrl, m->getWindowByIndexAndLock(ind1));
+    m->releaseWindowLock();
+    m->destroyWindow(ind1);
+}

@@ -70,8 +70,9 @@ DirectgraphWinIndex DIRECTGRAPH_EXPORT directgraph_create_window(const wchar_t *
         };
         PostThreadMessage(mainThreadId, DIRECTGRAPH_WND_CREATE, reinterpret_cast<WPARAM>(&createMsg), 0);
         GetMessage(&msg, NULL, DIRECTGRAPH_REPLY, DIRECTGRAPH_REPLY);
-        directgraph_repaint();
-        return static_cast<DirectgraphWinIndex>(msg.wParam);
+        DirectgraphWinIndex index = static_cast<DirectgraphWinIndex>(msg.wParam);
+        directgraph_repaintw(index);
+        return index;
     } else {
         tryCreateWindowManager();
         DirectgraphWinParams params = {width, height, name};
@@ -161,5 +162,15 @@ void DIRECTGRAPH_EXPORT directgraph_repaint(){
             lastController->repaint();
         }
         localWindowManager->releaseCurrentWindowLock();
+    }
+}
+
+void DIRECTGRAPH_EXPORT directgraph_repaintw(DirectgraphWinIndex index){
+    WindowManager *localWindowManager = static_cast<WindowManager *>(
+            InterlockedCompareExchangePointer(&windowManager, NULL, NULL)
+    );
+    if(localWindowManager != NULL) {
+        localWindowManager->getWindowByIndexAndLock(index)->repaint();
+        localWindowManager->releaseWindowLock();
     }
 }

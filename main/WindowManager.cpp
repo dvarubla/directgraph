@@ -86,4 +86,13 @@ namespace directgraph{
         _curWindowLock.endRead();
         _mapLock.endRead();
     }
+
+    IController *WindowManager::getWindowByIndexAndLock(DirectgraphWinIndex index) {
+        _mapLock.startRead();
+        return _windows[index].ctrl;
+    }
+
+    void WindowManager::releaseWindowLock() {
+        _mapLock.endRead();
+    }
 };

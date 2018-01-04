@@ -45,6 +45,8 @@ namespace directgraph {
         void destroyWindow(DirectgraphWinIndex winIndex);
         ControllerAndIndex getCurrentWindowAndLock();
         void releaseCurrentWindowLock();
+        IController *getWindowByIndexAndLock(DirectgraphWinIndex index);
+        void releaseWindowLock();
         void onClose(void *param);
         ~WindowManager();
     };
