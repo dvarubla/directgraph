@@ -1,5 +1,4 @@
-#ifndef PROJECT_IQUEUEREADER_H
-#define PROJECT_IQUEUEREADER_H
+#pragma once
 
 #include <stdint.h>
 #include "QueueItem.h"
@@ -13,5 +12,3 @@ namespace directgraph{
         virtual ~IQueueReader(){}
     };
 }
-
-#endif //PROJECT_IQUEUEREADER_H

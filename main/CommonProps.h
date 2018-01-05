@@ -1,5 +1,4 @@
-#ifndef PROJECT_COMMONPROPS_H
-#define PROJECT_COMMONPROPS_H
+#pragma once
 
 #include <stdint.h>
 
@@ -9,5 +8,3 @@ namespace directgraph {
         uint_fast32_t color;
     };
 }
-
-#endif //PROJECT_COMMONPROPS_H

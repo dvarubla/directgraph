@@ -1,5 +1,4 @@
-#ifndef PROJECT_QUEUE_H
-#define PROJECT_QUEUE_H
+#pragma once
 
 #include <stdint.h>
 #include <windows.h>
@@ -27,5 +26,3 @@ namespace directgraph {
         uint_fast32_t getReadSize();
     };
 }
-
-#endif //PROJECT_QUEUE_H

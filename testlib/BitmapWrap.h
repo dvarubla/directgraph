@@ -1,6 +1,4 @@
-#ifndef DIRECTGRAPH_TESTLIB_BITMAPWRAP_H
-#define DIRECTGRAPH_TESTLIB_BITMAPWRAP_H
-
+#pragma once
 
 #include <windows.h>
 #include <gdiplus.h>
@@ -14,5 +12,3 @@ namespace directgraph_testlib {
         Gdiplus::Bitmap * getBitmap();
     };
 }
-
-#endif //DIRECTGRAPH_TESTLIB_BITMAPWRAP_H

@@ -1,5 +1,4 @@
-#ifndef PROJECT_QUEUEITEM_H
-#define PROJECT_QUEUEITEM_H
+#pragma once
 
 #include <stdint.h>
 #include "IPixelContainer.h"
@@ -29,5 +28,3 @@ namespace directgraph{
         } data;
     };
 }
-
-#endif //PROJECT_QUEUEITEM_H

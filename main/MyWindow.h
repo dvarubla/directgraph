@@ -1,5 +1,4 @@
-﻿#ifndef DIRECTGRAPH_MYWINDOW_H
-#define DIRECTGRAPH_MYWINDOW_H
+﻿#pragma once
 
 #include <IRenderer.h>
 #include <windows.h>
@@ -41,4 +40,3 @@ namespace directgraph {
 
     void create_window_class();
 }
-#endif //DIRECTGRAPH_MYWINDOW_H

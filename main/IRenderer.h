@@ -1,5 +1,4 @@
-﻿#ifndef DIRECTGRAPH_IRENDERER_H
-#define DIRECTGRAPH_IRENDERER_H
+﻿#pragma once
 
 #include <common.h>
 #include <windows.h>
@@ -10,7 +9,7 @@
 #include "PixelContainerFactory.h"
 
 namespace directgraph {
-    IFACE IRenderer {
+    class IRenderer {
     public:
         virtual ~IRenderer(){};
 
@@ -23,4 +22,3 @@ namespace directgraph {
         virtual PixelContainerFactory* getPixContFactory() = 0;
     };
 }
-#endif //DIRECTGRAPH_IRENDERER_H

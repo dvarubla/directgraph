@@ -1,5 +1,4 @@
-#ifndef PROJECT_THREADCONTROLLER_H
-#define PROJECT_THREADCONTROLLER_H
+#pragma once
 
 #include "MyWindow.h"
 #include "Queue.h"
@@ -43,5 +42,3 @@ namespace directgraph {
         void repaint();
     };
 }
-
-#endif //PROJECT_THREADCONTROLLER_H

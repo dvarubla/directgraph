@@ -1,5 +1,4 @@
-#ifndef PROJECT_IMYWINDOW_H
-#define PROJECT_IMYWINDOW_H
+#pragma once
 
 #include "IRenderer.h"
 #include "IWindowListener.h"
@@ -14,5 +13,3 @@ namespace directgraph{
         virtual ~IMyWindow(){}
     };
 }
-
-#endif //PROJECT_IMYWINDOW_H

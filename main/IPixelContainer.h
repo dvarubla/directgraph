@@ -1,5 +1,4 @@
-#ifndef PROJECT_IPIXELCONTAINER_H
-#define PROJECT_IPIXELCONTAINER_H
+#pragma once
 
 #include <stdint.h>
 #include "util.h"
@@ -23,5 +22,3 @@ namespace directgraph {
         virtual ~IPixelContainer(){}
     };
 }
-
-#endif //PROJECT_IPIXELCONTAINER_H

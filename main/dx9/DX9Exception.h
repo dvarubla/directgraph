@@ -1,5 +1,4 @@
-#ifndef DIRECTGRAPH_DX9EXCEPTION_H
-#define DIRECTGRAPH_DX9EXCEPTION_H
+#pragma once
 
 #include <WException.h>
 
@@ -9,5 +8,3 @@ namespace directgraph {
         DX9Exception(const std::wstring &errStr);
     };
 }
-
-#endif //DIRECTGRAPH_DX9EXCEPTION_H

@@ -1,5 +1,4 @@
-#ifndef PROJECT_RENDERERSTUB_H
-#define PROJECT_RENDERERSTUB_H
+#pragma once
 
 #include <QueueItem.h>
 #include <vector>
@@ -25,5 +24,3 @@ namespace directgraph{
         void drawImpl(IQueueReader *reader);
     };
 }
-
-#endif //PROJECT_RENDERERSTUB_H

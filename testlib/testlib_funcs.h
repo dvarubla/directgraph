@@ -1,5 +1,4 @@
-#ifndef DIRECTGRAPH_TESTLIB_FUNCS_H
-#define DIRECTGRAPH_TESTLIB_FUNCS_H
+#pragma once
 
 #include <windows.h>
 #include <string>
@@ -57,5 +56,3 @@ namespace directgraph_testlib {
     int add_func(ImageTestWrap *test, const std::wstring &name);
     void test_image(ImageTest *test, const std::wstring &name);
 }
-
-#endif //DIRECTGRAPH_TESTLIB_FUNCS_H

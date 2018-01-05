@@ -1,5 +1,4 @@
-#ifndef DIRECTGRAPH_TESTLIB_IMAGETESTER_H
-#define DIRECTGRAPH_TESTLIB_IMAGETESTER_H
+#pragma once
 
 #include <string>
 #include <gdiplus.h>
@@ -18,5 +17,3 @@ namespace directgraph_testlib {
         void test(BitmapWrap *bmpWin, const std::wstring &name);
     };
 }
-
-#endif //DIRECTGRAPH_TESTLIB_IMAGETESTER_H

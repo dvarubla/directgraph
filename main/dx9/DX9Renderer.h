@@ -1,5 +1,4 @@
-#ifndef DIRECTGRAPH_DX9RENDERER_H
-#define DIRECTGRAPH_DX9RENDERER_H
+#pragma once
 
 #include <IRenderer.h>
 #include <d3d9.h>
@@ -76,5 +75,3 @@ namespace directgraph {
         virtual PixelContainerFactory* getPixContFactory();
     };
 }
-
-#endif //DIRECTGRAPH_DX9RENDERER_H

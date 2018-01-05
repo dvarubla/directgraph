@@ -1,5 +1,4 @@
-#ifndef PROJECT_UTIL_H
-#define PROJECT_UTIL_H
+#pragma once
 
 #include <stdint.h>
 
@@ -13,5 +12,3 @@ namespace directgraph{
         uint_fast32_t bottom;
     };
 }
-
-#endif //PROJECT_UTIL_H

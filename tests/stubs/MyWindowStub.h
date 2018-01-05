@@ -1,5 +1,4 @@
-#ifndef PROJECT_MYWINDOWSTUB_H
-#define PROJECT_MYWINDOWSTUB_H
+#pragma once
 
 #include <main/IMyWindow.h>
 #include <gmock/gmock.h>
@@ -14,5 +13,3 @@ namespace directgraph {
         MOCK_METHOD2(addListener, void(IWindowListener *listener, void *param));
     };
 }
-
-#endif //PROJECT_MYWINDOWSTUB_H

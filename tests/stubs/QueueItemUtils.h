@@ -1,5 +1,4 @@
-#ifndef PROJECT_QUEUEITEMUTILS_H
-#define PROJECT_QUEUEITEMUTILS_H
+#pragma once
 
 #include <QueueItem.h>
 
@@ -11,5 +10,3 @@ namespace directgraph {
         bool operator() (QueueItem l, QueueItem r);
     };
 }
-
-#endif //PROJECT_QUEUEITEMUTILS_H

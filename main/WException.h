@@ -1,5 +1,4 @@
-#ifndef DIRECTGRAPH_WEXCEPTION_H
-#define DIRECTGRAPH_WEXCEPTION_H
+#pragma once
 
 #include <stdexcept>
 
@@ -15,4 +14,3 @@ namespace directgraph {
         void setString(const std::wstring &str);
     };
 }
-#endif //DIRECTGRAPH_WEXCEPTION_H

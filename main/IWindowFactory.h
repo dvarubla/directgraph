@@ -1,5 +1,4 @@
-#ifndef DIRECTGRAPH_IWINDOWFACTORY_H
-#define DIRECTGRAPH_IWINDOWFACTORY_H
+#pragma once
 
 #include <MyWindow.h>
 
@@ -15,5 +14,3 @@ namespace directgraph {
         virtual void deleteWindow(IMyWindow *win) = 0;
     };
 }
-
-#endif //DIRECTGRAPH_IWINDOWFACTORY_H

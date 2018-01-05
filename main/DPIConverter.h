@@ -1,5 +1,4 @@
-#ifndef DIRECTGRAPH_DPICONVERTER_H
-#define DIRECTGRAPH_DPICONVERTER_H
+#pragma once
 
 namespace directgraph {
     class DPIConverter {
@@ -10,5 +9,3 @@ namespace directgraph {
         float convertY(float dip);
     };
 }
-
-#endif //DIRECTGRAPH_DPICONVERTER_H

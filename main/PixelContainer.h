@@ -1,5 +1,4 @@
-#ifndef PROJECT_PIXELCONTAINER_H
-#define PROJECT_PIXELCONTAINER_H
+#pragma once
 
 #include "IPixelContainer.h"
 #include "util.h"
@@ -80,5 +79,3 @@ namespace directgraph {
         bool tryAddPixel(uint_fast32_t x, uint_fast32_t y, uint_fast32_t color);
     };
 }
-
-#endif //PROJECT_PIXELCONTAINER_H

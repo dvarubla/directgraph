@@ -1,5 +1,5 @@
-#ifndef PROJECT_COMMON_H
-#define PROJECT_COMMON_H
+#pragma once
+
 #include <main/dx9/DX9WindowFactory.h>
 #include <testlib/testlib_funcs.h>
 #include <tests/stubs/QueueReaderStub.h>
@@ -17,5 +17,3 @@ public:
     void addOnCall(NiceMock<QueueReaderStub> &readerStub);
     void init_factory();
 };
-
-#endif //PROJECT_COMMON_H

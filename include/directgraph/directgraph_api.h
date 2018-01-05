@@ -1,5 +1,5 @@
-#ifndef DIRECTGRAPH_MAINLOOP_H
-#define DIRECTGRAPH_MAINLOOP_H
+#ifndef DIRECTGRAPH_API_H
+#define DIRECTGRAPH_API_H
 #include <windows.h>
 #include <stdint.h>
 #include "export_header.h"
@@ -63,4 +63,4 @@ WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine, INT
 }
 #endif
 
-#endif //DIRECTGRAPH_MAINLOOP_H
+#endif //DIRECTGRAPH_API_H

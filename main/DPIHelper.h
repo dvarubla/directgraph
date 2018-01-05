@@ -1,5 +1,4 @@
-﻿#ifndef DIRECTGRAPH_DPIHELPER_H
-#define DIRECTGRAPH_DPIHELPER_H
+﻿#pragma once
 
 #include <stdint.h>
 
@@ -29,4 +28,3 @@ namespace directgraph {
 
     void setDPIAware();
 }
-#endif //DIRECTGRAPH_DPIHELPER_H

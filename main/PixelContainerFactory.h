@@ -1,5 +1,4 @@
-#ifndef PROJECT_PIXELCONTAINERFACTORY_H
-#define PROJECT_PIXELCONTAINERFACTORY_H
+#pragma once
 
 #include <utility>
 #include "IPixelContainer.h"
@@ -28,5 +27,3 @@ namespace directgraph {
         uint_fast32_t getMaxHeight();
     };
 }
-
-#endif //PROJECT_PIXELCONTAINERFACTORY_H

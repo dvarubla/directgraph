@@ -1,5 +1,5 @@
-#ifndef DIRECTGRAPH_DX9WINDOWFACTORY_H
-#define DIRECTGRAPH_DX9WINDOWFACTORY_H
+#pragma once
+
 #include <DPIHelper.h>
 #include <MyWindow.h>
 #include <dx9/DX9Common.h>
@@ -21,7 +21,3 @@ namespace directgraph {
         void deleteWindow(IMyWindow *win);
     };
 }
-
-
-
-#endif //DIRECTGRAPH_DX9WINDOWFACTORY_H

@@ -1,5 +1,4 @@
-#ifndef PROJECT_QUEUEREADER_H
-#define PROJECT_QUEUEREADER_H
+#pragma once
 
 #include "Queue.h"
 #include "IQueueReader.h"
@@ -21,5 +20,3 @@ namespace directgraph {
         void endReading(uint_fast32_t numRead);
     };
 }
-
-#endif //PROJECT_QUEUEREADER_H

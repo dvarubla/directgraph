@@ -1,5 +1,4 @@
-#ifndef DIRECTGRAPH_DX9COMMON_H
-#define DIRECTGRAPH_DX9COMMON_H
+#pragma once
 
 #include <d3d9.h>
 #include <stdint.h>
@@ -35,5 +34,3 @@ namespace directgraph {
         void unlock();
     };
 }
-
-#endif //DIRECTGRAPH_DX9COMMON_H
