@@ -1,39 +1,26 @@
 #include <gtest/gtest.h>
 #include <tests/stubs/QueueReaderStub.h>
-#include <PixelContainer.h>
-#include <QueueItem.h>
 #include <graphics_const_internal.h>
-
-namespace {
-    class DX9PixelContainerTest : public ::testing::Test {
-    public:
-
-    protected:
-
-        DX9PixelContainerTest() {
-        }
-
-        virtual ~DX9PixelContainerTest() {
-        }
-
-        virtual void SetUp() {
-        }
-
-        virtual void TearDown() {
-        }
-    };
-}
-
 #include "common.h"
 
-static float WIDTH = 200;
-static float HEIGHT = 300;
+class DX9PixelContainerTest : public ImageTest, public CommonSimple {
+public:
+    NiceMock<QueueReaderStub> _readerStub;
+    IMyWindow *win;
+    const float WIDTH = 200;
+    const float HEIGHT = 300;
+
+    DX9PixelContainerTest() {
+        win = createWindow(WIDTH, HEIGHT);
+        addOnCall(_readerStub);
+    }
+
+    ~DX9PixelContainerTest(){
+
+    }
+};
 
 IMG_TEST_F(DX9PixelContainerTest, TwoPixels){
-    init_factory();
-    IMyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
-    win->show();
-    QueueReaderStub _readerStub;
     QueueItem items[2];
     items[0].type = QueueItem::CLEAR;
     items[1].type = QueueItem::PIXEL_CONTAINER;
@@ -47,10 +34,6 @@ IMG_TEST_F(DX9PixelContainerTest, TwoPixels){
 }
 
 IMG_TEST_F(DX9PixelContainerTest, TwoPixelsVertical){
-    init_factory();
-    IMyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
-    win->show();
-    QueueReaderStub _readerStub;
     QueueItem items[2];
     items[0].type = QueueItem::CLEAR;
     items[1].type = QueueItem::PIXEL_CONTAINER;
@@ -64,10 +47,6 @@ IMG_TEST_F(DX9PixelContainerTest, TwoPixelsVertical){
 }
 
 IMG_TEST_F(DX9PixelContainerTest, VerticalTopDown){
-    init_factory();
-    IMyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
-    win->show();
-    QueueReaderStub _readerStub;
     QueueItem items[2];
     items[0].type = QueueItem::CLEAR;
     items[1].type = QueueItem::PIXEL_CONTAINER;
@@ -84,10 +63,6 @@ IMG_TEST_F(DX9PixelContainerTest, VerticalTopDown){
 }
 
 IMG_TEST_F(DX9PixelContainerTest, VerticalBottomUp){
-    init_factory();
-    IMyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
-    win->show();
-    QueueReaderStub _readerStub;
     QueueItem items[2];
     items[0].type = QueueItem::CLEAR;
     items[1].type = QueueItem::PIXEL_CONTAINER;
@@ -104,10 +79,6 @@ IMG_TEST_F(DX9PixelContainerTest, VerticalBottomUp){
 }
 
 IMG_TEST_F(DX9PixelContainerTest, RedSquare5x5TopDown){
-    init_factory();
-    IMyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
-    win->show();
-    QueueReaderStub _readerStub;
     QueueItem items[2];
     items[0].type = QueueItem::CLEAR;
     items[1].type = QueueItem::PIXEL_CONTAINER;
@@ -127,10 +98,6 @@ IMG_TEST_F(DX9PixelContainerTest, RedSquare5x5TopDown){
 }
 
 IMG_TEST_F(DX9PixelContainerTest, RedSquareAndBar){
-    init_factory();
-    IMyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
-    win->show();
-    QueueReaderStub _readerStub;
     QueueItem items[4];
     items[0].type = QueueItem::CLEAR;
     items[1].type = QueueItem::PIXEL_CONTAINER;
@@ -154,10 +121,6 @@ IMG_TEST_F(DX9PixelContainerTest, RedSquareAndBar){
 }
 
 IMG_TEST_F(DX9PixelContainerTest, RedSquare5x5BottomUp){
-    init_factory();
-    IMyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
-    win->show();
-    QueueReaderStub _readerStub;
     QueueItem items[2];
     items[0].type = QueueItem::CLEAR;
     items[1].type = QueueItem::PIXEL_CONTAINER;
@@ -177,10 +140,6 @@ IMG_TEST_F(DX9PixelContainerTest, RedSquare5x5BottomUp){
 }
 
 IMG_TEST_F(DX9PixelContainerTest, ExtraLineTopDown){
-    init_factory();
-    IMyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
-    win->show();
-    QueueReaderStub _readerStub;
     QueueItem items[2];
     items[0].type = QueueItem::CLEAR;
     items[1].type = QueueItem::PIXEL_CONTAINER;
@@ -203,10 +162,6 @@ IMG_TEST_F(DX9PixelContainerTest, ExtraLineTopDown){
 }
 
 IMG_TEST_F(DX9PixelContainerTest, ExtraLineBottomUp){
-    init_factory();
-    IMyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
-    win->show();
-    QueueReaderStub _readerStub;
     QueueItem items[2];
     items[0].type = QueueItem::CLEAR;
     items[1].type = QueueItem::PIXEL_CONTAINER;

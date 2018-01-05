@@ -2,6 +2,7 @@
 #include <dx9/DX9WindowFactory.h>
 #include "ThreadController.h"
 #include "WindowManager.h"
+#include "ControllerFactory.h"
 
 using namespace directgraph;
 
@@ -20,8 +21,9 @@ static void tryCreateWindowManager(){
     if(InterlockedExchange(&needCreateWindowManager, 0)) {
         IWindowFactory *factory = new DX9WindowFactory();
         std::vector<IWindowFactory *> factories;
+        IControllerFactory *ctrlFactory = new ControllerFactory();
         factories.push_back(factory);
-        WindowManager *localManager = new WindowManager(factories);
+        WindowManager *localManager = new WindowManager(factories, ctrlFactory);
         InterlockedExchangePointer(&windowManager, localManager);
     }
 }

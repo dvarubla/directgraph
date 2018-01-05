@@ -6,8 +6,10 @@
 namespace directgraph{
     const DirectgraphWinIndex WindowManager::NO_CURRENT_WINDOW = std::numeric_limits<DirectgraphWinIndex>::max();
 
-    WindowManager::WindowManager(std::vector<IWindowFactory *> &rendFactories)
-            : _rendFactories(rendFactories), _curWindowIndex(NO_CURRENT_WINDOW), _curMapIndex(0)
+    WindowManager::WindowManager(
+            std::vector<IWindowFactory *> &rendFactories,
+            IControllerFactory *ctrlFactory
+    ): _rendFactories(rendFactories), _ctrlFactory(ctrlFactory), _curWindowIndex(NO_CURRENT_WINDOW), _curMapIndex(0)
     {
     }
 
@@ -25,11 +27,11 @@ namespace directgraph{
         IMyWindow *win = _rendFactories[params.renderer]->createPixelWindow(params.name, params.width, params.height);
         win->show();
         win->addListener(this, index);
-        ThreadController *controller = new ThreadController(win);
+        IController *controller = _ctrlFactory->createMultThreadController(win);
         controller->init();
         _mapLock.startWrite();
         _windows.insert(std::pair<DirectgraphWinIndex, WindowData>(
-                *index, {controller, index, GetCurrentThreadId()}
+                *index, {controller, win, params.renderer, index, GetCurrentThreadId()}
         ));
         if(_curWindowIndex == NO_CURRENT_WINDOW){
             _curWindowIndex = *index;
@@ -52,7 +54,8 @@ namespace directgraph{
 
         _mapLock.startWrite();
         delete(_windows[winIndex].winIndexMem);
-        delete(_windows[winIndex].ctrl);
+        _ctrlFactory->deleteController(_windows[winIndex].ctrl);
+        _rendFactories[_windows[winIndex].renderer]->deleteWindow(_windows[winIndex].win);
         _windows.erase(winIndex);
         if(_curWindowIndex == winIndex){
             if(_windows.empty()) {
@@ -69,6 +72,7 @@ namespace directgraph{
         for(uint_fast32_t i = 0; i < _rendFactories.size(); i++){
             delete(_rendFactories[i]);
         }
+        delete _ctrlFactory;
     }
 
     WindowManager::ControllerAndIndex WindowManager::getCurrentWindowAndLock() {

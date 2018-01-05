@@ -8,6 +8,7 @@
 #include "IWindowFactory.h"
 #include "NullWindowListener.h"
 #include "RWRPLock.h"
+#include "IControllerFactory.h"
 
 namespace directgraph {
     struct DirectgraphWinParams{
@@ -24,11 +25,14 @@ namespace directgraph {
     private:
         struct WindowData{
             IController *ctrl;
+            IMyWindow *win;
+            DirectgraphRendererType renderer;
             void *winIndexMem;
             DWORD threadId;
         };
         std::map<DirectgraphWinIndex, WindowData> _windows;
         std::vector<IWindowFactory*> _rendFactories;
+        IControllerFactory *_ctrlFactory;
         DirectgraphWinIndex _curWindowIndex;
         RWRPLock _mapLock;
         RWRPLock _curWindowLock;
@@ -39,7 +43,7 @@ namespace directgraph {
             DirectgraphWinIndex index;
         };
         const static DirectgraphWinIndex NO_CURRENT_WINDOW;
-        WindowManager(std::vector<IWindowFactory*> &rendFactories);
+        WindowManager(std::vector<IWindowFactory*> &rendFactories, IControllerFactory *ctrlFactory);
         void setCurrentWindow(DirectgraphWinIndex winIndex);
         DirectgraphWinIndex createWindow(const DirectgraphWinParams &params);
         void destroyWindow(DirectgraphWinIndex winIndex);

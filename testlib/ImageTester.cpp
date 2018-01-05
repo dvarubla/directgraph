@@ -16,7 +16,9 @@ namespace directgraph_testlib {
             i != getTestInfos().cend();
             ++i
         ) {
-            BitmapWrap *bitmapWrap = i->func();
+            ImageTest *test = i->test->getObj();
+            BitmapWrap *bitmapWrap = test->imageTestRun();
+            delete test;
             Gdiplus::Bitmap *bmp = bitmapWrap->getBitmap();
             std::wstring filename = getFullPath(i->str);
             bmp->Save(filename.c_str(), &encoderClsid, NULL);

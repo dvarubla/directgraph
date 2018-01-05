@@ -10,6 +10,7 @@ namespace directgraph{
     }
 
     DX9WindowFactory::~DX9WindowFactory() {
+        delete _common;
     }
 
     IMyWindow *DX9WindowFactory::createDPIWindow(const wchar_t *name, float width, float height) {
@@ -29,5 +30,10 @@ namespace directgraph{
         MyWindow *window = new MyWindow(name, helper->toPixelsX(width), helper->toPixelsY(height));
         window->setRenderer(renderer);
         return window;
+    }
+
+    void DX9WindowFactory::deleteWindow(IMyWindow *win) {
+        delete win->getRenderer();
+        delete win;
     }
 }

@@ -17,6 +17,8 @@ namespace directgraph {
 
         IMyWindow *createDPIWindow(const wchar_t *name, float width, float height);
         IMyWindow *createPixelWindow(const wchar_t *name, float width, float height);
+
+        void deleteWindow(IMyWindow *win);
     };
 }
 

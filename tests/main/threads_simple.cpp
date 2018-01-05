@@ -6,10 +6,15 @@
 #include <tests/stubs/MyWindowStub.h>
 
 using namespace directgraph;
+using testing::Return;
+using testing::Invoke;
+using testing::WithArgs;
+using testing::NiceMock;
+using testing::_;
 
 class ThreadsSimpleTest : public ::testing::Test {
 public:
-    IMyWindow *win;
+    MyWindowStub *win;
     RendererStub *ren;
 
     void addPointsLine(
@@ -45,11 +50,15 @@ public:
     }
 protected:
     ThreadsSimpleTest() {
-        ren = new RendererStub();
-        win = new MyWindowStub(ren);
+        ren = new NiceMock<RendererStub>();
+        win = new NiceMock<MyWindowStub>();
+        ON_CALL(*win, getRenderer()).WillByDefault(Return(ren));
+        ON_CALL(*ren, draw(_, _)).WillByDefault(testing::WithArgs<0>(Invoke(ren, &RendererStub::drawImpl)));
     }
 
     virtual ~ThreadsSimpleTest() {
+        delete ren;
+        delete win;
     }
 
     virtual void SetUp() {

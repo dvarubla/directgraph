@@ -2,9 +2,9 @@ project(dx9_tests)
 
 set(SHADERS_RES_FILE "${CMAKE_BINARY_DIR}/resources/shaders.res")
 
-add_executable(dx9_bar dx9_bar.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h)
-add_executable(dx9_single_pixel dx9_single_pixel.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h)
-add_executable(dx9_pixel_container dx9_pixel_container.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h)
+add_executable(dx9_bar dx9_bar.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp)
+add_executable(dx9_single_pixel dx9_single_pixel.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp)
+add_executable(dx9_pixel_container dx9_pixel_container.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp)
 
 set_target_properties(
         dx9_bar dx9_single_pixel dx9_pixel_container

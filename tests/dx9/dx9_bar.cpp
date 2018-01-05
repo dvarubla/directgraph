@@ -3,36 +3,28 @@
 #include <graphics_const_internal.h>
 #include <tests/stubs/QueueReaderStub.h>
 
-namespace {
-    class DX9BarTest : public ::testing::Test {
-    public:
-
-    protected:
-
-        DX9BarTest() {
-        }
-
-        virtual ~DX9BarTest() {
-        }
-
-        virtual void SetUp() {
-        }
-
-        virtual void TearDown() {
-        }
-    };
-}
-
+#include <testlib/testlib_funcs.h>
 #include "common.h"
 
-static float WIDTH = 200;
-static float HEIGHT = 300;
+using testing::NiceMock;
+
+class DX9BarTest: public ImageTest, public CommonSimple{
+public:
+    NiceMock<QueueReaderStub> _readerStub;
+    IMyWindow *win;
+    const float WIDTH = 200;
+    const float HEIGHT = 300;
+
+    DX9BarTest() {
+        win = createWindow(WIDTH, HEIGHT);
+        addOnCall(_readerStub);
+    }
+
+    virtual ~DX9BarTest() {
+    }
+};
 
 IMG_TEST_F(DX9BarTest, SimpleBar){
-    init_factory();
-    IMyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
-    win->show();
-    QueueReaderStub _readerStub;
     QueueItem items[3];
     items[0].type = QueueItem::CLEAR;
     items[1].type = QueueItem::SETFILLSTYLE;
@@ -44,10 +36,6 @@ IMG_TEST_F(DX9BarTest, SimpleBar){
 }
 
 IMG_TEST_F(DX9BarTest, InverseCoords){
-    init_factory();
-    IMyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
-    win->show();
-    QueueReaderStub _readerStub;
     QueueItem items[3];
     items[0].type = QueueItem::CLEAR;
     items[1].type = QueueItem::SETFILLSTYLE;
@@ -59,10 +47,6 @@ IMG_TEST_F(DX9BarTest, InverseCoords){
 }
 
 IMG_TEST_F(DX9BarTest, OutsideScreen){
-    init_factory();
-    IMyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
-    win->show();
-    QueueReaderStub _readerStub;
     QueueItem items[3];
     items[0].type = QueueItem::CLEAR;
     items[1].type = QueueItem::SETFILLSTYLE;
@@ -74,10 +58,6 @@ IMG_TEST_F(DX9BarTest, OutsideScreen){
 }
 
 IMG_TEST_F(DX9BarTest, OutsideScreenFull){
-    init_factory();
-    IMyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
-    win->show();
-    QueueReaderStub _readerStub;
     QueueItem items[3];
     items[0].type = QueueItem::CLEAR;
     items[1].type = QueueItem::SETFILLSTYLE;
@@ -89,10 +69,6 @@ IMG_TEST_F(DX9BarTest, OutsideScreenFull){
 }
 
 IMG_TEST_F(DX9BarTest, OnePixel){
-    init_factory();
-    IMyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
-    win->show();
-    QueueReaderStub _readerStub;
     QueueItem items[3];
     items[0].type = QueueItem::CLEAR;
     items[1].type = QueueItem::SETFILLSTYLE;
@@ -104,10 +80,6 @@ IMG_TEST_F(DX9BarTest, OnePixel){
 }
 
 IMG_TEST_F(DX9BarTest, OnePxBorder){
-    init_factory();
-    IMyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
-    win->show();
-    QueueReaderStub _readerStub;
     QueueItem items[5];
     items[0].type = QueueItem::CLEAR;
     items[1].type = QueueItem::SETFILLSTYLE;

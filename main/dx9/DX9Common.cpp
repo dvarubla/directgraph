@@ -93,4 +93,9 @@ namespace directgraph {
         LeaveCriticalSection(&_mainCS);
     }
 
+    DX9Common::~DX9Common() {
+        _device->Release();
+        _d3d->Release();
+    }
+
 }

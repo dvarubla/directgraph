@@ -3,12 +3,13 @@
 #include <gtest/gtest.h>
 
 namespace directgraph_testlib {
-    void test_image(BitmapWrap *bitmapWrap, const std::wstring &name) {
-        getTester()->test(bitmapWrap, name);
+    void test_image(ImageTest *test, const std::wstring &name) {
+        getTester()->test(test->imageTestRun(), name);
+        delete test;
     }
 
-    int add_func(BitmapWrap* (*func)(), const std::wstring &name) {
-        TestInfo info = {func, name};
+    int add_func(ImageTestWrap *test, const std::wstring &name) {
+        TestInfo info = {test, name};
         getTestInfos().push_back(info);
         return 0;
     }

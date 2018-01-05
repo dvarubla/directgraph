@@ -137,7 +137,6 @@ namespace directgraph{
         stopRepaintThread();
         DeleteCriticalSection(&_addCS);
         DeleteCriticalSection(&_queueCS);
-        delete _window;
     }
 
     void ThreadController::init() {

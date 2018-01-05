@@ -3,7 +3,7 @@ project(main_tests)
 add_executable(pixel_container pixel_container.cpp)
 add_executable(threads_simple threads_simple.cpp ../stubs/MyWindowStub.cpp ../stubs/MyWindowStub.h ../stubs/RendererStub.cpp ../stubs/RendererStub.h ../stubs/QueueItemUtils.cpp ../stubs/QueueItemUtils.h)
 add_executable(threads_last threads_last.cpp ../stubs/MyWindowStub.cpp ../stubs/MyWindowStub.h ../stubs/RendererStub.cpp ../stubs/RendererStub.h ../stubs/QueueItemUtils.cpp ../stubs/QueueItemUtils.h)
-add_executable(window_manager window_manager.cpp window_manager.cpp ../stubs/WindowFactoryStub.cpp ../stubs/WindowFactoryStub.h ../stubs/MyWindowStub.cpp ../stubs/MyWindowStub.h ../stubs/RendererStub.cpp ../stubs/RendererStub.h)
+add_executable(window_manager window_manager.cpp window_manager.cpp ../stubs/WindowFactoryStub.cpp ../stubs/WindowFactoryStub.h ../stubs/MyWindowStub.cpp ../stubs/MyWindowStub.h ../stubs/RendererStub.cpp ../stubs/RendererStub.h ../stubs/ControllerFactoryStub.cpp ../stubs/ControllerFactoryStub.h ../stubs/ControllerStub.cpp ../stubs/ControllerStub.h)
 
 set_target_properties(
     pixel_container threads_simple threads_last window_manager

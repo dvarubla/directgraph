@@ -8,10 +8,15 @@
 #include <PixelContainer.h>
 
 using namespace directgraph;
+using testing::Return;
+using testing::Invoke;
+using testing::WithArgs;
+using testing::NiceMock;
+using testing::_;
 
 class ThreadsLastTest : public ::testing::Test {
 public:
-    IMyWindow *win;
+    MyWindowStub *win;
     RendererStub *ren;
     PixelContainerFactory *fact;
 
@@ -55,13 +60,18 @@ public:
     }
 protected:
     ThreadsLastTest() {
-        ren = new RendererStub();
+        ren = new NiceMock<RendererStub>();
         fact = new PixelContainerFactory(500, 500, IPixelContainer::R8G8B8);
-        ren->setPixContFactory(fact);
-        win = new MyWindowStub(ren);
+        win = new NiceMock<MyWindowStub>();
+        ON_CALL(*win, getRenderer()).WillByDefault(Return(ren));
+        ON_CALL(*ren, draw(_, _)).WillByDefault(testing::WithArgs<0>(Invoke(ren, &RendererStub::drawImpl)));
+        ON_CALL(*ren, getPixContFactory()).WillByDefault(Return(fact));
     }
 
     virtual ~ThreadsLastTest() {
+        delete ren;
+        delete fact;
+        delete win;
     }
 
     virtual void SetUp() {

@@ -1,44 +1,16 @@
 #include "RendererStub.h"
 
 namespace directgraph{
-    void RendererStub::setWindow(HWND hwnd) {
-    }
 
-    void RendererStub::repaint() {
-    }
-
-    void RendererStub::draw(IQueueReader *reader, CommonProps *props) {
+    void RendererStub::drawImpl(IQueueReader *reader) {
         uint_fast32_t size = reader->getSize();
         for(uint_fast32_t i = 0; i < size; i++){
             _data.push_back(reader->getAt(i));
         }
-        _props = props;
         reader->endReading(size);
     }
 
     std::vector<QueueItem> &RendererStub::getData() {
         return _data;
-    }
-
-    CommonProps *RendererStub::getProps() {
-        return _props;
-    }
-
-    PixelContainerFactory *RendererStub::getPixContFactory() {
-        return _pixContFact;
-    }
-
-    void RendererStub::setPixContFactory(PixelContainerFactory *pixContFact) {
-        _pixContFact = pixContFact;
-    }
-
-    RendererStub::RendererStub(): _pixContFact(NULL) {
-
-    }
-
-    RendererStub::~RendererStub() {
-        if(_pixContFact != NULL){
-            delete(_pixContFact);
-        }
     }
 }

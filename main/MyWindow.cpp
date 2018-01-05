@@ -84,7 +84,6 @@ namespace directgraph {
     }
 
     MyWindow::~MyWindow() {
-        delete _renderer;
         EnterCriticalSection(&windowMapCS);
         windowMap.erase(_hwnd);
         LeaveCriticalSection(&windowMapCS);

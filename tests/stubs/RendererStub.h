@@ -4,31 +4,25 @@
 #include <QueueItem.h>
 #include <vector>
 #include <IRenderer.h>
+#include <gmock/gmock.h>
 
 namespace directgraph{
     class RendererStub: public IRenderer {
     private:
         std::vector<QueueItem> _data;
-        PixelContainerFactory *_pixContFact;
-        CommonProps *_props;
     public:
-        RendererStub();
 
-        ~RendererStub();
-
-        PixelContainerFactory *getPixContFactory();
+        MOCK_METHOD0(getPixContFactory, PixelContainerFactory *());
 
         std::vector<QueueItem> & getData();
 
-        void setPixContFactory(PixelContainerFactory *pixContFact);
+        MOCK_METHOD1(setWindow, void (HWND hwnd));
 
-        void setWindow(HWND hwnd);
+        MOCK_METHOD0(repaint, void ());
 
-        void repaint();
+        MOCK_METHOD2(draw, void(IQueueReader *reader, CommonProps *props));
 
-        void draw(IQueueReader *reader, CommonProps *props);
-
-        CommonProps *getProps();
+        void drawImpl(IQueueReader *reader);
     };
 }
 

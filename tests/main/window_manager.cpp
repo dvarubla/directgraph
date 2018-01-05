@@ -1,20 +1,42 @@
 #include <gtest/gtest.h>
 #include <WindowManager.h>
 #include <tests/stubs/WindowFactoryStub.h>
+#include <tests/stubs/ControllerFactoryStub.h>
+#include <tests/stubs/MyWindowStub.h>
+#include <tests/stubs/ControllerStub.h>
 
 using namespace directgraph;
+
+using testing::_;
+using testing::Return;
+using testing::NiceMock;
 
 namespace {
     class WindowManagerTest : public ::testing::Test {
     protected:
         WindowManager *m;
+        WindowFactoryStub *wf;
+        ControllerFactoryStub *cf;
+        ControllerStub *cstub;
+        MyWindowStub *wstub;
         WindowManagerTest() {
-            std::vector<IWindowFactory *> facts = {new WindowFactoryStub()};
-            m = new WindowManager(facts);
+            wf = new NiceMock<WindowFactoryStub>();
+            wstub = new NiceMock<MyWindowStub>();
+            ON_CALL(*wf, createPixelWindow(_, _, _)).WillByDefault(Return(wstub));
+            cf = new NiceMock<ControllerFactoryStub>();
+            cstub = new NiceMock<ControllerStub>();
+            ON_CALL(*cf, createMultThreadController(_)).WillByDefault(Return(cstub));
+
+            std::vector<IWindowFactory *> facts;
+            facts.push_back(wf);
+            m = new WindowManager(facts, cf);
+
         }
 
         virtual ~WindowManagerTest() {
             delete m;
+            delete wstub;
+            delete cstub;
         }
 
         virtual void SetUp() {

@@ -20,6 +20,8 @@ namespace directgraph {
     public:
         DX9Common();
 
+        ~DX9Common();
+
         D3DFORMAT getFormat();
 
         void getDpi(float &dpiX, float &dpiY);

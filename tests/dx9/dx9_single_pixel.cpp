@@ -1,36 +1,25 @@
 #include <gtest/gtest.h>
 #include <tests/stubs/QueueReaderStub.h>
-
-namespace {
-    class DX9SinglePixelTest : public ::testing::Test {
-    public:
-
-    protected:
-
-        DX9SinglePixelTest() {
-        }
-
-        virtual ~DX9SinglePixelTest() {
-        }
-
-        virtual void SetUp() {
-        }
-
-        virtual void TearDown() {
-        }
-    };
-}
-
 #include "common.h"
 
-static float WIDTH = 200;
-static float HEIGHT = 300;
+class DX9SinglePixelTest : public ImageTest, public CommonSimple {
+public:
+    NiceMock<QueueReaderStub> _readerStub;
+    IMyWindow *win;
+    const float WIDTH = 200;
+    const float HEIGHT = 300;
+
+    DX9SinglePixelTest() {
+        win = createWindow(WIDTH, HEIGHT);
+        addOnCall(_readerStub);
+    }
+
+    ~DX9SinglePixelTest(){
+
+    }
+};
 
 IMG_TEST_F(DX9SinglePixelTest, OnePixel){
-    init_factory();
-    IMyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
-    win->show();
-    QueueReaderStub _readerStub;
     QueueItem items[2];
     items[0].type = QueueItem::CLEAR;
     items[1].type = QueueItem::SINGLE_PIXEL;
@@ -40,10 +29,6 @@ IMG_TEST_F(DX9SinglePixelTest, OnePixel){
 }
 
 IMG_TEST_F(DX9SinglePixelTest, PixelLine){
-    init_factory();
-    IMyWindow *win = _dx9Wf->createPixelWindow(L"Hello", WIDTH, HEIGHT);
-    win->show();
-    QueueReaderStub _readerStub;
     QueueItem item;
     item.type = QueueItem::CLEAR;
     _readerStub.addItems(&item, 1);
