@@ -24,12 +24,12 @@ namespace directgraph{
     DirectgraphWinIndex WindowManager::createWindow(const DirectgraphWinParams &params) {
         DirectgraphWinIndex *index = new DirectgraphWinIndex;
         *index = static_cast<DirectgraphWinIndex>(InterlockedIncrement(&_curMapIndex));
+        _mapLock.startWrite();
         IMyWindow *win = _rendFactories[params.renderer]->createPixelWindow(params.name, params.width, params.height);
         win->show();
         win->addListener(this, index);
         IController *controller = _ctrlFactory->createMultThreadController(win);
         controller->init();
-        _mapLock.startWrite();
         _windows.insert(std::pair<DirectgraphWinIndex, WindowData>(
                 *index, {controller, win, params.renderer, index, GetCurrentThreadId()}
         ));

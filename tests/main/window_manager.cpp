@@ -96,3 +96,80 @@ TEST_F(WindowManagerTest, WindowGetCtrl){
     m->releaseWindowLock();
     m->destroyWindow(ind1);
 }
+
+static const int MSG_CODE = WM_USER + 6000;
+
+struct WinParam{
+    WindowManager *m;
+    uint_fast32_t maxSleep;
+    std::vector<DirectgraphWinIndex> *createIndices;
+    std::vector<DirectgraphWinIndex> *deleteIndices;
+    DWORD id;
+};
+
+static DWORD WINAPI TwoThreadsHelper(LPVOID param){
+    WinParam *p = static_cast<WinParam *>(param);
+    PostThreadMessage(p->id, MSG_CODE, 0, 0);
+    MSG msg;
+    DirectgraphWinParams winParams = {100, 100, L"Test", DIRECTGRAPH_MULT_THREAD_CTRL, DIRECTGRAPH_DX9_RENDERER};
+    for(uint32_t i = 0; i < 100; i++){
+        p->createIndices->push_back(p->m->createWindow(winParams));
+        p->m->getCurrentWindowAndLock();
+        Sleep(rand() % p->maxSleep);
+        p->m->releaseCurrentWindowLock();
+    }
+
+    PostThreadMessage(p->id, MSG_CODE, 0, 0);
+    GetMessage(&msg, NULL, MSG_CODE, MSG_CODE);
+
+    for(uint32_t i = 0; i < 100; i++){
+        GetMessage(&msg, NULL, MSG_CODE, MSG_CODE);
+        p->m->destroyWindow(static_cast<DirectgraphWinIndex>(msg.wParam));
+        p->deleteIndices->push_back(static_cast<DirectgraphWinIndex>(msg.wParam));
+        p->m->getCurrentWindowAndLock();
+        Sleep(rand() % 5);
+        p->m->releaseCurrentWindowLock();
+    }
+
+    PostThreadMessage(p->id, MSG_CODE, 0, 0);
+    return 0;
+}
+
+TEST_F(WindowManagerTest, TwoThreads){
+    DirectgraphWinParams p = {100, 100, L"Test", DIRECTGRAPH_MULT_THREAD_CTRL, DIRECTGRAPH_DX9_RENDERER};
+    std::vector<DirectgraphWinIndex> createIndices1, createIndices2, deleteIndices2, allIndices;
+    WinParam winParam = {m, 5, &createIndices2, &deleteIndices2, GetCurrentThreadId()};
+    DWORD delThreadId;
+    CreateThread(NULL, 0, TwoThreadsHelper, &winParam, 0, &delThreadId);
+    MSG msg;
+    GetMessage(&msg, NULL, MSG_CODE, MSG_CODE);
+    for(uint32_t i = 0; i < 100; i++){
+        createIndices1.push_back(m->createWindow(p));
+        m->getCurrentWindowAndLock();
+        Sleep(rand() % 5);
+        m->releaseCurrentWindowLock();
+    }
+    GetMessage(&msg, NULL, MSG_CODE, MSG_CODE);
+
+    std::copy(createIndices1.cbegin(), createIndices1.cend(), std::back_inserter(allIndices));
+    std::copy(createIndices2.cbegin(), createIndices2.cend(), std::back_inserter(allIndices));
+    std::sort(allIndices.begin(), allIndices.end());
+    ASSERT_EQ(allIndices.size(), 200);
+    for(uint32_t i = 1; i <= 200; i++){
+        EXPECT_EQ(allIndices[i - 1], i);
+    }
+
+    PostThreadMessage(delThreadId, MSG_CODE, 0, 0);
+
+    for(uint32_t i = 0; i < 100; i++){
+        m->destroyWindow(createIndices1[i]);
+        PostThreadMessage(delThreadId, MSG_CODE, createIndices2[i], 0);
+        m->getCurrentWindowAndLock();
+        Sleep(rand() % 5);
+        m->releaseCurrentWindowLock();
+    }
+    GetMessage(&msg, NULL, MSG_CODE, MSG_CODE);
+    std::sort(createIndices2.begin(), createIndices2.end());
+    std::sort(deleteIndices2.begin(), deleteIndices2.end());
+    EXPECT_EQ(createIndices2, deleteIndices2);
+}
