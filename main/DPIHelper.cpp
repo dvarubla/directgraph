@@ -1,6 +1,7 @@
 ﻿#include "DPIHelper.h"
 #include <windows.h>
 #include <iostream>
+#include "util.h"
 
 namespace directgraph {
 
@@ -11,11 +12,11 @@ namespace directgraph {
     const float DPIHelper::DEFAULT_DPIY = 96.0f;
 
     int_fast32_t DPIHelper::toPixelsX(float dip) {
-        return static_cast<int_fast32_t>(std::round(dip * _dpiX / DEFAULT_DPIX));
+        return static_cast<int_fast32_t>(round(dip * _dpiX / DEFAULT_DPIX));
     }
 
     int_fast32_t DPIHelper::toPixelsY(float dip) {
-        return static_cast<int_fast32_t>(std::round(dip * _dpiY / DEFAULT_DPIY));
+        return static_cast<int_fast32_t>(round(dip * _dpiY / DEFAULT_DPIY));
     }
 
     DPIHelper::DPIHelper() {

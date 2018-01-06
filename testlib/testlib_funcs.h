@@ -18,7 +18,7 @@
     test_fixture##_##test_name##_var
 
 #define IMAGE_TEST_FNAME(test_fixture, test_name)\
-    L#test_fixture"_"#test_name
+    L#test_fixture L"_" L#test_name
 
 #define IMG_TEST_F(test_fixture, test_name)\
     class IMAGE_TEST_NAME(test_fixture, test_name): public test_fixture{\

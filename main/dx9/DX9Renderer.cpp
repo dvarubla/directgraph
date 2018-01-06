@@ -2,7 +2,7 @@
 #include <Queue.h>
 #include "DX9Renderer.h"
 #include <graphics_const_internal.h>
-#include <cmath>
+#include <math.h>
 #include <main/QueueItem.h>
 #include <algorithm>
 
@@ -10,6 +10,18 @@
 #undef min
 
 namespace directgraph {
+    template<>
+    DX9Renderer::RectVertex VertexCreator::create<DX9Renderer::RectVertex>(float x, float y, float z, float rhw, DWORD color) {
+        DX9Renderer::RectVertex v = {x ,y, z, rhw, color};
+        return v;
+    }
+
+    template<>
+    DX9Renderer::TexturedVertex VertexCreator::create<DX9Renderer::TexturedVertex>(float x, float y, float z, float rhw, float tu, float tv) {
+        DX9Renderer::TexturedVertex v = {x ,y, z, rhw,tu, tv};
+        return v;
+    }
+
     DX9Renderer::DX9Renderer(DX9Common *common, DPIHelper *helper, float width, float height) {
         _helper = helper;
         _width = width;
@@ -35,8 +47,8 @@ namespace directgraph {
         _swapChain->GetDevice(&_device);
         _swapChain->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &_backBuffer);
 
-        _pixelTextureWidth = static_cast<uint_fast32_t>(1 << (uint_fast32_t) ceil(log2(pxWidth)));
-        _pixelTextureHeight = static_cast<uint_fast32_t>(1 << (uint_fast32_t) ceil(log2(pxHeight)));
+        _pixelTextureWidth = static_cast<uint_fast32_t>(1 << (uint_fast32_t) ceil(log2<double>(pxWidth)));
+        _pixelTextureHeight = static_cast<uint_fast32_t>(1 << (uint_fast32_t) ceil(log2<double>(pxHeight)));
 
         _device->CreateTexture(
                 _pixelTextureWidth, _pixelTextureHeight, 1, 0,
@@ -238,21 +250,22 @@ namespace directgraph {
             int_fast32_t startX, int_fast32_t startY,
             int_fast32_t endX, int_fast32_t endY
     ) {
-        *vertices = {
+
+        (*vertices) = VertexCreator::create<RectVertex>(
                 static_cast<float>(startX) - 0.5f,
                 static_cast<float>(startY) - 0.5f,
                 0.0f,
                 1.0f,
                 D3DCOLOR_ARGB(0, 0, 0, 0)
-        };
+        );
         vertices++;
-        *vertices = {
+        *vertices = VertexCreator::create<RectVertex>(
                 static_cast<float>(endX) - 0.5f,
                 static_cast<float>(endY) - 0.5f,
                 0.0f,
                 1.0f,
                 D3DCOLOR_ARGB(0, 0, 0, 0)
-        };
+        );
         vertices++;
         return vertices;
     }
@@ -264,37 +277,37 @@ namespace directgraph {
             int_fast32_t endX, int_fast32_t endY,
             uint_fast32_t color
     ) {
-        *vertices = {
+        *vertices = VertexCreator::create<RectVertex>(
                 static_cast<float>(startX) - 0.5f,
                 static_cast<float>(startY) - 0.5f,
                 0.0f,
                 1.0f,
                 swap_color(color)
-        };
+        );
         vertices++;
-        *vertices = {
+        *vertices = VertexCreator::create<RectVertex>(
                 static_cast<float>(endX) - 0.5f,
                 static_cast<float>(startY) - 0.5f,
                 0.0f,
                 1.0f,
                 swap_color(color)
-        };
+        );
         vertices++;
-        *vertices = {
+        *vertices = VertexCreator::create<RectVertex>(
                 static_cast<float>(startX) - 0.5f,
                 static_cast<float>(endY) - 0.5f,
                 0.0f,
                 1.0f,
                 swap_color(color)
-        };
+        );
         vertices++;
-        *vertices = {
+        *vertices = VertexCreator::create<RectVertex>(
                 static_cast<float>(endX) - 0.5f,
                 static_cast<float>(endY) - 0.5f,
                 0.0f,
                 1.0f,
                 swap_color(color)
-        };
+        );
         vertices++;
         return vertices;
     }
@@ -306,25 +319,25 @@ namespace directgraph {
             int_fast32_t endX, int_fast32_t endY,
             uint_fast32_t maxX, uint_fast32_t maxY
     ) {
-        *vertices = {
+        *vertices = VertexCreator::create<TexturedVertex>(
                 startX - 0.5f, startY - 0.5f, 0.0f, 1.0f,
                 static_cast<float>(startX) / maxX, static_cast<float>(startY) / maxY
-        };
+        );
         vertices++;
-        *vertices = {
+        *vertices = VertexCreator::create<TexturedVertex>(
                 endX - 0.5f, startY - 0.5f, 0.0f, 1.0f,
                 static_cast<float>(endX) / maxX, static_cast<float>(startY) / maxY
-        };
+        );
         vertices++;
-        *vertices = {
+        *vertices = VertexCreator::create<TexturedVertex>(
                 startX - 0.5f, endY - 0.5f, 0.0f, 1.0f,
                 static_cast<float>(startX) / maxX, static_cast<float>(endY) / maxY
-        };
+        );
         vertices++;
-        *vertices = {
+        *vertices = VertexCreator::create<TexturedVertex>(
                 endX - 0.5f, endY - 0.5f, 0.0f, 1.0f,
                 static_cast<float>(endX) / maxX, static_cast<float>(endY) / maxY
-        };
+        );
         vertices++;
         return vertices;
     }

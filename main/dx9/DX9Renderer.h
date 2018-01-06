@@ -6,7 +6,9 @@
 #include <util.h>
 
 namespace directgraph {
+    class VertexCreator;
     class DX9Renderer : public IRenderer {
+    friend class VertexCreator;
     private:
         const static int REGISTER_SIZE = 4;
         const static int TRIANGLES_IN_QUAD = 2;
@@ -26,12 +28,12 @@ namespace directgraph {
             float x, y, z, rhw;
             DWORD color;
         };
-        const DWORD RECT_VERTEX_FVF = D3DFVF_XYZRHW | D3DFVF_DIFFUSE;
+        const static DWORD RECT_VERTEX_FVF = D3DFVF_XYZRHW | D3DFVF_DIFFUSE;
         struct TexturedVertex{
             float x, y, z, rhw;
             float tu, tv;
         };
-        const DWORD TEXTURED_VERTEX_FVF = D3DFVF_XYZRHW | D3DFVF_TEX1;
+        const static DWORD TEXTURED_VERTEX_FVF = D3DFVF_XYZRHW | D3DFVF_TEX1;
         IDirect3DVertexBuffer9 *_vertBuffer;
         void *_vertMem;
 
@@ -73,5 +75,13 @@ namespace directgraph {
         virtual void draw(IQueueReader *reader, CommonProps *props);
 
         virtual PixelContainerFactory* getPixContFactory();
+    };
+
+    class VertexCreator{
+    public:
+        template <typename T>
+        static T create(float x, float y, float z, float rhw, DWORD color);
+        template <typename T>
+        static T create(float x, float y, float z, float rhw, float tu, float tv);
     };
 }

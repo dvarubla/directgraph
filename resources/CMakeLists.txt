@@ -1,6 +1,6 @@
 project(resources)
 
-if($ENV{DXSDK_DIR} STREQUAL "")
+if("$ENV{DXSDK_DIR}" STREQUAL "")
     message( FATAL_ERROR "Don't know where DirectXSDK directory is." )
 endif()
 

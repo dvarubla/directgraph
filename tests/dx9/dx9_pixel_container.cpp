@@ -7,8 +7,8 @@ class DX9PixelContainerTest : public ImageTest, public CommonSimple {
 public:
     NiceMock<QueueReaderStub> _readerStub;
     IMyWindow *win;
-    const float WIDTH = 200;
-    const float HEIGHT = 300;
+    static float WIDTH;
+    static float HEIGHT;
 
     DX9PixelContainerTest() {
         win = createWindow(WIDTH, HEIGHT);
@@ -19,6 +19,9 @@ public:
 
     }
 };
+
+float DX9PixelContainerTest::WIDTH = 200;
+float DX9PixelContainerTest::HEIGHT = 300;
 
 IMG_TEST_F(DX9PixelContainerTest, TwoPixels){
     QueueItem items[2];
@@ -112,10 +115,8 @@ IMG_TEST_F(DX9PixelContainerTest, RedSquareAndBar){
         }
     }
     items[1].data.pixelContainer = pixelContainer;
-    items[2].type = QueueItem::SETFILLSTYLE;
-    items[2].data.setfillstyle = {SOLID_FILL, 0x00FF00};
-    items[3].type = QueueItem::BAR;
-    items[3].data.bar = {6, 3, 10, 20};
+    items[2] = QueueItemCreator::create<QueueItem::SETFILLSTYLE>(SOLID_FILL, 0x00FF00);
+    items[3] = QueueItemCreator::create<QueueItem::BAR>(6, 3, 10, 20);
     _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
     return afterTestSimple(win, &_readerStub);
 }

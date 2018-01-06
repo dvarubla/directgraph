@@ -137,7 +137,8 @@ TEST_F(ThreadsLastTest, ContainerOneDrawMultRep){
     RepParam params[NUM_THREADS];
     MSG msg;
     for(int i = 0; i < NUM_THREADS; i++){
-        params[i] = {&tc, 5, GetCurrentThreadId()};
+        RepParam p = {&tc, 5, GetCurrentThreadId()};
+        params[i] = p;
         CreateThread(NULL, 0, ContainerRepHelper, &params[i], 0, &threadIds[i]);
         GetMessage(&msg, NULL, MSG_CODE, MSG_CODE);
     }

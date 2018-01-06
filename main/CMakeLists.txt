@@ -12,6 +12,7 @@ set(D2D_FILES
         d2d/D2DCommon.cpp d2d/D2DCommon.h)
 
 set(COMMON_FILES
+    QueueItem.h
     IMyWindow.h util.cpp util.h PixelContainerFactory.cpp PixelContainerFactory.h
     IRenderer.h
     common.h
@@ -23,7 +24,7 @@ set(COMMON_FILES
     resource.h
         WindowManager.cpp WindowManager.h IController.h IWindowListener.h
         WException.cpp WException.h IWindowFactory.h DPIConverter.cpp DPIConverter.h
-        Queue.cpp Queue.h ThreadController.cpp ThreadController.h QueueReader.cpp QueueReader.h CommonProps.cpp CommonProps.h ../include/directgraph/directgraph_constants.h graphics_const_internal.h IPixelContainer.h PixelContainer.cpp PixelContainer.h NullWindowListener.cpp NullWindowListener.h RWRPLock.cpp RWRPLock.h ControllerFactory.cpp ControllerFactory.h IControllerFactory.h)
+        Queue.cpp Queue.h ThreadController.cpp ThreadController.h QueueReader.cpp QueueReader.h CommonProps.cpp CommonProps.h ../include/directgraph/directgraph_constants.h graphics_const_internal.h IPixelContainer.h PixelContainer.cpp PixelContainer.h NullWindowListener.cpp NullWindowListener.h RWRPLock.cpp RWRPLock.h ControllerFactory.cpp ControllerFactory.h IControllerFactory.h QueueItem.cpp)
 
 set(INCLUDE_FILES
     ${CMAKE_SOURCE_DIR}/include/directgraph/directgraph_api.h

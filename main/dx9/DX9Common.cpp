@@ -4,7 +4,7 @@
 #include <iostream>
 
 namespace directgraph {
-    DX9Common::DX9Common() : _d3d(NULL), _device(NULL), _d3dpp({}) {
+    DX9Common::DX9Common() : _d3d(NULL), _device(NULL) {
         try {
             _d3d = Direct3DCreate9(D3D_SDK_VERSION);
             if (_d3d == NULL) {
@@ -43,6 +43,7 @@ namespace directgraph {
         D3DDISPLAYMODE displayMode = {};
         _d3d->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &displayMode);
         _format = displayMode.Format;
+        ZeroMemory(&_d3dpp, sizeof(_d3dpp));
         _d3dpp.BackBufferFormat = _format;
         _d3dpp.Windowed = TRUE;
         _d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;

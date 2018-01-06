@@ -25,27 +25,17 @@ namespace directgraph{
     }
 
     void ThreadController::clear() {
-        QueueItem item;
-        item.type = QueueItem::CLEAR;
+        QueueItem item = QueueItemCreator::create<QueueItem::CLEAR>();
         writeItemHelper(item);
     }
 
     void ThreadController::bar(float left, float top, float right, float bottom) {
-        QueueItem item;
-        item.type = QueueItem::BAR;
-        item.data.bar = {
-                left, top, right, bottom
-        };
+        QueueItem item = QueueItemCreator::create<QueueItem::BAR>(left, top, right, bottom);
         writeItemHelper(item);
     }
 
     void ThreadController::setfillstyle(uint_fast8_t fillStyle, uint_fast32_t color) {
-        QueueItem item;
-        item.type = QueueItem::SETFILLSTYLE;
-        item.data.setfillstyle = {
-                fillStyle,
-                color
-        };
+        QueueItem item = QueueItemCreator::create<QueueItem::SETFILLSTYLE>(fillStyle, color);
         writeItemHelper(item);
     }
 
@@ -83,9 +73,9 @@ namespace directgraph{
         LeaveCriticalSection(&_lastElemCS);
 
         if(addSinglePixel) {
-            QueueItem item;
-            item.type = QueueItem::SINGLE_PIXEL;
-            item.data.singlePixel = {static_cast<uint32_t>(x), static_cast<uint32_t>(y), color};
+            QueueItem item = QueueItemCreator::create<QueueItem::SINGLE_PIXEL>(
+                    static_cast<uint32_t>(x), static_cast<uint32_t>(y), color
+            );
             writeItemHelper(item);
         }
     }

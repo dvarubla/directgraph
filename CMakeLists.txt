@@ -38,6 +38,7 @@ enable_testing()
 
 set(OLD_CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMMON_COMPILE_FLAGS}")
+add_definitions(/D_VARIADIC_MAX=10)
 add_subdirectory("gtest/googlemock" EXCLUDE_FROM_ALL)
 set(CMAKE_CXX_FLAGS "${OLD_CMAKE_CXX_FLAGS}")
 

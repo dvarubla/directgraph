@@ -5,7 +5,7 @@
 
 namespace directgraph{
     struct QueueItem{
-        enum {
+        enum QueueItemType{
             CLEAR = 0,
             SETFILLSTYLE,
             BAR,
@@ -13,18 +13,32 @@ namespace directgraph{
             PIXEL_CONTAINER
         } type;
         union{
-            struct{
+            struct FillStyleItem{
                 uint8_t fillStyle;
                 uint32_t color;
             } setfillstyle;
-            struct {
+            struct BarItem{
                 float left, top, right, bottom;
             } bar;
-            struct{
+            struct SinglePixelItem{
                 uint32_t x, y;
                 uint32_t color;
             } singlePixel;
             IPixelContainer *pixelContainer;
         } data;
+    };
+
+    class QueueItemCreator{
+    public:
+        template <QueueItem::QueueItemType T>
+        static QueueItem create();
+        template <QueueItem::QueueItemType T>
+        static QueueItem create(uint8_t fillStyle, uint32_t color);
+        template <QueueItem::QueueItemType T>
+        static QueueItem create(float left, float top, float right, float bottom);
+        template <QueueItem::QueueItemType T>
+        static QueueItem create(uint32_t x, uint32_t y, uint32_t color);
+        template <QueueItem::QueueItemType T>
+        static QueueItem create(IPixelContainer *pixelContainer);
     };
 }

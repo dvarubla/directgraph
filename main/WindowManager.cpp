@@ -30,8 +30,9 @@ namespace directgraph{
         win->addListener(this, index);
         IController *controller = _ctrlFactory->createMultThreadController(win);
         controller->init();
+        WindowData data = {controller, win, params.renderer, index, GetCurrentThreadId()};
         _windows.insert(std::pair<DirectgraphWinIndex, WindowData>(
-                *index, {controller, win, params.renderer, index, GetCurrentThreadId()}
+                *index, data
         ));
         if(_curWindowIndex == NO_CURRENT_WINDOW){
             _curWindowIndex = *index;
@@ -79,7 +80,8 @@ namespace directgraph{
         _mapLock.startRead();
         _curWindowLock.startRead();
         IController *ctrl = (_curWindowIndex == NO_CURRENT_WINDOW) ? NULL : _windows[_curWindowIndex].ctrl;
-        return {ctrl, _curWindowIndex};
+        ControllerAndIndex retVal = {ctrl, _curWindowIndex};
+        return retVal;
     }
 
     void WindowManager::onClose(void *param) {

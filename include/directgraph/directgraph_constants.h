@@ -1,19 +1,21 @@
 #ifndef DIRECTGRAPH_GRAPHICS_CONST_H
 #define DIRECTGRAPH_GRAPHICS_CONST_H
 
+#include <stdint.h>
+
 typedef enum DirectgraphEvent{
     DIRECTGRAPH_WND_CREATED = 60000,
     DIRECTGRAPH_WND_CREATE,
     DIRECTGRAPH_WND_DESTROY,
     DIRECTGRAPH_WND_DESTROYED,
     DIRECTGRAPH_REPLY
-} DirectGraphEvent;
+} DirectgraphEvent;
 
-typedef enum DirectgraphRenderer{
+typedef enum DirectgraphRendererType{
     DIRECTGRAPH_DX9_RENDERER = 0
 } DirectgraphRendererType;
 
-typedef enum DirectgraphController{
+typedef enum DirectgraphControllerType{
     DIRECTGRAPH_MULT_THREAD_CTRL = 0
 } DirectgraphControllerType;
 

@@ -3,9 +3,8 @@
 #include "ImageTester.h"
 #include "BitmapWrap.h"
 #include <testlib_funcs.h>
-#include <vector>
-#include <iostream>
 #include <gtest/gtest.h>
+#include <stdint.h>
 
 namespace directgraph_testlib {
     void ImageTester::saveAll() {

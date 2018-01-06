@@ -25,12 +25,10 @@ public:
     ){
         QueueItem item;
         for(uint_fast32_t j = 0; j < 200; j++, cnt++){
-            item.type = QueueItem::SETFILLSTYLE;
-            item.data.setfillstyle = {SOLID_FILL, cnt % 0xFF};
+            item = QueueItemCreator::create<QueueItem::SETFILLSTYLE>(SOLID_FILL, cnt % 0xFF);
             items.push_back(item);
             tc.setfillstyle(SOLID_FILL, cnt % 0xFF);
-            item.type = QueueItem::BAR;
-            item.data.bar = {(float)j, (float)line, (float)j + 1, (float)line + 1};
+            item = QueueItemCreator::create<QueueItem::BAR>((float)j, (float)line, (float)j + 1, (float)line + 1);
             items.push_back(item);
             tc.bar((float)j, (float)line, (float)j + 1, (float)line + 1);
             if(cnt % 10 == 0){
@@ -151,7 +149,8 @@ TEST_F(ThreadsSimpleTest, BarOneDrawMultRep){
     RepParam params[NUM_THREADS];
     MSG msg;
     for(int i = 0; i < NUM_THREADS; i++){
-        params[i] = {&tc, static_cast<uint_fast32_t>(rand() % 20 + 1), GetCurrentThreadId()};
+        RepParam p = {&tc, static_cast<uint_fast32_t>(rand() % 20 + 1), GetCurrentThreadId()};
+        params[i] = p;
         CreateThread(NULL, 0, BarRepHelper, &params[i], 0, &threadIds[i]);
         GetMessage(&msg, NULL, MSG_CODE, MSG_CODE);
     }
@@ -203,7 +202,8 @@ TEST_F(ThreadsSimpleTest, BarMultDrawMultRep){
     items.push_back(item);
 
     for(int i = 0; i < NUM_REP_THREADS; i++){
-        repParams[i] = {&tc, static_cast<uint_fast32_t>(rand() % 20 + 1), GetCurrentThreadId()};
+        RepParam p = {&tc, static_cast<uint_fast32_t>(rand() % 20 + 1), GetCurrentThreadId()};
+        repParams[i] = p;
         CreateThread(NULL, 0, BarRepHelper, &repParams[i], 0, &repThreadIds[i]);
         GetMessage(&msg, NULL, MSG_CODE, MSG_CODE);
     }
@@ -212,7 +212,8 @@ TEST_F(ThreadsSimpleTest, BarMultDrawMultRep){
     DWORD drawThreadIds[NUM_DRAW_THREADS];
     DrawParam drawParams[NUM_DRAW_THREADS];
     for(int i = 0; i < NUM_DRAW_THREADS; i++){
-        drawParams[i] = {&tc, this, &items, static_cast<uint_fast32_t>(i), GetCurrentThreadId()};
+        DrawParam p = {&tc, this, &items, static_cast<uint_fast32_t>(i), GetCurrentThreadId()};
+        drawParams[i] = p;
         CreateThread(NULL, 0, BarDrawHelper, &drawParams[i], 0, &drawThreadIds[i]);
         GetMessage(&msg, NULL, MSG_CODE, MSG_CODE);
     }

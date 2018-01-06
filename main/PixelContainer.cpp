@@ -14,9 +14,9 @@ namespace directgraph{
     {
         if(firstX == secondX){
             if(secondY > firstY){
-                _direction = Direction::LEFT_RIGHT_TOP_DOWN;
+                _direction = LEFT_RIGHT_TOP_DOWN;
             } else {
-                _direction = Direction::LEFT_RIGHT_BOTTOM_UP;
+                _direction = LEFT_RIGHT_BOTTOM_UP;
             }
             _height = 2;
             _width = 1;
