@@ -1,8 +1,11 @@
-﻿#include <directgraph/directgraph_api.h>
-#include <dx9/DX9WindowFactory.h>
+﻿#include <dx9/DX9WindowFactory.h>
+#include <sstream>
 #include "ThreadController.h"
 #include "WindowManager.h"
 #include "ControllerFactory.h"
+#include "WinManException.h"
+#include <directgraph/directgraph_api.h>
+#include "error_handler.h"
 
 using namespace directgraph;
 
@@ -28,6 +31,16 @@ static void tryCreateWindowManager(){
     }
 }
 
+static WindowManager * getWindowManager(){
+    WindowManager *ret = static_cast<WindowManager *>(
+            InterlockedCompareExchangePointer(&windowManager, NULL, NULL)
+    );
+    if(ret == NULL){
+        THROW_EXC_CODE(WinManException, NO_WINDOWS, std::wstring(L"No window manager"));
+    }
+    return ret;
+}
+
 static DirectgraphWinIndex createWindow(const DirectgraphWinParams &params){
     return static_cast<WindowManager *>(
             InterlockedCompareExchangePointer(&windowManager, NULL, NULL)
@@ -43,13 +56,31 @@ WPARAM DIRECTGRAPH_EXPORT directgraph_mainloop() {
     while (GetMessageW(&msg, NULL, 0, 0)){
         if(msg.message == DIRECTGRAPH_WND_CREATE){
             CreateWinMsg *createMsg = reinterpret_cast<CreateWinMsg *>(msg.wParam);
-            tryCreateWindowManager();
-            PostThreadMessage(createMsg->threadId, DIRECTGRAPH_REPLY, createWindow(createMsg->params), 0);
+            try {
+                tryCreateWindowManager();
+                PostThreadMessage(createMsg->threadId, DIRECTGRAPH_REPLY, createWindow(createMsg->params), false);
+            } catch(const std::exception &) {
+                std::exception_ptr *ptrMem = new std::exception_ptr;
+                *ptrMem = std::current_exception();
+                PostThreadMessage(
+                        createMsg->threadId, DIRECTGRAPH_REPLY,
+                        reinterpret_cast<WPARAM>(ptrMem), true
+                );
+            }
         } else if(msg.message == DIRECTGRAPH_WND_CREATED){
             num_windows++;
         } else if(msg.message == DIRECTGRAPH_WND_DESTROY){
-            directgraph_destroy_window(static_cast<DirectgraphWinIndex>(msg.lParam));
-            PostThreadMessage(static_cast<DWORD>(msg.wParam), DIRECTGRAPH_REPLY, 0, 0);
+            try {
+                directgraph_destroy_window(static_cast<DirectgraphWinIndex>(msg.lParam));
+                PostThreadMessage(static_cast<DWORD>(msg.wParam), DIRECTGRAPH_REPLY, NULL, false);
+            } catch(const std::exception &){
+                std::exception_ptr *ptrMem = new std::exception_ptr;
+                *ptrMem = std::current_exception();
+                PostThreadMessage(
+                        static_cast<DWORD>(msg.wParam), DIRECTGRAPH_REPLY,
+                        reinterpret_cast<WPARAM>(ptrMem), true
+                );
+            }
         } else if(msg.message == DIRECTGRAPH_WND_DESTROYED){
             num_windows--;
             if(num_windows == 0){
@@ -72,32 +103,35 @@ DirectgraphWinIndex DIRECTGRAPH_EXPORT directgraph_create_window(const wchar_t *
         };
         PostThreadMessage(mainThreadId, DIRECTGRAPH_WND_CREATE, reinterpret_cast<WPARAM>(&createMsg), 0);
         GetMessage(&msg, NULL, DIRECTGRAPH_REPLY, DIRECTGRAPH_REPLY);
+        EXC_CALL_WRAP_EXTRA(
+                rethrow_exc_wparam(msg);
+        ) {
+            return WindowManager::NO_CURRENT_WINDOW;
+        }
         DirectgraphWinIndex index = static_cast<DirectgraphWinIndex>(msg.wParam);
         directgraph_repaintw(index);
         return index;
     } else {
-        tryCreateWindowManager();
-        DirectgraphWinParams params = {width, height, name};
-        return createWindow(params);
+        DirectgraphWinParams params = {width, height, name, DIRECTGRAPH_MULT_THREAD_CTRL, DIRECTGRAPH_DX9_RENDERER};
+        DirectgraphWinIndex index = WindowManager::NO_CURRENT_WINDOW;
+        EXC_CALL_WRAP(
+                tryCreateWindowManager();
+                index = createWindow(params);
+        )
+        return index;
     }
 }
 
 void DIRECTGRAPH_EXPORT directgraph_destroy_window(DirectgraphWinIndex index){
-    WindowManager *localWindowManager = static_cast<WindowManager *>(
-            InterlockedCompareExchangePointer(&windowManager, NULL, NULL)
-    );
-    if(localWindowManager != NULL) {
-        localWindowManager->destroyWindow(index);
-    }
+    EXC_CALL_WRAP(
+            getWindowManager()->destroyWindow(index);
+    )
 }
 
 void DIRECTGRAPH_EXPORT directgraph_set_window(DirectgraphWinIndex index){
-    WindowManager *localWindowManager = static_cast<WindowManager *>(
-            InterlockedCompareExchangePointer(&windowManager, NULL, NULL)
-    );
-    if(localWindowManager != NULL) {
-        localWindowManager->setCurrentWindow(index);
-    }
+    EXC_CALL_WRAP(
+    getWindowManager()->setCurrentWindow(index);
+    )
 }
 
 void DIRECTGRAPH_EXPORT directgraph_wait_for_main_thread(){
@@ -111,42 +145,24 @@ void DIRECTGRAPH_EXPORT resize(float width, float height){
 }
 
 void DIRECTGRAPH_EXPORT bar(float left, float top, float right, float bottom){
-    WindowManager *localWindowManager = static_cast<WindowManager *>(
-            InterlockedCompareExchangePointer(&windowManager, NULL, NULL)
-    );
-    if(localWindowManager != NULL) {
-        IController *lastController = localWindowManager->getCurrentWindowAndLock().controller;
-        if(lastController != NULL) {
-            lastController->bar(left, top, right, bottom);
-        }
-        localWindowManager->releaseCurrentWindowLock();
-    }
+    EXC_CALL_WRAP(
+    getWindowManager()->getCurrentWindowAndLock().controller->bar(left, top, right, bottom);
+    getWindowManager()->releaseCurrentWindowLock();
+    )
 }
 
 void DIRECTGRAPH_EXPORT putpixel(uint32_t x, uint32_t y, uint32_t color){
-    WindowManager *localWindowManager = static_cast<WindowManager *>(
-            InterlockedCompareExchangePointer(&windowManager, NULL, NULL)
-    );
-    if(localWindowManager != NULL) {
-        IController *lastController = localWindowManager->getCurrentWindowAndLock().controller;
-        if(lastController != NULL) {
-            lastController->putpixel(x, y, color);
-        }
-        localWindowManager->releaseCurrentWindowLock();
-    }
+    EXC_CALL_WRAP(
+    getWindowManager()->getCurrentWindowAndLock().controller->putpixel(x, y, color);
+    getWindowManager()->releaseCurrentWindowLock();
+    )
 }
 
 void DIRECTGRAPH_EXPORT setfillstyle(fill_patterns pattern, uint32_t color){
-    WindowManager *localWindowManager = static_cast<WindowManager *>(
-            InterlockedCompareExchangePointer(&windowManager, NULL, NULL)
-    );
-    if(localWindowManager != NULL) {
-        IController *lastController = localWindowManager->getCurrentWindowAndLock().controller;
-        if(lastController != NULL) {
-            lastController->setfillstyle(pattern, color);
-        }
-        localWindowManager->releaseCurrentWindowLock();
-    }
+    EXC_CALL_WRAP(
+    getWindowManager()->getCurrentWindowAndLock().controller->setfillstyle(pattern, color);
+    getWindowManager()->releaseCurrentWindowLock();
+    )
 }
 
 void DIRECTGRAPH_EXPORT delay(uint32_t msec){
@@ -155,24 +171,15 @@ void DIRECTGRAPH_EXPORT delay(uint32_t msec){
 }
 
 void DIRECTGRAPH_EXPORT directgraph_repaint(){
-    WindowManager *localWindowManager = static_cast<WindowManager *>(
-            InterlockedCompareExchangePointer(&windowManager, NULL, NULL)
-    );
-    if(localWindowManager != NULL) {
-        IController *lastController = localWindowManager->getCurrentWindowAndLock().controller;
-        if(lastController != NULL) {
-            lastController->repaint();
-        }
-        localWindowManager->releaseCurrentWindowLock();
-    }
+    EXC_CALL_WRAP(
+    getWindowManager()->getCurrentWindowAndLock().controller->repaint();
+    getWindowManager()->releaseCurrentWindowLock();
+    )
 }
 
 void DIRECTGRAPH_EXPORT directgraph_repaintw(DirectgraphWinIndex index){
-    WindowManager *localWindowManager = static_cast<WindowManager *>(
-            InterlockedCompareExchangePointer(&windowManager, NULL, NULL)
-    );
-    if(localWindowManager != NULL) {
-        localWindowManager->getWindowByIndexAndLock(index)->repaint();
-        localWindowManager->releaseWindowLock();
-    }
+    EXC_CALL_WRAP(
+    getWindowManager()->getWindowByIndexAndLock(index)->repaint();
+    getWindowManager()->releaseWindowLock();
+    )
 }

@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <main/ThreadController.h>
-#include <graphics_const_internal.h>
+#include <directgraph/directgraph_constants.h>
 #include <RendererStub.h>
 #include <tests/stubs/QueueItemUtils.h>
 #include <tests/stubs/MyWindowStub.h>

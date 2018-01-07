@@ -1,4 +1,5 @@
 #include "PixelContainer.h"
+#include "WException.h"
 
 namespace directgraph{
 
@@ -8,10 +9,14 @@ namespace directgraph{
             uint_fast32_t secondX, uint_fast32_t secondY, uint_fast32_t secondColor,
             uint_fast32_t maxWidth, uint_fast32_t maxHeight
     ): _direction(NO_DIRECTION),
-       _buffer(new ContainerType[maxWidth * maxHeight]),
        _firstX(firstX), _firstY(firstY), _lastX(secondX), _lastY(secondY),
        _maxWidth(maxWidth), _maxHeight(maxHeight)
     {
+        try{
+            _buffer = new ContainerType[maxWidth * maxHeight];
+        } catch(const std::bad_alloc &) {
+            THROW_EXC_CODE(WException, CANT_ALLOC, std::wstring(L"Can't allocate pixel container buffer"));
+        }
         if(firstX == secondX){
             if(secondY > firstY){
                 _direction = LEFT_RIGHT_TOP_DOWN;

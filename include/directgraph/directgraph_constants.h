@@ -19,6 +19,23 @@ typedef enum DirectgraphControllerType{
     DIRECTGRAPH_MULT_THREAD_CTRL = 0
 } DirectgraphControllerType;
 
+typedef enum DirectgraphErrorCode{
+    DIRECTGRAPH_UNREACHABLE_CODE = 0,
+    DIRECTGRAPH_CANT_ALLOC,
+    DIRECTGRAPH_CANT_CREATE_WINDOW,
+    DIRECTGRAPH_NO_WINDOWS,
+    DIRECTGRAPH_WRONG_WINDOW_INDEX,
+
+    DIRECTGRAPH_CANT_CREATE_DIRECTX9 = 2048,
+    DIRECTGRAPH_DX9_CANT_GET_DISPLAY_MODE,
+    DIRECTGRAPH_DX9_CANT_CREATE_DEVICE,
+    DIRECTGRAPH_DX9_CANT_CREATE_EXTRA_WIN,
+    DIRECTGRAPH_DX9_CANT_SET_RENDER_STATE,
+    DIRECTGRAPH_DX9_CANT_CREATE_TEXTURE,
+    DIRECTGRAPH_DX9_CANT_CREATE_VBUFFER,
+    DIRECTGRAPH_DX9_UNSUPPORTED_DISPLAY_FORMAT
+} DirectgraphErrorCode;
+
 typedef uint32_t DirectgraphWinIndex;
 
 typedef enum fill_patterns {
@@ -36,5 +53,12 @@ typedef enum fill_patterns {
     CLOSE_DOT_FILL,  // Closely spaced dot
     USER_FILL        // User-defined fill
 } fill_patterns;
+
+typedef void (*DirectgraphErrorHandler)(
+        const wchar_t *filename,
+        uint_fast32_t lineNum,
+        DirectgraphErrorCode code,
+        const wchar_t *str
+);
 
 #endif //DIRECTGRAPH_GRAPHICS_CONST_H

@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <dx9/DX9WindowFactory.h>
-#include <graphics_const_internal.h>
+#include <directgraph/directgraph_constants.h>
 #include <tests/stubs/QueueReaderStub.h>
 
 #include <testlib/testlib_funcs.h>

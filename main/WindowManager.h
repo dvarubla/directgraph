@@ -2,7 +2,7 @@
 
 #include <map>
 #include <vector>
-#include "graphics_const_internal.h"
+#include <directgraph/directgraph_constants.h>
 #include "IMyWindow.h"
 #include "IController.h"
 #include "IWindowFactory.h"
@@ -30,7 +30,8 @@ namespace directgraph {
             void *winIndexMem;
             DWORD threadId;
         };
-        std::map<DirectgraphWinIndex, WindowData> _windows;
+        typedef std::map<DirectgraphWinIndex, WindowData> WinManMap;
+        WinManMap _windows;
         std::vector<IWindowFactory*> _rendFactories;
         IControllerFactory *_ctrlFactory;
         DirectgraphWinIndex _curWindowIndex;
@@ -48,6 +49,7 @@ namespace directgraph {
         DirectgraphWinIndex createWindow(const DirectgraphWinParams &params);
         void destroyWindow(DirectgraphWinIndex winIndex);
         ControllerAndIndex getCurrentWindowAndLock();
+        ControllerAndIndex getCurrentWindowAndLock(bool throwExc);
         void releaseCurrentWindowLock();
         IController *getWindowByIndexAndLock(DirectgraphWinIndex index);
         void releaseWindowLock();

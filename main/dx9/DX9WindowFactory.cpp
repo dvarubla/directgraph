@@ -1,6 +1,7 @@
 #include "DX9WindowFactory.h"
 #include <dx9/DX9Renderer.h>
 #include <dx9/DX9Common.h>
+#include <main/WException.h>
 
 namespace directgraph{
     DX9WindowFactory::DX9WindowFactory() {
@@ -26,9 +27,27 @@ namespace directgraph{
     }
 
     MyWindow *DX9WindowFactory::commonCreateWindow(DPIHelper *helper, const wchar_t *name, float width, float height) {
-        DX9Renderer *renderer = new DX9Renderer(_common, helper, width, height);
-        MyWindow *window = new MyWindow(name, helper->toPixelsX(width), helper->toPixelsY(height));
-        window->setRenderer(renderer);
+        if(width < 0 || height < 0){
+            THROW_EXC_CODE(
+                    WException, CANT_CREATE_WINDOW,
+                    std::wstring(L"Window width and height must be positive")
+            );
+        }
+        DX9Renderer *renderer = NULL;
+        MyWindow *window = NULL;
+        try {
+            renderer = new DX9Renderer(_common, helper, width, height);
+            window = new MyWindow(
+                    name,
+                    static_cast<uint_fast32_t>(helper->toPixelsX(width)),
+                    static_cast<uint_fast32_t>(helper->toPixelsY(height))
+            );
+            window->setRenderer(renderer);
+        } catch (const std::exception &){
+            delete renderer;
+            delete window;
+            throw;
+        }
         return window;
     }
 

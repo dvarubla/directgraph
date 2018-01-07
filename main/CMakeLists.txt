@@ -24,7 +24,7 @@ set(COMMON_FILES
     resource.h
         WindowManager.cpp WindowManager.h IController.h IWindowListener.h
         WException.cpp WException.h IWindowFactory.h DPIConverter.cpp DPIConverter.h
-        Queue.cpp Queue.h ThreadController.cpp ThreadController.h QueueReader.cpp QueueReader.h CommonProps.cpp CommonProps.h ../include/directgraph/directgraph_constants.h graphics_const_internal.h IPixelContainer.h PixelContainer.cpp PixelContainer.h NullWindowListener.cpp NullWindowListener.h RWRPLock.cpp RWRPLock.h ControllerFactory.cpp ControllerFactory.h IControllerFactory.h QueueItem.cpp)
+        Queue.cpp Queue.h ThreadController.cpp ThreadController.h QueueReader.cpp QueueReader.h CommonProps.cpp CommonProps.h ../include/directgraph/directgraph_constants.h IPixelContainer.h PixelContainer.cpp PixelContainer.h NullWindowListener.cpp NullWindowListener.h RWRPLock.cpp RWRPLock.h ControllerFactory.cpp ControllerFactory.h IControllerFactory.h QueueItem.cpp WinManException.cpp WinManException.h error_handler.cpp error_handler.h)
 
 set(INCLUDE_FILES
     ${CMAKE_SOURCE_DIR}/include/directgraph/directgraph_api.h
@@ -49,7 +49,7 @@ set_target_properties(
         directgraph_dx9 PROPERTIES
         COMPILE_FLAGS "${COMMON_COMPILE_FLAGS}"
 )
-target_link_libraries(directgraph_dx9 directgraph_common directgraph_dx9_renderer)
+target_link_libraries(directgraph_dx9 directgraph_dx9_int)
 target_compile_definitions(directgraph_dx9 PUBLIC DIRECTGRAPH_EXPORTS)
 
 add_custom_command(TARGET directgraph_dx9

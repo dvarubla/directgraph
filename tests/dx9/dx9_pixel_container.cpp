@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <tests/stubs/QueueReaderStub.h>
-#include <graphics_const_internal.h>
+#include <directgraph/directgraph_constants.h>
 #include "common.h"
 
 class DX9PixelContainerTest : public ImageTest, public CommonSimple {

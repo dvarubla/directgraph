@@ -5,15 +5,13 @@
 
 namespace directgraph {
     DX9Common::DX9Common() : _d3d(NULL), _device(NULL) {
-        try {
-            _d3d = Direct3DCreate9(D3D_SDK_VERSION);
-            if (_d3d == NULL) {
-                throw DX9Exception(std::wstring(L"Error in Direct3DCreate9"));
-            }
-            InitializeCriticalSection(&_mainCS);
-        } catch (...) {
-            throw;
+        _d3d = Direct3DCreate9(D3D_SDK_VERSION);
+        if (_d3d == NULL) {
+            THROW_EXC_CODE(
+                    DX9Exception, CANT_CREATE_DIRECTX9, std::wstring(L"Can't create DirectX object")
+            );
         }
+        InitializeCriticalSection(&_mainCS);
     }
 
     void DX9Common::getDpi(float &dpiX, float &dpiY) {
@@ -31,7 +29,11 @@ namespace directgraph {
             _d3dpp.BackBufferWidth = width;
             _d3dpp.BackBufferHeight = height;
             _d3dpp.hDeviceWindow = win;
-            _device->CreateAdditionalSwapChain(&_d3dpp, &swapChain);
+            if(_device->CreateAdditionalSwapChain(&_d3dpp, &swapChain) != D3D_OK){
+                THROW_EXC_CODE(
+                        DX9Exception, DX9_CANT_CREATE_EXTRA_WIN, std::wstring(L"Can't create extra window")
+                );
+            }
         }
         return swapChain;
     }
@@ -41,7 +43,11 @@ namespace directgraph {
         DWORD flags;
         checkCaps(devType, flags);
         D3DDISPLAYMODE displayMode = {};
-        _d3d->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &displayMode);
+        if(_d3d->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &displayMode) != D3D_OK){
+            THROW_EXC_CODE(
+                    DX9Exception, DX9_CANT_GET_DISPLAY_MODE, std::wstring(L"Can't get display mode")
+            );
+        }
         _format = displayMode.Format;
         ZeroMemory(&_d3dpp, sizeof(_d3dpp));
         _d3dpp.BackBufferFormat = _format;
@@ -50,16 +56,37 @@ namespace directgraph {
         _d3dpp.BackBufferWidth = width;
         _d3dpp.BackBufferHeight = height;
 
-        _d3d->CreateDevice(D3DADAPTER_DEFAULT,
+        if(_d3d->CreateDevice(D3DADAPTER_DEFAULT,
                            devType,
                            win,
                            flags,
                            &_d3dpp,
                            &_device
-        );
-        _device->SetRenderState(D3DRS_LIGHTING, FALSE);
-        _device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-        _device->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
+        ) != D3D_OK){
+            THROW_EXC_CODE(
+                    DX9Exception, DX9_CANT_CREATE_DEVICE, std::wstring(L"Can't create DirectX device")
+            );
+        }
+        try {
+            if (_device->SetRenderState(D3DRS_LIGHTING, FALSE) != D3D_OK) {
+                THROW_EXC_CODE(
+                        DX9Exception, DX9_CANT_SET_RENDER_STATE, std::wstring(L"Can't disable lighting")
+                );
+            }
+            if (_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE) != D3D_OK) {
+                THROW_EXC_CODE(
+                        DX9Exception, DX9_CANT_SET_RENDER_STATE, std::wstring(L"Can't disable cull mode")
+                );
+            }
+            if (_device->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE) != D3D_OK) {
+                THROW_EXC_CODE(
+                        DX9Exception, DX9_CANT_SET_RENDER_STATE, std::wstring(L"Can't disable z-buffer")
+                );
+            }
+        } catch(const std::exception &){
+            _device->Release();
+            throw;
+        }
     }
 
     void DX9Common::checkCaps(D3DDEVTYPE &devType, DWORD &flags) {
@@ -79,7 +106,9 @@ namespace directgraph {
     }
 
     void DX9Common::deleteSwapChain(IDirect3DSwapChain9 *swapChain) {
-        swapChain->Release();
+        if(swapChain != NULL) {
+            swapChain->Release();
+        }
     }
 
     D3DFORMAT DX9Common::getFormat() {

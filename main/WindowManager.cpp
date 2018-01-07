@@ -1,5 +1,8 @@
 #include "WindowManager.h"
 #include "ThreadController.h"
+#include "WException.h"
+#include "WinManException.h"
+#include "error_handler.h"
 
 #undef max
 
@@ -16,6 +19,17 @@ namespace directgraph{
     void WindowManager::setCurrentWindow(DirectgraphWinIndex winIndex) {
         _mapLock.startRead();
         _curWindowLock.startWrite();
+        WinManMap::iterator it = _windows.find(winIndex);
+        if(it == _windows.end()){
+            _curWindowLock.endWrite();
+            _mapLock.endRead();
+            THROW_EXC_CODE(
+                    WinManException,
+                    WRONG_WINDOW_INDEX,
+                    std::wstring(L"Wrong window index when setting window"),
+                    winIndex
+            );
+        }
         _curWindowIndex = winIndex;
         _curWindowLock.endWrite();
         _mapLock.endRead();
@@ -25,16 +39,28 @@ namespace directgraph{
         DirectgraphWinIndex *index = new DirectgraphWinIndex;
         *index = static_cast<DirectgraphWinIndex>(InterlockedIncrement(&_curMapIndex));
         _mapLock.startWrite();
-        IMyWindow *win = _rendFactories[params.renderer]->createPixelWindow(params.name, params.width, params.height);
-        win->show();
-        win->addListener(this, index);
-        IController *controller = _ctrlFactory->createMultThreadController(win);
-        controller->init();
-        WindowData data = {controller, win, params.renderer, index, GetCurrentThreadId()};
-        _windows.insert(std::pair<DirectgraphWinIndex, WindowData>(
-                *index, data
-        ));
-        if(_curWindowIndex == NO_CURRENT_WINDOW){
+        IMyWindow *win = NULL;
+        IController *controller = NULL;
+        try {
+            win = _rendFactories[params.renderer]->createPixelWindow(
+                    params.name, params.width,
+                    params.height
+            );
+            win->show();
+            win->addListener(this, index);
+            controller = _ctrlFactory->createMultThreadController(win);
+            controller->init();
+            WindowData data = {controller, win, params.renderer, index, GetCurrentThreadId()};
+            _windows.insert(std::pair<DirectgraphWinIndex, WindowData>(
+                    *index, data
+            ));
+        } catch (const std::exception &){
+            _mapLock.endWrite();
+            delete win;
+            delete controller;
+            throw;
+        }
+        if (_curWindowIndex == NO_CURRENT_WINDOW) {
             _curWindowIndex = *index;
         }
         _mapLock.endWrite();
@@ -43,6 +69,16 @@ namespace directgraph{
 
     void WindowManager::destroyWindow(DirectgraphWinIndex winIndex) {
         _mapLock.startRead();
+        WinManMap::iterator it = _windows.find(winIndex);
+        if(it == _windows.end()){
+            _mapLock.endRead();
+            THROW_EXC_CODE(
+                    WinManException,
+                    WRONG_WINDOW_INDEX,
+                    std::wstring(L"Wrong window index when destroying window"),
+                    winIndex
+            );
+        }
         DWORD threadId = _windows[winIndex].threadId;
         _mapLock.endRead();
 
@@ -50,13 +86,25 @@ namespace directgraph{
             MSG msg;
             PostThreadMessageW(threadId, DIRECTGRAPH_WND_DESTROY, GetCurrentThreadId(), static_cast<LPARAM>(winIndex));
             GetMessage(&msg, NULL, DIRECTGRAPH_REPLY, DIRECTGRAPH_REPLY);
+            rethrow_exc_wparam(msg);
             return;
         }
 
         _mapLock.startWrite();
-        delete(_windows[winIndex].winIndexMem);
-        _ctrlFactory->deleteController(_windows[winIndex].ctrl);
-        _rendFactories[_windows[winIndex].renderer]->deleteWindow(_windows[winIndex].win);
+        it = _windows.find(winIndex);
+        if(it == _windows.end()){
+            _mapLock.endWrite();
+            THROW_EXC_CODE(
+                    WinManException,
+                    WRONG_WINDOW_INDEX,
+                    std::wstring(L"Wrong window index when destroying window"),
+                    winIndex
+            );
+        }
+
+        delete(it->second.winIndexMem);
+        _ctrlFactory->deleteController(it->second.ctrl);
+        _rendFactories[it->second.renderer]->deleteWindow(it->second.win);
         _windows.erase(winIndex);
         if(_curWindowIndex == winIndex){
             if(_windows.empty()) {
@@ -76,16 +124,24 @@ namespace directgraph{
         delete _ctrlFactory;
     }
 
-    WindowManager::ControllerAndIndex WindowManager::getCurrentWindowAndLock() {
+    WindowManager::ControllerAndIndex WindowManager::getCurrentWindowAndLock(bool throwExc) {
         _mapLock.startRead();
         _curWindowLock.startRead();
+        if(throwExc && _curWindowIndex == NO_CURRENT_WINDOW){
+            releaseCurrentWindowLock();
+            THROW_EXC_CODE(WinManException, NO_WINDOWS, std::wstring(L"No windows to draw"));
+        }
         IController *ctrl = (_curWindowIndex == NO_CURRENT_WINDOW) ? NULL : _windows[_curWindowIndex].ctrl;
         ControllerAndIndex retVal = {ctrl, _curWindowIndex};
         return retVal;
     }
 
+    WindowManager::ControllerAndIndex WindowManager::getCurrentWindowAndLock() {
+        return getCurrentWindowAndLock(true);
+    }
+
     void WindowManager::onClose(void *param) {
-        destroyWindow(*static_cast<DirectgraphWinIndex*>(param));
+        EXC_CALL_WRAP(destroyWindow(*static_cast<DirectgraphWinIndex *>(param));)
     }
 
     void WindowManager::releaseCurrentWindowLock() {
@@ -95,7 +151,12 @@ namespace directgraph{
 
     IController *WindowManager::getWindowByIndexAndLock(DirectgraphWinIndex index) {
         _mapLock.startRead();
-        return _windows[index].ctrl;
+        WinManMap::iterator it = _windows.find(index);
+        if(it == _windows.end()){
+            releaseWindowLock();
+            THROW_EXC_CODE(WinManException, WRONG_WINDOW_INDEX, std::wstring(L"Wrong window index"), index);
+        }
+        return it->second.ctrl;
     }
 
     void WindowManager::releaseWindowLock() {

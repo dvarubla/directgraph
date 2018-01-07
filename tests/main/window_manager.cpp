@@ -83,7 +83,7 @@ TEST_F(WindowManagerTest, MultWindowsCurNull){
     m->setCurrentWindow(ind2);
     m->destroyWindow(ind1);
     m->destroyWindow(ind2);
-    EXPECT_EQ(m->getCurrentWindowAndLock().controller, (IController*)NULL);
+    EXPECT_EQ(m->getCurrentWindowAndLock(false).controller, (IController*)NULL);
     m->releaseCurrentWindowLock();
 }
 
@@ -114,7 +114,7 @@ static DWORD WINAPI TwoThreadsHelper(LPVOID param){
     DirectgraphWinParams winParams = {100, 100, L"Test", DIRECTGRAPH_MULT_THREAD_CTRL, DIRECTGRAPH_DX9_RENDERER};
     for(uint32_t i = 0; i < 100; i++){
         p->createIndices->push_back(p->m->createWindow(winParams));
-        p->m->getCurrentWindowAndLock();
+        p->m->getCurrentWindowAndLock(false);
         Sleep(rand() % p->maxSleep);
         p->m->releaseCurrentWindowLock();
     }
@@ -126,7 +126,7 @@ static DWORD WINAPI TwoThreadsHelper(LPVOID param){
         GetMessage(&msg, NULL, MSG_CODE, MSG_CODE);
         p->m->destroyWindow(static_cast<DirectgraphWinIndex>(msg.wParam));
         p->deleteIndices->push_back(static_cast<DirectgraphWinIndex>(msg.wParam));
-        p->m->getCurrentWindowAndLock();
+        p->m->getCurrentWindowAndLock(false);
         Sleep(rand() % 5);
         p->m->releaseCurrentWindowLock();
     }
@@ -145,7 +145,7 @@ TEST_F(WindowManagerTest, TwoThreads){
     GetMessage(&msg, NULL, MSG_CODE, MSG_CODE);
     for(uint32_t i = 0; i < 100; i++){
         createIndices1.push_back(m->createWindow(p));
-        m->getCurrentWindowAndLock();
+        m->getCurrentWindowAndLock(false);
         Sleep(rand() % 5);
         m->releaseCurrentWindowLock();
     }
@@ -164,7 +164,7 @@ TEST_F(WindowManagerTest, TwoThreads){
     for(uint32_t i = 0; i < 100; i++){
         m->destroyWindow(createIndices1[i]);
         PostThreadMessage(delThreadId, MSG_CODE, createIndices2[i], 0);
-        m->getCurrentWindowAndLock();
+        m->getCurrentWindowAndLock(false);
         Sleep(rand() % 5);
         m->releaseCurrentWindowLock();
     }

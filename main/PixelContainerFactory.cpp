@@ -1,6 +1,7 @@
 #include "PixelContainerFactory.h"
 #include "QueueItem.h"
 #include "PixelContainer.h"
+#include "WException.h"
 
 namespace directgraph{
 
@@ -38,7 +39,8 @@ namespace directgraph{
                             _maxWidth, _maxHeight
                     );
                 break;
-                default: break;
+                default:
+                    THROW_EXC_CODE(WException, UNREACHABLE_CODE, L"Unknown format");
             }
         } else {
             result.containerCreated = false;

@@ -1,6 +1,6 @@
 ﻿#include "MyWindow.h"
+#include "WException.h"
 #include <map>
-#include <graphics_const_internal.h>
 #include <common.h>
 
 namespace directgraph {
@@ -46,7 +46,6 @@ namespace directgraph {
         rect.right = (long)width;
         rect.bottom = (long)height;
         AdjustWindowRect(&rect, WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, false);
-        PostThreadMessageW(GetCurrentThreadId(), DIRECTGRAPH_WND_CREATED, 0, 0);
         _hwnd = CreateWindowExW(
                 WS_EX_APPWINDOW,
                 CLASS_NAME.c_str(),
@@ -61,6 +60,10 @@ namespace directgraph {
                 HINST_THISCOMPONENT,
                 NULL
         );
+        if(_hwnd == NULL){
+            THROW_EXC_CODE(WException, CANT_CREATE_WINDOW, std::wstring(L"Can't create window"));
+        }
+        PostThreadMessageW(GetCurrentThreadId(), DIRECTGRAPH_WND_CREATED, 0, 0);
     }
 
     void MyWindow::show() {

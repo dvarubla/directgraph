@@ -1,9 +1,10 @@
 #include <resource.h>
 #include <Queue.h>
 #include "DX9Renderer.h"
-#include <graphics_const_internal.h>
+#include <directgraph/directgraph_constants.h>
 #include <math.h>
 #include <main/QueueItem.h>
+#include "DX9Exception.h"
 #include <algorithm>
 
 #undef max
@@ -22,7 +23,8 @@ namespace directgraph {
         return v;
     }
 
-    DX9Renderer::DX9Renderer(DX9Common *common, DPIHelper *helper, float width, float height) {
+    DX9Renderer::DX9Renderer(DX9Common *common, DPIHelper *helper, float width, float height)
+        : _swapChain(NULL), _vertBuffer(NULL), _vertMem(NULL), _pixelTexture(NULL){
         _helper = helper;
         _width = width;
         _height = height;
@@ -50,33 +52,58 @@ namespace directgraph {
         _pixelTextureWidth = static_cast<uint_fast32_t>(1 << (uint_fast32_t) ceil(log2<double>(pxWidth)));
         _pixelTextureHeight = static_cast<uint_fast32_t>(1 << (uint_fast32_t) ceil(log2<double>(pxHeight)));
 
-        _device->CreateTexture(
+        if(_device->CreateTexture(
                 _pixelTextureWidth, _pixelTextureHeight, 1, 0,
                 _common->getFormat(), D3DPOOL_MANAGED, &_pixelTexture, NULL
-        );
+        ) != D3D_OK){
+            THROW_EXC_CODE(DX9Exception, DX9_CANT_CREATE_TEXTURE, std::wstring(L"Can't create texture"));
+        };
 
-        IPixelContainer::Format format = IPixelContainer::R5G6B5;
+        IPixelContainer::Format format;
 
         switch(_common->getFormat()){
             case D3DFMT_R8G8B8: case D3DFMT_X8R8G8B8: case D3DFMT_A8R8G8B8:
                 format = IPixelContainer::R8G8B8;
             break;
             case D3DFMT_R5G6B5: format = IPixelContainer::R5G6B5; break;
-            default: break;
+            default:
+                THROW_EXC_CODE(
+                        DX9Exception,
+                        DX9_UNSUPPORTED_DISPLAY_FORMAT,
+                        std::wstring(L"Unsupported display format")
+                );
         }
         _pixContFactory = new PixelContainerFactory(pxWidth, pxHeight, format);
 
-        _device->CreateVertexBuffer(VERTEX_BUFFER_SIZE * sizeof(RectVertex),
+        if(_device->CreateVertexBuffer(VERTEX_BUFFER_SIZE * sizeof(RectVertex),
                                           D3DUSAGE_DYNAMIC,
                                           0,
                                           D3DPOOL_DEFAULT,
-                                          &_vertBuffer, NULL);
+                                          &_vertBuffer, NULL) != D3D_OK
+        ){
+            THROW_EXC_CODE(
+                    DX9Exception,
+                    DX9_CANT_CREATE_VBUFFER,
+                    std::wstring(L"Can't create vertex buffer")
+            );
+        }
         _vertMem = malloc(VERTEX_BUFFER_SIZE * sizeof(RectVertex));
+        if(_vertMem == NULL){
+            THROW_EXC_CODE(
+                    DX9Exception,
+                    CANT_ALLOC,
+                    std::wstring(L"Can't allocate memory for vertices")
+            );
+        }
     }
 
     DX9Renderer::~DX9Renderer() {
-        _pixelTexture->Release();
-        _vertBuffer->Release();
+        if(_pixelTexture != NULL){
+            _pixelTexture->Release();
+        }
+        if(_vertBuffer != NULL){
+            _vertBuffer->Release();
+        }
         _common->deleteSwapChain(_swapChain);
         delete _helper;
         delete _pixContFactory;

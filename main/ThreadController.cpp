@@ -1,6 +1,7 @@
 #include "ThreadController.h"
 #include "Queue.h"
 #include "QueueItem.h"
+#include "WException.h"
 
 namespace directgraph{
 
@@ -50,25 +51,30 @@ namespace directgraph{
 
         bool addSinglePixel = true;
         EnterCriticalSection(&_lastElemCS);
-        if(_queue.getReadSize() != 0) {
-            QueueItem &prevItem = _queue.getItemAt(_queue.transformIndex((int_fast32_t) _queue.getPutIndex() - 1));
-            if (prevItem.type == QueueItem::SINGLE_PIXEL) {
-                PixelContainerFactory::ContainerOpt contOpt = _pixContFactory->tryGetContainer(
-                        prevItem.data.singlePixel.x,
-                        prevItem.data.singlePixel.y,
-                        prevItem.data.singlePixel.color,
-                        static_cast<uint_fast32_t>(x), static_cast<uint_fast32_t>(y), color
-                );
-                if (contOpt.containerCreated) {
-                    addSinglePixel = false;
-                    prevItem.type = QueueItem::PIXEL_CONTAINER;
-                    prevItem.data.pixelContainer = contOpt.container;
+        try {
+            if (_queue.getReadSize() != 0) {
+                QueueItem &prevItem = _queue.getItemAt(_queue.transformIndex((int_fast32_t) _queue.getPutIndex() - 1));
+                if (prevItem.type == QueueItem::SINGLE_PIXEL) {
+                    PixelContainerFactory::ContainerOpt contOpt = _pixContFactory->tryGetContainer(
+                            prevItem.data.singlePixel.x,
+                            prevItem.data.singlePixel.y,
+                            prevItem.data.singlePixel.color,
+                            static_cast<uint_fast32_t>(x), static_cast<uint_fast32_t>(y), color
+                    );
+                    if (contOpt.containerCreated) {
+                        addSinglePixel = false;
+                        prevItem.type = QueueItem::PIXEL_CONTAINER;
+                        prevItem.data.pixelContainer = contOpt.container;
+                    }
+                } else if (prevItem.type == QueueItem::PIXEL_CONTAINER) {
+                    addSinglePixel = !prevItem.data.pixelContainer->tryAddPixel(
+                            static_cast<uint_fast32_t>(x), static_cast<uint_fast32_t>(y), color
+                    );
                 }
-            } else if (prevItem.type == QueueItem::PIXEL_CONTAINER) {
-                addSinglePixel = !prevItem.data.pixelContainer->tryAddPixel(
-                        static_cast<uint_fast32_t>(x), static_cast<uint_fast32_t>(y), color
-                );
             }
+        } catch (const std::exception &){
+            LeaveCriticalSection(&_lastElemCS);
+            throw;
         }
         LeaveCriticalSection(&_lastElemCS);
 
