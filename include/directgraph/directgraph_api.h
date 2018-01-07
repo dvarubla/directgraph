@@ -1,7 +1,7 @@
 #ifndef DIRECTGRAPH_API_H
 #define DIRECTGRAPH_API_H
 #include <windows.h>
-#include <stdint.h>
+#include "directgraph_stdint.h"
 #include "export_header.h"
 #include "directgraph_constants.h"
 

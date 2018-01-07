@@ -29,6 +29,7 @@ set(COMMON_FILES
 set(INCLUDE_FILES
     ${CMAKE_SOURCE_DIR}/include/directgraph/directgraph_api.h
     ${CMAKE_SOURCE_DIR}/include/directgraph/export_header.h
+    ${CMAKE_SOURCE_DIR}/include/directgraph/directgraph_stdint.h
 )
 
 set(API_FILES directgraph_api.cpp)

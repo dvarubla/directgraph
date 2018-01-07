@@ -1,7 +1,7 @@
 #ifndef DIRECTGRAPH_GRAPHICS_CONST_H
 #define DIRECTGRAPH_GRAPHICS_CONST_H
 
-#include <stdint.h>
+#include "directgraph_stdint.h"
 
 typedef enum DirectgraphEvent{
     DIRECTGRAPH_WND_CREATED = 60000,
@@ -56,7 +56,7 @@ typedef enum fill_patterns {
 
 typedef void (*DirectgraphErrorHandler)(
         const wchar_t *filename,
-        uint_fast32_t lineNum,
+        uint32_t lineNum,
         DirectgraphErrorCode code,
         const wchar_t *str
 );

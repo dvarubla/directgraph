@@ -4,7 +4,7 @@
 #include <sstream>
 
 namespace directgraph {
-    static void defaultErrorHandler(const wchar_t *filename, uint_fast32_t lineNum, DirectgraphErrorCode code,
+    static void defaultErrorHandler(const wchar_t *filename, uint32_t lineNum, DirectgraphErrorCode code,
                                     const wchar_t *str) {
         std::wstringstream strm;
         strm << str << L"\nCode: " << code << L" (" << filename << L":" << lineNum << L")" << "\n\n"
