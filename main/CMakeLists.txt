@@ -2,15 +2,6 @@ project(directgraph)
 
 add_subdirectory(dx9)
 
-set(D2D_FILES
-    d2d/D2DRenderer.cpp
-    d2d/D2DRenderer.h
-    d2d/BufferCreator.cpp
-    d2d/BufferCreator.h
-    d2d/D2DWindowFactory.cpp
-    d2d/D2DWindowFactory.h
-        d2d/D2DCommon.cpp d2d/D2DCommon.h)
-
 set(COMMON_FILES
     QueueItem.h
     IMyWindow.h util.cpp util.h PixelContainerFactory.cpp PixelContainerFactory.h
