@@ -5,6 +5,7 @@
 #include <math.h>
 #include <main/QueueItem.h>
 #include "Exception.h"
+#include "PatternTexturesHelper.h"
 #include <algorithm>
 
 #undef max
@@ -26,8 +27,16 @@ namespace directgraph {
             return v;
         }
 
+        template<>
+        Renderer::TexturedRectVertex VertexCreator::create(
+                float x, float y, float z, float rhw, DWORD color, float tu, float tv
+        ) {
+            Renderer::TexturedRectVertex v = {x, y, z, rhw, color, tu, tv};
+            return v;
+        }
+
         Renderer::Renderer(Common *common, DPIHelper *helper, float width, float height)
-                : _swapChain(NULL), _vertBuffer(NULL), _vertMem(NULL), _pixelTexture(NULL) {
+                : _swapChain(NULL), _vertBuffer(NULL), _vertMem(NULL), _pixelTexture(NULL), _patTextHelper(NULL) {
             _helper = helper;
             _width = width;
             _height = height;
@@ -102,6 +111,22 @@ namespace directgraph {
                         std::wstring(L"Can't allocate memory for vertices")
                 );
             }
+            switch(_common->getFeatures()->getPatternTexFormat()){
+                case ColorFormat::A8:
+                    _patTextHelper = new PatternTexturesHelper<ColorFormat::A8>(
+                            _device, D3DFMT_A8,
+                            _common->getFeatures()->supportsTexConst()
+                    );
+                    break;
+                case ColorFormat::AR5G5B5:
+                    _patTextHelper = new PatternTexturesHelper<ColorFormat::AR5G5B5>(
+                            _device, D3DFMT_A1R5G5B5,
+                            _common->getFeatures()->supportsTexConst()
+                    );
+                    break;
+                default:
+                    THROW_EXC_CODE(WException, UNREACHABLE_CODE, L"Unknown format");
+            }
         }
 
         Renderer::~Renderer() {
@@ -111,6 +136,7 @@ namespace directgraph {
             if (_vertBuffer != NULL) {
                 _vertBuffer->Release();
             }
+            delete _patTextHelper;
             _common->deleteSwapChain(_swapChain);
             delete _helper;
             delete _pixContFactory;
@@ -128,7 +154,9 @@ namespace directgraph {
                         1.0f,
                         0
                 );
-            } else if (firstItem.type == QueueItem::PIXEL_CONTAINER) {
+                return;
+            }
+            if (firstItem.type == QueueItem::PIXEL_CONTAINER) {
                 IPixelContainer *cont = firstItem.data.pixelContainer;
                 reader->endReading(1);
                 bool haveLastLine = cont->getLastStride() != cont->getStride();
@@ -189,6 +217,8 @@ namespace directgraph {
                 _vertBuffer->Lock(0, numVertices * sizeof(TexturedVertex), &voidPointer, D3DLOCK_DISCARD);
                 memcpy(voidPointer, _vertMem, numVertices * sizeof(TexturedVertex));
                 _vertBuffer->Unlock();
+                _patTextHelper->unsetPattern();
+
                 _device->SetRenderTarget(0, _backBuffer);
                 _device->SetStreamSource(0, _vertBuffer, 0, sizeof(TexturedVertex));
                 _device->SetTexture(0, _pixelTexture);
@@ -201,27 +231,51 @@ namespace directgraph {
                 _device->EndScene();
                 delete cont;
                 _device->SetTexture(0, NULL);
-            } else {
-                uint_fast32_t size = reader->getSize();
-                uint_fast32_t readIndex = 0;
-                uint_fast32_t totalNumVertices = 0;
-                int_fast32_t prevX = 0, prevY = 0;
-                bool isFirst = true;
-                for (readIndex = 0; readIndex < size; readIndex++) {
-                    QueueItem &item = reader->getAt(readIndex);
-                    if (item.type == QueueItem::SINGLE_PIXEL ||
-                        (item.type == QueueItem::BAR && props->fillStyle == SOLID_FILL)) {
-                        uint_fast32_t curNumVertices =
-                                (isFirst) ?
-                                VERTICES_IN_QUAD :
-                                VERTICES_IN_QUAD * 2 - VERTICES_TRIANGLES_DIFF;
-                        if ((totalNumVertices + curNumVertices) >= VERTEX_BUFFER_SIZE) {
+                return;
+            }
+            uint_fast32_t size = reader->getSize();
+            uint_fast32_t readIndex = 0;
+            uint_fast32_t totalNumVertices = 0;
+            int_fast32_t prevX = 0, prevY = 0;
+            bool isFirst = true;
+            uint_fast8_t curFillStyle = SOLID_FILL;
+            bool useFillTexture = false;
+            void *curVertMem = _vertMem;
+            for (readIndex = 0; readIndex < size; readIndex++) {
+                QueueItem &item = reader->getAt(readIndex);
+                if (
+                    (item.type == QueueItem::SINGLE_PIXEL && !useFillTexture) ||
+                    item.type == QueueItem::BAR
+                ) {
+                    if(item.type != QueueItem::SINGLE_PIXEL && curFillStyle != props->fillStyle){
+                        if(!isFirst) {
                             break;
                         }
-                        RectVertex *rectVectMem = static_cast<RectVertex *>(_vertMem) + totalNumVertices;
-                        if (!isFirst) {
-                            rectVectMem = genDegenerate(
-                                    rectVectMem,
+                        curFillStyle = props->fillStyle;
+                        useFillTexture = true;
+                    }
+                    uint_fast32_t curNumVertices =
+                            (isFirst) ?
+                            VERTICES_IN_QUAD :
+                            VERTICES_IN_QUAD * 2 - VERTICES_TRIANGLES_DIFF;
+                    if ((totalNumVertices + curNumVertices) >= VERTEX_BUFFER_SIZE) {
+                        break;
+                    }
+                    if (!isFirst) {
+                        if(useFillTexture) {
+                            curVertMem = genFillDegenerate(
+                                    curVertMem,
+                                    prevX, prevY,
+                                    ((item.type == QueueItem::SINGLE_PIXEL) ?
+                                     static_cast<int_fast32_t>(item.data.singlePixel.x) :
+                                     _helper->toPixelsX(item.data.bar.left)),
+                                    ((item.type == QueueItem::SINGLE_PIXEL) ?
+                                     static_cast<int_fast32_t>(item.data.singlePixel.y) :
+                                     _helper->toPixelsY(item.data.bar.top))
+                            );
+                        } else {
+                            curVertMem = genDegenerate(
+                                    curVertMem,
                                     prevX, prevY,
                                     ((item.type == QueueItem::SINGLE_PIXEL) ?
                                      static_cast<int_fast32_t>(item.data.singlePixel.x) :
@@ -231,59 +285,107 @@ namespace directgraph {
                                      _helper->toPixelsY(item.data.bar.top))
                             );
                         }
-                        if (item.type == QueueItem::SINGLE_PIXEL) {
-                            genQuad(rectVectMem,
-                                    item.data.singlePixel.x,
-                                    item.data.singlePixel.y,
-                                    item.data.singlePixel.x + 1,
-                                    item.data.singlePixel.y + 1,
-                                    item.data.singlePixel.color
-                            );
-                            prevX = item.data.singlePixel.x + 1;
-                            prevY = item.data.singlePixel.y + 1;
-                        } else {
-                            genQuad(rectVectMem,
+                    }
+                    if (item.type == QueueItem::SINGLE_PIXEL) {
+                        curVertMem = genQuad(curVertMem,
+                                item.data.singlePixel.x,
+                                item.data.singlePixel.y,
+                                item.data.singlePixel.x + 1,
+                                item.data.singlePixel.y + 1,
+                                item.data.singlePixel.color
+                        );
+                        prevX = item.data.singlePixel.x + 1;
+                        prevY = item.data.singlePixel.y + 1;
+                    } else {
+                        if(useFillTexture) {
+                            curVertMem= genFillQuad(curVertMem,
                                     _helper->toPixelsX(item.data.bar.left),
                                     _helper->toPixelsY(item.data.bar.top),
                                     _helper->toPixelsX(item.data.bar.right),
                                     _helper->toPixelsY(item.data.bar.bottom),
                                     props->color
                             );
-                            prevX = _helper->toPixelsX(item.data.bar.right);
-                            prevY = _helper->toPixelsY(item.data.bar.bottom);
+                        } else {
+                            curVertMem = genQuad(curVertMem,
+                                    _helper->toPixelsX(item.data.bar.left),
+                                    _helper->toPixelsY(item.data.bar.top),
+                                    _helper->toPixelsX(item.data.bar.right),
+                                    _helper->toPixelsY(item.data.bar.bottom),
+                                    props->color
+                            );
                         }
-                        isFirst = false;
-                        totalNumVertices += curNumVertices;
-                    } else if (item.type == QueueItem::SETFILLSTYLE) {
-                        props->color = item.data.setfillstyle.color;
-                        props->fillStyle = item.data.setfillstyle.fillStyle;
-                    } else {
+                        prevX = _helper->toPixelsX(item.data.bar.right);
+                        prevY = _helper->toPixelsY(item.data.bar.bottom);
+                    }
+                    isFirst = false;
+                    totalNumVertices += curNumVertices;
+                } else if (item.type == QueueItem::SETFILLSTYLE) {
+                    if(!(isFirst || (props->fillStyle == item.data.setfillstyle.fillStyle))){
                         break;
                     }
+                    props->color = item.data.setfillstyle.color;
+                    props->fillStyle = item.data.setfillstyle.fillStyle;
+                } else if (item.type == QueueItem::SETFILLPATTERN) {
+                    if(!isFirst){
+                        break;
+                    }
+                    props->color = item.data.setfillpattern.color;
+                    props->fillStyle = USER_FILL;
+                    delete [] props->userFillPattern;
+                    props->userFillPattern = item.data.setfillpattern.fillPattern;
+                    _patTextHelper->setUserFillPattern(props->userFillPattern);
+                } else if (item.type == QueueItem::BGCOLOR){
+                    if(!(
+                         isFirst || props->fillStyle == SOLID_FILL ||
+                         (props->bgColor == item.data.bgColor)
+                    )){
+                        break;
+                    }
+                    props->bgColor = item.data.bgColor;
+                } else {
+                    break;
                 }
-                if (readIndex != 0) {
-                    reader->endReading(readIndex);
+            }
+
+            if (readIndex != 0 && totalNumVertices != 0) {
+                reader->endReading(readIndex);
+                if (useFillTexture) {
+                    void *voidPointer;
+                    _vertBuffer->Lock(0, totalNumVertices * sizeof(TexturedRectVertex), &voidPointer, D3DLOCK_DISCARD);
+                    memcpy(voidPointer, _vertMem, totalNumVertices * sizeof(TexturedRectVertex));
+                    _vertBuffer->Unlock();
+
+                    _patTextHelper->setFillPattern(curFillStyle, props->bgColor);
+                    _device->SetRenderTarget(0, _backBuffer);
+                    _device->SetStreamSource(0, _vertBuffer, 0, sizeof(TexturedRectVertex));
+                    _device->SetFVF(TEXTURED_RECT_VERTEX_FVF);
+                } else {
                     void *voidPointer;
                     _vertBuffer->Lock(0, totalNumVertices * sizeof(RectVertex), &voidPointer, D3DLOCK_DISCARD);
                     memcpy(voidPointer, _vertMem, totalNumVertices * sizeof(RectVertex));
                     _vertBuffer->Unlock();
+
                     _device->SetRenderTarget(0, _backBuffer);
                     _device->SetStreamSource(0, _vertBuffer, 0, sizeof(RectVertex));
                     _device->SetFVF(RECT_VERTEX_FVF);
-                    _device->BeginScene();
-                    _device->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, totalNumVertices - VERTICES_TRIANGLES_DIFF);
-                    _device->EndScene();
                 }
+                _device->BeginScene();
+                _device->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, totalNumVertices - VERTICES_TRIANGLES_DIFF);
+                _device->EndScene();
+                if (useFillTexture) {
+                    _patTextHelper->unsetPattern();
+                }
+                return;
             }
         }
 
         Renderer::RectVertex *
         Renderer::genDegenerate(
-                Renderer::RectVertex *vertices,
+                void *verticesVoid,
                 int_fast32_t startX, int_fast32_t startY,
                 int_fast32_t endX, int_fast32_t endY
         ) {
-
+            RectVertex *vertices = static_cast<RectVertex*>(verticesVoid);
             (*vertices) = VertexCreator::create<RectVertex>(
                     static_cast<float>(startX) - 0.5f,
                     static_cast<float>(startY) - 0.5f,
@@ -303,13 +405,44 @@ namespace directgraph {
             return vertices;
         }
 
+        Renderer::TexturedRectVertex *
+        Renderer::genFillDegenerate(
+                void *verticesVoid,
+                int_fast32_t startX, int_fast32_t startY,
+                int_fast32_t endX, int_fast32_t endY
+        ) {
+            TexturedRectVertex *vertices = static_cast<TexturedRectVertex*>(verticesVoid);
+            (*vertices) = VertexCreator::create<TexturedRectVertex>(
+                    static_cast<float>(startX) - 0.5f,
+                    static_cast<float>(startY) - 0.5f,
+                    0.0f,
+                    1.0f,
+                    D3DCOLOR_ARGB(0, 0, 0, 0),
+                    0.0f,
+                    0.0f
+            );
+            vertices++;
+            *vertices = VertexCreator::create<TexturedRectVertex>(
+                    static_cast<float>(endX) - 0.5f,
+                    static_cast<float>(endY) - 0.5f,
+                    0.0f,
+                    1.0f,
+                    D3DCOLOR_ARGB(0, 0, 0, 0),
+                    0.0f,
+                    0.0f
+            );
+            vertices++;
+            return vertices;
+        }
+
         Renderer::RectVertex *
         Renderer::genQuad(
-                Renderer::RectVertex *vertices,
+                void *verticesVoid,
                 int_fast32_t startX, int_fast32_t startY,
                 int_fast32_t endX, int_fast32_t endY,
                 uint_fast32_t color
         ) {
+            RectVertex *vertices = static_cast<RectVertex*>(verticesVoid);
             *vertices = VertexCreator::create<RectVertex>(
                     static_cast<float>(startX) - 0.5f,
                     static_cast<float>(startY) - 0.5f,
@@ -345,13 +478,67 @@ namespace directgraph {
             return vertices;
         }
 
+        Renderer::TexturedRectVertex *
+        Renderer::genFillQuad(
+                void *verticesVoid,
+                int_fast32_t startX, int_fast32_t startY,
+                int_fast32_t endX, int_fast32_t endY,
+                uint_fast32_t color
+        ) {
+            TexturedRectVertex *vertices = static_cast<TexturedRectVertex*>(verticesVoid);
+            float textureRight = (endX - startX) / 8.0f;
+            float textureBottom = (endY - startY) / 8.0f;
+            *vertices = VertexCreator::create<TexturedRectVertex>(
+                    static_cast<float>(startX) - 0.5f,
+                    static_cast<float>(startY) - 0.5f,
+                    0.0f,
+                    1.0f,
+                    swap_color(color),
+                    0.0f,
+                    0.0f
+            );
+            vertices++;
+            *vertices = VertexCreator::create<TexturedRectVertex>(
+                    static_cast<float>(endX) - 0.5f,
+                    static_cast<float>(startY) - 0.5f,
+                    0.0f,
+                    1.0f,
+                    swap_color(color),
+                    textureRight,
+                    0.0f
+            );
+            vertices++;
+            *vertices = VertexCreator::create<TexturedRectVertex>(
+                    static_cast<float>(startX) - 0.5f,
+                    static_cast<float>(endY) - 0.5f,
+                    0.0f,
+                    1.0f,
+                    swap_color(color),
+                    0.0f,
+                    textureBottom
+            );
+            vertices++;
+            *vertices = VertexCreator::create<TexturedRectVertex>(
+                    static_cast<float>(endX) - 0.5f,
+                    static_cast<float>(endY) - 0.5f,
+                    0.0f,
+                    1.0f,
+                    swap_color(color),
+                    textureRight,
+                    textureBottom
+            );
+            vertices++;
+            return vertices;
+        }
+
         Renderer::TexturedVertex *
         Renderer::genTexQuad(
-                Renderer::TexturedVertex *vertices,
+                void *verticesVoid,
                 int_fast32_t startX, int_fast32_t startY,
                 int_fast32_t endX, int_fast32_t endY,
                 uint_fast32_t maxX, uint_fast32_t maxY
         ) {
+            TexturedVertex *vertices = static_cast<TexturedVertex*>(verticesVoid);
             *vertices = VertexCreator::create<TexturedVertex>(
                     startX - 0.5f, startY - 0.5f, 0.0f, 1.0f,
                     static_cast<float>(startX) / maxX, static_cast<float>(startY) / maxY

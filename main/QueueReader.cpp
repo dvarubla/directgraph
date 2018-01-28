@@ -13,7 +13,7 @@ namespace directgraph{
     }
 
     QueueItem &QueueReader::getAt(uint_fast32_t index) {
-        if(index + 1 == _size){
+        if(index + 1 == _size && !_holdingLastElemCS){
             _holdingLastElemCS = true;
             EnterCriticalSection(_lastElemCS);
         }

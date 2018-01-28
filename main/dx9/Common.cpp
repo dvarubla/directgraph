@@ -12,6 +12,12 @@ namespace directgraph {
                         Exception, CANT_CREATE_DIRECTX9, std::wstring(L"Can't create DirectX object")
                 );
             }
+            try {
+                _features = new DeviceFeatures(_d3d);
+            } catch (const std::exception &){
+                _d3d->Release();
+                throw;
+            }
             InitializeCriticalSection(&_mainCS);
         }
 
@@ -42,14 +48,9 @@ namespace directgraph {
         void Common::createDevice(HWND win, uint_fast32_t width, uint_fast32_t height) {
             D3DDEVTYPE devType;
             DWORD flags;
-            checkCaps(devType, flags);
-            D3DDISPLAYMODE displayMode = {};
-            if (_d3d->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &displayMode) != D3D_OK) {
-                THROW_EXC_CODE(
-                        Exception, DX9_CANT_GET_DISPLAY_MODE, std::wstring(L"Can't get display mode")
-                );
-            }
-            _format = displayMode.Format;
+            _features->getDeviceFlags(devType, flags);
+
+            _format = _features->getDisplayMode();
             ZeroMemory(&_d3dpp, sizeof(_d3dpp));
             _d3dpp.BackBufferFormat = _format;
             _d3dpp.Windowed = TRUE;
@@ -90,22 +91,6 @@ namespace directgraph {
             }
         }
 
-        void Common::checkCaps(D3DDEVTYPE &devType, DWORD &flags) {
-            D3DCAPS9 caps = {};
-            HRESULT hRes = _d3d->GetDeviceCaps(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, &caps);
-            if (FAILED(hRes)) {
-                devType = D3DDEVTYPE_REF;
-                flags = D3DCREATE_SOFTWARE_VERTEXPROCESSING;
-            } else {
-                if (caps.DevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT) {
-                    flags = D3DCREATE_HARDWARE_VERTEXPROCESSING;
-                } else {
-                    flags = D3DCREATE_SOFTWARE_VERTEXPROCESSING;
-                }
-                devType = D3DDEVTYPE_HAL;
-            }
-        }
-
         void Common::deleteSwapChain(IDirect3DSwapChain9 *swapChain) {
             if (swapChain != NULL) {
                 swapChain->Release();
@@ -127,6 +112,15 @@ namespace directgraph {
         Common::~Common() {
             _device->Release();
             _d3d->Release();
+            delete _features;
+        }
+
+        IFeatures *Common::getFeatures() {
+            return _features;
+        }
+
+        void Common::setFeatures(IFeatures *features) {
+            _features = features;
         }
     }
 }

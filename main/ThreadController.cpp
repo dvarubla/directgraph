@@ -8,7 +8,10 @@ namespace directgraph{
     ThreadController::ThreadController(IMyWindow *window)
             : _window(window), _queue(), _reader(&_queue, &_queueCS, &_lastElemCS),
               _threadStarted(0), _pixContFactory(_window->getRenderer()->getPixContFactory()) {
+        _currentProps.fillStyle = SOLID_FILL;
         _currentProps.color = 0xFFFFFF;
+        _currentProps.bgColor = 0xFFFFFF;
+        _currentProps.userFillPattern = NULL;
         InitializeCriticalSection(&_addCS);
         InitializeCriticalSection(&_queueCS);
         InitializeCriticalSection(&_lastElemCS);
@@ -145,6 +148,7 @@ namespace directgraph{
         stopRepaintThread();
         DeleteCriticalSection(&_addCS);
         DeleteCriticalSection(&_queueCS);
+        delete [] _currentProps.userFillPattern;
     }
 
     void ThreadController::init() {

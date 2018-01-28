@@ -1,4 +1,7 @@
+#include <cstring>
+#include <algorithm>
 #include "QueueItem.h"
+#include "patterns.h"
 
 namespace directgraph{
     template<>
@@ -43,6 +46,24 @@ namespace directgraph{
     QueueItem QueueItemCreator::create<QueueItem::CLEAR>() {
         QueueItem item;
         item.type = QueueItem::CLEAR;
+        return item;
+    }
+
+    template<>
+    QueueItem QueueItemCreator::create<QueueItem::BGCOLOR>(uint32_t color) {
+        QueueItem item;
+        item.type = QueueItem::BGCOLOR;
+        item.data.bgColor = color;
+        return item;
+    }
+
+    template<>
+    QueueItem QueueItemCreator::create<QueueItem::SETFILLPATTERN>(const char *fillPattern, uint32_t color) {
+        QueueItem item;
+        item.type = QueueItem::SETFILLPATTERN;
+        item.data.setfillpattern.fillPattern = new char[FPATTERN_SIZE];
+        std::copy(fillPattern, fillPattern + FPATTERN_SIZE, item.data.setfillpattern.fillPattern);
+        item.data.setfillpattern.color = color;
         return item;
     }
 }

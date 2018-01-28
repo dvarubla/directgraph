@@ -56,5 +56,9 @@ namespace directgraph{
             delete win->getRenderer();
             delete win;
         }
+
+        Common *WindowFactory::getCommon() {
+            return _common;
+        }
     }
 }

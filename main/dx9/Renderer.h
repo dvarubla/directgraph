@@ -4,6 +4,7 @@
 #include <d3d9.h>
 #include <dx9/Common.h>
 #include <util.h>
+#include "IPatternTexturesHelper.h"
 
 namespace directgraph {
     namespace dx9 {
@@ -37,6 +38,13 @@ namespace directgraph {
                 float tu, tv;
             };
             const static DWORD TEXTURED_VERTEX_FVF = D3DFVF_XYZRHW | D3DFVF_TEX1;
+            struct TexturedRectVertex {
+                float x, y, z, rhw;
+                DWORD color;
+                float tu, tv;
+            };
+            const static DWORD TEXTURED_RECT_VERTEX_FVF = D3DFVF_XYZRHW |  D3DFVF_DIFFUSE | D3DFVF_TEX1;
+
             IDirect3DVertexBuffer9 *_vertBuffer;
             void *_vertMem;
 
@@ -44,25 +52,40 @@ namespace directgraph {
             uint_fast32_t _pixelTextureHeight;
             IDirect3DTexture9 *_pixelTexture;
 
+            IPatternTexturesHelper *_patTextHelper;
+
             PixelContainerFactory *_pixContFactory;
 
             void createDeviceRes();
 
             RectVertex *genDegenerate(
-                    RectVertex *vertices,
+                    void *verticesVoid,
                     int_fast32_t startX, int_fast32_t startY,
                     int_fast32_t endX, int_fast32_t endY
             );
 
             RectVertex *genQuad(
-                    RectVertex *vertices,
+                    void *verticesVoid,
+                    int_fast32_t startX, int_fast32_t startY,
+                    int_fast32_t endX, int_fast32_t endY,
+                    uint_fast32_t color
+            );
+
+            TexturedRectVertex *genFillDegenerate(
+                    void *verticesVoid,
+                    int_fast32_t startX, int_fast32_t startY,
+                    int_fast32_t endX, int_fast32_t endY
+            );
+
+            TexturedRectVertex *genFillQuad(
+                    void *verticesVoid,
                     int_fast32_t startX, int_fast32_t startY,
                     int_fast32_t endX, int_fast32_t endY,
                     uint_fast32_t color
             );
 
             TexturedVertex *genTexQuad(
-                    TexturedVertex *vertices,
+                    void *verticesVoid,
                     int_fast32_t startX, int_fast32_t startY,
                     int_fast32_t endX, int_fast32_t endY,
                     uint_fast32_t maxX, uint_fast32_t maxY
@@ -89,6 +112,9 @@ namespace directgraph {
 
             template<typename T>
             static T create(float x, float y, float z, float rhw, float tu, float tv);
+
+            template<typename T>
+            static T create(float x, float y, float z, float rhw, DWORD color, float tu, float tv);
         };
     }
 }

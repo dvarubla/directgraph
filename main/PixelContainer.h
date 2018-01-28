@@ -15,7 +15,7 @@ namespace directgraph {
             LEFT_RIGHT_BOTTOM_UP
         } _direction;
         typedef FormatFinder<DispMode> FFinder;
-        typedef typename FFinder::ContainerType ContainerType;
+        typedef typename FFinder::FormatType ContainerType;
         ContainerType *_buffer;
         uint_fast32_t _firstX;
         uint_fast32_t _firstY;
