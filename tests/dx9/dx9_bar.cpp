@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <dx9/DX9WindowFactory.h>
+#include <dx9/WindowFactory.h>
 #include <directgraph/directgraph_constants.h>
 #include <tests/stubs/QueueReaderStub.h>
 

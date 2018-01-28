@@ -1,4 +1,4 @@
-﻿#include <dx9/DX9WindowFactory.h>
+﻿#include <dx9/WindowFactory.h>
 #include <sstream>
 #include "ThreadController.h"
 #include "WindowManager.h"
@@ -22,7 +22,7 @@ static LONG volatile needCreateWindowManager = 1;
 
 static void tryCreateWindowManager(){
     if(InterlockedExchange(&needCreateWindowManager, 0)) {
-        IWindowFactory *factory = new DX9WindowFactory();
+        IWindowFactory *factory = new dx9::WindowFactory();
         std::vector<IWindowFactory *> factories;
         IControllerFactory *ctrlFactory = new ControllerFactory();
         factories.push_back(factory);

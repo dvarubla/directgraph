@@ -15,7 +15,7 @@ BitmapWrap *CommonSimple::afterTestSimple(IMyWindow *win, IQueueReader *reader) 
 
 void CommonSimple::init_factory() {
     if(_dx9Wf == NULL) {
-        _dx9Wf = new DX9WindowFactory();
+        _dx9Wf = new WindowFactory();
     }
 }
 
@@ -23,7 +23,7 @@ CommonSimple::CommonSimple() {
 
 }
 
-DX9WindowFactory *CommonSimple::_dx9Wf = NULL;
+WindowFactory *CommonSimple::_dx9Wf = NULL;
 
 IMyWindow* CommonSimple::createWindow(float w, float h) {
     init_factory();
