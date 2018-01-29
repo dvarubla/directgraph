@@ -6,7 +6,7 @@ using namespace directgraph;
 namespace {
     class PixelContainerTest : public ::testing::Test {
     public:
-        typedef PixelContainer<IPixelContainer::R8G8B8> PCont;
+        typedef PixelContainer<ColorFormat::R8G8B8> PCont;
         struct PContParams{
             uint_fast32_t left;
             uint_fast32_t top;

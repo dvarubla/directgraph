@@ -7,7 +7,7 @@ namespace directgraph{
 
     PixelContainerFactory::PixelContainerFactory(
             uint_fast32_t maxWidth, uint_fast32_t maxHeight,
-            IPixelContainer::Format format
+            ColorFormat::Format format
     ): _maxWidth(maxWidth), _maxHeight(maxHeight), _format(format) {
     }
 
@@ -25,15 +25,15 @@ namespace directgraph{
         ){
             result.containerCreated = true;
             switch(_format){
-                case IPixelContainer::R8G8B8:
-                    result.container = new PixelContainer<IPixelContainer::R8G8B8>(
+                case ColorFormat::R8G8B8:
+                    result.container = new PixelContainer<ColorFormat::R8G8B8>(
                             firstX, firstY, firstColor,
                             secondX, secondY, secondColor,
                             _maxWidth, _maxHeight
                     );
                 break;
-                case IPixelContainer::R5G6B5:
-                    result.container = new PixelContainer<IPixelContainer::R5G6B5>(
+                case ColorFormat::R5G6B5:
+                    result.container = new PixelContainer<ColorFormat::R5G6B5>(
                             firstX, firstY, firstColor,
                             secondX, secondY, secondColor,
                             _maxWidth, _maxHeight

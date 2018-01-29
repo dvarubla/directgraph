@@ -26,7 +26,7 @@ public:
         item.type = QueueItem::CLEAR;
         items.push_back(item);
         item.type = QueueItem::PIXEL_CONTAINER;
-        item.data.pixelContainer = new PixelContainer<IPixelContainer::R8G8B8>(5, 2, 0, 6, 2, 0, 500, 500);
+        item.data.pixelContainer = new PixelContainer<ColorFormat::R8G8B8>(5, 2, 0, 6, 2, 0, 500, 500);
         tc.putpixel(5, 2, 0);
         tc.putpixel(6, 2, 0);
         items.push_back(item);
@@ -61,7 +61,7 @@ public:
 protected:
     ThreadsLastTest() {
         ren = new NiceMock<RendererStub>();
-        fact = new PixelContainerFactory(500, 500, IPixelContainer::R8G8B8);
+        fact = new PixelContainerFactory(500, 500, ColorFormat::R8G8B8);
         win = new NiceMock<MyWindowStub>();
         ON_CALL(*win, getRenderer()).WillByDefault(Return(ren));
         ON_CALL(*ren, draw(_, _)).WillByDefault(testing::WithArgs<0>(Invoke(ren, &RendererStub::drawImpl)));

@@ -6,10 +6,6 @@
 namespace directgraph {
     class IPixelContainer {
     public:
-        enum Format{
-            R5G6B5,
-            R8G8B8
-        };
         virtual void* getBuffer() = 0;
         virtual uint_fast32_t getStartOffset() = 0;
         virtual uint_fast32_t getNextLineOffset() = 0;

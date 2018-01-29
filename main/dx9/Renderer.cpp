@@ -62,16 +62,16 @@ namespace directgraph {
                 THROW_EXC_CODE(Exception, DX9_CANT_CREATE_TEXTURE, std::wstring(L"Can't create texture"));
             };
 
-            IPixelContainer::Format format;
+            ColorFormat::Format format;
 
             switch (_common->getFormat()) {
                 case D3DFMT_R8G8B8:
                 case D3DFMT_X8R8G8B8:
                 case D3DFMT_A8R8G8B8:
-                    format = IPixelContainer::R8G8B8;
+                    format = ColorFormat::R8G8B8;
                     break;
                 case D3DFMT_R5G6B5:
-                    format = IPixelContainer::R5G6B5;
+                    format = ColorFormat::R5G6B5;
                     break;
                 default:
                     THROW_EXC_CODE(

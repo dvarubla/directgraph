@@ -3,18 +3,19 @@
 #include <utility>
 #include "IPixelContainer.h"
 #include "QueueItem.h"
+#include "FormatFinder.h"
 
 namespace directgraph {
     class PixelContainerFactory {
         uint_fast32_t _maxWidth;
         uint_fast32_t _maxHeight;
-        IPixelContainer::Format _format;
+        ColorFormat::Format _format;
     public:
         struct ContainerOpt{
             bool containerCreated;
             IPixelContainer *container;
         };
-        PixelContainerFactory(uint_fast32_t maxWidth, uint_fast32_t maxHeight, IPixelContainer::Format format);
+        PixelContainerFactory(uint_fast32_t maxWidth, uint_fast32_t maxHeight, ColorFormat::Format format);
         ContainerOpt tryGetContainer(
                 uint_fast32_t firstX,
                 uint_fast32_t firstY,
