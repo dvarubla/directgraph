@@ -93,6 +93,7 @@ namespace directgraph{
         MSG msg;
         PostThreadMessage(_drawThreadId, REPAINT, GetCurrentThreadId(), 0);
         GetMessage(&msg, NULL, REPLY, REPLY);
+        rethrow_exc_wparam(msg);
     }
 
     void ThreadController::repaintThread() {
@@ -113,7 +114,18 @@ namespace directgraph{
                     break;
                 }
                 _reader.setGetIndex(_queue.getGetIndex(), readSize);
-                _window->getRenderer()->draw(&_reader, &_currentProps);
+                try {
+                    _window->getRenderer()->draw(&_reader, &_currentProps);
+                } catch (const std::exception &){
+                    LeaveCriticalSection(&_queueCS);
+                    std::exception_ptr *ptrMem = new std::exception_ptr;
+                    *ptrMem = std::current_exception();
+                    PostThreadMessage(
+                            static_cast<DWORD>(msg.wParam), REPLY,
+                            reinterpret_cast<WPARAM>(ptrMem), true
+                    );
+                    break;
+                }
             }
             _window->getRenderer()->repaint();
             PostThreadMessage(static_cast<DWORD>(msg.wParam), REPLY, 0, 0);
