@@ -38,6 +38,8 @@ namespace directgraph {
         void clear();
         void bar(float left, float top, float right, float bottom);
         void setfillstyle(uint_fast8_t fillStyle, uint_fast32_t color);
+        void setfillpattern(const char *fillpattern, uint_fast32_t color);
+        void setbgcolor(uint_fast32_t color);
         void putpixel(int_fast32_t x, int_fast32_t y, uint_fast32_t color);
         void repaint();
     };

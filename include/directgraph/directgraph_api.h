@@ -15,6 +15,10 @@ void DIRECTGRAPH_EXPORT putpixel(uint32_t x, uint32_t y, uint32_t color);
 
 void DIRECTGRAPH_EXPORT setfillstyle(fill_patterns pattern, uint32_t color);
 
+void DIRECTGRAPH_EXPORT setfillpattern(const char *fillpattern, uint32_t color);
+
+void DIRECTGRAPH_EXPORT setbgcolor(uint32_t color);
+
 void DIRECTGRAPH_EXPORT delay(uint32_t msec);
 
 void DIRECTGRAPH_EXPORT resize(float width, float height);

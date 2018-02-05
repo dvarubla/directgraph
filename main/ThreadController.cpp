@@ -43,6 +43,16 @@ namespace directgraph{
         writeItemHelper(item);
     }
 
+    void ThreadController::setbgcolor(uint_fast32_t color) {
+        QueueItem item = QueueItemCreator::create<QueueItem::BGCOLOR>(color);
+        writeItemHelper(item);
+    }
+
+    void ThreadController::setfillpattern(const char *fillpattern, uint_fast32_t color) {
+        QueueItem item = QueueItemCreator::create<QueueItem::SETFILLPATTERN>(fillpattern, color);
+        writeItemHelper(item);
+    }
+
     void ThreadController::putpixel(int_fast32_t x, int_fast32_t y, uint_fast32_t color) {
         if(
                 x < 0 || y < 0 ||

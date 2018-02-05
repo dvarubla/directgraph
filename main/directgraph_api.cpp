@@ -165,6 +165,20 @@ void DIRECTGRAPH_EXPORT setfillstyle(fill_patterns pattern, uint32_t color){
     )
 }
 
+void DIRECTGRAPH_EXPORT setfillpattern(const char *fillpattern, uint32_t color){
+    EXC_CALL_WRAP(
+            getWindowManager()->getCurrentWindowAndLock().controller->setfillpattern(fillpattern, color);
+            getWindowManager()->releaseCurrentWindowLock();
+    )
+}
+
+void DIRECTGRAPH_EXPORT setbgcolor(uint32_t color){
+    EXC_CALL_WRAP(
+            getWindowManager()->getCurrentWindowAndLock().controller->setbgcolor(color);
+            getWindowManager()->releaseCurrentWindowLock();
+    )
+}
+
 void DIRECTGRAPH_EXPORT delay(uint32_t msec){
     Sleep(msec);
     directgraph_repaint();

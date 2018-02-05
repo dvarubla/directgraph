@@ -9,6 +9,8 @@ namespace directgraph{
         MOCK_METHOD0(clear, void ());
         MOCK_METHOD4(bar, void (float left, float top, float right, float bottom));
         MOCK_METHOD2(setfillstyle, void (uint_fast8_t fillStyle, uint_fast32_t color));
+        MOCK_METHOD2(setfillpattern, void(const char *fillpattern, uint_fast32_t color));
+        MOCK_METHOD1(setbgcolor, void(uint_fast32_t color));
         MOCK_METHOD3(putpixel, void (int_fast32_t x, int_fast32_t y, uint_fast32_t color));
         MOCK_METHOD0(repaint, void ());
     };
