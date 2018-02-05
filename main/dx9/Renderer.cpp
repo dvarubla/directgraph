@@ -309,7 +309,7 @@ namespace directgraph {
                                     _helper->toPixelsY(item.data.bar.top),
                                     _helper->toPixelsX(item.data.bar.right),
                                     _helper->toPixelsY(item.data.bar.bottom),
-                                    props->color
+                                    props->fillColor
                             );
                         } else {
                             curVertMem = genQuad(curVertMem,
@@ -317,7 +317,7 @@ namespace directgraph {
                                     _helper->toPixelsY(item.data.bar.top),
                                     _helper->toPixelsX(item.data.bar.right),
                                     _helper->toPixelsY(item.data.bar.bottom),
-                                    props->color
+                                    props->fillColor
                             );
                         }
                         prevX = _helper->toPixelsX(item.data.bar.right);
@@ -329,13 +329,13 @@ namespace directgraph {
                     if(!(isFirst || (props->fillStyle == item.data.setfillstyle.fillStyle))){
                         break;
                     }
-                    props->color = item.data.setfillstyle.color;
+                    props->fillColor = item.data.setfillstyle.color;
                     props->fillStyle = item.data.setfillstyle.fillStyle;
                 } else if (item.type == QueueItem::SETFILLPATTERN) {
                     if(!isFirst){
                         break;
                     }
-                    props->color = item.data.setfillpattern.color;
+                    props->fillColor = item.data.setfillpattern.color;
                     props->fillStyle = USER_FILL;
                     delete [] props->userFillPattern;
                     props->userFillPattern = item.data.setfillpattern.fillPattern;

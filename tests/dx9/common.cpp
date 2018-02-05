@@ -7,7 +7,7 @@ using testing::Invoke;
 BitmapWrap *CommonSimple::afterTestSimple(IMyWindow *win, IQueueReader *reader) {
     CommonProps props;
     props.fillStyle = SOLID_FILL;
-    props.color = 0xFFFFFF;
+    props.fillColor = 0xFFFFFF;
     props.bgColor = 0xFFFFFF;
     props.userFillPattern = NULL;
     while(reader->getSize() != 0) {
