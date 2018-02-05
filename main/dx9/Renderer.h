@@ -18,7 +18,7 @@ namespace directgraph {
             const static int TRIANGLES_IN_QUAD = 2;
             const static int VERTICES_IN_QUAD = 4;
             const static int VERTICES_TRIANGLES_DIFF = 2;
-            const static int VERTEX_BUFFER_SIZE = 256;
+            const static int VERTEX_BUFFER_SIZE = 262144;
             IDirect3D9 *_d3d;
             IDirect3DDevice9 *_device;
             IDirect3DSwapChain9 *_swapChain;

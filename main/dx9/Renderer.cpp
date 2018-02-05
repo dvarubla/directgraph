@@ -91,8 +91,8 @@ namespace directgraph {
             }
             _pixContFactory = new PixelContainerFactory(pxWidth, pxHeight, format);
 
-            if (_device->CreateVertexBuffer(VERTEX_BUFFER_SIZE * sizeof(RectVertex),
-                                            D3DUSAGE_DYNAMIC,
+            if (_device->CreateVertexBuffer(VERTEX_BUFFER_SIZE,
+                                            D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY,
                                             0,
                                             D3DPOOL_DEFAULT,
                                             &_vertBuffer, NULL) != D3D_OK
@@ -103,7 +103,7 @@ namespace directgraph {
                         std::wstring(L"Can't create vertex buffer")
                 );
             }
-            _vertMem = malloc(VERTEX_BUFFER_SIZE * sizeof(RectVertex));
+            _vertMem = malloc(VERTEX_BUFFER_SIZE);
             if (_vertMem == NULL) {
                 THROW_EXC_CODE(
                         Exception,
@@ -258,7 +258,13 @@ namespace directgraph {
                             (isFirst) ?
                             VERTICES_IN_QUAD :
                             VERTICES_IN_QUAD * 2 - VERTICES_TRIANGLES_DIFF;
-                    if ((totalNumVertices + curNumVertices) >= VERTEX_BUFFER_SIZE) {
+                    uint_fast32_t curUsedSize = ((uint8_t*)curVertMem - (uint8_t*)_vertMem);
+                    if(useFillTexture){
+                        curUsedSize += curNumVertices * sizeof(TexturedRectVertex);
+                    } else {
+                        curUsedSize += curNumVertices * sizeof(RectVertex);
+                    }
+                    if (curUsedSize > VERTEX_BUFFER_SIZE) {
                         break;
                     }
                     if (!isFirst) {
