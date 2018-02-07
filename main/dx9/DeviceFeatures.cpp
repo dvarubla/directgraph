@@ -35,7 +35,7 @@ namespace directgraph{
             return (_caps.PrimitiveMiscCaps & D3DPMISCCAPS_PERSTAGECONSTANT) == D3DPMISCCAPS_PERSTAGECONSTANT;
         }
 
-        DeviceFeatures::DeviceFeatures(IDirect3D9 *d3d): _d3d(d3d), _caps({}) {
+        DeviceFeatures::DeviceFeatures(IDirect3D9 *d3d): _d3d(d3d), _caps() {
             HRESULT hRes = _d3d->GetDeviceCaps(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, &_caps);
             if (FAILED(hRes)) {
                 _devType = D3DDEVTYPE_REF;

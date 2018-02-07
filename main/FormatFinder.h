@@ -17,7 +17,7 @@ namespace directgraph {
     };
 
     template <>
-    class FormatFinder<ColorFormat::Format::R8G8B8>{
+    class FormatFinder<ColorFormat::R8G8B8>{
     public:
         typedef uint32_t FormatType;
         static FormatType convert(uint32_t color){
@@ -40,7 +40,7 @@ namespace directgraph {
     };
 
     template <>
-    class FormatFinder<ColorFormat::Format::AR5G5B5>{
+    class FormatFinder<ColorFormat::AR5G5B5>{
     public:
         typedef uint16_t FormatType;
         static FormatType convert(uint32_t color, bool isTransparent){
@@ -55,7 +55,7 @@ namespace directgraph {
     };
 
     template <>
-    class FormatFinder<ColorFormat::Format::A8>{
+    class FormatFinder<ColorFormat::A8>{
     public:
         typedef uint8_t FormatType;
         static FormatType convert(uint32_t, bool isTransparent){

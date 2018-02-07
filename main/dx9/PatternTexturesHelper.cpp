@@ -128,7 +128,7 @@ namespace directgraph{
             delete [] _userPattern;
         }
 
-        template class PatternTexturesHelper<ColorFormat::Format::A8>;
-        template class PatternTexturesHelper<ColorFormat::Format::AR5G5B5>;
+        template class PatternTexturesHelper<ColorFormat::A8>;
+        template class PatternTexturesHelper<ColorFormat::AR5G5B5>;
     }
 }

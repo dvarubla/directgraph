@@ -144,6 +144,6 @@ namespace directgraph{
         _buffer[y * _maxWidth + x] = FFinder::convert(color);
     }
 
-    template class PixelContainer<ColorFormat::Format::R8G8B8>;
-    template class PixelContainer<ColorFormat::Format::R5G6B5>;
+    template class PixelContainer<ColorFormat::R8G8B8>;
+    template class PixelContainer<ColorFormat::R5G6B5>;
 }

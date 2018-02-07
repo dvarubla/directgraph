@@ -241,7 +241,7 @@ namespace directgraph {
                             (isFirst) ?
                             VERTICES_IN_QUAD :
                             VERTICES_IN_QUAD * 2 - VERTICES_TRIANGLES_DIFF;
-                    uint_fast32_t curUsedSize = ((uint8_t*)curVertMem - (uint8_t*)_vertMem);
+                    uint_fast32_t curUsedSize = static_cast<uint_fast32_t>(((uint8_t*)curVertMem - (uint8_t*)_vertMem));
                     if(useFillTexture){
                         curUsedSize += curNumVertices * sizeof(TexturedRectVertex);
                     } else {
