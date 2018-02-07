@@ -91,6 +91,8 @@ namespace directgraph {
                     uint_fast32_t maxX, uint_fast32_t maxY
             );
 
+            bool isColorVertexFill(uint_fast8_t patt);
+
         public:
             Renderer(Common *common, DPIHelper *helper, float width, float height);
 

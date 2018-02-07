@@ -148,3 +148,27 @@ IMG_TEST_F(DX9BarFillstyleTest, UserPatternThenSolidFill){
     _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
     return afterTestSimple(win, &_readerStub);
 }
+
+IMG_TEST_F(DX9BarFillstyleTest, EmptyFill){
+    QueueItem items[] = {
+            QueueItemCreator::create<QueueItem::CLEAR>(),
+            QueueItemCreator::create<QueueItem::BGCOLOR>(0x0000FF),
+            QueueItemCreator::create<QueueItem::SETFILLSTYLE>(EMPTY_FILL, 0x00CC00),
+            QueueItemCreator::create<QueueItem::BAR>(0, 0, WIDTH/4, HEIGHT/4)
+    };
+    _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
+    return afterTestSimple(win, &_readerStub);
+}
+
+IMG_TEST_F(DX9BarFillstyleTest, EmptyFillThenSolid){
+    QueueItem items[] = {
+            QueueItemCreator::create<QueueItem::CLEAR>(),
+            QueueItemCreator::create<QueueItem::BGCOLOR>(0x0000FF),
+            QueueItemCreator::create<QueueItem::SETFILLSTYLE>(EMPTY_FILL, 0x00CC00),
+            QueueItemCreator::create<QueueItem::BAR>(0, 0, WIDTH/4, HEIGHT/4),
+            QueueItemCreator::create<QueueItem::SETFILLSTYLE>(SOLID_FILL, 0x00CC00),
+            QueueItemCreator::create<QueueItem::BAR>(WIDTH/4, HEIGHT/4, WIDTH/2, HEIGHT/2)
+    };
+    _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
+    return afterTestSimple(win, &_readerStub);
+}

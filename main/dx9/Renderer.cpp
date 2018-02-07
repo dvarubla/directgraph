@@ -252,7 +252,7 @@ namespace directgraph {
                             break;
                         }
                         curFillStyle = props->fillStyle;
-                        useFillTexture = true;
+                        useFillTexture = !isColorVertexFill(curFillStyle);
                     }
                     uint_fast32_t curNumVertices =
                             (isFirst) ?
@@ -317,7 +317,7 @@ namespace directgraph {
                                     _helper->toPixelsY(item.data.bar.top),
                                     _helper->toPixelsX(item.data.bar.right),
                                     _helper->toPixelsY(item.data.bar.bottom),
-                                    props->fillColor
+                                    ((props->fillStyle == SOLID_FILL) ? props->fillColor : props->bgColor)
                             );
                         }
                         prevX = _helper->toPixelsX(item.data.bar.right);
@@ -326,7 +326,11 @@ namespace directgraph {
                     isFirst = false;
                     totalNumVertices += curNumVertices;
                 } else if (item.type == QueueItem::SETFILLSTYLE) {
-                    if(!(isFirst || (props->fillStyle == item.data.setfillstyle.fillStyle))){
+                    if(!(
+                         isFirst ||
+                         (isColorVertexFill(props->fillStyle) && isColorVertexFill(item.data.setfillstyle.fillStyle)) ||
+                         (props->fillStyle == item.data.setfillstyle.fillStyle)
+                    )){
                         break;
                     }
                     props->fillColor = item.data.setfillstyle.color;
@@ -342,7 +346,7 @@ namespace directgraph {
                     _patTextHelper->setUserFillPattern(props->userFillPattern);
                 } else if (item.type == QueueItem::BGCOLOR){
                     if(!(
-                         isFirst || props->fillStyle == SOLID_FILL ||
+                         isFirst || isColorVertexFill(props->fillStyle) ||
                          (props->bgColor == item.data.bgColor)
                     )){
                         break;
@@ -570,6 +574,10 @@ namespace directgraph {
 
         PixelContainerFactory *Renderer::getPixContFactory() {
             return _pixContFactory;
+        }
+
+        bool Renderer::isColorVertexFill(uint_fast8_t patt) {
+            return patt == SOLID_FILL || patt == EMPTY_FILL;
         }
     }
 }
