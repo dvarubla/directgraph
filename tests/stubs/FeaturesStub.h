@@ -9,6 +9,8 @@ namespace directgraph {
         public:
             MOCK_METHOD2(getDeviceFlags, void (D3DDEVTYPE &devType, DWORD &flags));
 
+            MOCK_METHOD0(getImageTexFormat, ColorFormat::Format());
+
             MOCK_METHOD0(getPatternTexFormat, ColorFormat::Format());
 
             MOCK_METHOD0(getDisplayMode, D3DFORMAT ());

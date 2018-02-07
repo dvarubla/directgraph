@@ -66,5 +66,22 @@ namespace directgraph{
         D3DFORMAT DeviceFeatures::getDisplayMode() {
             return _displayMode.Format;
         }
+
+        ColorFormat::Format DeviceFeatures::getImageTexFormat() {
+            switch (_displayMode.Format) {
+                case D3DFMT_R8G8B8:
+                case D3DFMT_X8R8G8B8:
+                case D3DFMT_A8R8G8B8:
+                    return ColorFormat::R8G8B8;
+                case D3DFMT_R5G6B5:
+                    return ColorFormat::R5G6B5;
+                default:
+                    THROW_EXC_CODE(
+                            Exception,
+                            DX9_UNSUPPORTED_DISPLAY_FORMAT,
+                            std::wstring(L"Unsupported display format")
+                    );
+            }
+        }
     }
 }

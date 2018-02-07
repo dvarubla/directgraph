@@ -15,6 +15,8 @@ namespace directgraph {
 
             D3DFORMAT getDisplayMode();
 
+            ColorFormat::Format getImageTexFormat();
+
             ColorFormat::Format getPatternTexFormat();
 
             void getDeviceFlags(D3DDEVTYPE &devType, DWORD &flags);
