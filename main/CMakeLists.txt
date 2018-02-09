@@ -31,7 +31,7 @@ set_target_properties(
         directgraph_common PROPERTIES
         COMPILE_FLAGS "${COMMON_COMPILE_FLAGS}"
 )
-target_include_directories(directgraph_common BEFORE PUBLIC . "${CMAKE_SOURCE_DIR}/include")
+target_include_directories(directgraph_common BEFORE PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/include")
 
 add_library(directgraph_dx9_int INTERFACE)
 target_link_libraries(directgraph_dx9_int INTERFACE directgraph_common directgraph_dx9_renderer)

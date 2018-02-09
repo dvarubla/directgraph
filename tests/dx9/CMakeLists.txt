@@ -1,48 +1,35 @@
 project(dx9_tests)
 
 set(SHADERS_RES_FILE "${CMAKE_BINARY_DIR}/resources/shaders.res")
-
-add_executable(dx9_bar dx9_bar.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp ../stubs/FeaturesStub.h)
-add_executable(dx9_single_pixel dx9_single_pixel.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp ../stubs/FeaturesStub.h)
-add_executable(dx9_pixel_container dx9_pixel_container.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp ../stubs/FeaturesStub.h)
-add_executable(dx9_bar_fillstyle dx9_bar_fillstyle.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp ../stubs/FeaturesStub.h)
-add_executable(dx9_bar_fillstyle_old dx9_bar_fillstyle_old.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp ../stubs/FeaturesStub.h)
-
-set_target_properties(
-        dx9_bar dx9_single_pixel dx9_pixel_container dx9_bar_fillstyle dx9_bar_fillstyle_old
-        PROPERTIES
-        COMPILE_FLAGS "${COMMON_COMPILE_FLAGS}"
-        LINK_FLAGS "/ENTRY:wmainCRTStartup /subsystem:console ${EXTRA_LINK_FLAGS}")
-
-target_link_libraries(dx9_bar PUBLIC directgraph_dx9_int directgraph_testlib)
-target_link_libraries(dx9_single_pixel PUBLIC directgraph_dx9_int directgraph_testlib)
-target_link_libraries(dx9_pixel_container PUBLIC directgraph_dx9_int directgraph_testlib)
-target_link_libraries(dx9_bar_fillstyle PUBLIC directgraph_dx9_int directgraph_testlib)
-target_link_libraries(dx9_bar_fillstyle_old PUBLIC directgraph_dx9_int directgraph_testlib)
 set_source_files_properties(
         "${SHADERS_RES_FILE}"
         PROPERTIES
         EXTERNAL_OBJECT true
         GENERATED true
 )
-add_dependencies(dx9_bar static_res)
-add_dependencies(dx9_single_pixel static_res)
-add_dependencies(dx9_pixel_container static_res)
-add_dependencies(dx9_bar_fillstyle static_res)
 
-add_test(NAME dx9_bar WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/previous
-        COMMAND $<TARGET_FILE:dx9_bar> .)
+function(dx9_test name src)
+    add_executable(${name} "${src}")
+    add_dependencies(${name} static_res)
+    add_test(NAME ${name} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/previous
+            COMMAND $<TARGET_FILE:${name}> .)
+    set_target_properties(
+            ${name}
+            PROPERTIES
+            COMPILE_FLAGS "${COMMON_COMPILE_FLAGS}"
+            LINK_FLAGS "/ENTRY:wmainCRTStartup /subsystem:console ${EXTRA_LINK_FLAGS}"
+    )
+    target_link_libraries(${name} PUBLIC directgraph_dx9_int directgraph_testlib)
+    set_tests_properties(${name} PROPERTIES LABELS "dx9")
+endfunction()
 
-add_test(NAME dx9_single_pixel WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/previous
-        COMMAND $<TARGET_FILE:dx9_single_pixel> .)
-
-add_test(NAME dx9_pixel_container WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/previous
-        COMMAND $<TARGET_FILE:dx9_pixel_container> .)
-
-add_test(NAME dx9_bar_fillstyle WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/previous
-        COMMAND $<TARGET_FILE:dx9_bar_fillstyle> .)
-
-add_test(NAME dx9_bar_fillstyle_old WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/previous
-        COMMAND $<TARGET_FILE:dx9_bar_fillstyle_old> .)
-
-set_tests_properties(dx9_bar dx9_pixel_container dx9_single_pixel dx9_bar_fillstyle dx9_bar_fillstyle_old PROPERTIES LABELS "dx9")
+set(DX9_BAR_SRC dx9_bar.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp ../stubs/FeaturesStub.h)
+dx9_test(dx9_bar "${DX9_BAR_SRC}")
+set(DX9_SINGLE_PIXEL_SRC dx9_single_pixel.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp ../stubs/FeaturesStub.h)
+dx9_test(dx9_single_pixel "${DX9_SINGLE_PIXEL_SRC}")
+set(DX9_PIXEL_CONTAINER_SRC dx9_pixel_container.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp ../stubs/FeaturesStub.h)
+dx9_test(dx9_pixel_container "${DX9_PIXEL_CONTAINER_SRC}")
+set(DX9_BAR_FILLSTYLE_SRC dx9_bar_fillstyle.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp ../stubs/FeaturesStub.h)
+dx9_test(dx9_bar_fillstyle "${DX9_BAR_FILLSTYLE_SRC}")
+set(DX9_BAR_FILLSTYLE_OLD_SRC dx9_bar_fillstyle_old.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp ../stubs/FeaturesStub.h)
+dx9_test(dx9_bar_fillstyle_old "${DX9_BAR_FILLSTYLE_OLD_SRC}")
