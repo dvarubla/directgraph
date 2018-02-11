@@ -19,6 +19,13 @@ namespace directgraph {
             _width = width;
             _height = height;
             _common = common;
+            _curState.fillPattern = SOLID_FILL;
+            _curState.bgColor = 0xFFFFFF;
+            _curState.userFillPattern = NULL;
+            _lastState = _curState;
+            _curGenDataVars.fillColor = 0xFFFFFF;
+            _curGenDataVars.bgColor = 0xFFFFFF;
+            _curGenDataVars.fillStyle = SOLID_FILL;
         }
 
         void Renderer::setWindow(HWND hwnd) {
@@ -102,6 +109,7 @@ namespace directgraph {
             delete _helper;
             delete _pixContFactory;
             free(_vertMem);
+            delete [] _curState.userFillPattern;
         }
 
         void Renderer::draw(IQueueReader *reader, CommonProps *props) {
@@ -197,42 +205,89 @@ namespace directgraph {
                 _device->SetTexture(0, NULL);
                 return;
             }
+
             uint_fast32_t size = reader->getSize();
             uint_fast32_t readIndex = 0;
-            uint_fast32_t totalNumVertices = 0;
             int_fast32_t prevX = 0, prevY = 0;
             bool isFirst = true;
-            uint_fast8_t curFillStyle = SOLID_FILL;
-            bool useFillTexture = false;
+            bool haveVertices = false;
             void *curVertMem = _vertMem;
+            
+            DevDrawState tempState = _curState;
+            if(tempState.userFillPattern != NULL){
+                _patterns.push_back(tempState.userFillPattern);
+            }
             for (readIndex = 0; readIndex < size; readIndex++) {
                 QueueItem &item = reader->getAt(readIndex);
+                if(item.type == QueueItem::SINGLE_PIXEL){
+                    if(tempState.fillPattern != SOLID_FILL){
+                        DrawOp op;
+                        op.type = SET_FILL_PATTERN;
+                        op.fillPattern = SOLID_FILL;
+                        _drawOps.push_back(op);
+                        tempState.fillPattern = SOLID_FILL;
+                        isFirst = true;
+                    }
+                } else if(item.type == QueueItem::BAR){
+                    if(tempState.userFillPattern != _lastState.userFillPattern && _lastState.fillPattern == USER_FILL){
+                        DrawOp op;
+                        op.type = SET_USER_FILL_PATTERN;
+                        op.userFillPattern = _lastState.userFillPattern;
+                        _drawOps.push_back(op);
+                        tempState.userFillPattern = _lastState.userFillPattern;
+                        isFirst = true;
+                    }
+                    if(tempState.fillPattern != _lastState.fillPattern){
+                        DrawOp op;
+                        op.type = SET_FILL_PATTERN;
+                        op.fillPattern = _lastState.fillPattern;
+                        _drawOps.push_back(op);
+                        tempState.fillPattern = _lastState.fillPattern;
+                        isFirst = true;
+                    }
+                    if(tempState.bgColor != _lastState.bgColor && tempState.fillPattern != SOLID_FILL){
+                        DrawOp op;
+                        op.type = SET_BG_COLOR;
+                        op.bgColor = _lastState.bgColor;
+                        _drawOps.push_back(op);
+                        tempState.bgColor = _lastState.bgColor;
+                        isFirst = true;
+                    }
+                }
                 if (
-                    (item.type == QueueItem::SINGLE_PIXEL && !useFillTexture) ||
+                    item.type == QueueItem::SINGLE_PIXEL ||
                     item.type == QueueItem::BAR
                 ) {
-                    if(item.type != QueueItem::SINGLE_PIXEL && curFillStyle != props->fillStyle){
-                        if(!isFirst) {
-                            break;
-                        }
-                        curFillStyle = props->fillStyle;
-                        useFillTexture = !isColorVertexFill(curFillStyle);
-                    }
                     uint_fast32_t curNumVertices =
                             (isFirst) ?
                             VERTICES_IN_QUAD :
                             VERTICES_IN_QUAD * 2 - VERTICES_TRIANGLES_DIFF;
                     uint_fast32_t curUsedSize = static_cast<uint_fast32_t>(((uint8_t*)curVertMem - (uint8_t*)_vertMem));
+                    bool useFillTexture = tempState.fillPattern != SOLID_FILL;
+                    uint_fast32_t newUsedSize = curUsedSize;
                     if(useFillTexture){
-                        curUsedSize += curNumVertices * sizeof(PrimitiveCreator::TexturedRectVertex);
+                        newUsedSize += curNumVertices * sizeof(PrimitiveCreator::TexturedRectVertex);
                     } else {
-                        curUsedSize += curNumVertices * sizeof(PrimitiveCreator::RectVertex);
+                        newUsedSize += curNumVertices * sizeof(PrimitiveCreator::RectVertex);
                     }
-                    if (curUsedSize > VERTEX_BUFFER_SIZE) {
+                    if (newUsedSize > VERTEX_BUFFER_SIZE) {
                         break;
                     }
+
+                    if(_drawOps.empty() || _drawOps.back().type != ITEMS){
+                        DrawOp op;
+                        op.type = ITEMS;
+                        op.items.numItems = curNumVertices;
+                        op.items.offset = curUsedSize;
+                        op.items.type = (useFillTexture) ? TEXTURED_RECT_VERTEX : RECT_VERTEX;
+                        _drawOps.push_back(op);
+                    } else {
+                        _drawOps.back().items.numItems += curNumVertices;
+                    }
+                    curUsedSize = newUsedSize;
+
                     if (!isFirst) {
-                        if(useFillTexture) {
+                        if(tempState.fillPattern != SOLID_FILL) {
                             curVertMem = _primCreator.genFillDegenerate(
                                     curVertMem,
                                     prevX, prevY,
@@ -273,7 +328,7 @@ namespace directgraph {
                                     _helper->toPixelsY(item.data.bar.top),
                                     _helper->toPixelsX(item.data.bar.right),
                                     _helper->toPixelsY(item.data.bar.bottom),
-                                    props->fillColor
+                                    _curGenDataVars.fillColor
                             );
                         } else {
                             curVertMem = _primCreator.genQuad(curVertMem,
@@ -281,81 +336,111 @@ namespace directgraph {
                                     _helper->toPixelsY(item.data.bar.top),
                                     _helper->toPixelsX(item.data.bar.right),
                                     _helper->toPixelsY(item.data.bar.bottom),
-                                    ((props->fillStyle == SOLID_FILL) ? props->fillColor : props->bgColor)
+                                    ((_curGenDataVars.fillStyle == SOLID_FILL) ?
+                                     _curGenDataVars.fillColor :
+                                     _curGenDataVars.bgColor)
                             );
                         }
                         prevX = _helper->toPixelsX(item.data.bar.right);
                         prevY = _helper->toPixelsY(item.data.bar.bottom);
                     }
                     isFirst = false;
-                    totalNumVertices += curNumVertices;
+                    haveVertices = true;
                 } else if (item.type == QueueItem::SETFILLSTYLE) {
-                    if(!(
-                         isFirst ||
-                         (isColorVertexFill(props->fillStyle) && isColorVertexFill(item.data.setfillstyle.fillStyle)) ||
-                         (props->fillStyle == item.data.setfillstyle.fillStyle)
-                    )){
-                        break;
+                    _curGenDataVars.fillColor = item.data.setfillstyle.color;
+                    if(item.data.setfillstyle.fillStyle == EMPTY_FILL){
+                        _curGenDataVars.fillStyle = EMPTY_FILL;
+                        _lastState.fillPattern = SOLID_FILL;
+                    } else {
+                        _curGenDataVars.fillStyle = SOLID_FILL;
+                        _lastState.fillPattern = item.data.setfillstyle.fillStyle;
                     }
-                    props->fillColor = item.data.setfillstyle.color;
-                    props->fillStyle = item.data.setfillstyle.fillStyle;
                 } else if (item.type == QueueItem::SETFILLPATTERN) {
-                    if(!isFirst){
-                        break;
-                    }
-                    props->fillColor = item.data.setfillpattern.color;
-                    props->fillStyle = USER_FILL;
-                    delete [] props->userFillPattern;
-                    props->userFillPattern = item.data.setfillpattern.fillPattern;
-                    _patTextHelper->setUserFillPattern(props->userFillPattern);
+                    _curGenDataVars.fillColor = item.data.setfillpattern.color;
+                    _lastState.fillPattern = USER_FILL;
+                    _curGenDataVars.fillStyle = SOLID_FILL;
+                    _lastState.userFillPattern = item.data.setfillpattern.fillPattern;
+                    _patterns.push_back(_lastState.userFillPattern);
                 } else if (item.type == QueueItem::BGCOLOR){
-                    if(!(
-                         isFirst || isColorVertexFill(props->fillStyle) ||
-                         (props->bgColor == item.data.bgColor)
-                    )){
-                        break;
-                    }
-                    props->bgColor = item.data.bgColor;
+                    _lastState.bgColor = item.data.bgColor;
+                    _curGenDataVars.bgColor = item.data.bgColor;
                 } else {
                     break;
                 }
             }
 
-            if (readIndex != 0 && totalNumVertices != 0) {
+            if (readIndex != 0 && haveVertices) {
                 reader->endReading(readIndex);
-                if (useFillTexture) {
-                    void *voidPointer;
-                    _vertBuffer->Lock(
-                            0, totalNumVertices * sizeof(PrimitiveCreator::TexturedRectVertex),
-                            &voidPointer, D3DLOCK_DISCARD
-                    );
-                    memcpy(voidPointer, _vertMem, totalNumVertices * sizeof(PrimitiveCreator::TexturedRectVertex));
-                    _vertBuffer->Unlock();
+                uint_fast32_t curUsedSize = static_cast<uint_fast32_t>(((uint8_t*)curVertMem - (uint8_t*)_vertMem));
+                void *voidPointer;
+                _vertBuffer->Lock(
+                        0, curUsedSize,
+                        &voidPointer, D3DLOCK_DISCARD
+                );
+                memcpy(voidPointer, _vertMem, curUsedSize);
+                _vertBuffer->Unlock();
 
-                    _patTextHelper->setFillPattern(curFillStyle, props->bgColor);
-                    _device->SetRenderTarget(0, _backBuffer);
-                    _device->SetStreamSource(0, _vertBuffer, 0, sizeof(PrimitiveCreator::TexturedRectVertex));
-                    _device->SetFVF(TEXTURED_RECT_VERTEX_FVF);
+                _device->SetRenderTarget(0, _backBuffer);
+                if(_curState.userFillPattern != NULL){
+                    _patTextHelper->setUserFillPattern(_curState.userFillPattern);
+                }
+                if(_curState.fillPattern == SOLID_FILL){
+                    _patTextHelper->unsetPattern();
                 } else {
-                    void *voidPointer;
-                    _vertBuffer->Lock(
-                            0, totalNumVertices * sizeof(PrimitiveCreator::RectVertex),
-                            &voidPointer, D3DLOCK_DISCARD
-                    );
-                    memcpy(voidPointer, _vertMem, totalNumVertices * sizeof(PrimitiveCreator::RectVertex));
-                    _vertBuffer->Unlock();
-
-                    _device->SetRenderTarget(0, _backBuffer);
-                    _device->SetStreamSource(0, _vertBuffer, 0, sizeof(PrimitiveCreator::RectVertex));
-                    _device->SetFVF(RECT_VERTEX_FVF);
+                    _patTextHelper->setFillPattern(_curState.fillPattern, _curState.bgColor);
                 }
                 _device->BeginScene();
-                _device->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, totalNumVertices - VERTICES_TRIANGLES_DIFF);
-                _device->EndScene();
-                if (useFillTexture) {
-                    _patTextHelper->unsetPattern();
+                for(DrawOpVector::iterator it = _drawOps.begin(); it != _drawOps.end(); ++it){
+                    switch(it->type){
+                        case ITEMS:
+                            UINT stride;
+                            DWORD fvf;
+                            switch (it->items.type){
+                                case RECT_VERTEX:
+                                    stride = sizeof(PrimitiveCreator::RectVertex);
+                                    fvf = RECT_VERTEX_FVF;
+                                    break;
+                                case TEXTURED_RECT_VERTEX:
+                                    stride = sizeof(PrimitiveCreator::TexturedRectVertex);
+                                    fvf = TEXTURED_RECT_VERTEX_FVF;
+                                    break;
+                            }
+                            _device->SetStreamSource(
+                                    0, _vertBuffer,
+                                    it->items.offset,
+                                    stride
+                            );
+                            _device->SetFVF(fvf);
+                            _device->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, it->items.numItems - VERTICES_TRIANGLES_DIFF);
+                            break;
+                        case SET_FILL_PATTERN:
+                            _curState.fillPattern = it->fillPattern;
+                            if(_curState.fillPattern == SOLID_FILL){
+                                _patTextHelper->unsetPattern();
+                            } else {
+                                _patTextHelper->setFillPattern(_curState.fillPattern, _curState.bgColor);
+                            }
+                            break;
+                        case SET_USER_FILL_PATTERN:
+                            _curState.userFillPattern = it->userFillPattern;
+                            _patTextHelper->setUserFillPattern(_curState.userFillPattern);
+                            break;
+                        case SET_BG_COLOR:
+                            _curState.bgColor = it->bgColor;
+                            _patTextHelper->setFillPattern(_curState.fillPattern, _curState.bgColor);
+                            break;
+                    }
                 }
-                return;
+                _device->EndScene();
+
+                if(!_patterns.empty()){
+                    _patterns.pop_back();
+                    for(CharPVector::iterator it = _patterns.begin(); it != _patterns.end(); ++it){
+                        delete [] *it;
+                    }
+                }
+                _patterns.clear();
+                _drawOps.clear();
             }
         }
 

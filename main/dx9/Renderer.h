@@ -4,6 +4,7 @@
 #include <d3d9.h>
 #include <dx9/Common.h>
 #include <util.h>
+#include <vector>
 #include "IPatternTexturesHelper.h"
 #include "PrimitiveCreator.h"
 
@@ -12,14 +13,55 @@ namespace directgraph {
         class VertexCreator;
 
         class Renderer : public IRenderer {
-            friend class VertexCreator;
+        public:
+            enum DrawOpType{
+                SET_FILL_PATTERN,
+                SET_USER_FILL_PATTERN,
+                SET_BG_COLOR,
+                ITEMS
+            };
+            enum DrawDataType{
+                RECT_VERTEX,
+                TEXTURED_RECT_VERTEX
+            };
+            struct DrawOp{
+                DrawOpType type;
+                union {
+                    uint8_t fillPattern;
+                    uint32_t bgColor;
+                    char *userFillPattern;
+                    struct Items{
+                        uint32_t offset;
+                        uint32_t numItems;
+                        DrawDataType type;
+                    } items;
+                };
+            };
+            struct DevDrawState{
+                uint_fast8_t fillPattern;
+                uint_fast32_t bgColor;
+                char *userFillPattern;
+            };
 
+            struct GenDataVars{
+                uint_fast32_t fillColor;
+                uint_fast32_t bgColor;
+                uint_fast8_t fillStyle;
+            };
         private:
             const static int REGISTER_SIZE = 4;
             const static int TRIANGLES_IN_QUAD = 2;
             const static int VERTICES_IN_QUAD = 4;
             const static int VERTICES_TRIANGLES_DIFF = 2;
             const static int VERTEX_BUFFER_SIZE = 262144;
+
+            GenDataVars _curGenDataVars;
+            DevDrawState _curState, _lastState;
+            typedef std::vector<DrawOp> DrawOpVector;
+            DrawOpVector _drawOps;
+            typedef std::vector<char*> CharPVector;
+            CharPVector _patterns;
+
             IDirect3D9 *_d3d;
             IDirect3DDevice9 *_device;
             IDirect3DSwapChain9 *_swapChain;
