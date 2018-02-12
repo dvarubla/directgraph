@@ -82,6 +82,24 @@ namespace directgraph {
             bool isEmpty();
             uint_fast32_t getUsedSize();
         };
+
+        class DrawOpCreator{
+        public:
+            template <BufferPreparer::DrawOpType T>
+            static BufferPreparer::DrawOp create();
+            template <BufferPreparer::DrawOpType T>
+            static BufferPreparer::DrawOp create(uint_fast32_t);
+            template <BufferPreparer::DrawOpType T>
+            static BufferPreparer::DrawOp create(char *userFillPattern);
+            template <BufferPreparer::DrawOpType T>
+            static BufferPreparer::DrawOp create(
+                    uint32_t offset, uint32_t numItems, BufferPreparer::DrawDataType type
+            );
+            template <BufferPreparer::DrawOpType T>
+            static BufferPreparer::DrawOp create(
+                    IPixelContainer *container
+            );
+        };
     }
 }
 

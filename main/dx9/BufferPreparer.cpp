@@ -6,6 +6,60 @@
 
 namespace directgraph{
     namespace dx9{
+        template<>
+        BufferPreparer::DrawOp DrawOpCreator::create<BufferPreparer::CLEAR>() {
+            BufferPreparer::DrawOp op;
+            op.type = BufferPreparer::CLEAR;
+            return op;
+        }
+
+        template<>
+        BufferPreparer::DrawOp DrawOpCreator::create<BufferPreparer::SET_FILL_PATTERN>(uint_fast32_t fillPattern) {
+            BufferPreparer::DrawOp op;
+            op.type = BufferPreparer::SET_FILL_PATTERN;
+            op.data.fillPattern = static_cast<uint8_t>(fillPattern);
+            return op;
+        }
+
+        template<>
+        BufferPreparer::DrawOp DrawOpCreator::create<BufferPreparer::SET_BG_COLOR>(uint32_t bgColor) {
+            BufferPreparer::DrawOp op;
+            op.type = BufferPreparer::SET_BG_COLOR;
+            op.data.bgColor = bgColor;
+            return op;
+        }
+
+        template<>
+        BufferPreparer::DrawOp
+        DrawOpCreator::create<BufferPreparer::ITEMS>(
+                uint32_t offset, uint32_t numItems, BufferPreparer::DrawDataType type
+        ) {
+            BufferPreparer::DrawOp op;
+            op.type = BufferPreparer::ITEMS;
+            op.data.items.offset = offset;
+            op.data.items.numItems = numItems;
+            op.data.items.type = type;
+            return op;
+        }
+
+        template<>
+        BufferPreparer::DrawOp DrawOpCreator::create<BufferPreparer::SET_PIXEL_TEXTURE>(
+                IPixelContainer *container
+        ) {
+            BufferPreparer::DrawOp op;
+            op.type = BufferPreparer::SET_PIXEL_TEXTURE;
+            op.data.pixelContainer = container;
+            return op;
+        }
+
+        template<>
+        BufferPreparer::DrawOp DrawOpCreator::create<BufferPreparer::SET_USER_FILL_PATTERN>(char *userFillPattern) {
+            BufferPreparer::DrawOp op;
+            op.type = BufferPreparer::SET_USER_FILL_PATTERN;
+            op.data.userFillPattern = userFillPattern;
+            return op;
+        }
+
         BufferPreparer::BufferPreparer(
                 uint_fast32_t memSize,
                 const BufferPreparer::DevDrawState *state,
@@ -42,53 +96,34 @@ namespace directgraph{
                 QueueItem &item = reader->getAt(readIndex);
                 if(item.type == QueueItem::SINGLE_PIXEL){
                     if(tempState.fillPattern != SOLID_FILL){
-                        DrawOp op;
-                        op.type = SET_FILL_PATTERN;
-                        op.data.fillPattern = SOLID_FILL;
-                        _drawOps.push_back(op);
+                        _drawOps.push_back(DrawOpCreator::create<SET_FILL_PATTERN>(SOLID_FILL));
                         tempState.fillPattern = SOLID_FILL;
                         isFirst = true;
                     }
                 } else if(item.type == QueueItem::BAR){
                     if(tempState.userFillPattern != _lastState.userFillPattern && _lastState.fillPattern == USER_FILL){
-                        DrawOp op;
-                        op.type = SET_USER_FILL_PATTERN;
-                        op.data.userFillPattern = _lastState.userFillPattern;
-                        _drawOps.push_back(op);
+                        _drawOps.push_back(DrawOpCreator::create<SET_USER_FILL_PATTERN>(_lastState.userFillPattern));
                         tempState.userFillPattern = _lastState.userFillPattern;
                         isFirst = true;
                     }
                     if(tempState.fillPattern != _lastState.fillPattern){
-                        DrawOp op;
-                        op.type = SET_FILL_PATTERN;
-                        op.data.fillPattern = _lastState.fillPattern;
-                        _drawOps.push_back(op);
+                        _drawOps.push_back(DrawOpCreator::create<SET_FILL_PATTERN>(_lastState.fillPattern));
                         tempState.fillPattern = _lastState.fillPattern;
                         isFirst = true;
                     }
                     if(tempState.bgColor != _lastState.bgColor && tempState.fillPattern != SOLID_FILL){
-                        DrawOp op;
-                        op.type = SET_BG_COLOR;
-                        op.data.bgColor = _lastState.bgColor;
-                        _drawOps.push_back(op);
+                        _drawOps.push_back(DrawOpCreator::create<SET_BG_COLOR>(_lastState.bgColor));
                         tempState.bgColor = _lastState.bgColor;
                         isFirst = true;
                     }
                 } else if(item.type == QueueItem::CLEAR){
-                    DrawOp op;
-                    op.type = CLEAR;
-                    _drawOps.push_back(op);
+                    _drawOps.push_back(DrawOpCreator::create<CLEAR>());
                 } else if(item.type == QueueItem::PIXEL_CONTAINER){
-                    DrawOp op;
                     if(tempState.fillPattern != SOLID_FILL){
-                        op.type = SET_FILL_PATTERN;
-                        op.data.fillPattern = SOLID_FILL;
-                        _drawOps.push_back(op);
+                        _drawOps.push_back(DrawOpCreator::create<SET_FILL_PATTERN>(SOLID_FILL));
                         tempState.fillPattern = SOLID_FILL;
                     }
-                    op.type = SET_PIXEL_TEXTURE;
-                    op.data.pixelContainer = item.data.pixelContainer;
-                    _drawOps.push_back(op);
+                    _drawOps.push_back(DrawOpCreator::create<SET_PIXEL_TEXTURE>(item.data.pixelContainer));
                     isFirst = true;
                 }
                 if (
@@ -133,12 +168,9 @@ namespace directgraph{
                         break;
                     }
                     if(isFirst){
-                        DrawOp op;
-                        op.type = ITEMS;
-                        op.data.items.numItems = curNumVertices - VERTICES_TRIANGLES_DIFF;
-                        op.data.items.offset = curUsedSize;
-                        op.data.items.type = drawDataType;
-                        _drawOps.push_back(op);
+                        _drawOps.push_back(DrawOpCreator::create<ITEMS>(
+                                curUsedSize, curNumVertices - VERTICES_TRIANGLES_DIFF, drawDataType
+                        ));
                     } else {
                         _drawOps.back().data.items.numItems += curNumVertices;
                     }
