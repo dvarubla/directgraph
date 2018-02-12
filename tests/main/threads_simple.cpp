@@ -51,7 +51,7 @@ protected:
         ren = new NiceMock<RendererStub>();
         win = new NiceMock<MyWindowStub>();
         ON_CALL(*win, getRenderer()).WillByDefault(Return(ren));
-        ON_CALL(*ren, draw(_, _)).WillByDefault(testing::WithArgs<0>(Invoke(ren, &RendererStub::drawImpl)));
+        ON_CALL(*ren, draw(_)).WillByDefault(Invoke(ren, &RendererStub::drawImpl));
     }
 
     virtual ~ThreadsSimpleTest() {

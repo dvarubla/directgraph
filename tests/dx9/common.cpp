@@ -5,18 +5,12 @@ using testing::_;
 using testing::Invoke;
 
 BitmapWrap *CommonSimple::afterTestSimple(IMyWindow *win, IQueueReader *reader) {
-    CommonProps props;
-    props.fillStyle = SOLID_FILL;
-    props.fillColor = 0xFFFFFF;
-    props.bgColor = 0xFFFFFF;
-    props.userFillPattern = NULL;
     while(reader->getSize() != 0) {
-        win->getRenderer()->draw(reader, &props);
+        win->getRenderer()->draw(reader);
     }
     win->getRenderer()->repaint();
     BitmapWrap *wrap = new BitmapWrap(dynamic_cast<MyWindow*>(win)->getHWND());
     _dx9Wf->deleteWindow(win);
-    delete [] props.userFillPattern;
     return wrap;
 }
 

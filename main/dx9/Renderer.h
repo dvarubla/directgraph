@@ -55,7 +55,7 @@ namespace directgraph {
 
             virtual void repaint();
 
-            virtual void draw(IQueueReader *reader, CommonProps *props);
+            virtual void draw(IQueueReader *reader);
 
             virtual PixelContainerFactory *getPixContFactory();
         };

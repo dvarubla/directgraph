@@ -110,7 +110,7 @@ namespace directgraph {
             delete [] _curState.userFillPattern;
         }
 
-        void Renderer::draw(IQueueReader *reader, CommonProps *) {
+        void Renderer::draw(IQueueReader *reader) {
             _bufPreparer->prepareBuffer(reader);
             if (!_bufPreparer->isEmpty()) {
                 void *vertMem = _bufPreparer->getBuffer();

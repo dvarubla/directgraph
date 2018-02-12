@@ -128,7 +128,7 @@ namespace directgraph{
                 }
                 _reader.setGetIndex(_queue.getGetIndex(), readSize);
                 try {
-                    _window->getRenderer()->draw(&_reader, &_currentProps);
+                    _window->getRenderer()->draw(&_reader);
                 } catch (const std::exception &){
                     LeaveCriticalSection(&_queueCS);
                     std::exception_ptr *ptrMem = new std::exception_ptr;
