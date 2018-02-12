@@ -19,11 +19,13 @@ namespace directgraph {
                 SET_FILL_PATTERN,
                 SET_USER_FILL_PATTERN,
                 SET_BG_COLOR,
-                ITEMS
+                ITEMS,
+                SET_PIXEL_TEXTURE
             };
             enum DrawDataType{
                 RECT_VERTEX,
-                TEXTURED_RECT_VERTEX
+                TEXTURED_RECT_VERTEX,
+                TEXTURED_VERTEX
             };
             struct DrawOp{
                 DrawOpType type;
@@ -36,7 +38,8 @@ namespace directgraph {
                         uint32_t numItems;
                         DrawDataType type;
                     } items;
-                };
+                    IPixelContainer *pixelContainer;
+                } data;
             };
             struct DevDrawState{
                 uint_fast8_t fillPattern;

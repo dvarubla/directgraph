@@ -29,6 +29,12 @@ namespace directgraph {
                     int_fast32_t endX, int_fast32_t endY
             );
 
+            TexturedVertex *genTexDegenerate(
+                    void *verticesVoid,
+                    int_fast32_t startX, int_fast32_t startY,
+                    int_fast32_t endX, int_fast32_t endY
+            );
+
             RectVertex *genQuad(
                     void *verticesVoid,
                     int_fast32_t startX, int_fast32_t startY,

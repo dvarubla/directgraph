@@ -112,89 +112,7 @@ namespace directgraph {
             delete [] _curState.userFillPattern;
         }
 
-        void Renderer::draw(IQueueReader *reader, CommonProps *props) {
-            QueueItem &firstItem = reader->getAt(0);
-            if (firstItem.type == QueueItem::PIXEL_CONTAINER) {
-                IPixelContainer *cont = firstItem.data.pixelContainer;
-                reader->endReading(1);
-                bool haveLastLine = cont->getLastStride() != cont->getStride();
-                Rectangle firstCoords = cont->getFirstCoords();
-                Rectangle lastCoords = cont->getLastCoords();
-                firstCoords.right++;
-                firstCoords.bottom++;
-                lastCoords.right++;
-                lastCoords.bottom++;
-                RECT lockRect = {
-                        static_cast<LONG>(firstCoords.left),
-                        static_cast<LONG>(std::min(firstCoords.top, lastCoords.top)),
-                        static_cast<LONG>(firstCoords.right),
-                        static_cast<LONG>(std::max(firstCoords.bottom, lastCoords.top))
-                };
-                uint_fast32_t pxHeight = cont->getHeight();
-                if (haveLastLine) {
-                    pxHeight--;
-                }
-                uint_fast32_t stride = cont->getStride();
-                uint_fast32_t nextLineOffset = cont->getNextLineOffset();
-                char *contBuffer = static_cast<char *>(cont->getBuffer()) + cont->getStartOffset();
-                D3DLOCKED_RECT outRect;
-                _pixelTexture->LockRect(0, &outRect, &lockRect, 0);
-                char *textBuffer = static_cast<char *>(outRect.pBits);
-                if (firstCoords.top > lastCoords.top) {
-                    memcpy(textBuffer, contBuffer, cont->getLastStride());
-                    textBuffer += outRect.Pitch;
-                    contBuffer += nextLineOffset;
-                }
-                for (uint_fast32_t y = 0; y < pxHeight; ++y) {
-                    memcpy(textBuffer, contBuffer, stride);
-                    textBuffer += outRect.Pitch;
-                    contBuffer += nextLineOffset;
-                }
-                if (firstCoords.bottom < lastCoords.bottom) {
-                    memcpy(textBuffer, contBuffer, cont->getLastStride());
-                }
-                _pixelTexture->UnlockRect(0);
-                PrimitiveCreator::TexturedVertex *texVertMem = static_cast<PrimitiveCreator::TexturedVertex *>(_vertMem);
-                uint_fast32_t numVertices = 4;
-                if (_height != 0) {
-                    texVertMem = _primCreator.genTexQuad(
-                            texVertMem,
-                            firstCoords.left, firstCoords.top, firstCoords.right, firstCoords.bottom,
-                            _pixelTextureWidth, _pixelTextureHeight
-                    );
-                }
-                if (haveLastLine) {
-                    numVertices += 4;
-                    _primCreator.genTexQuad(
-                            texVertMem,
-                            lastCoords.left, lastCoords.top, lastCoords.right, lastCoords.bottom,
-                            _pixelTextureWidth, _pixelTextureHeight
-                    );
-                }
-                void *voidPointer;
-                _vertBuffer->Lock(
-                        0, numVertices * sizeof(PrimitiveCreator::TexturedVertex),
-                        &voidPointer, D3DLOCK_DISCARD
-                );
-                memcpy(voidPointer, _vertMem, numVertices * sizeof(PrimitiveCreator::TexturedVertex));
-                _vertBuffer->Unlock();
-                _patTextHelper->unsetPattern();
-
-                _device->SetRenderTarget(0, _backBuffer);
-                _device->SetStreamSource(0, _vertBuffer, 0, sizeof(PrimitiveCreator::TexturedVertex));
-                _device->SetTexture(0, _pixelTexture);
-                _device->SetFVF(TEXTURED_VERTEX_FVF);
-                _device->BeginScene();
-                _device->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, TRIANGLES_IN_QUAD);
-                if (haveLastLine) {
-                    _device->DrawPrimitive(D3DPT_TRIANGLESTRIP, VERTICES_IN_QUAD, TRIANGLES_IN_QUAD);
-                }
-                _device->EndScene();
-                delete cont;
-                _device->SetTexture(0, NULL);
-                return;
-            }
-
+        void Renderer::draw(IQueueReader *reader, CommonProps *) {
             uint_fast32_t size = reader->getSize();
             uint_fast32_t readIndex = 0;
             int_fast32_t prevX = 0, prevY = 0;
@@ -212,7 +130,7 @@ namespace directgraph {
                     if(tempState.fillPattern != SOLID_FILL){
                         DrawOp op;
                         op.type = SET_FILL_PATTERN;
-                        op.fillPattern = SOLID_FILL;
+                        op.data.fillPattern = SOLID_FILL;
                         _drawOps.push_back(op);
                         tempState.fillPattern = SOLID_FILL;
                         isFirst = true;
@@ -221,7 +139,7 @@ namespace directgraph {
                     if(tempState.userFillPattern != _lastState.userFillPattern && _lastState.fillPattern == USER_FILL){
                         DrawOp op;
                         op.type = SET_USER_FILL_PATTERN;
-                        op.userFillPattern = _lastState.userFillPattern;
+                        op.data.userFillPattern = _lastState.userFillPattern;
                         _drawOps.push_back(op);
                         tempState.userFillPattern = _lastState.userFillPattern;
                         isFirst = true;
@@ -229,7 +147,7 @@ namespace directgraph {
                     if(tempState.fillPattern != _lastState.fillPattern){
                         DrawOp op;
                         op.type = SET_FILL_PATTERN;
-                        op.fillPattern = _lastState.fillPattern;
+                        op.data.fillPattern = _lastState.fillPattern;
                         _drawOps.push_back(op);
                         tempState.fillPattern = _lastState.fillPattern;
                         isFirst = true;
@@ -237,7 +155,7 @@ namespace directgraph {
                     if(tempState.bgColor != _lastState.bgColor && tempState.fillPattern != SOLID_FILL){
                         DrawOp op;
                         op.type = SET_BG_COLOR;
-                        op.bgColor = _lastState.bgColor;
+                        op.data.bgColor = _lastState.bgColor;
                         _drawOps.push_back(op);
                         tempState.bgColor = _lastState.bgColor;
                         isFirst = true;
@@ -246,98 +164,156 @@ namespace directgraph {
                     DrawOp op;
                     op.type = CLEAR;
                     _drawOps.push_back(op);
+                } else if(item.type == QueueItem::PIXEL_CONTAINER){
+                    DrawOp op;
+                    if(tempState.fillPattern != SOLID_FILL){
+                        op.type = SET_FILL_PATTERN;
+                        op.data.fillPattern = SOLID_FILL;
+                        _drawOps.push_back(op);
+                        tempState.fillPattern = SOLID_FILL;
+                    }
+                    op.type = SET_PIXEL_TEXTURE;
+                    op.data.pixelContainer = item.data.pixelContainer;
+                    _drawOps.push_back(op);
+                    isFirst = true;
                 }
                 if (
                     item.type == QueueItem::SINGLE_PIXEL ||
-                    item.type == QueueItem::BAR
+                    item.type == QueueItem::BAR ||
+                    item.type == QueueItem::PIXEL_CONTAINER
                 ) {
-                    uint_fast32_t curNumVertices =
-                            (isFirst) ?
-                            VERTICES_IN_QUAD :
-                            VERTICES_IN_QUAD * 2 - VERTICES_TRIANGLES_DIFF;
-                    uint_fast32_t curUsedSize = static_cast<uint_fast32_t>(((uint8_t*)curVertMem - (uint8_t*)_vertMem));
+                    uint_fast32_t curNumVertices;
+                    uint_fast32_t sizeMult;
+                    DrawDataType drawDataType;
                     bool useFillTexture = tempState.fillPattern != SOLID_FILL;
-                    uint_fast32_t newUsedSize = curUsedSize;
-                    if(useFillTexture){
-                        newUsedSize += curNumVertices * sizeof(PrimitiveCreator::TexturedRectVertex);
+                    bool haveLastStride;
+                    if(item.type == QueueItem::PIXEL_CONTAINER){
+                        IPixelContainer *cont = item.data.pixelContainer;
+                        haveLastStride = cont->getLastStride() != cont->getStride();
+                        if(haveLastStride && cont->getHeight() != 1){
+                            curNumVertices = VERTICES_IN_QUAD * 3 - VERTICES_TRIANGLES_DIFF;
+                        } else {
+                            curNumVertices = VERTICES_IN_QUAD;
+                        }
+                        sizeMult = sizeof(PrimitiveCreator::TexturedVertex);
+                        drawDataType = TEXTURED_VERTEX;
                     } else {
-                        newUsedSize += curNumVertices * sizeof(PrimitiveCreator::RectVertex);
+                        curNumVertices =
+                                (isFirst) ?
+                                VERTICES_IN_QUAD :
+                                VERTICES_IN_QUAD * 2 - VERTICES_TRIANGLES_DIFF
+                        ;
+                        if(useFillTexture){
+                            sizeMult = sizeof(PrimitiveCreator::TexturedRectVertex);
+                            drawDataType = TEXTURED_RECT_VERTEX;
+                        } else {
+                            sizeMult = sizeof(PrimitiveCreator::RectVertex);
+                            drawDataType = RECT_VERTEX;
+                        }
                     }
+                    uint_fast32_t curUsedSize = static_cast<uint_fast32_t>(((uint8_t*)curVertMem - (uint8_t*)_vertMem));
+                    uint_fast32_t newUsedSize = curUsedSize * sizeMult;
                     if (newUsedSize > VERTEX_BUFFER_SIZE) {
                         break;
                     }
-
-                    if(_drawOps.empty() || _drawOps.back().type != ITEMS){
+                    if(isFirst){
                         DrawOp op;
                         op.type = ITEMS;
-                        op.items.numItems = curNumVertices;
-                        op.items.offset = curUsedSize;
-                        op.items.type = (useFillTexture) ? TEXTURED_RECT_VERTEX : RECT_VERTEX;
+                        op.data.items.numItems = curNumVertices;
+                        op.data.items.offset = curUsedSize;
+                        op.data.items.type = drawDataType;
                         _drawOps.push_back(op);
                     } else {
-                        _drawOps.back().items.numItems += curNumVertices;
+                        _drawOps.back().data.items.numItems += curNumVertices;
                     }
                     curUsedSize = newUsedSize;
-
-                    if (!isFirst) {
-                        if(tempState.fillPattern != SOLID_FILL) {
-                            curVertMem = _primCreator.genFillDegenerate(
+                    if(item.type == QueueItem::PIXEL_CONTAINER){
+                        IPixelContainer *cont = item.data.pixelContainer;
+                        Rectangle firstCoords = cont->getFirstCoords();
+                        Rectangle lastCoords = cont->getLastCoords();
+                        firstCoords.right++;
+                        firstCoords.bottom++;
+                        lastCoords.right++;
+                        lastCoords.bottom++;
+                        bool nonZeroHeight = cont->getHeight() != 1 || !haveLastStride;
+                        if (nonZeroHeight) {
+                            curVertMem = _primCreator.genTexQuad(
                                     curVertMem,
-                                    prevX, prevY,
-                                    ((item.type == QueueItem::SINGLE_PIXEL) ?
-                                     static_cast<int_fast32_t>(item.data.singlePixel.x) :
-                                     _helper->toPixelsX(item.data.bar.left)),
-                                    ((item.type == QueueItem::SINGLE_PIXEL) ?
-                                     static_cast<int_fast32_t>(item.data.singlePixel.y) :
-                                     _helper->toPixelsY(item.data.bar.top))
-                            );
-                        } else {
-                            curVertMem = _primCreator.genDegenerate(
-                                    curVertMem,
-                                    prevX, prevY,
-                                    ((item.type == QueueItem::SINGLE_PIXEL) ?
-                                     static_cast<int_fast32_t>(item.data.singlePixel.x) :
-                                     _helper->toPixelsX(item.data.bar.left)),
-                                    ((item.type == QueueItem::SINGLE_PIXEL) ?
-                                     static_cast<int_fast32_t>(item.data.singlePixel.y) :
-                                     _helper->toPixelsY(item.data.bar.top))
+                                    firstCoords.left, firstCoords.top, firstCoords.right, firstCoords.bottom,
+                                    _pixelTextureWidth, _pixelTextureHeight
                             );
                         }
-                    }
-                    if (item.type == QueueItem::SINGLE_PIXEL) {
-                        curVertMem = _primCreator.genQuad(curVertMem,
-                                item.data.singlePixel.x,
-                                item.data.singlePixel.y,
-                                item.data.singlePixel.x + 1,
-                                item.data.singlePixel.y + 1,
-                                item.data.singlePixel.color
-                        );
-                        prevX = item.data.singlePixel.x + 1;
-                        prevY = item.data.singlePixel.y + 1;
+                        if (haveLastStride) {
+                            if(nonZeroHeight) {
+                                curVertMem = _primCreator.genTexDegenerate(
+                                        curVertMem,
+                                        firstCoords.right, firstCoords.bottom,
+                                        lastCoords.left, lastCoords.top
+                                );
+                            }
+                            curVertMem = _primCreator.genTexQuad(
+                                    curVertMem,
+                                    lastCoords.left, lastCoords.top, lastCoords.right, lastCoords.bottom,
+                                    _pixelTextureWidth, _pixelTextureHeight
+                            );
+                        }
                     } else {
-                        if(useFillTexture) {
-                            curVertMem = _primCreator.genFillQuad(curVertMem,
-                                    _helper->toPixelsX(item.data.bar.left),
-                                    _helper->toPixelsY(item.data.bar.top),
-                                    _helper->toPixelsX(item.data.bar.right),
-                                    _helper->toPixelsY(item.data.bar.bottom),
-                                    _curGenDataVars.fillColor
-                            );
-                        } else {
-                            curVertMem = _primCreator.genQuad(curVertMem,
-                                    _helper->toPixelsX(item.data.bar.left),
-                                    _helper->toPixelsY(item.data.bar.top),
-                                    _helper->toPixelsX(item.data.bar.right),
-                                    _helper->toPixelsY(item.data.bar.bottom),
-                                    ((_curGenDataVars.fillStyle == SOLID_FILL) ?
-                                     _curGenDataVars.fillColor :
-                                     _curGenDataVars.bgColor)
-                            );
+                        if (!isFirst) {
+                            if (tempState.fillPattern != SOLID_FILL) {
+                                curVertMem = _primCreator.genFillDegenerate(
+                                        curVertMem,
+                                        prevX, prevY,
+                                        _helper->toPixelsX(item.data.bar.left),
+                                        _helper->toPixelsY(item.data.bar.top)
+                                );
+                            } else {
+                                curVertMem = _primCreator.genDegenerate(
+                                        curVertMem,
+                                        prevX, prevY,
+                                        ((item.type == QueueItem::SINGLE_PIXEL) ?
+                                         static_cast<int_fast32_t>(item.data.singlePixel.x) :
+                                         _helper->toPixelsX(item.data.bar.left)),
+                                        ((item.type == QueueItem::SINGLE_PIXEL) ?
+                                         static_cast<int_fast32_t>(item.data.singlePixel.y) :
+                                         _helper->toPixelsY(item.data.bar.top))
+                                );
+                            }
                         }
-                        prevX = _helper->toPixelsX(item.data.bar.right);
-                        prevY = _helper->toPixelsY(item.data.bar.bottom);
+                        if (item.type == QueueItem::SINGLE_PIXEL) {
+                            curVertMem = _primCreator.genQuad(curVertMem,
+                                                              item.data.singlePixel.x,
+                                                              item.data.singlePixel.y,
+                                                              item.data.singlePixel.x + 1,
+                                                              item.data.singlePixel.y + 1,
+                                                              item.data.singlePixel.color
+                            );
+                            prevX = item.data.singlePixel.x + 1;
+                            prevY = item.data.singlePixel.y + 1;
+                        } else {
+                            if (useFillTexture) {
+                                curVertMem = _primCreator.genFillQuad(curVertMem,
+                                                                      _helper->toPixelsX(item.data.bar.left),
+                                                                      _helper->toPixelsY(item.data.bar.top),
+                                                                      _helper->toPixelsX(item.data.bar.right),
+                                                                      _helper->toPixelsY(item.data.bar.bottom),
+                                                                      _curGenDataVars.fillColor
+                                );
+                            } else {
+                                curVertMem = _primCreator.genQuad(curVertMem,
+                                                                  _helper->toPixelsX(item.data.bar.left),
+                                                                  _helper->toPixelsY(item.data.bar.top),
+                                                                  _helper->toPixelsX(item.data.bar.right),
+                                                                  _helper->toPixelsY(item.data.bar.bottom),
+                                                                  ((_curGenDataVars.fillStyle == SOLID_FILL) ?
+                                                                   _curGenDataVars.fillColor :
+                                                                   _curGenDataVars.bgColor)
+                                );
+                            }
+                            prevX = _helper->toPixelsX(item.data.bar.right);
+                            prevY = _helper->toPixelsY(item.data.bar.bottom);
+                        }
                     }
-                    isFirst = false;
+                    isFirst = (item.type == QueueItem::PIXEL_CONTAINER);
                     haveVertices = true;
                 } else if (item.type == QueueItem::SETFILLSTYLE) {
                     _curGenDataVars.fillColor = item.data.setfillstyle.color;
@@ -386,7 +362,7 @@ namespace directgraph {
                         case ITEMS:
                             UINT stride;
                             DWORD fvf;
-                            switch (it->items.type){
+                            switch (it->data.items.type){
                                 case RECT_VERTEX:
                                     stride = sizeof(PrimitiveCreator::RectVertex);
                                     fvf = RECT_VERTEX_FVF;
@@ -395,17 +371,24 @@ namespace directgraph {
                                     stride = sizeof(PrimitiveCreator::TexturedRectVertex);
                                     fvf = TEXTURED_RECT_VERTEX_FVF;
                                     break;
+                                case TEXTURED_VERTEX:
+                                    stride = sizeof(PrimitiveCreator::TexturedVertex);
+                                    fvf = TEXTURED_VERTEX_FVF;
+                                    break;
                             }
                             _device->SetStreamSource(
                                     0, _vertBuffer,
-                                    it->items.offset,
+                                    it->data.items.offset,
                                     stride
                             );
                             _device->SetFVF(fvf);
-                            _device->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, it->items.numItems - VERTICES_TRIANGLES_DIFF);
+                            _device->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, it->data.items.numItems - VERTICES_TRIANGLES_DIFF);
+                            if(it->data.items.type == TEXTURED_VERTEX){
+                                _device->SetTexture(0, NULL);
+                            }
                             break;
                         case SET_FILL_PATTERN:
-                            _curState.fillPattern = it->fillPattern;
+                            _curState.fillPattern = it->data.fillPattern;
                             if(_curState.fillPattern == SOLID_FILL){
                                 _patTextHelper->unsetPattern();
                             } else {
@@ -413,11 +396,11 @@ namespace directgraph {
                             }
                             break;
                         case SET_USER_FILL_PATTERN:
-                            _curState.userFillPattern = it->userFillPattern;
+                            _curState.userFillPattern = it->data.userFillPattern;
                             _patTextHelper->setUserFillPattern(_curState.userFillPattern);
                             break;
                         case SET_BG_COLOR:
-                            _curState.bgColor = it->bgColor;
+                            _curState.bgColor = it->data.bgColor;
                             _patTextHelper->setFillPattern(_curState.fillPattern, _curState.bgColor);
                             break;
                         case CLEAR:
@@ -428,6 +411,48 @@ namespace directgraph {
                                     1.0f,
                                     0
                             );
+                            break;
+                        case SET_PIXEL_TEXTURE:
+                            IPixelContainer *cont = it->data.pixelContainer;
+                            bool haveLastLine = cont->getLastStride() != cont->getStride();
+                            Rectangle firstCoords = cont->getFirstCoords();
+                            Rectangle lastCoords = cont->getLastCoords();
+                            firstCoords.right++;
+                            firstCoords.bottom++;
+                            lastCoords.right++;
+                            lastCoords.bottom++;
+                            RECT lockRect = {
+                                    static_cast<LONG>(firstCoords.left),
+                                    static_cast<LONG>(std::min(firstCoords.top, lastCoords.top)),
+                                    static_cast<LONG>(firstCoords.right),
+                                    static_cast<LONG>(std::max(firstCoords.bottom, lastCoords.top))
+                            };
+                            uint_fast32_t pxHeight = cont->getHeight();
+                            if (haveLastLine) {
+                                pxHeight--;
+                            }
+                            uint_fast32_t imageStride = cont->getStride();
+                            uint_fast32_t nextLineOffset = cont->getNextLineOffset();
+                            char *contBuffer = static_cast<char *>(cont->getBuffer()) + cont->getStartOffset();
+                            D3DLOCKED_RECT outRect;
+                            _pixelTexture->LockRect(0, &outRect, &lockRect, 0);
+                            char *textBuffer = static_cast<char *>(outRect.pBits);
+                            if (firstCoords.top > lastCoords.top) {
+                                memcpy(textBuffer, contBuffer, cont->getLastStride());
+                                textBuffer += outRect.Pitch;
+                                contBuffer += nextLineOffset;
+                            }
+                            for (uint_fast32_t y = 0; y < pxHeight; ++y) {
+                                memcpy(textBuffer, contBuffer, imageStride);
+                                textBuffer += outRect.Pitch;
+                                contBuffer += nextLineOffset;
+                            }
+                            if (firstCoords.bottom < lastCoords.bottom) {
+                                memcpy(textBuffer, contBuffer, cont->getLastStride());
+                            }
+                            _pixelTexture->UnlockRect(0);
+                            delete cont;
+                            _device->SetTexture(0, _pixelTexture);
                             break;
                     }
                 }

@@ -52,6 +52,33 @@ namespace directgraph{
             return vertices;
         }
 
+        PrimitiveCreator::TexturedVertex *
+        PrimitiveCreator::genTexDegenerate(
+                void *verticesVoid,
+                int_fast32_t startX, int_fast32_t startY,
+                int_fast32_t endX, int_fast32_t endY) {
+            TexturedVertex *vertices = static_cast<TexturedVertex*>(verticesVoid);
+            (*vertices) = VertexCreator::create<TexturedVertex>(
+                    static_cast<float>(startX) - 0.5f,
+                    static_cast<float>(startY) - 0.5f,
+                    0.0f,
+                    1.0f,
+                    0.0f,
+                    0.0f
+            );
+            vertices++;
+            *vertices = VertexCreator::create<TexturedVertex>(
+                    static_cast<float>(endX) - 0.5f,
+                    static_cast<float>(endY) - 0.5f,
+                    0.0f,
+                    1.0f,
+                    0.0f,
+                    0.0f
+            );
+            vertices++;
+            return vertices;
+        }
+        
         PrimitiveCreator::TexturedRectVertex *
         PrimitiveCreator::genFillDegenerate(
                 void *verticesVoid,
