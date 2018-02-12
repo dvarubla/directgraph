@@ -15,6 +15,7 @@ namespace directgraph {
         class Renderer : public IRenderer {
         public:
             enum DrawOpType{
+                CLEAR,
                 SET_FILL_PATTERN,
                 SET_USER_FILL_PATTERN,
                 SET_BG_COLOR,

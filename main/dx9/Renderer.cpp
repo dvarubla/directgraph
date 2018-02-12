@@ -114,17 +114,6 @@ namespace directgraph {
 
         void Renderer::draw(IQueueReader *reader, CommonProps *props) {
             QueueItem &firstItem = reader->getAt(0);
-            if (firstItem.type == QueueItem::CLEAR) {
-                reader->endReading(1);
-                _device->SetRenderTarget(0, _backBuffer);
-                _device->Clear(
-                        0, NULL, D3DCLEAR_TARGET,
-                        D3DCOLOR_COLORVALUE(1.0, 1.0, 1.0, 1.0),
-                        1.0f,
-                        0
-                );
-                return;
-            }
             if (firstItem.type == QueueItem::PIXEL_CONTAINER) {
                 IPixelContainer *cont = firstItem.data.pixelContainer;
                 reader->endReading(1);
@@ -253,6 +242,10 @@ namespace directgraph {
                         tempState.bgColor = _lastState.bgColor;
                         isFirst = true;
                     }
+                } else if(item.type == QueueItem::CLEAR){
+                    DrawOp op;
+                    op.type = CLEAR;
+                    _drawOps.push_back(op);
                 }
                 if (
                     item.type == QueueItem::SINGLE_PIXEL ||
@@ -364,8 +357,6 @@ namespace directgraph {
                 } else if (item.type == QueueItem::BGCOLOR){
                     _lastState.bgColor = item.data.bgColor;
                     _curGenDataVars.bgColor = item.data.bgColor;
-                } else {
-                    break;
                 }
             }
 
@@ -428,6 +419,15 @@ namespace directgraph {
                         case SET_BG_COLOR:
                             _curState.bgColor = it->bgColor;
                             _patTextHelper->setFillPattern(_curState.fillPattern, _curState.bgColor);
+                            break;
+                        case CLEAR:
+                            _device->SetRenderTarget(0, _backBuffer);
+                            _device->Clear(
+                                    0, NULL, D3DCLEAR_TARGET,
+                                    D3DCOLOR_COLORVALUE(1.0, 1.0, 1.0, 1.0),
+                                    1.0f,
+                                    0
+                            );
                             break;
                     }
                 }
