@@ -3,8 +3,8 @@
 
 namespace directgraph{
 
-    IController *ControllerFactory::createMultThreadController(IMyWindow *window) {
-        return new ThreadController(window);
+    IController *ControllerFactory::createMultThreadController(IMyWindow *window, const CommonProps &props) {
+        return new ThreadController(window, props);
     }
 
     void ControllerFactory::deleteController(IController *ctrl) {

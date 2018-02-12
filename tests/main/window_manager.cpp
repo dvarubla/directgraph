@@ -22,10 +22,10 @@ namespace {
         WindowManagerTest() {
             wf = new NiceMock<WindowFactoryStub>();
             wstub = new NiceMock<MyWindowStub>();
-            ON_CALL(*wf, createPixelWindow(_, _, _)).WillByDefault(Return(wstub));
+            ON_CALL(*wf, createPixelWindow(_, _, _, _)).WillByDefault(Return(wstub));
             cf = new NiceMock<ControllerFactoryStub>();
             cstub = new NiceMock<ControllerStub>();
-            ON_CALL(*cf, createMultThreadController(_)).WillByDefault(Return(cstub));
+            ON_CALL(*cf, createMultThreadController(_, _)).WillByDefault(Return(cstub));
 
             std::vector<IWindowFactory *> facts;
             facts.push_back(wf);

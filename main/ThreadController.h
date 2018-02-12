@@ -32,7 +32,7 @@ namespace directgraph {
         void stopRepaintThread();
         void writeItemHelper(const QueueItem &item);
     public:
-        ThreadController(IMyWindow *window);
+        ThreadController(IMyWindow *window, const CommonProps &props);
         ~ThreadController();
         void init();
         void clear();

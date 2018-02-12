@@ -5,13 +5,10 @@
 
 namespace directgraph{
 
-    ThreadController::ThreadController(IMyWindow *window)
+    ThreadController::ThreadController(IMyWindow *window, const CommonProps &props)
             : _window(window), _queue(), _reader(&_queue, &_queueCS, &_lastElemCS),
               _threadStarted(0), _pixContFactory(_window->getRenderer()->getPixContFactory()) {
-        _currentProps.fillStyle = SOLID_FILL;
-        _currentProps.fillColor = 0xFFFFFF;
-        _currentProps.bgColor = 0xFFFFFF;
-        _currentProps.userFillPattern = NULL;
+        _currentProps = props;
         InitializeCriticalSection(&_addCS);
         InitializeCriticalSection(&_queueCS);
         InitializeCriticalSection(&_lastElemCS);

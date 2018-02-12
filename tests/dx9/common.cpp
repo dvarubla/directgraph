@@ -28,7 +28,12 @@ WindowFactory *CommonSimple::_dx9Wf = NULL;
 
 IMyWindow* CommonSimple::createWindow(float w, float h) {
     init_factory();
-    IMyWindow* win = _dx9Wf->createPixelWindow(L"Hello", w, h);
+    CommonProps props;
+    props.fillColor = 0xFFFFFF;
+    props.bgColor = 0xFFFFFF;
+    props.userFillPattern = NULL;
+    props.fillStyle = SOLID_FILL;
+    IMyWindow* win = _dx9Wf->createPixelWindow(L"Hello", w, h, props);
     win->show();
     return win;
 }

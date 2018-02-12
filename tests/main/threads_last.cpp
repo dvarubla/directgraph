@@ -19,6 +19,7 @@ public:
     MyWindowStub *win;
     RendererStub *ren;
     PixelContainerFactory *fact;
+    CommonProps props;
 
     void addPoints(ThreadController &tc, std::vector<QueueItem> &items){
         uint_fast32_t cnt = 0;
@@ -66,6 +67,10 @@ protected:
         ON_CALL(*win, getRenderer()).WillByDefault(Return(ren));
         ON_CALL(*ren, draw(_)).WillByDefault(Invoke(ren, &RendererStub::drawImpl));
         ON_CALL(*ren, getPixContFactory()).WillByDefault(Return(fact));
+        props.fillColor = 0xFFFFFF;
+        props.bgColor = 0xFFFFFF;
+        props.userFillPattern = NULL;
+        props.fillStyle = SOLID_FILL;
     }
 
     virtual ~ThreadsLastTest() {
@@ -82,7 +87,7 @@ protected:
 };
 
 TEST_F(ThreadsLastTest, ContainerOneThread){
-    ThreadController tc(win);
+    ThreadController tc(win, props);
     tc.init();
     std::vector<QueueItem> items;
     addPoints(tc, items);
@@ -114,7 +119,7 @@ static DWORD WINAPI ContainerRepHelper(LPVOID param){
 }
 
 TEST_F(ThreadsLastTest, ContainerOneDrawOneRep){
-    ThreadController tc(win);
+    ThreadController tc(win, props);
     tc.init();
     DWORD threadId;
     MSG msg;
@@ -130,7 +135,7 @@ TEST_F(ThreadsLastTest, ContainerOneDrawOneRep){
 }
 
 TEST_F(ThreadsLastTest, ContainerOneDrawMultRep){
-    ThreadController tc(win);
+    ThreadController tc(win, props);
     tc.init();
     const int NUM_THREADS = 3;
     DWORD threadIds[NUM_THREADS];

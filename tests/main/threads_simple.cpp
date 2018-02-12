@@ -16,7 +16,8 @@ class ThreadsSimpleTest : public ::testing::Test {
 public:
     MyWindowStub *win;
     RendererStub *ren;
-
+    CommonProps props;
+    
     void addPointsLine(
             ThreadController &tc,
             std::vector<QueueItem> &items,
@@ -52,6 +53,10 @@ protected:
         win = new NiceMock<MyWindowStub>();
         ON_CALL(*win, getRenderer()).WillByDefault(Return(ren));
         ON_CALL(*ren, draw(_)).WillByDefault(Invoke(ren, &RendererStub::drawImpl));
+        props.fillColor = 0xFFFFFF;
+        props.bgColor = 0xFFFFFF;
+        props.userFillPattern = NULL;
+        props.fillStyle = SOLID_FILL;
     }
 
     virtual ~ThreadsSimpleTest() {
@@ -70,7 +75,7 @@ protected:
 static const int MSG_CODE = WM_USER + 6000;
 
 TEST_F(ThreadsSimpleTest, BarOneThread){
-    ThreadController tc(win);
+    ThreadController tc(win, props);
     tc.init();
     std::vector<QueueItem> items;
     addPoints(tc, items);
@@ -108,7 +113,7 @@ static DWORD WINAPI BarRepHelper(LPVOID param){
 }
 
 TEST_F(ThreadsSimpleTest, BarOneDrawOneRepLong){
-    ThreadController tc(win);
+    ThreadController tc(win, props);
     tc.init();
     DWORD threadId;
     MSG msg;
@@ -125,7 +130,7 @@ TEST_F(ThreadsSimpleTest, BarOneDrawOneRepLong){
 }
 
 TEST_F(ThreadsSimpleTest, BarOneDrawOneRepShort){
-    ThreadController tc(win);
+    ThreadController tc(win, props);
     tc.init();
     DWORD threadId;
     MSG msg;
@@ -142,7 +147,7 @@ TEST_F(ThreadsSimpleTest, BarOneDrawOneRepShort){
 }
 
 TEST_F(ThreadsSimpleTest, BarOneDrawMultRep){
-    ThreadController tc(win);
+    ThreadController tc(win, props);
     tc.init();
     const int NUM_THREADS = 3;
     DWORD threadIds[NUM_THREADS];
@@ -189,7 +194,7 @@ static DWORD WINAPI BarDrawHelper(LPVOID param){
 
 TEST_F(ThreadsSimpleTest, BarMultDrawMultRep){
     InitializeCriticalSection(&crit);
-    ThreadController tc(win);
+    ThreadController tc(win, props);
     tc.init();
     const int NUM_REP_THREADS = 5;
     DWORD repThreadIds[NUM_REP_THREADS];

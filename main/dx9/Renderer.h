@@ -27,6 +27,7 @@ namespace directgraph {
             Common *_common;
             DPIHelper *_helper;
             BufferPreparer *_bufPreparer;
+            BufferPreparer::GenDataVars _initialVars;
             HWND _hwnd;
             float _width, _height;
 
@@ -47,7 +48,7 @@ namespace directgraph {
             void createDeviceRes();
 
         public:
-            Renderer(Common *common, DPIHelper *helper, float width, float height);
+            Renderer(Common *common, DPIHelper *helper, float width, float height, const CommonProps &props);
 
             virtual ~Renderer();
 

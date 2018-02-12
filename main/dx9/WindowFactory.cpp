@@ -15,19 +15,28 @@ namespace directgraph{
             delete _common;
         }
 
-        IMyWindow *WindowFactory::createDPIWindow(const wchar_t *name, float width, float height) {
+        IMyWindow *WindowFactory::createDPIWindow(
+                const wchar_t *name, float width, float height,
+                const CommonProps &props
+        ) {
             float dpiX, dpiY;
             _common->getDpi(dpiX, dpiY);
             DPIHelper *helper = new DPIHelper(dpiX, dpiY);
-            return commonCreateWindow(helper, name, width, height);
+            return commonCreateWindow(helper, name, width, height, props);
         }
 
-        IMyWindow *WindowFactory::createPixelWindow(const wchar_t *name, float width, float height) {
+        IMyWindow *WindowFactory::createPixelWindow(
+                const wchar_t *name, float width, float height,
+                const CommonProps &props
+        ) {
             DPIHelper *helper = new DPIHelper(DPIHelper::DEFAULT_DPIX, DPIHelper::DEFAULT_DPIY);
-            return commonCreateWindow(helper, name, width, height);
+            return commonCreateWindow(helper, name, width, height, props);
         }
 
-        MyWindow *WindowFactory::commonCreateWindow(DPIHelper *helper, const wchar_t *name, float width, float height) {
+        MyWindow *WindowFactory::commonCreateWindow(
+                DPIHelper *helper, const wchar_t *name, float width, float height,
+                const CommonProps &props
+        ) {
             if (width < 0 || height < 0) {
                 THROW_EXC_CODE(
                         WException, CANT_CREATE_WINDOW,
@@ -37,7 +46,7 @@ namespace directgraph{
             Renderer *renderer = NULL;
             MyWindow *window = NULL;
             try {
-                renderer = new Renderer(_common, helper, width, height);
+                renderer = new Renderer(_common, helper, width, height, props);
                 window = new MyWindow(
                         name,
                         static_cast<uint_fast32_t>(helper->toPixelsX(width)),

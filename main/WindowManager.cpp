@@ -41,14 +41,19 @@ namespace directgraph{
         _mapLock.startWrite();
         IMyWindow *win = NULL;
         IController *controller = NULL;
+        CommonProps props;
+        props.fillStyle = SOLID_FILL;
+        props.fillColor = 0xFFFFFF;
+        props.bgColor = 0xFFFFFF;
+        props.userFillPattern = NULL;
         try {
             win = _rendFactories[params.renderer]->createPixelWindow(
                     params.name, params.width,
-                    params.height
+                    params.height, props
             );
             win->show();
             win->addListener(this, index);
-            controller = _ctrlFactory->createMultThreadController(win);
+            controller = _ctrlFactory->createMultThreadController(win, props);
             controller->init();
             WindowData data = {controller, win, params.renderer, index, GetCurrentThreadId()};
             _windows.insert(std::pair<DirectgraphWinIndex, WindowData>(

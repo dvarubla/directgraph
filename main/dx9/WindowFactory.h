@@ -11,16 +11,21 @@ namespace directgraph {
         private:
             Common *_common;
 
-            MyWindow *commonCreateWindow(DPIHelper *helper, const wchar_t *name, float width, float height);
+            MyWindow *commonCreateWindow(
+                    DPIHelper *helper,
+                    const wchar_t *name,
+                    float width, float height,
+                    const CommonProps &props
+            );
 
         public:
             WindowFactory();
 
             ~WindowFactory();
 
-            IMyWindow *createDPIWindow(const wchar_t *name, float width, float height);
+            IMyWindow *createDPIWindow(const wchar_t *name, float width, float height, const CommonProps &props);
 
-            IMyWindow *createPixelWindow(const wchar_t *name, float width, float height);
+            IMyWindow *createPixelWindow(const wchar_t *name, float width, float height, const CommonProps &props);
 
             void deleteWindow(IMyWindow *win);
 

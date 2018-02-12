@@ -13,15 +13,18 @@
 
 namespace directgraph {
     namespace dx9 {
-        Renderer::Renderer(Common *common, DPIHelper *helper, float width, float height)
+        Renderer::Renderer(Common *common, DPIHelper *helper, float width, float height, const CommonProps &props)
                 : _swapChain(NULL), _vertBuffer(NULL), _pixelTexture(NULL), _patTextHelper(NULL), _bufPreparer(NULL) {
             _helper = helper;
             _width = width;
             _height = height;
             _common = common;
-            _curState.fillPattern = SOLID_FILL;
-            _curState.bgColor = 0xFFFFFF;
-            _curState.userFillPattern = NULL;
+            _curState.fillPattern = props.fillStyle;
+            _curState.bgColor = props.bgColor;
+            _curState.userFillPattern = props.userFillPattern;
+            _initialVars.bgColor = props.fillColor;
+            _initialVars.fillStyle = _curState.fillPattern;
+            _initialVars.bgColor = _curState.bgColor;
         }
 
         void Renderer::setWindow(HWND hwnd) {
@@ -85,13 +88,9 @@ namespace directgraph {
                     THROW_EXC_CODE(WException, UNREACHABLE_CODE, L"Unknown format");
             }
 
-            BufferPreparer::GenDataVars tVars;
-            tVars.bgColor = 0xFFFFFF;
-            tVars.fillStyle = _curState.fillPattern;
-            tVars.bgColor = _curState.bgColor;
             _bufPreparer = new BufferPreparer(
                     VERTEX_BUFFER_SIZE, &_curState, _helper,
-                    pixelTextureWidth, pixelTextureHeight, tVars
+                    pixelTextureWidth, pixelTextureHeight, _initialVars
             );
         }
 
