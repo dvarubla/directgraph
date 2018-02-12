@@ -8,7 +8,7 @@ set(DX9_FILES
         Common.cpp
         Common.h
         Exception.cpp
-        Exception.h PatternTexturesHelper.cpp PatternTexturesHelper.h IPatternTexturesHelper.h IFeatures.h DeviceFeatures.cpp DeviceFeatures.h PrimitiveCreator.cpp PrimitiveCreator.h)
+        Exception.h PatternTexturesHelper.cpp PatternTexturesHelper.h IPatternTexturesHelper.h IFeatures.h DeviceFeatures.cpp DeviceFeatures.h PrimitiveCreator.cpp PrimitiveCreator.h BufferPreparer.cpp BufferPreparer.h)
 
 add_library(directgraph_dx9_renderer ${DX9_FILES})
 set_target_properties(
