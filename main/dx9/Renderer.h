@@ -16,8 +16,7 @@ namespace directgraph {
         class Renderer : public IRenderer {
         private:
             const static int REGISTER_SIZE = 4;
-            const static int VERTEX_BUFFER_SIZE = 262144;
-
+            const static int VERTEX_BUFFER_SIZE = 1024 * 1024;
             BufferPreparer::DevDrawState _curState;
 
             IDirect3D9 *_d3d;
@@ -38,6 +37,7 @@ namespace directgraph {
             const static DWORD TEXTURED_RECT_VERTEX_FVF = D3DFVF_XYZRHW |  D3DFVF_DIFFUSE | D3DFVF_TEX1;
 
             IDirect3DVertexBuffer9 *_vertBuffer;
+            IDirect3DVertexBuffer9 *_vertBuffer2;
 
             IDirect3DTexture9 *_pixelTexture;
 
@@ -47,8 +47,16 @@ namespace directgraph {
 
             void createDeviceRes();
 
+            void copyToVBuffer();
+
+            void doRender();
+
+            void setInitialState();
+
         public:
             Renderer(Common *common, DPIHelper *helper, float width, float height, const CommonProps &props);
+
+            void prepare(IQueueReader *reader);
 
             virtual ~Renderer();
 

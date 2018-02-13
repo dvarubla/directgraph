@@ -58,8 +58,7 @@ namespace directgraph {
             PrimitiveCreator _primCreator;
             void *_vertMem;
             uint_fast32_t _memSize;
-            const DevDrawState *_state;
-            DevDrawState _lastState;
+            DevDrawState _lastState, _curState;
             DrawOpVector _drawOps;
             CharPVector _patterns;
             DPIHelper *_helper;
@@ -67,6 +66,8 @@ namespace directgraph {
             uint_fast32_t _pixelTextureHeight;
             GenDataVars _curGenDataVars;
             uint_fast32_t _curUsedSize;
+            uint_fast32_t _lastOffset;
+            bool _canReadMore;
         public:
             BufferPreparer(
                     uint_fast32_t memSize, const DevDrawState *state, DPIHelper *_helper,
@@ -74,13 +75,16 @@ namespace directgraph {
                     const GenDataVars &vars
             );
             ~BufferPreparer();
-            void prepareBuffer(IQueueReader *reader);
+            void prepareBuffer(IQueueReader *reader, uint_fast32_t offset, uint_fast32_t maxSize);
             void *getBuffer();
             void clear();
             DrawOpVector::iterator drawOpsBegin();
             DrawOpVector::iterator drawOpsEnd();
             bool isEmpty();
             uint_fast32_t getUsedSize();
+            bool isFull();
+            uint_fast32_t getLastOffset();
+            void resetOffset();
         };
 
         class DrawOpCreator{

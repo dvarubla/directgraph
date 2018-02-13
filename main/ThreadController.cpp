@@ -7,14 +7,14 @@ namespace directgraph{
 
     ThreadController::ThreadController(IMyWindow *window, const CommonProps &props)
             : _window(window), _queue(), _reader(&_queue, &_queueCS, &_lastElemCS),
-              _threadStarted(0), _pixContFactory(_window->getRenderer()->getPixContFactory()) {
+              _threadStarted(0), _numDrawMsgs(0), _pixContFactory(_window->getRenderer()->getPixContFactory()) {
         _currentProps = props;
         InitializeCriticalSection(&_addCS);
         InitializeCriticalSection(&_queueCS);
         InitializeCriticalSection(&_lastElemCS);
     }
 
-    void ThreadController::writeItemHelper(const QueueItem &item) {
+    void ThreadController::writeItemHelper(const QueueItem &item, bool needPrepare) {
         EnterCriticalSection(&_addCS);
         if(_queue.needGrow()) {
             EnterCriticalSection(&_queueCS);
@@ -23,6 +23,10 @@ namespace directgraph{
         }
         _queue.writeItem(item);
         LeaveCriticalSection(&_addCS);
+        if(needPrepare && InterlockedCompareExchange(&_threadStarted, 0, 0)
+           && InterlockedCompareExchange(&_numDrawMsgs, 1, 0) == 0){
+            PostThreadMessage(_drawThreadId, PREPARE, 0, 0);
+        }
     }
 
     void ThreadController::clear() {
@@ -60,11 +64,13 @@ namespace directgraph{
         }
 
         bool addSinglePixel = true;
+        bool lastIsSinglePixel = false;
         EnterCriticalSection(&_lastElemCS);
         try {
             if (_queue.getReadSize() != 0) {
                 QueueItem &prevItem = _queue.getItemAt(_queue.transformIndex((int_fast32_t) _queue.getPutIndex() - 1));
                 if (prevItem.type == QueueItem::SINGLE_PIXEL) {
+                    lastIsSinglePixel = true;
                     PixelContainerFactory::ContainerOpt contOpt = _pixContFactory->tryGetContainer(
                             prevItem.data.singlePixel.x,
                             prevItem.data.singlePixel.y,
@@ -92,7 +98,7 @@ namespace directgraph{
             QueueItem item = QueueItemCreator::create<QueueItem::SINGLE_PIXEL>(
                     static_cast<uint32_t>(x), static_cast<uint32_t>(y), color
             );
-            writeItemHelper(item);
+            writeItemHelper(item, lastIsSinglePixel);
         }
     }
 
@@ -101,6 +107,7 @@ namespace directgraph{
             Sleep(100);
         }
         MSG msg;
+        InterlockedIncrement(&_numDrawMsgs);
         PostThreadMessage(_drawThreadId, REPAINT, GetCurrentThreadId(), 0);
         GetMessage(&msg, NULL, REPLY, REPLY);
         rethrow_exc_wparam(msg);
@@ -119,26 +126,37 @@ namespace directgraph{
             while(true) {
                 EnterCriticalSection(&_queueCS);
                 uint_fast32_t readSize = _queue.getReadSize();
-                if(readSize == 0){
+                if(readSize == 0 && msg.message == PREPARE){
                     LeaveCriticalSection(&_queueCS);
                     break;
                 }
                 _reader.setGetIndex(_queue.getGetIndex(), readSize);
-                try {
-                    _window->getRenderer()->draw(&_reader);
-                } catch (const std::exception &){
-                    LeaveCriticalSection(&_queueCS);
-                    std::exception_ptr *ptrMem = new std::exception_ptr;
-                    *ptrMem = std::current_exception();
-                    PostThreadMessage(
-                            static_cast<DWORD>(msg.wParam), REPLY,
-                            reinterpret_cast<WPARAM>(ptrMem), true
-                    );
+                if(msg.message == REPAINT) {
+                    try {
+                        _window->getRenderer()->draw(&_reader);
+                    } catch (const std::exception &) {
+                        LeaveCriticalSection(&_queueCS);
+                        std::exception_ptr *ptrMem = new std::exception_ptr;
+                        *ptrMem = std::current_exception();
+                        PostThreadMessage(
+                                static_cast<DWORD>(msg.wParam), REPLY,
+                                reinterpret_cast<WPARAM>(ptrMem), true
+                        );
+                        break;
+                    }
+                } else {
+                    _window->getRenderer()->prepare(&_reader);
+                    break;
+                }
+                if(readSize == 0){
                     break;
                 }
             }
-            _window->getRenderer()->repaint();
-            PostThreadMessage(static_cast<DWORD>(msg.wParam), REPLY, 0, 0);
+            InterlockedDecrement(&_numDrawMsgs);
+            if(msg.message == REPAINT) {
+                _window->getRenderer()->repaint();
+                PostThreadMessage(static_cast<DWORD>(msg.wParam), REPLY, 0, 0);
+            }
         }
     }
 

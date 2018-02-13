@@ -120,6 +120,7 @@ namespace directgraph{
 
         template<uint_fast32_t DispMode>
         PatternTexturesHelper<DispMode>::~PatternTexturesHelper() {
+            _device->SetTexture(0, NULL);
             for(uint_fast8_t i = 0; i < NUM_TOTAL_FPATTERNS; i++){
                 if(_textures[i].texture != NULL){
                     _textures[i].texture->Release();

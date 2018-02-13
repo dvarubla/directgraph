@@ -13,4 +13,8 @@ namespace directgraph{
     std::vector<QueueItem> &RendererStub::getData() {
         return _data;
     }
+
+    void RendererStub::prepareImpl(IQueueReader *reader) {
+        drawImpl(reader);
+    }
 }

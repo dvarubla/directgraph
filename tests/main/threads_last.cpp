@@ -66,6 +66,7 @@ protected:
         win = new NiceMock<MyWindowStub>();
         ON_CALL(*win, getRenderer()).WillByDefault(Return(ren));
         ON_CALL(*ren, draw(_)).WillByDefault(Invoke(ren, &RendererStub::drawImpl));
+        ON_CALL(*ren, prepare(_)).WillByDefault(Invoke(ren, &RendererStub::prepareImpl));
         ON_CALL(*ren, getPixContFactory()).WillByDefault(Return(fact));
         props.fillColor = 0xFFFFFF;
         props.bgColor = 0xFFFFFF;

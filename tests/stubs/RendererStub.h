@@ -19,8 +19,12 @@ namespace directgraph{
 
         MOCK_METHOD0(repaint, void ());
 
+        MOCK_METHOD1(prepare, void(IQueueReader *reader));
+
         MOCK_METHOD1(draw, void(IQueueReader *reader));
 
         void drawImpl(IQueueReader *reader);
+
+        void prepareImpl(IQueueReader *reader);
     };
 }

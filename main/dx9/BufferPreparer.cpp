@@ -66,9 +66,9 @@ namespace directgraph{
                 DPIHelper *helper,
                 uint_fast32_t pxTextureWidth, uint_fast32_t pxTextureHeight,
                 const GenDataVars &vars
-        ): _memSize(memSize), _state(state), _helper(helper),
+        ): _memSize(memSize), _helper(helper),
            _pixelTextureWidth(pxTextureWidth), _pixelTextureHeight(pxTextureHeight),
-           _curGenDataVars(vars), _curUsedSize(0)
+           _curGenDataVars(vars), _curUsedSize(0), _lastOffset(0), _canReadMore(true)
         {
             _vertMem = malloc(memSize);
             if (_vertMem == NULL) {
@@ -78,50 +78,49 @@ namespace directgraph{
                         std::wstring(L"Can't allocate memory for vertices")
                 );
             }
-            _lastState = *_state;
+            _lastState = *state;
+            _curState = *state;
         }
 
-        void BufferPreparer::prepareBuffer(IQueueReader *reader) {
+        void BufferPreparer::prepareBuffer(IQueueReader *reader, uint_fast32_t offset, uint_fast32_t maxSize) {
             uint_fast32_t size = reader->getSize();
             uint_fast32_t readIndex = 0;
             int_fast32_t prevX = 0, prevY = 0;
             bool isFirst = true;
             void *curVertMem = (static_cast<uint8_t*>(_vertMem) + _curUsedSize);
-
-            DevDrawState tempState = *_state;
-            if(tempState.userFillPattern != NULL){
-                _patterns.push_back(tempState.userFillPattern);
+            if(_curState.userFillPattern != NULL){
+                _patterns.push_back(_curState.userFillPattern);
             }
-            for (readIndex = 0; readIndex < size; readIndex++) {
+            for (readIndex = offset; readIndex < size; readIndex++) {
                 QueueItem &item = reader->getAt(readIndex);
                 if(item.type == QueueItem::SINGLE_PIXEL){
-                    if(tempState.fillPattern != SOLID_FILL){
+                    if(_curState.fillPattern != SOLID_FILL){
                         _drawOps.push_back(DrawOpCreator::create<SET_FILL_PATTERN>(SOLID_FILL));
-                        tempState.fillPattern = SOLID_FILL;
+                        _curState.fillPattern = SOLID_FILL;
                         isFirst = true;
                     }
                 } else if(item.type == QueueItem::BAR){
-                    if(tempState.userFillPattern != _lastState.userFillPattern && _lastState.fillPattern == USER_FILL){
+                    if(_curState.userFillPattern != _lastState.userFillPattern && _lastState.fillPattern == USER_FILL){
                         _drawOps.push_back(DrawOpCreator::create<SET_USER_FILL_PATTERN>(_lastState.userFillPattern));
-                        tempState.userFillPattern = _lastState.userFillPattern;
+                        _curState.userFillPattern = _lastState.userFillPattern;
                         isFirst = true;
                     }
-                    if(tempState.fillPattern != _lastState.fillPattern){
+                    if(_curState.fillPattern != _lastState.fillPattern){
                         _drawOps.push_back(DrawOpCreator::create<SET_FILL_PATTERN>(_lastState.fillPattern));
-                        tempState.fillPattern = _lastState.fillPattern;
+                        _curState.fillPattern = _lastState.fillPattern;
                         isFirst = true;
                     }
-                    if(tempState.bgColor != _lastState.bgColor && tempState.fillPattern != SOLID_FILL){
+                    if(_curState.bgColor != _lastState.bgColor && _curState.fillPattern != SOLID_FILL){
                         _drawOps.push_back(DrawOpCreator::create<SET_BG_COLOR>(_lastState.bgColor));
-                        tempState.bgColor = _lastState.bgColor;
+                        _curState.bgColor = _lastState.bgColor;
                         isFirst = true;
                     }
                 } else if(item.type == QueueItem::CLEAR){
                     _drawOps.push_back(DrawOpCreator::create<CLEAR>());
                 } else if(item.type == QueueItem::PIXEL_CONTAINER){
-                    if(tempState.fillPattern != SOLID_FILL){
+                    if(_curState.fillPattern != SOLID_FILL){
                         _drawOps.push_back(DrawOpCreator::create<SET_FILL_PATTERN>(SOLID_FILL));
-                        tempState.fillPattern = SOLID_FILL;
+                        _curState.fillPattern = SOLID_FILL;
                     }
                     _drawOps.push_back(DrawOpCreator::create<SET_PIXEL_TEXTURE>(item.data.pixelContainer));
                     isFirst = true;
@@ -134,7 +133,7 @@ namespace directgraph{
                     uint_fast32_t curNumVertices;
                     uint_fast32_t sizeMult;
                     DrawDataType drawDataType;
-                    bool useFillTexture = tempState.fillPattern != SOLID_FILL;
+                    bool useFillTexture = _curState.fillPattern != SOLID_FILL;
                     bool haveLastStride;
                     if(item.type == QueueItem::PIXEL_CONTAINER){
                         IPixelContainer *cont = item.data.pixelContainer;
@@ -164,7 +163,8 @@ namespace directgraph{
                             static_cast<uint8_t*>(curVertMem) - static_cast<uint8_t*>(_vertMem)
                     );
                     uint_fast32_t newUsedSize = curUsedSize * sizeMult;
-                    if (newUsedSize > _memSize) {
+                    if (newUsedSize > maxSize) {
+                        _canReadMore = false;
                         break;
                     }
                     if(isFirst){
@@ -207,7 +207,7 @@ namespace directgraph{
                         }
                     } else {
                         if (!isFirst) {
-                            if (tempState.fillPattern != SOLID_FILL) {
+                            if (_curState.fillPattern != SOLID_FILL) {
                                 curVertMem = _primCreator.genFillDegenerate(
                                         curVertMem,
                                         prevX, prevY,
@@ -282,8 +282,8 @@ namespace directgraph{
                     _curGenDataVars.bgColor = item.data.bgColor;
                 }
             }
-            reader->endReading(readIndex);
             _curUsedSize = static_cast<uint_fast32_t>(static_cast<uint8_t*>(curVertMem) - static_cast<uint8_t*>(_vertMem));
+            _lastOffset = readIndex;
         }
 
         void *BufferPreparer::getBuffer() {
@@ -300,6 +300,7 @@ namespace directgraph{
             _patterns.clear();
             _drawOps.clear();
             _curUsedSize = 0;
+            _canReadMore = true;
         }
 
         BufferPreparer::DrawOpVector::iterator
@@ -322,6 +323,18 @@ namespace directgraph{
 
         BufferPreparer::~BufferPreparer() {
             free(_vertMem);
+        }
+
+        bool BufferPreparer::isFull() {
+            return !_canReadMore;
+        }
+
+        uint_fast32_t BufferPreparer::getLastOffset() {
+            return _lastOffset;
+        }
+
+        void BufferPreparer::resetOffset() {
+            _lastOffset = 0;
         }
     }
 }

@@ -10,6 +10,7 @@ namespace directgraph {
     private:
         enum ThreadCtrlMsg{
             REPAINT = WM_USER+1,
+            PREPARE,
             STOP,
             REPLY = 65535
         };
@@ -18,6 +19,7 @@ namespace directgraph {
         Queue _queue;
         QueueReader _reader;
         LONG volatile _threadStarted;
+        LONG volatile _numDrawMsgs;
 
         CRITICAL_SECTION _addCS;
         CRITICAL_SECTION _queueCS;
@@ -30,7 +32,7 @@ namespace directgraph {
 
         void repaintThread();
         void stopRepaintThread();
-        void writeItemHelper(const QueueItem &item);
+        void writeItemHelper(const QueueItem &item, bool needPrepare = true);
     public:
         ThreadController(IMyWindow *window, const CommonProps &props);
         ~ThreadController();
