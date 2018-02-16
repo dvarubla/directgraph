@@ -52,31 +52,36 @@ public:
 
     uint_fast32_t countTotal(const std::vector<QueueItem> &items){
         directgraph::Rectangle maxCrds;
-        if(items[0].type == QueueItem::PIXEL_CONTAINER){
-            IPixelContainer *cont = items[0].data.pixelContainer;
-            directgraph::Rectangle coords =  cont->getCoords();
-            maxCrds = coords;
-            delete cont;
-        } else {
-            maxCrds.left = items[0].data.singlePixel.x;
-            maxCrds.right = items[0].data.singlePixel.x;
-            maxCrds.top = items[0].data.singlePixel.y;
-            maxCrds.bottom = items[0].data.singlePixel.y;
-        }
+        bool coordsSet = false;
         for(uint_fast32_t i = 1; i < items.size(); i++){
-            if(items[i].type == QueueItem::PIXEL_CONTAINER){
-                IPixelContainer *cont = items[i].data.pixelContainer;
-                directgraph::Rectangle coords = cont->getCoords();
-                maxCrds.left = std::min(maxCrds.left, coords.left);
-                maxCrds.top = std::min(maxCrds.top, coords.top);
-                maxCrds.right = std::max(maxCrds.right, coords.right);
-                maxCrds.bottom = std::max(maxCrds.bottom, coords.bottom);
-                delete cont;
-            } else if(items[i].type == QueueItem::SINGLE_PIXEL){
-                maxCrds.left = std::min(maxCrds.left, items[i].data.singlePixel.x);
-                maxCrds.top = std::min(maxCrds.top, items[i].data.singlePixel.y);
-                maxCrds.right = std::max(maxCrds.right, items[i].data.singlePixel.x);
-                maxCrds.bottom = std::max(maxCrds.bottom, items[i].data.singlePixel.y);
+            if(!coordsSet){
+                if(items[i].type == QueueItem::PIXEL_CONTAINER){
+                    IPixelContainer *cont = items[i].data.pixelContainer;
+                    directgraph::Rectangle coords =  cont->getCoords();
+                    maxCrds = coords;
+                    delete cont;
+                } else if(items[i].type == QueueItem::SINGLE_PIXEL){
+                    maxCrds.left = items[i].data.singlePixel.x;
+                    maxCrds.right = items[i].data.singlePixel.x;
+                    maxCrds.top = items[i].data.singlePixel.y;
+                    maxCrds.bottom = items[i].data.singlePixel.y;
+                }
+                coordsSet = true;
+            } else {
+                if (items[i].type == QueueItem::PIXEL_CONTAINER) {
+                    IPixelContainer *cont = items[i].data.pixelContainer;
+                    directgraph::Rectangle coords = cont->getCoords();
+                    maxCrds.left = std::min(maxCrds.left, coords.left);
+                    maxCrds.top = std::min(maxCrds.top, coords.top);
+                    maxCrds.right = std::max(maxCrds.right, coords.right);
+                    maxCrds.bottom = std::max(maxCrds.bottom, coords.bottom);
+                    delete cont;
+                } else if (items[i].type == QueueItem::SINGLE_PIXEL) {
+                    maxCrds.left = std::min(maxCrds.left, items[i].data.singlePixel.x);
+                    maxCrds.top = std::min(maxCrds.top, items[i].data.singlePixel.y);
+                    maxCrds.right = std::max(maxCrds.right, items[i].data.singlePixel.x);
+                    maxCrds.bottom = std::max(maxCrds.bottom, items[i].data.singlePixel.y);
+                }
             }
         }
         return (maxCrds.bottom - maxCrds.top) * (maxCrds.right - maxCrds.left);
