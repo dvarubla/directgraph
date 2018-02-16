@@ -23,16 +23,18 @@ namespace directgraph {
 
         CRITICAL_SECTION _addCS;
         CRITICAL_SECTION _queueCS;
-        CRITICAL_SECTION _lastElemCS;
 
         DWORD _drawThreadId;
         CommonProps _currentProps;
 
-        PixelContainerFactory *_pixContFactory;
+        PixelContainerCreator *_pixContFactory;
 
+        void flushPixels();
         void repaintThread();
         void stopRepaintThread();
-        void writeItemHelper(const QueueItem &item, bool needPrepare = true);
+        void writeItemHelper(const QueueItem &item);
+        void checkGrow();
+        void sendPrepareMsg();
     public:
         ThreadController(IMyWindow *window, const CommonProps &props);
         ~ThreadController();

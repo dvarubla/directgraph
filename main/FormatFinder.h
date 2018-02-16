@@ -5,9 +5,8 @@
 namespace directgraph {
     namespace ColorFormat{
         enum Format{
-            R5G6B5,
+            A8R8G8B8,
             AR5G5B5,
-            R8G8B8,
             A8
         };
     };
@@ -17,25 +16,11 @@ namespace directgraph {
     };
 
     template <>
-    class FormatFinder<ColorFormat::R8G8B8>{
+    class FormatFinder<ColorFormat::A8R8G8B8>{
     public:
         typedef uint32_t FormatType;
-        static FormatType convert(uint32_t color){
-            return swap_color(color);
-        }
-    };
-
-    template <>
-    class FormatFinder<ColorFormat::R5G6B5>{
-    public:
-        typedef uint16_t FormatType;
-        static FormatType convert(uint32_t color){
-            return
-                    static_cast<uint16_t>
-                    ((((color & 0xFF) / 8) << 11) |
-                     ((((color >> 8) & 0xFF) / 8) << 6) |
-                     ((((color >> 16) & 0xFF)) / 8))
-                    ;
+        static FormatType convert(uint32_t color, bool isTransparent){
+            return ((isTransparent) ? 0 : 0xFF000000) | swap_color(color);
         }
     };
 

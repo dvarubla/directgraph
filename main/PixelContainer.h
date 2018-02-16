@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include "IPixelContainer.h"
 #include "util.h"
 #include "FormatFinder.h"
@@ -9,48 +10,28 @@ namespace directgraph {
     template <uint_fast32_t DispMode>
     class PixelContainer: public IPixelContainer {
     private:
-        enum Direction{
-            NO_DIRECTION,
-            LEFT_RIGHT_TOP_DOWN,
-            LEFT_RIGHT_BOTTOM_UP
-        } _direction;
         typedef FormatFinder<DispMode> FFinder;
         typedef typename FFinder::FormatType ContainerType;
         ContainerType *_buffer;
-        uint_fast32_t _firstX;
-        uint_fast32_t _firstY;
-        uint_fast32_t _lastX;
-        uint_fast32_t _lastY;
+        Rectangle _coords;
         uint_fast32_t _maxWidth;
         uint_fast32_t _maxHeight;
-        uint_fast32_t _width;
-        uint_fast32_t _height;
-        uint_fast32_t _lastWidth;
-        void setPixel(uint_fast32_t x, uint_fast32_t y, uint_fast32_t color);
+        void updateCoords(uint_fast32_t x, uint_fast32_t y);
     public:
         PixelContainer(
-                uint_fast32_t firstX, uint_fast32_t firstY, uint_fast32_t firstColor,
-                uint_fast32_t secondX, uint_fast32_t secondY, uint_fast32_t secondColor,
+                const std::vector<SinglePixel> &pixels,
                 uint_fast32_t maxWidth, uint_fast32_t maxHeight
         );
         ~PixelContainer();
 
         void *getBuffer();
 
-        Rectangle getFirstCoords();
+        Rectangle getCoords();
 
-        Rectangle getLastCoords();
-
-        uint_fast32_t getStride();
-
-        uint_fast32_t getLastStride();
-
-        uint_fast32_t getHeight();
+        void addPixel(uint_fast32_t x, uint_fast32_t y, uint_fast32_t color);
 
         uint_fast32_t getStartOffset();
-
         uint_fast32_t getNextLineOffset();
-
-        bool tryAddPixel(uint_fast32_t x, uint_fast32_t y, uint_fast32_t color);
+        uint_fast32_t getStride();
     };
 }

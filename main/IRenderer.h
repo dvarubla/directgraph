@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include "QueueReader.h"
 #include "CommonProps.h"
-#include "PixelContainerFactory.h"
+#include "PixelContainerCreator.h"
 
 namespace directgraph {
     class IRenderer {
@@ -21,6 +21,6 @@ namespace directgraph {
 
         virtual void draw(IQueueReader *reader) = 0;
 
-        virtual PixelContainerFactory* getPixContFactory() = 0;
+        virtual PixelContainerCreator* getPixContFactory() = 0;
     };
 }

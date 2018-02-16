@@ -72,9 +72,9 @@ namespace directgraph{
                 case D3DFMT_R8G8B8:
                 case D3DFMT_X8R8G8B8:
                 case D3DFMT_A8R8G8B8:
-                    return ColorFormat::R8G8B8;
+                    return ColorFormat::A8R8G8B8;
                 case D3DFMT_R5G6B5:
-                    return ColorFormat::R5G6B5;
+                    return ColorFormat::AR5G5B5;
                 default:
                     THROW_EXC_CODE(
                             Exception,

@@ -49,15 +49,24 @@ namespace directgraph {
             uint_fast32_t pixelTextureWidth = static_cast<uint_fast32_t>(1 << (uint_fast32_t) ceil(log2<double>(pxWidth)));
             uint_fast32_t pixelTextureHeight = static_cast<uint_fast32_t>(1 << (uint_fast32_t) ceil(log2<double>(pxHeight)));
 
+            ColorFormat::Format pxFormat = _common->getFeatures()->getImageTexFormat();
+
+            D3DFORMAT pxTexFormat;
+            switch(pxFormat){
+                case ColorFormat::A8R8G8B8: pxTexFormat = D3DFMT_A8R8G8B8; break;
+                case ColorFormat::AR5G5B5: pxTexFormat = D3DFMT_A1R5G5B5; break;
+                default:
+                    THROW_EXC_CODE(WException, UNREACHABLE_CODE, L"Unknown format");
+            }
+
             if (_device->CreateTexture(
                     pixelTextureWidth, pixelTextureHeight, 1, 0,
-                    _common->getFormat(), D3DPOOL_MANAGED, &_pixelTexture, NULL
+                    pxTexFormat, D3DPOOL_MANAGED, &_pixelTexture, NULL
             ) != D3D_OK) {
                 THROW_EXC_CODE(Exception, DX9_CANT_CREATE_TEXTURE, std::wstring(L"Can't create texture"));
             };
 
-            ColorFormat::Format pxFormat = _common->getFeatures()->getImageTexFormat();
-            _pixContFactory = new PixelContainerFactory(pxWidth, pxHeight, pxFormat);
+            _pixContFactory = new PixelContainerCreator(pxWidth, pxHeight, pxFormat);
 
             if (_device->CreateVertexBuffer(VERTEX_BUFFER_SIZE,
                                             D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY,
@@ -155,7 +164,7 @@ namespace directgraph {
             _bufPreparer->resetOffset();
         }
 
-        PixelContainerFactory *Renderer::getPixContFactory() {
+        PixelContainerCreator *Renderer::getPixContFactory() {
             return _pixContFactory;
         }
 
@@ -188,6 +197,7 @@ namespace directgraph {
                         _device->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, it->data.items.numItems);
                         if(it->data.items.type == BufferPreparer::TEXTURED_VERTEX){
                             _device->SetTexture(0, NULL);
+                            _device->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
                         }
                         break;
                     case BufferPreparer::SET_FILL_PATTERN:
@@ -217,45 +227,30 @@ namespace directgraph {
                         break;
                     case BufferPreparer::SET_PIXEL_TEXTURE:
                         IPixelContainer *cont = it->data.pixelContainer;
-                        bool haveLastLine = cont->getLastStride() != cont->getStride();
-                        Rectangle firstCoords = cont->getFirstCoords();
-                        Rectangle lastCoords = cont->getLastCoords();
-                        firstCoords.right++;
-                        firstCoords.bottom++;
-                        lastCoords.right++;
-                        lastCoords.bottom++;
+                        Rectangle coords = cont->getCoords();
+                        uint_fast32_t height = coords.bottom - coords.top;
                         RECT lockRect = {
-                                static_cast<LONG>(firstCoords.left),
-                                static_cast<LONG>(std::min(firstCoords.top, lastCoords.top)),
-                                static_cast<LONG>(firstCoords.right),
-                                static_cast<LONG>(std::max(firstCoords.bottom, lastCoords.top))
+                                static_cast<LONG>(coords.left),
+                                static_cast<LONG>(coords.top),
+                                static_cast<LONG>(coords.right),
+                                static_cast<LONG>(coords.bottom)
                         };
-                        uint_fast32_t pxHeight = cont->getHeight();
-                        if (haveLastLine) {
-                            pxHeight--;
-                        }
-                        uint_fast32_t imageStride = cont->getStride();
-                        uint_fast32_t nextLineOffset = cont->getNextLineOffset();
                         char *contBuffer = static_cast<char *>(cont->getBuffer()) + cont->getStartOffset();
                         D3DLOCKED_RECT outRect;
                         _pixelTexture->LockRect(0, &outRect, &lockRect, 0);
                         char *textBuffer = static_cast<char *>(outRect.pBits);
-                        if (firstCoords.top > lastCoords.top) {
-                            memcpy(textBuffer, contBuffer, cont->getLastStride());
+                        for (uint_fast32_t y = 0; y < height; ++y) {
+                            memcpy(textBuffer, contBuffer, cont->getStride());
                             textBuffer += outRect.Pitch;
-                            contBuffer += nextLineOffset;
-                        }
-                        for (uint_fast32_t y = 0; y < pxHeight; ++y) {
-                            memcpy(textBuffer, contBuffer, imageStride);
-                            textBuffer += outRect.Pitch;
-                            contBuffer += nextLineOffset;
-                        }
-                        if (firstCoords.bottom < lastCoords.bottom) {
-                            memcpy(textBuffer, contBuffer, cont->getLastStride());
+                            contBuffer += cont->getNextLineOffset();
                         }
                         _pixelTexture->UnlockRect(0);
                         delete cont;
                         _device->SetTexture(0, _pixelTexture);
+                        _device->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+                        _device->SetRenderState(D3DRS_SRCBLEND,D3DBLEND_SRCALPHA);
+                        _device->SetRenderState(D3DRS_DESTBLEND,D3DBLEND_INVSRCALPHA);
+                        _device->SetRenderState(D3DRS_BLENDOP,D3DBLENDOP_ADD);
                         break;
                 }
             }

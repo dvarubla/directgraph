@@ -1,38 +1,28 @@
+#include <algorithm>
 #include "PixelContainer.h"
 #include "WException.h"
+
+#undef max
+#undef min
 
 namespace directgraph{
 
     template<uint_fast32_t DispMode>
     PixelContainer<DispMode>::PixelContainer(
-            uint_fast32_t firstX, uint_fast32_t firstY, uint_fast32_t firstColor,
-            uint_fast32_t secondX, uint_fast32_t secondY, uint_fast32_t secondColor,
+            const std::vector<SinglePixel> &pixels,
             uint_fast32_t maxWidth, uint_fast32_t maxHeight
-    ): _direction(NO_DIRECTION),
-       _firstX(firstX), _firstY(firstY), _lastX(secondX), _lastY(secondY),
-       _maxWidth(maxWidth), _maxHeight(maxHeight)
+    ): _maxWidth(maxWidth), _maxHeight(maxHeight)
     {
         try{
             _buffer = new ContainerType[maxWidth * maxHeight];
+            std::fill(_buffer, _buffer + maxWidth * maxHeight, 0);
         } catch(const std::bad_alloc &) {
             THROW_EXC_CODE(WException, CANT_ALLOC, std::wstring(L"Can't allocate pixel container buffer"));
         }
-        if(firstX == secondX){
-            if(secondY > firstY){
-                _direction = LEFT_RIGHT_TOP_DOWN;
-            } else {
-                _direction = LEFT_RIGHT_BOTTOM_UP;
-            }
-            _height = 2;
-            _width = 1;
-            _lastWidth = 1;
-        } else {
-            _height = 1;
-            _width = 2;
-            _lastWidth = 2;
+        _coords = {pixels[0].x, pixels[0].y, pixels[0].x, pixels[0].y};
+        for(std::vector<SinglePixel>::const_iterator it = pixels.begin(); it != pixels.end(); ++it){
+            addPixel(it->x, it->y, it->color);
         }
-        setPixel(firstX, firstY, firstColor);
-        setPixel(secondX, secondY, secondColor);
     }
 
     template<uint_fast32_t DispMode>
@@ -46,48 +36,30 @@ namespace directgraph{
     }
 
     template<uint_fast32_t DispMode>
-    Rectangle PixelContainer<DispMode>::getFirstCoords() {
-        Rectangle result;
-        result.left = _firstX;
-        result.right = _firstX + _width - 1;
-        if(_direction == LEFT_RIGHT_TOP_DOWN){
-            result.top = _firstY;
-            result.bottom = (_lastWidth == _width) ? _lastY : _lastY - 1;
-        } else {
-            result.top = (_lastWidth == _width) ? _lastY : _lastY + 1;
-            result.bottom = _firstY;
-        }
-        return result;
+    void PixelContainer<DispMode>::addPixel(uint_fast32_t x, uint_fast32_t y, uint_fast32_t color) {
+        _buffer[y * _maxWidth + x] = FFinder::convert(color, false);
+        updateCoords(x, y);
     }
 
     template<uint_fast32_t DispMode>
-    Rectangle PixelContainer<DispMode>::getLastCoords() {
-        Rectangle result;
-        result.left = _firstX;
-        result.right = _lastX;
-        result.top = result.bottom = _lastY;
-        return result;
+    Rectangle PixelContainer<DispMode>::getCoords() {
+        Rectangle res = _coords;
+        res.bottom++;
+        res.right++;
+        return res;
     }
 
     template<uint_fast32_t DispMode>
-    uint_fast32_t PixelContainer<DispMode>::getStride() {
-        return _width * sizeof(ContainerType);
-    }
-
-    template<uint_fast32_t DispMode>
-    uint_fast32_t PixelContainer<DispMode>::getLastStride() {
-        return _lastWidth * sizeof(ContainerType);
-    }
-
-    template<uint_fast32_t DispMode>
-    uint_fast32_t PixelContainer<DispMode>::getHeight() {
-        return _height;
+    void PixelContainer<DispMode>::updateCoords(uint_fast32_t x, uint_fast32_t y) {
+        _coords.left = std::min(_coords.left, x);
+        _coords.top = std::min(_coords.top, y);
+        _coords.right = std::max(_coords.right, x);
+        _coords.bottom = std::max(_coords.bottom, y);
     }
 
     template<uint_fast32_t DispMode>
     uint_fast32_t PixelContainer<DispMode>::getStartOffset() {
-        uint_fast32_t top = (_direction == LEFT_RIGHT_TOP_DOWN) ? _firstY : _lastY;
-        return (top * _maxWidth + _firstX) * sizeof(ContainerType);
+        return (_coords.top * _maxWidth + _coords.left) * sizeof(ContainerType);
     }
 
     template<uint_fast32_t DispMode>
@@ -96,54 +68,10 @@ namespace directgraph{
     }
 
     template<uint_fast32_t DispMode>
-    bool PixelContainer<DispMode>::tryAddPixel(uint_fast32_t x, uint_fast32_t y, uint_fast32_t color) {
-        bool status = true;
-        if(_lastY == y && (_lastX + 1) == x && (_height == 1 || _lastWidth < _width)){
-            _lastX++;
-            if(_height == 1) {
-                _width++;
-            }
-            _lastWidth++;
-        } else if(_firstX == x && _lastWidth == _width){
-            Direction curDirection;
-            if(_lastY + 1== y){
-                curDirection = LEFT_RIGHT_TOP_DOWN;
-            } else if(_lastY == y + 1){
-                curDirection = LEFT_RIGHT_BOTTOM_UP;
-            } else {
-                status = false;
-            }
-            if(status) {
-                if (_direction == NO_DIRECTION) {
-                    _direction = curDirection;
-                } else if (_direction != curDirection) {
-                    status = false;
-                }
-                if(status){
-                    _lastWidth = 1;
-                    _lastX = _firstX;
-                    if(_direction == LEFT_RIGHT_TOP_DOWN){
-                        _lastY++;
-                    } else {
-                        _lastY--;
-                    }
-                    _height++;
-                }
-            }
-        } else {
-            status = false;
-        }
-        if(status){
-            setPixel(x, y, color);
-        }
-        return status;
+    uint_fast32_t PixelContainer<DispMode>::getStride() {
+        return (_coords.right - _coords.left + 1) * sizeof(ContainerType);
     }
 
-    template<uint_fast32_t DispMode>
-    void PixelContainer<DispMode>::setPixel(uint_fast32_t x, uint_fast32_t y, uint_fast32_t color) {
-        _buffer[y * _maxWidth + x] = FFinder::convert(color);
-    }
-
-    template class PixelContainer<ColorFormat::R8G8B8>;
-    template class PixelContainer<ColorFormat::R5G6B5>;
+    template class PixelContainer<ColorFormat::A8R8G8B8>;
+    template class PixelContainer<ColorFormat::AR5G5B5>;
 }

@@ -6,27 +6,53 @@
 namespace directgraph{
 
     ThreadController::ThreadController(IMyWindow *window, const CommonProps &props)
-            : _window(window), _queue(), _reader(&_queue, &_queueCS, &_lastElemCS),
+            : _window(window), _queue(), _reader(&_queue, &_queueCS),
               _threadStarted(0), _numDrawMsgs(0), _pixContFactory(_window->getRenderer()->getPixContFactory()) {
         _currentProps = props;
         InitializeCriticalSection(&_addCS);
         InitializeCriticalSection(&_queueCS);
-        InitializeCriticalSection(&_lastElemCS);
     }
 
-    void ThreadController::writeItemHelper(const QueueItem &item, bool needPrepare) {
-        EnterCriticalSection(&_addCS);
+    void ThreadController::checkGrow() {
         if(_queue.needGrow()) {
             EnterCriticalSection(&_queueCS);
             _queue.grow();
             LeaveCriticalSection(&_queueCS);
         }
-        _queue.writeItem(item);
-        LeaveCriticalSection(&_addCS);
-        if(needPrepare && InterlockedCompareExchange(&_threadStarted, 0, 0)
+    }
+
+    void ThreadController::sendPrepareMsg() {
+        if(InterlockedCompareExchange(&_threadStarted, 0, 0)
            && InterlockedCompareExchange(&_numDrawMsgs, 1, 0) == 0){
             PostThreadMessage(_drawThreadId, PREPARE, 0, 0);
         }
+    }
+
+    void ThreadController::flushPixels() {
+        if(_pixContFactory->havePixels()){
+            for(
+                    PixelContainerCreator::PixelVector::iterator it = _pixContFactory->pixelsBegin();
+                    it != _pixContFactory->pixelsEnd();
+                    ++it
+                    ){
+                checkGrow();
+                _queue.writeItem(QueueItemCreator::create<QueueItem::SINGLE_PIXEL>(it->x, it->y, it->color));
+            }
+        }
+        if(_pixContFactory->haveContainer()){
+            checkGrow();
+            _queue.writeItem(QueueItemCreator::create<QueueItem::PIXEL_CONTAINER>(_pixContFactory->getContainer()));
+        }
+        _pixContFactory->clear();
+    }
+
+    void ThreadController::writeItemHelper(const QueueItem &item) {
+        EnterCriticalSection(&_addCS);
+        flushPixels();
+        checkGrow();
+        _queue.writeItem(item);
+        LeaveCriticalSection(&_addCS);
+        sendPrepareMsg();
     }
 
     void ThreadController::clear() {
@@ -63,46 +89,16 @@ namespace directgraph{
             return;
         }
 
-        bool addSinglePixel = true;
-        bool lastIsSinglePixel = false;
-        EnterCriticalSection(&_lastElemCS);
-        try {
-            if (_queue.getReadSize() != 0) {
-                QueueItem &prevItem = _queue.getItemAt(_queue.transformIndex((int_fast32_t) _queue.getPutIndex() - 1));
-                if (prevItem.type == QueueItem::SINGLE_PIXEL) {
-                    lastIsSinglePixel = true;
-                    PixelContainerFactory::ContainerOpt contOpt = _pixContFactory->tryGetContainer(
-                            prevItem.data.singlePixel.x,
-                            prevItem.data.singlePixel.y,
-                            prevItem.data.singlePixel.color,
-                            static_cast<uint_fast32_t>(x), static_cast<uint_fast32_t>(y), color
-                    );
-                    if (contOpt.containerCreated) {
-                        addSinglePixel = false;
-                        prevItem.type = QueueItem::PIXEL_CONTAINER;
-                        prevItem.data.pixelContainer = contOpt.container;
-                    }
-                } else if (prevItem.type == QueueItem::PIXEL_CONTAINER) {
-                    addSinglePixel = !prevItem.data.pixelContainer->tryAddPixel(
-                            static_cast<uint_fast32_t>(x), static_cast<uint_fast32_t>(y), color
-                    );
-                }
-            }
-        } catch (const std::exception &){
-            LeaveCriticalSection(&_lastElemCS);
-            throw;
-        }
-        LeaveCriticalSection(&_lastElemCS);
-
-        if(addSinglePixel) {
-            QueueItem item = QueueItemCreator::create<QueueItem::SINGLE_PIXEL>(
-                    static_cast<uint32_t>(x), static_cast<uint32_t>(y), color
-            );
-            writeItemHelper(item, lastIsSinglePixel);
-        }
+        EnterCriticalSection(&_addCS);
+        _pixContFactory->addPixel(static_cast<uint_fast32_t>(x), static_cast<uint_fast32_t>(y), color);
+        LeaveCriticalSection(&_addCS);
     }
 
     void ThreadController::repaint() {
+        EnterCriticalSection(&_addCS);
+        flushPixels();
+        LeaveCriticalSection(&_addCS);
+
         while(!InterlockedCompareExchange(&_threadStarted, 0, 0)){
             Sleep(100);
         }

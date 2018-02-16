@@ -17,6 +17,7 @@ public:
     MyWindowStub *win;
     RendererStub *ren;
     CommonProps props;
+    PixelContainerCreator *fact;
     
     void addPointsLine(
             ThreadController &tc,
@@ -51,9 +52,11 @@ protected:
     ThreadsSimpleTest() {
         ren = new NiceMock<RendererStub>();
         win = new NiceMock<MyWindowStub>();
+        fact = new PixelContainerCreator(500, 500, ColorFormat::A8R8G8B8);
         ON_CALL(*win, getRenderer()).WillByDefault(Return(ren));
         ON_CALL(*ren, draw(_)).WillByDefault(Invoke(ren, &RendererStub::drawImpl));
         ON_CALL(*ren, prepare(_)).WillByDefault(Invoke(ren, &RendererStub::prepareImpl));
+        ON_CALL(*ren, getPixContFactory()).WillByDefault(Return(fact));
         props.fillColor = 0xFFFFFF;
         props.bgColor = 0xFFFFFF;
         props.userFillPattern = NULL;
@@ -62,6 +65,7 @@ protected:
 
     virtual ~ThreadsSimpleTest() {
         delete ren;
+        delete fact;
         delete win;
     }
 

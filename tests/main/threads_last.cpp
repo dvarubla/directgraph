@@ -14,11 +14,14 @@ using testing::WithArgs;
 using testing::NiceMock;
 using testing::_;
 
+#undef min
+#undef max
+
 class ThreadsLastTest : public ::testing::Test {
 public:
     MyWindowStub *win;
     RendererStub *ren;
-    PixelContainerFactory *fact;
+    PixelContainerCreator *fact;
     CommonProps props;
 
     void addPoints(ThreadController &tc, std::vector<QueueItem> &items){
@@ -27,13 +30,18 @@ public:
         item.type = QueueItem::CLEAR;
         items.push_back(item);
         item.type = QueueItem::PIXEL_CONTAINER;
-        item.data.pixelContainer = new PixelContainer<ColorFormat::R8G8B8>(5, 2, 0, 6, 2, 0, 500, 500);
+        std::vector<IPixelContainer::SinglePixel> pixels;
+        IPixelContainer::SinglePixel v1 = {5, 2, 0};
+        IPixelContainer::SinglePixel v2 = {6, 2, 0};
+        pixels.push_back(v1);
+        pixels.push_back(v2);
+        item.data.pixelContainer = new PixelContainer<ColorFormat::A8R8G8B8>(pixels, 500, 500);
         tc.putpixel(5, 2, 0);
         tc.putpixel(6, 2, 0);
         items.push_back(item);
         for(uint_fast32_t i = 2; i <= 25; i++){
             for(uint_fast32_t j = (i == 2) ? 7: 5; j <= 200; j++, cnt++){
-                item.data.pixelContainer->tryAddPixel(j, i, 0);
+                item.data.pixelContainer->addPixel(j, i, 0);
                 if(cnt % 10 == 0){
                     Sleep(rand() % 5);
                 }
@@ -43,26 +51,41 @@ public:
     }
 
     uint_fast32_t countTotal(const std::vector<QueueItem> &items){
-        uint_fast32_t size = 0;
-        for(uint_fast32_t i = 0; i < items.size(); i++){
+        directgraph::Rectangle maxCrds;
+        if(items[0].type == QueueItem::PIXEL_CONTAINER){
+            IPixelContainer *cont = items[0].data.pixelContainer;
+            directgraph::Rectangle coords =  cont->getCoords();
+            maxCrds = coords;
+            delete cont;
+        } else {
+            maxCrds.left = items[0].data.singlePixel.x;
+            maxCrds.right = items[0].data.singlePixel.x;
+            maxCrds.top = items[0].data.singlePixel.y;
+            maxCrds.bottom = items[0].data.singlePixel.y;
+        }
+        for(uint_fast32_t i = 1; i < items.size(); i++){
             if(items[i].type == QueueItem::PIXEL_CONTAINER){
                 IPixelContainer *cont = items[i].data.pixelContainer;
-                directgraph::Rectangle firstCoords = cont->getFirstCoords();
-                size += (firstCoords.right - firstCoords.left + 1) * (firstCoords.bottom - firstCoords.top + 1);
-                if(cont->getStride() != cont->getLastStride()){
-                    size += (cont->getLastCoords().right - cont->getLastCoords().left + 1);
-                }
+                directgraph::Rectangle coords = cont->getCoords();
+                maxCrds.left = std::min(maxCrds.left, coords.left);
+                maxCrds.top = std::min(maxCrds.top, coords.top);
+                maxCrds.right = std::max(maxCrds.right, coords.right);
+                maxCrds.bottom = std::max(maxCrds.bottom, coords.bottom);
                 delete cont;
             } else if(items[i].type == QueueItem::SINGLE_PIXEL){
-                size++;
+                maxCrds.left = std::min(maxCrds.left, items[i].data.singlePixel.x);
+                maxCrds.top = std::min(maxCrds.top, items[i].data.singlePixel.y);
+                maxCrds.right = std::max(maxCrds.right, items[i].data.singlePixel.x);
+                maxCrds.bottom = std::max(maxCrds.bottom, items[i].data.singlePixel.y);
             }
         }
-        return size;
+        return (maxCrds.bottom - maxCrds.top) * (maxCrds.right - maxCrds.left);
     }
+    
 protected:
     ThreadsLastTest() {
         ren = new NiceMock<RendererStub>();
-        fact = new PixelContainerFactory(500, 500, ColorFormat::R8G8B8);
+        fact = new PixelContainerCreator(500, 500, ColorFormat::A8R8G8B8);
         win = new NiceMock<MyWindowStub>();
         ON_CALL(*win, getRenderer()).WillByDefault(Return(ren));
         ON_CALL(*ren, draw(_)).WillByDefault(Invoke(ren, &RendererStub::drawImpl));

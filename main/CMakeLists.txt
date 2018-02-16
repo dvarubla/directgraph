@@ -4,7 +4,7 @@ add_subdirectory(dx9)
 
 set(COMMON_FILES
     QueueItem.h
-    IMyWindow.h util.cpp util.h PixelContainerFactory.cpp PixelContainerFactory.h
+    IMyWindow.h util.cpp util.h PixelContainerCreator.cpp PixelContainerCreator.h
     IRenderer.h
     common.h
     DPIHelper.cpp

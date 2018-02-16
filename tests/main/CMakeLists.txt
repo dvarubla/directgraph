@@ -12,8 +12,6 @@ function(main_test name src)
     add_test(NAME ${name} COMMAND $<TARGET_FILE:${name}> .)
 endfunction()
 
-set(PIXEL_CONTAINER_SRC pixel_container.cpp)
-main_test(pixel_container "${PIXEL_CONTAINER_SRC}")
 set(THREADS_SIMPLE_SRC threads_simple.cpp ../stubs/MyWindowStub.cpp ../stubs/MyWindowStub.h ../stubs/RendererStub.cpp ../stubs/RendererStub.h ../stubs/QueueItemUtils.cpp ../stubs/QueueItemUtils.h)
 main_test(threads_simple "${THREADS_SIMPLE_SRC}")
 set(THREADS_LAST_SRC threads_last.cpp ../stubs/MyWindowStub.cpp ../stubs/MyWindowStub.h ../stubs/RendererStub.cpp ../stubs/RendererStub.h ../stubs/QueueItemUtils.cpp ../stubs/QueueItemUtils.h)

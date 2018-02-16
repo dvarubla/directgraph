@@ -11,7 +11,7 @@ namespace directgraph{
         std::vector<QueueItem> _data;
     public:
 
-        MOCK_METHOD0(getPixContFactory, PixelContainerFactory *());
+        MOCK_METHOD0(getPixContFactory, PixelContainerCreator *());
 
         std::vector<QueueItem> & getData();
 

@@ -134,15 +134,8 @@ namespace directgraph{
                     uint_fast32_t sizeMult;
                     DrawDataType drawDataType;
                     bool useFillTexture = _curState.fillPattern != SOLID_FILL;
-                    bool haveLastStride;
                     if(item.type == QueueItem::PIXEL_CONTAINER){
-                        IPixelContainer *cont = item.data.pixelContainer;
-                        haveLastStride = cont->getLastStride() != cont->getStride();
-                        if(haveLastStride && cont->getHeight() != 1){
-                            curNumVertices = VERTICES_IN_QUAD * 3 - VERTICES_TRIANGLES_DIFF;
-                        } else {
-                            curNumVertices = VERTICES_IN_QUAD;
-                        }
+                        curNumVertices = VERTICES_IN_QUAD;
                         sizeMult = sizeof(PrimitiveCreator::TexturedVertex);
                         drawDataType = TEXTURED_VERTEX;
                     } else {
@@ -177,34 +170,12 @@ namespace directgraph{
                     curUsedSize = newUsedSize;
                     if(item.type == QueueItem::PIXEL_CONTAINER){
                         IPixelContainer *cont = item.data.pixelContainer;
-                        Rectangle firstCoords = cont->getFirstCoords();
-                        Rectangle lastCoords = cont->getLastCoords();
-                        firstCoords.right++;
-                        firstCoords.bottom++;
-                        lastCoords.right++;
-                        lastCoords.bottom++;
-                        bool nonZeroHeight = cont->getHeight() != 1 || !haveLastStride;
-                        if (nonZeroHeight) {
-                            curVertMem = _primCreator.genTexQuad(
-                                    curVertMem,
-                                    firstCoords.left, firstCoords.top, firstCoords.right, firstCoords.bottom,
-                                    _pixelTextureWidth, _pixelTextureHeight
-                            );
-                        }
-                        if (haveLastStride) {
-                            if(nonZeroHeight) {
-                                curVertMem = _primCreator.genTexDegenerate(
-                                        curVertMem,
-                                        firstCoords.right, firstCoords.bottom,
-                                        lastCoords.left, lastCoords.top
-                                );
-                            }
-                            curVertMem = _primCreator.genTexQuad(
-                                    curVertMem,
-                                    lastCoords.left, lastCoords.top, lastCoords.right, lastCoords.bottom,
-                                    _pixelTextureWidth, _pixelTextureHeight
-                            );
-                        }
+                        Rectangle coords = cont->getCoords();
+                        curVertMem = _primCreator.genTexQuad(
+                                curVertMem,
+                                coords.left, coords.top, coords.right, coords.bottom,
+                                _pixelTextureWidth, _pixelTextureHeight
+                        );
                     } else {
                         if (!isFirst) {
                             if (_curState.fillPattern != SOLID_FILL) {

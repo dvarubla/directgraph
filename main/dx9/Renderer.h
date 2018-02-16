@@ -43,7 +43,7 @@ namespace directgraph {
 
             IPatternTexturesHelper *_patTextHelper;
 
-            PixelContainerFactory *_pixContFactory;
+            PixelContainerCreator *_pixContFactory;
 
             void createDeviceRes();
 
@@ -66,7 +66,7 @@ namespace directgraph {
 
             virtual void draw(IQueueReader *reader);
 
-            virtual PixelContainerFactory *getPixContFactory();
+            virtual PixelContainerCreator *getPixContFactory();
         };
     }
 }

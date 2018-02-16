@@ -26,12 +26,11 @@ namespace directgraph {
             IPixelContainer *lp = l.data.pixelContainer;
             IPixelContainer *rp = r.data.pixelContainer;
             Rectangle
-                    lpFirst = lp->getFirstCoords(), rpFirst = rp->getFirstCoords(),
-                    lpLast = lp->getLastCoords(), rpLast = rp->getLastCoords()
+                    lpC = lp->getCoords(), rpC = rp->getCoords()
             ;
             delete lp;
             delete rp;
-            return lpFirst == rpFirst && lpLast == rpLast;
+            return lpC == rpC;
         }
         return false;
     }
