@@ -34,7 +34,7 @@ namespace directgraph {
                     ((((color & 0xFF) / 8) << 10) |
                      ((((color >> 8) & 0xFF) / 8) << 5) |
                      ((((color >> 16) & 0xFF)) / 8)) |
-                     static_cast<FormatType>((isTransparent) ? (1 << 15) : 0)
+                     static_cast<FormatType>((isTransparent) ? 0 : (1 << 15))
                     ;
         }
     };
@@ -48,7 +48,7 @@ namespace directgraph {
         }
 
         static FormatType convert(bool isTransparent){
-            return static_cast<FormatType>((isTransparent) ? 0xFF : 0);
+            return static_cast<FormatType>((isTransparent) ? 0 : 0xFF);
         }
     };
 }

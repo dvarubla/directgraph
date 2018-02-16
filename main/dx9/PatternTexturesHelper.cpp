@@ -108,12 +108,12 @@ namespace directgraph{
             _device->SetTexture(0, _textures[index].texture);
             _device->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
             _device->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
-            _device->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
+            _device->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
             if(_haveConstantSupport) {
-                _device->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_CONSTANT);
+                _device->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_CONSTANT);
                 _device->SetTextureStageState(0, D3DTSS_CONSTANT, swap_color(bgColor));
             } else {
-                _device->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_TEXTURE);
+                _device->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
             }
             _device->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_BLENDTEXTUREALPHA);
         }
