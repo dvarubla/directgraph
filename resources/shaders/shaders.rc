@@ -1,3 +1,4 @@
 #include <common_res.h>
 
-RECT_MOVE_V2_0 IDR_VERTEX_SHADER "shaders/vs_2_0/rect_move.obj"
+CENTER_BAR_V1_1 IDR_VERTEX_SHADER "shaders/vs_1_1/center_bar.obj"
+ELLIPSE_P1_4 IDR_PIXEL_SHADER "shaders/ps_1_4/ellipse.obj"

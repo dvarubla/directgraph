@@ -1,6 +1,5 @@
 ﻿#include "DPIHelper.h"
 #include <windows.h>
-#include <iostream>
 #include "util.h"
 
 namespace directgraph {

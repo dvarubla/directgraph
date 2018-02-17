@@ -8,6 +8,7 @@
 #include "IPatternTexturesHelper.h"
 #include "PrimitiveCreator.h"
 #include "BufferPreparer.h"
+#include "ShaderManager.h"
 
 namespace directgraph {
     namespace dx9 {
@@ -26,6 +27,7 @@ namespace directgraph {
             Common *_common;
             DPIHelper *_helper;
             BufferPreparer *_bufPreparer;
+            ShaderManager *_shaderMan;
             BufferPreparer::GenDataVars _initialVars;
             HWND _hwnd;
             float _width, _height;
@@ -37,7 +39,6 @@ namespace directgraph {
             const static DWORD TEXTURED_RECT_VERTEX_FVF = D3DFVF_XYZRHW |  D3DFVF_DIFFUSE | D3DFVF_TEX1;
 
             IDirect3DVertexBuffer9 *_vertBuffer;
-            IDirect3DVertexBuffer9 *_vertBuffer2;
 
             IDirect3DTexture9 *_pixelTexture;
 

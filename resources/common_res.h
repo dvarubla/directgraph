@@ -1,2 +1,5 @@
 #define IDR_VERTEX_SHADER 101
-#define RECT_MOVE_V2_0 257
+#define CENTER_BAR_V1_1 257
+
+#define IDR_PIXEL_SHADER 102
+#define ELLIPSE_P1_4 257

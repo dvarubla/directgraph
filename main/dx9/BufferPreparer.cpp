@@ -1,5 +1,6 @@
 #include <main/WException.h>
 #include <main/DPIHelper.h>
+#include <main/QueueItem.h>
 #include "Exception.h"
 #include "BufferPreparer.h"
 #include "PrimitiveCreator.h"
@@ -14,10 +15,25 @@ namespace directgraph{
         }
 
         template<>
+        BufferPreparer::DrawOp DrawOpCreator::create<BufferPreparer::REMOVE_TEXTURE>() {
+            BufferPreparer::DrawOp op;
+            op.type = BufferPreparer::REMOVE_TEXTURE;
+            return op;
+        }
+
+        template<>
         BufferPreparer::DrawOp DrawOpCreator::create<BufferPreparer::SET_FILL_PATTERN>(uint_fast32_t fillPattern) {
             BufferPreparer::DrawOp op;
             op.type = BufferPreparer::SET_FILL_PATTERN;
             op.data.fillPattern = static_cast<uint8_t>(fillPattern);
+            return op;
+        }
+        
+        template<>
+        BufferPreparer::DrawOp DrawOpCreator::create<BufferPreparer::SET_SHADER>(uint_fast32_t shaderType) {
+            BufferPreparer::DrawOp op;
+            op.type = BufferPreparer::SET_SHADER;
+            op.data.shaderType = static_cast<BufferPreparer::ShaderType>(shaderType);
             return op;
         }
 
@@ -64,9 +80,12 @@ namespace directgraph{
                 uint_fast32_t memSize,
                 const BufferPreparer::DevDrawState *state,
                 DPIHelper *helper,
+                ShaderManager *shaderMan,
+                uint_fast32_t width, uint_fast32_t height,
                 uint_fast32_t pxTextureWidth, uint_fast32_t pxTextureHeight,
                 const GenDataVars &vars
-        ): _memSize(memSize), _helper(helper),
+        ): _shaderMan(shaderMan), _memSize(memSize), _helper(helper),
+           _width(width), _height(height),
            _pixelTextureWidth(pxTextureWidth), _pixelTextureHeight(pxTextureHeight),
            _curGenDataVars(vars), _curUsedSize(0), _lastOffset(0), _canReadMore(true)
         {
@@ -82,6 +101,227 @@ namespace directgraph{
             _curState = *state;
         }
 
+        void BufferPreparer::useFillTexture(bool &isFirst) {
+            if(_curState.userFillPattern != _lastState.userFillPattern && _lastState.fillPattern == USER_FILL) {
+                _drawOps.push_back(DrawOpCreator::create<SET_USER_FILL_PATTERN>(_lastState.userFillPattern));
+                _curState.userFillPattern = _lastState.userFillPattern;
+                isFirst = true;
+            }
+
+            bool patternChanged = false;
+
+            if(_curState.fillPattern != _lastState.fillPattern) {
+                _curState.fillPattern = _lastState.fillPattern;
+                patternChanged = true;
+            }
+
+            if (_curState.fillPattern == SOLID_FILL) {
+                if(patternChanged || _curState.textureState != NO_TEXTURE) {
+                    _curState.textureState = NO_TEXTURE;
+                    _drawOps.push_back(DrawOpCreator::create<REMOVE_TEXTURE>());
+                    isFirst = true;
+                }
+            } else {
+                if(patternChanged || _curState.textureState != FILL_TEXTURE) {
+                    _curState.textureState = FILL_TEXTURE;
+                    _drawOps.push_back(DrawOpCreator::create<SET_FILL_PATTERN>(_curState.fillPattern));
+                    isFirst = true;
+                }
+            }
+
+            if(_curState.bgColor != _lastState.bgColor && _curState.fillPattern != SOLID_FILL){
+                _drawOps.push_back(DrawOpCreator::create<SET_BG_COLOR>(_lastState.bgColor));
+                _curState.bgColor = _lastState.bgColor;
+                isFirst = true;
+            }
+        }
+
+        void BufferPreparer::disableTexture(bool &isFirst) {
+            if(_curState.textureState != NO_TEXTURE){
+                _curState.textureState = NO_TEXTURE;
+                _drawOps.push_back(DrawOpCreator::create<REMOVE_TEXTURE>());
+                isFirst = true;
+            }
+        }
+
+        void BufferPreparer::processStateChanges(const QueueItem &item, bool &isFirst) {
+            switch(item.type){
+                case QueueItem::BAR:
+                    if(_curState.shaderType != NO_SHADER){
+                        _drawOps.push_back(DrawOpCreator::create<SET_SHADER>(NO_SHADER));
+                        _curState.shaderType = NO_SHADER;
+                        isFirst = true;
+                    }
+                    useFillTexture(isFirst);
+                    break;
+                case QueueItem::SINGLE_PIXEL:
+                    if(_curState.shaderType != NO_SHADER){
+                        _drawOps.push_back(DrawOpCreator::create<SET_SHADER>(NO_SHADER));
+                        _curState.shaderType = NO_SHADER;
+                        isFirst = true;
+                    }
+                    disableTexture(isFirst);
+                    break;
+                case QueueItem::PIXEL_CONTAINER:
+                    if(_curState.shaderType != NO_SHADER){
+                        _drawOps.push_back(DrawOpCreator::create<SET_SHADER>(NO_SHADER));
+                        _curState.shaderType = NO_SHADER;
+                        isFirst = true;
+                    }
+                    disableTexture(isFirst);
+                    _drawOps.push_back(DrawOpCreator::create<SET_PIXEL_TEXTURE>(item.data.pixelContainer));
+                    isFirst = true;
+                    break;
+                case QueueItem::FILLELLIPSE:
+                    useFillTexture(isFirst);
+                    if(_lastState.lineStyle == NULL_LINE){
+                        if(_curState.lineStyle != NULL_LINE || _curState.textureState != NO_TEXTURE) {
+                            _curState.textureState = NO_TEXTURE;
+                            _curState.lineStyle = NULL_LINE;
+                            _drawOps.push_back(DrawOpCreator::create<REMOVE_TEXTURE>());
+                            isFirst = true;
+                        }
+                        if(_shaderMan->supportsEllipse() &&
+                           _curState.shaderType != ELLIPSE_SHADER
+                        ){
+                            _drawOps.push_back(DrawOpCreator::create<SET_SHADER>(ELLIPSE_SHADER));
+                            _curState.shaderType = ELLIPSE_SHADER;
+                            isFirst = true;
+                        }
+                    }
+                    break;
+                case QueueItem::CLEAR:
+                    _drawOps.push_back(DrawOpCreator::create<CLEAR>());
+                    break;
+                default: break;
+            }
+        }
+
+        BufferPreparer::TypeSize BufferPreparer::getTypeSize(const QueueItem &item) {
+            TypeSize res;
+            switch(item.type){
+                case QueueItem::PIXEL_CONTAINER:
+                    res.sizeMult = sizeof(PrimitiveCreator::TexturedVertex);
+                    res.drawDataType = TEXTURED_VERTEX;
+                    break;
+                case QueueItem::BAR:
+                    if (_curState.fillPattern != SOLID_FILL) {
+                        res.sizeMult = sizeof(PrimitiveCreator::TexturedRectVertex);
+                        res.drawDataType = TEXTURED_RECT_VERTEX;
+                    } else {
+                        res.sizeMult = sizeof(PrimitiveCreator::RectVertex);
+                        res.drawDataType = RECT_VERTEX;
+                    }
+                    break;
+                case QueueItem::SINGLE_PIXEL:
+                    res.sizeMult = sizeof(PrimitiveCreator::RectVertex);
+                    res.drawDataType = RECT_VERTEX;
+                    break;
+                case QueueItem::FILLELLIPSE:
+                    res.sizeMult = sizeof(PrimitiveCreator::EllipseVertex);
+                    res.drawDataType = ELLIPSE_VERTEX;
+                    break;
+                default: break;
+            }
+            return res;
+        }
+
+        void BufferPreparer::processDrawItem(
+                const QueueItem &item, bool &isFirst, void *&curVertMem, int_fast32_t &prevX, int_fast32_t &prevY
+        ) {
+            if (!isFirst) {
+                if (_curState.fillPattern != SOLID_FILL) {
+                    curVertMem = _primCreator.genFillDegenerate(
+                            curVertMem,
+                            prevX, prevY,
+                            _helper->toPixelsX(item.data.bar.left),
+                            _helper->toPixelsY(item.data.bar.top)
+                    );
+                } else {
+                    if(item.type == QueueItem::FILLELLIPSE){
+                        curVertMem = _primCreator.genEllipseDegenerate(
+                                curVertMem,
+                                prevX, prevY,
+                                _helper->toPixelsX(item.data.fillellipse.x - item.data.fillellipse.xradius),
+                                _helper->toPixelsY(item.data.fillellipse.y - item.data.fillellipse.yradius),
+                                _width, _height
+                        );
+                    } else {
+                        curVertMem = _primCreator.genDegenerate(
+                                curVertMem,
+                                prevX, prevY,
+                                ((item.type == QueueItem::SINGLE_PIXEL) ?
+                                 static_cast<int_fast32_t>(item.data.singlePixel.x) :
+                                 _helper->toPixelsX(item.data.bar.left)),
+                                ((item.type == QueueItem::SINGLE_PIXEL) ?
+                                 static_cast<int_fast32_t>(item.data.singlePixel.y) :
+                                 _helper->toPixelsY(item.data.bar.top))
+                        );
+                    }
+                }
+            }
+            switch(item.type){
+                case QueueItem::SINGLE_PIXEL:
+                    curVertMem = _primCreator.genQuad(curVertMem,
+                                                      item.data.singlePixel.x,
+                                                      item.data.singlePixel.y,
+                                                      item.data.singlePixel.x + 1,
+                                                      item.data.singlePixel.y + 1,
+                                                      item.data.singlePixel.color
+                    );
+                    prevX = item.data.singlePixel.x + 1;
+                    prevY = item.data.singlePixel.y + 1;
+                    break;
+                case QueueItem::FILLELLIPSE:
+                    if(_shaderMan->supportsEllipse()) {
+                        curVertMem = _primCreator.genEllipseQuad(curVertMem,
+                                                                 _helper->toPixelsX(item.data.fillellipse.x),
+                                                                 _helper->toPixelsY(item.data.fillellipse.y),
+                                                                 _helper->toPixelsX(item.data.fillellipse.xradius),
+                                                                 _helper->toPixelsY(item.data.fillellipse.yradius),
+                                                                 _width, _height,
+                                                                 _curGenDataVars.fillColor
+                        );
+                        prevX = _helper->toPixelsX(item.data.fillellipse.x + item.data.fillellipse.xradius);
+                        prevY = _helper->toPixelsY(item.data.fillellipse.y + item.data.fillellipse.yradius);
+                    }
+                    break;
+                case QueueItem::BAR:
+                    if (_curState.fillPattern != SOLID_FILL) {
+                        curVertMem = _primCreator.genFillQuad(curVertMem,
+                                                              _helper->toPixelsX(item.data.bar.left),
+                                                              _helper->toPixelsY(item.data.bar.top),
+                                                              _helper->toPixelsX(item.data.bar.right),
+                                                              _helper->toPixelsY(item.data.bar.bottom),
+                                                              _curGenDataVars.fillColor
+                        );
+                    } else {
+                        curVertMem = _primCreator.genQuad(curVertMem,
+                                                          _helper->toPixelsX(item.data.bar.left),
+                                                          _helper->toPixelsY(item.data.bar.top),
+                                                          _helper->toPixelsX(item.data.bar.right),
+                                                          _helper->toPixelsY(item.data.bar.bottom),
+                                                          ((_curGenDataVars.fillStyle == SOLID_FILL) ?
+                                                           _curGenDataVars.fillColor :
+                                                           _curGenDataVars.bgColor)
+                        );
+                    }
+                    prevX = _helper->toPixelsX(item.data.bar.right);
+                    prevY = _helper->toPixelsY(item.data.bar.bottom);
+                    break;
+                case QueueItem::PIXEL_CONTAINER:
+                    Rectangle coords = item.data.pixelContainer->getCoords();
+                    curVertMem = _primCreator.genTexQuad(
+                            curVertMem,
+                            coords.left, coords.top, coords.right, coords.bottom,
+                            _pixelTextureWidth, _pixelTextureHeight
+                    );
+                    break;
+                default:break;
+            }
+            isFirst = (item.type == QueueItem::PIXEL_CONTAINER);
+        }
+
         void BufferPreparer::prepareBuffer(IQueueReader *reader, uint_fast32_t offset, uint_fast32_t maxSize) {
             uint_fast32_t size = reader->getSize();
             uint_fast32_t readIndex = 0;
@@ -93,164 +333,65 @@ namespace directgraph{
             }
             for (readIndex = offset; readIndex < size; readIndex++) {
                 QueueItem &item = reader->getAt(readIndex);
-                if(item.type == QueueItem::SINGLE_PIXEL){
-                    if(_curState.fillPattern != SOLID_FILL){
-                        _drawOps.push_back(DrawOpCreator::create<SET_FILL_PATTERN>(SOLID_FILL));
-                        _curState.fillPattern = SOLID_FILL;
-                        isFirst = true;
-                    }
-                } else if(item.type == QueueItem::BAR){
-                    if(_curState.userFillPattern != _lastState.userFillPattern && _lastState.fillPattern == USER_FILL){
-                        _drawOps.push_back(DrawOpCreator::create<SET_USER_FILL_PATTERN>(_lastState.userFillPattern));
-                        _curState.userFillPattern = _lastState.userFillPattern;
-                        isFirst = true;
-                    }
-                    if(_curState.fillPattern != _lastState.fillPattern){
-                        _drawOps.push_back(DrawOpCreator::create<SET_FILL_PATTERN>(_lastState.fillPattern));
-                        _curState.fillPattern = _lastState.fillPattern;
-                        isFirst = true;
-                    }
-                    if(_curState.bgColor != _lastState.bgColor && _curState.fillPattern != SOLID_FILL){
-                        _drawOps.push_back(DrawOpCreator::create<SET_BG_COLOR>(_lastState.bgColor));
-                        _curState.bgColor = _lastState.bgColor;
-                        isFirst = true;
-                    }
-                } else if(item.type == QueueItem::CLEAR){
-                    _drawOps.push_back(DrawOpCreator::create<CLEAR>());
-                } else if(item.type == QueueItem::PIXEL_CONTAINER){
-                    if(_curState.fillPattern != SOLID_FILL){
-                        _drawOps.push_back(DrawOpCreator::create<SET_FILL_PATTERN>(SOLID_FILL));
-                        _curState.fillPattern = SOLID_FILL;
-                    }
-                    _drawOps.push_back(DrawOpCreator::create<SET_PIXEL_TEXTURE>(item.data.pixelContainer));
-                    isFirst = true;
-                }
+                processStateChanges(item, isFirst);
                 if (
                         item.type == QueueItem::SINGLE_PIXEL ||
                         item.type == QueueItem::BAR ||
-                        item.type == QueueItem::PIXEL_CONTAINER
-                        ) {
-                    uint_fast32_t curNumVertices;
-                    uint_fast32_t sizeMult;
-                    DrawDataType drawDataType;
-                    bool useFillTexture = _curState.fillPattern != SOLID_FILL;
-                    if(item.type == QueueItem::PIXEL_CONTAINER){
-                        curNumVertices = VERTICES_IN_QUAD;
-                        sizeMult = sizeof(PrimitiveCreator::TexturedVertex);
-                        drawDataType = TEXTURED_VERTEX;
-                    } else {
-                        curNumVertices =
-                                (isFirst) ?
-                                VERTICES_IN_QUAD :
-                                VERTICES_IN_QUAD * 2 - VERTICES_TRIANGLES_DIFF
-                                ;
-                        if(useFillTexture){
-                            sizeMult = sizeof(PrimitiveCreator::TexturedRectVertex);
-                            drawDataType = TEXTURED_RECT_VERTEX;
-                        } else {
-                            sizeMult = sizeof(PrimitiveCreator::RectVertex);
-                            drawDataType = RECT_VERTEX;
-                        }
-                    }
+                        item.type == QueueItem::PIXEL_CONTAINER ||
+                        item.type == QueueItem::FILLELLIPSE
+                ) {
+                    TypeSize ts = getTypeSize(item);
+                    uint_fast32_t curNumVertices =
+                        (isFirst) ?
+                        VERTICES_IN_QUAD :
+                        VERTICES_IN_QUAD * 2 - VERTICES_TRIANGLES_DIFF
+                    ;
                     uint_fast32_t curUsedSize = static_cast<uint_fast32_t>(
                             static_cast<uint8_t*>(curVertMem) - static_cast<uint8_t*>(_vertMem)
                     );
-                    uint_fast32_t newUsedSize = curUsedSize * sizeMult;
+                    uint_fast32_t newUsedSize = curUsedSize * ts.sizeMult;
                     if (newUsedSize > maxSize) {
                         _canReadMore = false;
                         break;
                     }
                     if(isFirst){
                         _drawOps.push_back(DrawOpCreator::create<ITEMS>(
-                                curUsedSize, curNumVertices - VERTICES_TRIANGLES_DIFF, drawDataType
+                                curUsedSize, curNumVertices - VERTICES_TRIANGLES_DIFF, ts.drawDataType
                         ));
                     } else {
                         _drawOps.back().data.items.numItems += curNumVertices;
                     }
                     curUsedSize = newUsedSize;
-                    if(item.type == QueueItem::PIXEL_CONTAINER){
-                        IPixelContainer *cont = item.data.pixelContainer;
-                        Rectangle coords = cont->getCoords();
-                        curVertMem = _primCreator.genTexQuad(
-                                curVertMem,
-                                coords.left, coords.top, coords.right, coords.bottom,
-                                _pixelTextureWidth, _pixelTextureHeight
-                        );
-                    } else {
-                        if (!isFirst) {
-                            if (_curState.fillPattern != SOLID_FILL) {
-                                curVertMem = _primCreator.genFillDegenerate(
-                                        curVertMem,
-                                        prevX, prevY,
-                                        _helper->toPixelsX(item.data.bar.left),
-                                        _helper->toPixelsY(item.data.bar.top)
-                                );
+                    processDrawItem(item, isFirst, curVertMem, prevX, prevY);
+                } else {
+                    switch (item.type){
+                        case QueueItem::BGCOLOR:
+                            _lastState.bgColor = item.data.bgColor;
+                            _curGenDataVars.bgColor = item.data.bgColor;
+                            break;
+                        case QueueItem::SETFILLSTYLE:
+                            _curGenDataVars.fillColor = item.data.setfillstyle.color;
+                            if(item.data.setfillstyle.fillStyle == EMPTY_FILL){
+                                _curGenDataVars.fillStyle = EMPTY_FILL;
+                                _lastState.fillPattern = SOLID_FILL;
                             } else {
-                                curVertMem = _primCreator.genDegenerate(
-                                        curVertMem,
-                                        prevX, prevY,
-                                        ((item.type == QueueItem::SINGLE_PIXEL) ?
-                                         static_cast<int_fast32_t>(item.data.singlePixel.x) :
-                                         _helper->toPixelsX(item.data.bar.left)),
-                                        ((item.type == QueueItem::SINGLE_PIXEL) ?
-                                         static_cast<int_fast32_t>(item.data.singlePixel.y) :
-                                         _helper->toPixelsY(item.data.bar.top))
-                                );
+                                _curGenDataVars.fillStyle = SOLID_FILL;
+                                _lastState.fillPattern = item.data.setfillstyle.fillStyle;
                             }
-                        }
-                        if (item.type == QueueItem::SINGLE_PIXEL) {
-                            curVertMem = _primCreator.genQuad(curVertMem,
-                                                              item.data.singlePixel.x,
-                                                              item.data.singlePixel.y,
-                                                              item.data.singlePixel.x + 1,
-                                                              item.data.singlePixel.y + 1,
-                                                              item.data.singlePixel.color
-                            );
-                            prevX = item.data.singlePixel.x + 1;
-                            prevY = item.data.singlePixel.y + 1;
-                        } else {
-                            if (useFillTexture) {
-                                curVertMem = _primCreator.genFillQuad(curVertMem,
-                                                                      _helper->toPixelsX(item.data.bar.left),
-                                                                      _helper->toPixelsY(item.data.bar.top),
-                                                                      _helper->toPixelsX(item.data.bar.right),
-                                                                      _helper->toPixelsY(item.data.bar.bottom),
-                                                                      _curGenDataVars.fillColor
-                                );
-                            } else {
-                                curVertMem = _primCreator.genQuad(curVertMem,
-                                                                  _helper->toPixelsX(item.data.bar.left),
-                                                                  _helper->toPixelsY(item.data.bar.top),
-                                                                  _helper->toPixelsX(item.data.bar.right),
-                                                                  _helper->toPixelsY(item.data.bar.bottom),
-                                                                  ((_curGenDataVars.fillStyle == SOLID_FILL) ?
-                                                                   _curGenDataVars.fillColor :
-                                                                   _curGenDataVars.bgColor)
-                                );
-                            }
-                            prevX = _helper->toPixelsX(item.data.bar.right);
-                            prevY = _helper->toPixelsY(item.data.bar.bottom);
-                        }
+                            break;
+                        case QueueItem::SETFILLPATTERN:
+                            _curGenDataVars.fillColor = item.data.setfillpattern.color;
+                            _lastState.fillPattern = USER_FILL;
+                            _curGenDataVars.fillStyle = SOLID_FILL;
+                            _lastState.userFillPattern = item.data.setfillpattern.fillPattern;
+                            _patterns.push_back(_lastState.userFillPattern);
+                            break;
+                        case QueueItem::SETLINESTYLE:
+                            _lastState.lineStyle = item.data.setlinestyle.linestyle;
+                            break;
+                        default:
+                            break;
                     }
-                    isFirst = (item.type == QueueItem::PIXEL_CONTAINER);
-                } else if (item.type == QueueItem::SETFILLSTYLE) {
-                    _curGenDataVars.fillColor = item.data.setfillstyle.color;
-                    if(item.data.setfillstyle.fillStyle == EMPTY_FILL){
-                        _curGenDataVars.fillStyle = EMPTY_FILL;
-                        _lastState.fillPattern = SOLID_FILL;
-                    } else {
-                        _curGenDataVars.fillStyle = SOLID_FILL;
-                        _lastState.fillPattern = item.data.setfillstyle.fillStyle;
-                    }
-                } else if (item.type == QueueItem::SETFILLPATTERN) {
-                    _curGenDataVars.fillColor = item.data.setfillpattern.color;
-                    _lastState.fillPattern = USER_FILL;
-                    _curGenDataVars.fillStyle = SOLID_FILL;
-                    _lastState.userFillPattern = item.data.setfillpattern.fillPattern;
-                    _patterns.push_back(_lastState.userFillPattern);
-                } else if (item.type == QueueItem::BGCOLOR){
-                    _lastState.bgColor = item.data.bgColor;
-                    _curGenDataVars.bgColor = item.data.bgColor;
                 }
             }
             _curUsedSize = static_cast<uint_fast32_t>(static_cast<uint8_t*>(curVertMem) - static_cast<uint8_t*>(_vertMem));

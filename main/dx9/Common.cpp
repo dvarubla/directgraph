@@ -1,7 +1,6 @@
 #include "Common.h"
 #include "Exception.h"
 #include <windows.h>
-#include <iostream>
 
 namespace directgraph {
     namespace dx9 {

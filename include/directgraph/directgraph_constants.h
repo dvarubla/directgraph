@@ -55,6 +55,15 @@ typedef enum fill_patterns {
     USER_FILL        // User-defined fill
 } fill_patterns;
 
+typedef enum line_styles{
+    SOLID_LINE,
+    DOTTED_LINE,
+    CENTER_LINE,
+    DASHED_LINE,
+    USERBIT_LINE,
+    NULL_LINE
+} line_styles;
+
 typedef void (*DirectgraphErrorHandler)(
         const wchar_t *filename,
         uint32_t lineNum,

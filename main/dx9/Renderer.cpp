@@ -6,6 +6,7 @@
 #include <main/QueueItem.h>
 #include "Exception.h"
 #include "PatternTexturesHelper.h"
+#include "BufferPreparer.h"
 #include <algorithm>
 
 #undef max
@@ -14,7 +15,8 @@
 namespace directgraph {
     namespace dx9 {
         Renderer::Renderer(Common *common, DPIHelper *helper, float width, float height, const CommonProps &props)
-                : _swapChain(NULL), _vertBuffer(NULL), _pixelTexture(NULL), _patTextHelper(NULL), _bufPreparer(NULL)
+                : _swapChain(NULL), _vertBuffer(NULL), _pixelTexture(NULL), _patTextHelper(NULL), _bufPreparer(NULL), 
+                  _shaderMan(NULL)
         {
             _helper = helper;
             _width = width;
@@ -23,9 +25,12 @@ namespace directgraph {
             _curState.fillPattern = props.fillStyle;
             _curState.bgColor = props.bgColor;
             _curState.userFillPattern = props.userFillPattern;
+            _curState.textureState = BufferPreparer::NO_TEXTURE;
+            _curState.lineStyle = props.lineStyle;
             _initialVars.bgColor = props.fillColor;
             _initialVars.fillStyle = _curState.fillPattern;
             _initialVars.bgColor = _curState.bgColor;
+            _curState.shaderType = BufferPreparer::NO_SHADER;
         }
 
         void Renderer::setWindow(HWND hwnd) {
@@ -99,8 +104,14 @@ namespace directgraph {
                     THROW_EXC_CODE(WException, UNREACHABLE_CODE, L"Unknown format");
             }
 
+            _shaderMan = new ShaderManager(
+                    _common->getFeatures(),
+                    _device
+            );
+
             _bufPreparer = new BufferPreparer(
-                    VERTEX_BUFFER_SIZE, &_curState, _helper,
+                    VERTEX_BUFFER_SIZE, &_curState, _helper, _shaderMan,
+                    pxWidth, pxHeight,
                     pixelTextureWidth, pixelTextureHeight, _initialVars
             );
         }
@@ -116,6 +127,7 @@ namespace directgraph {
             _common->deleteSwapChain(_swapChain);
             delete _helper;
             delete _bufPreparer;
+            delete _shaderMan;
             delete _pixContFactory;
             delete [] _curState.userFillPattern;
         }
@@ -128,6 +140,14 @@ namespace directgraph {
                 _patTextHelper->unsetPattern();
             } else {
                 _patTextHelper->setFillPattern(_curState.fillPattern, _curState.bgColor);
+            }
+            switch (_curState.shaderType) {
+                case BufferPreparer::NO_SHADER:
+                    _shaderMan->removeShaders();
+                    break;
+                case BufferPreparer::ELLIPSE_SHADER:
+                    _shaderMan->setEllipse();
+                    break;
             }
         }
 
@@ -171,21 +191,30 @@ namespace directgraph {
         void Renderer::doRender() {
             for(BufferPreparer::DrawOpVector::iterator it = _bufPreparer->drawOpsBegin(); it != _bufPreparer->drawOpsEnd(); ++it){
                 switch(it->type){
-                    case BufferPreparer::ITEMS:
+                    case BufferPreparer::ITEMS: {
                         UINT stride;
                         DWORD fvf;
-                        switch (it->data.items.type){
+                        bool setFVF;
+                        setFVF = false;
+                        switch (it->data.items.type) {
                             case BufferPreparer::RECT_VERTEX:
                                 stride = sizeof(PrimitiveCreator::RectVertex);
                                 fvf = RECT_VERTEX_FVF;
+                                setFVF = true;
                                 break;
                             case BufferPreparer::TEXTURED_RECT_VERTEX:
                                 stride = sizeof(PrimitiveCreator::TexturedRectVertex);
                                 fvf = TEXTURED_RECT_VERTEX_FVF;
+                                setFVF = true;
                                 break;
                             case BufferPreparer::TEXTURED_VERTEX:
                                 stride = sizeof(PrimitiveCreator::TexturedVertex);
                                 fvf = TEXTURED_VERTEX_FVF;
+                                setFVF = true;
+                                break;
+                            case BufferPreparer::ELLIPSE_VERTEX:
+                                stride = sizeof(PrimitiveCreator::EllipseVertex);
+                                setFVF = false;
                                 break;
                         }
                         _device->SetStreamSource(
@@ -193,30 +222,32 @@ namespace directgraph {
                                 it->data.items.offset,
                                 stride
                         );
-                        _device->SetFVF(fvf);
+                        if (setFVF) {
+                            _device->SetFVF(fvf);
+                        }
                         _device->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, it->data.items.numItems);
-                        if(it->data.items.type == BufferPreparer::TEXTURED_VERTEX){
+                        if (it->data.items.type == BufferPreparer::TEXTURED_VERTEX) {
                             _device->SetTexture(0, NULL);
                             _device->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
                         }
+                    }
                         break;
-                    case BufferPreparer::SET_FILL_PATTERN:
+                    case BufferPreparer::SET_FILL_PATTERN: {
                         _curState.fillPattern = it->data.fillPattern;
-                        if(_curState.fillPattern == SOLID_FILL){
-                            _patTextHelper->unsetPattern();
-                        } else {
-                            _patTextHelper->setFillPattern(_curState.fillPattern, _curState.bgColor);
-                        }
+                        _patTextHelper->setFillPattern(_curState.fillPattern, _curState.bgColor);
+                    }
                         break;
-                    case BufferPreparer::SET_USER_FILL_PATTERN:
+                    case BufferPreparer::SET_USER_FILL_PATTERN: {
                         _curState.userFillPattern = it->data.userFillPattern;
                         _patTextHelper->setUserFillPattern(_curState.userFillPattern);
+                    }
                         break;
-                    case BufferPreparer::SET_BG_COLOR:
+                    case BufferPreparer::SET_BG_COLOR: {
                         _curState.bgColor = it->data.bgColor;
                         _patTextHelper->setFillPattern(_curState.fillPattern, _curState.bgColor);
+                    }
                         break;
-                    case BufferPreparer::CLEAR:
+                    case BufferPreparer::CLEAR: {
                         _device->SetRenderTarget(0, _backBuffer);
                         _device->Clear(
                                 0, NULL, D3DCLEAR_TARGET,
@@ -224,8 +255,9 @@ namespace directgraph {
                                 1.0f,
                                 0
                         );
+                    }
                         break;
-                    case BufferPreparer::SET_PIXEL_TEXTURE:
+                    case BufferPreparer::SET_PIXEL_TEXTURE: {
                         IPixelContainer *cont = it->data.pixelContainer;
                         Rectangle coords = cont->getCoords();
                         uint_fast32_t height = coords.bottom - coords.top;
@@ -248,9 +280,25 @@ namespace directgraph {
                         delete cont;
                         _device->SetTexture(0, _pixelTexture);
                         _device->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-                        _device->SetRenderState(D3DRS_SRCBLEND,D3DBLEND_SRCALPHA);
-                        _device->SetRenderState(D3DRS_DESTBLEND,D3DBLEND_INVSRCALPHA);
-                        _device->SetRenderState(D3DRS_BLENDOP,D3DBLENDOP_ADD);
+                        _device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+                        _device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+                        _device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+                    }
+                        break;
+                    case BufferPreparer::SET_SHADER : {
+                        switch (it->data.shaderType) {
+                            case BufferPreparer::NO_SHADER:
+                                _shaderMan->removeShaders();
+                                break;
+                            case BufferPreparer::ELLIPSE_SHADER:
+                                _shaderMan->setEllipse();
+                                break;
+                        }
+                    }
+                        break;
+                    case BufferPreparer::REMOVE_TEXTURE:
+                        _patTextHelper->unsetPattern();
+                        _curState.textureState = BufferPreparer::NO_TEXTURE;
                         break;
                 }
             }

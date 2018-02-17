@@ -25,12 +25,33 @@ namespace directgraph{
     }
 
     template<>
+    QueueItem QueueItemCreator::create<QueueItem::FILLELLIPSE>(float x, float y, float xradius, float yradius) {
+        QueueItem item;
+        item.type = QueueItem::FILLELLIPSE;
+        item.data.fillellipse.x = x;
+        item.data.fillellipse.y = y;
+        item.data.fillellipse.xradius = xradius;
+        item.data.fillellipse.yradius = yradius;
+        return item;
+    }
+
+    template<>
     QueueItem QueueItemCreator::create<QueueItem::SINGLE_PIXEL>(uint32_t x, uint32_t y, uint32_t color) {
         QueueItem item;
         item.type = QueueItem::SINGLE_PIXEL;
         item.data.singlePixel.x = x;
         item.data.singlePixel.y = y;
         item.data.singlePixel.color = color;
+        return item;
+    }
+
+    template<>
+    QueueItem QueueItemCreator::create<QueueItem::SETLINESTYLE>(uint32_t linestyle, uint32_t pattern, uint32_t thickness) {
+        QueueItem item;
+        item.type = QueueItem::SETLINESTYLE;
+        item.data.setlinestyle.linestyle = static_cast<uint8_t>(linestyle);
+        item.data.setlinestyle.pattern = pattern;
+        item.data.setlinestyle.thickness = thickness;
         return item;
     }
 

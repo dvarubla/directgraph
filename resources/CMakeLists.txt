@@ -4,7 +4,7 @@ if("$ENV{DXSDK_DIR}" STREQUAL "")
     message( FATAL_ERROR "Don't know where DirectXSDK directory is." )
 endif()
 
-set(SHADER_SRCS shaders/vs_2_0/rect_move.hlsl)
+set(SHADER_SRCS shaders/ps_1_4/ellipse.hlsl shaders/vs_1_1/center_bar.hlsl)
 set(INCLUDE_FILE common_res.h)
 set(SHADER_RC shaders/shaders.rc)
 
@@ -30,7 +30,7 @@ foreach(shader_src ${SHADER_SRCS})
             WORKING_DIRECTORY "${output_dir}"
             VERBATIM
             COMMAND
-            ${FXC_BIN} /T${shader_profile} /Fo${output} ${shader_path}
+            ${FXC_BIN} /LD /T${shader_profile} /Fo${output} ${shader_path}
             DEPENDS "${shader_src}"
     )
     list(APPEND compiled_shaders ${output})

@@ -12,6 +12,13 @@ namespace directgraph{
         }
 
         template<>
+        PrimitiveCreator::EllipseVertex
+        VertexCreator::create<PrimitiveCreator::EllipseVertex>(float x, float y, float z, float rhw, DWORD color) {
+            PrimitiveCreator::EllipseVertex v = {x, y, z, rhw, color};
+            return v;
+        }
+        
+        template<>
         PrimitiveCreator::TexturedVertex
         VertexCreator::create<PrimitiveCreator::TexturedVertex>(float x, float y, float z, float rhw, float tu, float tv) {
             PrimitiveCreator::TexturedVertex v = {x, y, z, rhw, tu, tv};
@@ -237,6 +244,62 @@ namespace directgraph{
         }
 
         PrimitiveCreator::PrimitiveCreator() {
+        }
+
+        PrimitiveCreator::EllipseVertex *
+        PrimitiveCreator::genEllipseDegenerate(
+                void *verticesVoid, int_fast32_t startX, int_fast32_t startY,
+                int_fast32_t endX, int_fast32_t endY,
+                uint_fast32_t width, uint_fast32_t height
+        ) {
+            EllipseVertex *vertices = static_cast<EllipseVertex*>(verticesVoid);
+            (*vertices) = VertexCreator::create<EllipseVertex>(
+                    static_cast<float>(2.0 * (startX - 0.5) / width - 1),
+                    static_cast<float>(1 - 2.0 * (startY - 0.5) / height),
+                    0.0f, 0.0f,
+                    D3DCOLOR_ARGB(0, 0, 0, 0)
+            );
+            vertices++;
+            *vertices = VertexCreator::create<EllipseVertex>(
+                    static_cast<float>(2.0f * (endX - 0.5) / width - 1),
+                    static_cast<float>(1 - 2.0f * (endY - 0.5) / height),
+                    0.0f, 0.0f,
+                    D3DCOLOR_ARGB(0, 0, 0, 0)
+            );
+            vertices++;
+            return vertices;
+        }
+
+        PrimitiveCreator::EllipseVertex *
+        PrimitiveCreator::genEllipseQuad(
+                void *verticesVoid,
+                int_fast32_t centerX, int_fast32_t centerY,
+                int_fast32_t radiusX, int_fast32_t radiusY,
+                uint_fast32_t width, uint_fast32_t height,
+                uint_fast32_t color
+        ) {
+            float centerXTrans = static_cast<float>(2.0 * (centerX - 0.5)/ width - 1);
+            float radiusXTrans = static_cast<float>(1.0 * radiusX / width);
+            float centerYTrans = static_cast<float>(1 - 2.0 * (centerY - 0.5) / height);
+            float radiusYTrans = static_cast<float>(1.0 * radiusY / height);
+            EllipseVertex *vertices = static_cast<EllipseVertex*>(verticesVoid);
+            *vertices = VertexCreator::create<EllipseVertex>(
+                    centerXTrans, centerYTrans, -radiusXTrans, -radiusYTrans, swap_color(color)
+            );
+            vertices++;
+            *vertices = VertexCreator::create<EllipseVertex>(
+                    centerXTrans, centerYTrans, radiusXTrans, -radiusYTrans, swap_color(color)
+            );
+            vertices++;
+            *vertices = VertexCreator::create<EllipseVertex>(
+                    centerXTrans, centerYTrans, -radiusXTrans, radiusYTrans, swap_color(color)
+            );
+            vertices++;
+            *vertices = VertexCreator::create<EllipseVertex>(
+                    centerXTrans, centerYTrans, radiusXTrans, radiusYTrans, swap_color(color)
+            );
+            vertices++;
+            return vertices;
         }
     }
 }

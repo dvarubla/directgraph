@@ -40,11 +40,7 @@ struct DrawParam{
 static DWORD WINAPI mainWindowThread(LPVOID param){
     Param p = *reinterpret_cast<Param*>(param);
     MSG msg;
-    CommonProps props;
-    props.fillColor = 0xFFFFFF;
-    props.bgColor = 0xFFFFFF;
-    props.userFillPattern = NULL;
-    props.fillStyle = SOLID_FILL;
+    CommonProps props = get_default_common_props();
     CommonSimple::_dx9Wf = new WindowFactory();
     PostThreadMessage(p.threadId, MSG_CODE, 0, 0);
     bool windowSent = false;

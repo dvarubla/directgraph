@@ -41,11 +41,7 @@ namespace directgraph{
         _mapLock.startWrite();
         IMyWindow *win = NULL;
         IController *controller = NULL;
-        CommonProps props;
-        props.fillStyle = SOLID_FILL;
-        props.fillColor = 0xFFFFFF;
-        props.bgColor = 0xFFFFFF;
-        props.userFillPattern = NULL;
+        CommonProps props = get_default_common_props();
         try {
             win = _rendFactories[params.renderer]->createPixelWindow(
                     params.name, params.width,
