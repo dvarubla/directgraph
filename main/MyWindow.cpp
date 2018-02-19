@@ -25,7 +25,7 @@ namespace directgraph {
                     BeginPaint(hwnd, &s);
                     renderer->repaint();
                     EndPaint(hwnd, &s);
-                    break;
+                    return 0;
                 case WM_CLOSE:
                     for(uint_fast32_t i = 0; i < listenerData.size(); i++){
                         listenerData[i].listener->onClose(listenerData[i].param);

@@ -11,7 +11,7 @@ public:
     static float HEIGHT;
 
     DX9BarFillstyleOldTest() {
-        init_factory();
+        startThread();
         FeaturesStub *fstub = setupFeatures();
         ON_CALL(*fstub, getPatternTexFormat()).WillByDefault(testing::Return(ColorFormat::AR5G5B5));
         ON_CALL(*fstub, supportsTexConst()).WillByDefault(testing::Return(false));

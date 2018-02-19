@@ -4,20 +4,20 @@
 using testing::_;
 using testing::Invoke;
 
+static const int MSG_CODE = WM_USER + 6000;
+static const int MSG_CREATE = WM_USER + 6001;
+static const int MSG_DESTROY = WM_USER + 6002;
+
 BitmapWrap *CommonSimple::afterTestSimple(IMyWindow *win, IQueueReader *reader) {
     while(reader->getSize() != 0) {
         win->getRenderer()->draw(reader);
     }
     win->getRenderer()->repaint();
     BitmapWrap *wrap = new BitmapWrap(dynamic_cast<MyWindow*>(win)->getHWND());
-    _dx9Wf->deleteWindow(win);
+    PostThreadMessage(windowThreadId, MSG_DESTROY, reinterpret_cast<WPARAM>(win), 0);
+    MSG msg;
+    GetMessage(&msg, NULL, MSG_CODE, MSG_CODE);
     return wrap;
-}
-
-void CommonSimple::init_factory() {
-    if(_dx9Wf == NULL) {
-        _dx9Wf = new WindowFactory();
-    }
 }
 
 CommonSimple::CommonSimple(): _curFeatures(NULL) {
@@ -25,16 +25,68 @@ CommonSimple::CommonSimple(): _curFeatures(NULL) {
 }
 
 WindowFactory *CommonSimple::_dx9Wf = NULL;
+bool CommonSimple::threadStarted = false;
+DWORD CommonSimple::windowThreadId;
 
-IMyWindow* CommonSimple::createWindow(float w, float h) {
-    init_factory();
+struct Param{
+    DWORD threadId;
+};
+
+struct DrawParam{
+    float w;
+    float h;
+};
+
+static DWORD WINAPI mainWindowThread(LPVOID param){
+    Param p = *reinterpret_cast<Param*>(param);
+    MSG msg;
     CommonProps props;
     props.fillColor = 0xFFFFFF;
     props.bgColor = 0xFFFFFF;
     props.userFillPattern = NULL;
     props.fillStyle = SOLID_FILL;
-    IMyWindow* win = _dx9Wf->createPixelWindow(L"Hello", w, h, props);
-    win->show();
+    CommonSimple::_dx9Wf = new WindowFactory();
+    PostThreadMessage(p.threadId, MSG_CODE, 0, 0);
+    bool windowSent = false;
+    IMyWindow* win = NULL;
+    while (GetMessageW(&msg, NULL, 0, 0)){
+        if(msg.message == MSG_CREATE){
+            DrawParam *drawParam = reinterpret_cast<DrawParam*>(msg.wParam);
+            win = CommonSimple::_dx9Wf->createPixelWindow(L"Hello", drawParam->w, drawParam->h, props);
+            win->show();
+            windowSent = false;
+        } else if(msg.message == MSG_DESTROY){
+            CommonSimple::_dx9Wf->deleteWindow(reinterpret_cast<IMyWindow *>(msg.wParam));
+            PostThreadMessage(p.threadId, MSG_CODE, 0, 0);
+        } else {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+            if (msg.message == WM_PAINT && !windowSent) {
+                windowSent = true;
+                PostThreadMessage(p.threadId, MSG_CODE, reinterpret_cast<WPARAM>(win), 0);
+            }
+        }
+    }
+    return 0;
+}
+
+void CommonSimple::startThread() {
+    if(!threadStarted){
+        MSG msg;
+        Param p = {GetCurrentThreadId()};
+        CreateThread(NULL, 0, mainWindowThread, &p, 0, &windowThreadId);
+        GetMessage(&msg, NULL, MSG_CODE, MSG_CODE);
+        threadStarted = true;
+    }
+}
+
+IMyWindow* CommonSimple::createWindow(float w, float h) {
+    startThread();
+    MSG msg;
+    DrawParam dp = {w, h};
+    PostThreadMessage(windowThreadId, MSG_CREATE, reinterpret_cast<WPARAM>(&dp), 0);
+    GetMessage(&msg, NULL, MSG_CODE, MSG_CODE);
+    IMyWindow *win = reinterpret_cast<IMyWindow *>(msg.wParam);
     return win;
 }
 

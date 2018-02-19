@@ -15,10 +15,12 @@ public:
     CommonSimple();
     ~CommonSimple();
     static WindowFactory *_dx9Wf;
+    static bool threadStarted;
+    static DWORD windowThreadId;
     IFeatures *_curFeatures;
     IMyWindow* createWindow(float w, float h);
     BitmapWrap* afterTestSimple(IMyWindow *win, IQueueReader *reader);
     void addOnCall(NiceMock<QueueReaderStub> &readerStub);
     FeaturesStub* setupFeatures();
-    void init_factory();
+    void startThread();
 };
