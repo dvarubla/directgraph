@@ -4,19 +4,28 @@
 
 namespace directgraph {
     namespace dx9 {
-        ShaderManager::ShaderManager(IFeatures *features, IDirect3DDevice9 *device): _device(device) {
-            createVertexShader(CENTER_BAR_V1_1, IDR_VERTEX_SHADER, _centerBarV11Shader);
-            createPixelShader(ELLIPSE_P1_4, IDR_PIXEL_SHADER, _ellipseP14Shader);
-            D3DVERTEXELEMENT9 decl[] = {
-                    { 0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
-                    { 0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0 },
-                    D3DDECL_END()
-            };
-            _device->CreateVertexDeclaration(decl, &_centerBarV11Decl);
+        ShaderManager::ShaderManager(IFeatures *features, IDirect3DDevice9 *device):
+                _device(device), _supportsEllipse(false),
+                _centerBarV11Shader(NULL), _ellipseP14Shader(NULL), _centerBarV11Decl(NULL) {
+            IFeatures::ShaderVersion vertexVer = features->getVertexShaderVer();
+            IFeatures::ShaderVersion pixelVer = features->getPixelShaderVer();
+            IFeatures::ShaderVersion ellipseVertexVer = {1, 1};
+            IFeatures::ShaderVersion ellipsePixelVer = {1, 4};
+            if(ellipseVertexVer <= vertexVer && ellipsePixelVer <= pixelVer) {
+                _supportsEllipse = true;
+                createVertexShader(CENTER_BAR_V1_1, IDR_VERTEX_SHADER, _centerBarV11Shader);
+                createPixelShader(ELLIPSE_P1_4, IDR_PIXEL_SHADER, _ellipseP14Shader);
+                D3DVERTEXELEMENT9 decl[] = {
+                        {0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+                        {0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0},
+                        D3DDECL_END()
+                };
+                _device->CreateVertexDeclaration(decl, &_centerBarV11Decl);
+            }
         }
 
         bool ShaderManager::supportsEllipse() {
-            return true;
+            return _supportsEllipse;
         }
 
         void ShaderManager::setEllipse() {
@@ -54,9 +63,15 @@ namespace directgraph {
 
         ShaderManager::~ShaderManager() {
             removeShaders();
-            _centerBarV11Decl->Release();
-            _centerBarV11Shader->Release();
-            _ellipseP14Shader->Release();
+            if(_centerBarV11Decl != NULL) {
+                _centerBarV11Decl->Release();
+            }
+            if(_centerBarV11Shader != NULL) {
+                _centerBarV11Shader->Release();
+            }
+            if(_ellipseP14Shader != NULL) {
+                _ellipseP14Shader->Release();
+            }
         }
     }
 }

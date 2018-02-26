@@ -101,6 +101,8 @@ FeaturesStub *CommonSimple::setupFeatures() {
     ON_CALL(*fstub, getPatternTexFormat()).WillByDefault(Invoke(_curFeatures, &IFeatures::getPatternTexFormat));
     ON_CALL(*fstub, getDisplayMode()).WillByDefault(Invoke(_curFeatures, &IFeatures::getDisplayMode));
     ON_CALL(*fstub, supportsTexConst()).WillByDefault(Invoke(_curFeatures, &IFeatures::supportsTexConst));
+    ON_CALL(*fstub, getVertexShaderVer()).WillByDefault(Invoke(_curFeatures, &IFeatures::getVertexShaderVer));
+    ON_CALL(*fstub, getPixelShaderVer()).WillByDefault(Invoke(_curFeatures, &IFeatures::getPixelShaderVer));
     return fstub;
 }
 

@@ -4,36 +4,7 @@
 
 namespace directgraph{
     namespace dx9{
-        template<>
-        PrimitiveCreator::RectVertex
-        VertexCreator::create<PrimitiveCreator::RectVertex>(float x, float y, float z, float rhw, DWORD color) {
-            PrimitiveCreator::RectVertex v = {x, y, z, rhw, color};
-            return v;
-        }
-
-        template<>
-        PrimitiveCreator::EllipseVertex
-        VertexCreator::create<PrimitiveCreator::EllipseVertex>(float x, float y, float z, float rhw, DWORD color) {
-            PrimitiveCreator::EllipseVertex v = {x, y, z, rhw, color};
-            return v;
-        }
-        
-        template<>
-        PrimitiveCreator::TexturedVertex
-        VertexCreator::create<PrimitiveCreator::TexturedVertex>(float x, float y, float z, float rhw, float tu, float tv) {
-            PrimitiveCreator::TexturedVertex v = {x, y, z, rhw, tu, tv};
-            return v;
-        }
-
-        template<>
-        PrimitiveCreator::TexturedRectVertex VertexCreator::create(
-                float x, float y, float z, float rhw, DWORD color, float tu, float tv
-        ) {
-            PrimitiveCreator::TexturedRectVertex v = {x, y, z, rhw, color, tu, tv};
-            return v;
-        }
-
-        PrimitiveCreator::RectVertex *
+        RectVertex *
         PrimitiveCreator::genDegenerate(
                 void *verticesVoid,
                 int_fast32_t startX, int_fast32_t startY,
@@ -59,7 +30,7 @@ namespace directgraph{
             return vertices;
         }
 
-        PrimitiveCreator::TexturedVertex *
+        TexturedVertex *
         PrimitiveCreator::genTexDegenerate(
                 void *verticesVoid,
                 int_fast32_t startX, int_fast32_t startY,
@@ -86,7 +57,7 @@ namespace directgraph{
             return vertices;
         }
         
-        PrimitiveCreator::TexturedRectVertex *
+        TexturedRectVertex *
         PrimitiveCreator::genFillDegenerate(
                 void *verticesVoid,
                 int_fast32_t startX, int_fast32_t startY,
@@ -116,7 +87,7 @@ namespace directgraph{
             return vertices;
         }
 
-        PrimitiveCreator::RectVertex *
+        RectVertex *
         PrimitiveCreator::genQuad(
                 void *verticesVoid,
                 int_fast32_t startX, int_fast32_t startY,
@@ -159,7 +130,7 @@ namespace directgraph{
             return vertices;
         }
 
-        PrimitiveCreator::TexturedRectVertex *
+        TexturedRectVertex *
         PrimitiveCreator::genFillQuad(
                 void *verticesVoid,
                 int_fast32_t startX, int_fast32_t startY,
@@ -212,7 +183,7 @@ namespace directgraph{
             return vertices;
         }
 
-        PrimitiveCreator::TexturedVertex *
+        TexturedVertex *
         PrimitiveCreator::genTexQuad(
                 void *verticesVoid,
                 int_fast32_t startX, int_fast32_t startY,
@@ -246,7 +217,7 @@ namespace directgraph{
         PrimitiveCreator::PrimitiveCreator() {
         }
 
-        PrimitiveCreator::EllipseVertex *
+        EllipseVertex *
         PrimitiveCreator::genEllipseDegenerate(
                 void *verticesVoid, int_fast32_t startX, int_fast32_t startY,
                 int_fast32_t endX, int_fast32_t endY,
@@ -270,7 +241,7 @@ namespace directgraph{
             return vertices;
         }
 
-        PrimitiveCreator::EllipseVertex *
+        EllipseVertex *
         PrimitiveCreator::genEllipseQuad(
                 void *verticesVoid,
                 int_fast32_t centerX, int_fast32_t centerY,
@@ -300,6 +271,20 @@ namespace directgraph{
             );
             vertices++;
             return vertices;
+        }
+
+        RectVertex *
+        PrimitiveCreator::genEllipse(void *verticesVoid,
+                                     int_fast32_t centerX, int_fast32_t centerY,
+                                     uint_fast32_t rx, uint_fast32_t ry, uint_fast32_t color,
+                                     int_fast32_t &prevX,
+                                     int_fast32_t &prevY
+        ) {
+            return _ellipseHelper.genEllipse(verticesVoid, centerX, centerY, rx, ry, color, prevX, prevY);
+        }
+
+        uint_fast32_t PrimitiveCreator::getNumEllipseVertices(uint_fast32_t rx, uint_fast32_t ry) {
+            return _ellipseHelper.getNumEllipseVertices(rx, ry);
         }
     }
 }

@@ -1,33 +1,16 @@
 #pragma once
 
-#include <windows.h>
 #include <stdint.h>
+#include "EllipseHelper.h"
+#include "VertexCreator.h"
 
 namespace directgraph {
     namespace dx9 {
         class PrimitiveCreator {
         private:
+            EllipseHelper _ellipseHelper;
         public:
             PrimitiveCreator();
-
-            struct EllipseVertex {
-                float x, y, z, rhw;
-                DWORD color;
-            };
-
-            struct RectVertex {
-                float x, y, z, rhw;
-                DWORD color;
-            };
-            struct TexturedVertex {
-                float x, y, z, rhw;
-                float tu, tv;
-            };
-            struct TexturedRectVertex {
-                float x, y, z, rhw;
-                DWORD color;
-                float tu, tv;
-            };
 
             RectVertex *genDegenerate(
                     void *verticesVoid,
@@ -82,20 +65,22 @@ namespace directgraph {
                     uint_fast32_t width, uint_fast32_t height,
                     uint_fast32_t color
             );
-        };
 
-        class VertexCreator {
-        public:
-            template<typename T>
-            static T create(
-                    float x, float y, float z, float rhw, DWORD color
+            RectVertex* genEllipse(
+                    void *verticesVoid,
+                    int_fast32_t centerX,
+                    int_fast32_t centerY,
+                    uint_fast32_t rx,
+                    uint_fast32_t ry,
+                    uint_fast32_t color,
+                    int_fast32_t &prevX,
+                    int_fast32_t &prevY
             );
 
-            template<typename T>
-            static T create(float x, float y, float z, float rhw, float tu, float tv);
-
-            template<typename T>
-            static T create(float x, float y, float z, float rhw, DWORD color, float tu, float tv);
+            uint_fast32_t getNumEllipseVertices(
+                    uint_fast32_t rx,
+                    uint_fast32_t ry
+            );
         };
     }
 }

@@ -22,6 +22,10 @@ namespace directgraph {
             void getDeviceFlags(D3DDEVTYPE &devType, DWORD &flags);
 
             bool supportsTexConst();
+
+            ShaderVersion getVertexShaderVer();
+
+            ShaderVersion getPixelShaderVer();
         };
     }
 }

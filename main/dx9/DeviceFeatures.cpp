@@ -83,5 +83,23 @@ namespace directgraph{
                     );
             }
         }
+
+        IFeatures::ShaderVersion DeviceFeatures::getVertexShaderVer() {
+            uint_fast32_t verNum = _caps.VertexShaderVersion;
+            IFeatures::ShaderVersion version = {
+                    static_cast<uint_fast8_t>((verNum >> 8) & 0xFF),
+                    static_cast<uint_fast8_t>(verNum & 0xFF)
+            };
+            return version;
+        }
+
+        IFeatures::ShaderVersion DeviceFeatures::getPixelShaderVer() {
+            uint_fast32_t verNum = _caps.PixelShaderVersion;
+            IFeatures::ShaderVersion version = {
+                    static_cast<uint_fast8_t>((verNum >> 8) & 0xFF),
+                    static_cast<uint_fast8_t>(verNum & 0xFF)
+            };
+            return version;
+        }
     }
 }

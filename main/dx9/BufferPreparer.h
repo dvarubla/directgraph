@@ -101,6 +101,7 @@ namespace directgraph {
             );
             void useFillTexture(bool &isFirst);
             void disableTexture(bool &isFirst);
+            void disableShader(bool &isFirst);
         public:
             BufferPreparer(
                     uint_fast32_t memSize, const DevDrawState *state, DPIHelper *helper,

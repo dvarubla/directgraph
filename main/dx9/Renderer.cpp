@@ -198,22 +198,22 @@ namespace directgraph {
                         setFVF = false;
                         switch (it->data.items.type) {
                             case BufferPreparer::RECT_VERTEX:
-                                stride = sizeof(PrimitiveCreator::RectVertex);
+                                stride = sizeof(RectVertex);
                                 fvf = RECT_VERTEX_FVF;
                                 setFVF = true;
                                 break;
                             case BufferPreparer::TEXTURED_RECT_VERTEX:
-                                stride = sizeof(PrimitiveCreator::TexturedRectVertex);
+                                stride = sizeof(TexturedRectVertex);
                                 fvf = TEXTURED_RECT_VERTEX_FVF;
                                 setFVF = true;
                                 break;
                             case BufferPreparer::TEXTURED_VERTEX:
-                                stride = sizeof(PrimitiveCreator::TexturedVertex);
+                                stride = sizeof(TexturedVertex);
                                 fvf = TEXTURED_VERTEX_FVF;
                                 setFVF = true;
                                 break;
                             case BufferPreparer::ELLIPSE_VERTEX:
-                                stride = sizeof(PrimitiveCreator::EllipseVertex);
+                                stride = sizeof(EllipseVertex);
                                 setFVF = false;
                                 break;
                         }

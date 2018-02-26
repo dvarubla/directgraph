@@ -16,6 +16,10 @@ namespace directgraph {
             MOCK_METHOD0(getDisplayMode, D3DFORMAT ());
 
             MOCK_METHOD0(supportsTexConst, bool ());
+
+            MOCK_METHOD0(getVertexShaderVer, ShaderVersion ());
+
+            MOCK_METHOD0(getPixelShaderVer, ShaderVersion ());
         };
     }
 }

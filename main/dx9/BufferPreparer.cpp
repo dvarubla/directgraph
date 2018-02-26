@@ -144,30 +144,26 @@ namespace directgraph{
             }
         }
 
+        void BufferPreparer::disableShader(bool &isFirst) {
+            if(_curState.shaderType != NO_SHADER){
+                _drawOps.push_back(DrawOpCreator::create<SET_SHADER>(NO_SHADER));
+                _curState.shaderType = NO_SHADER;
+                isFirst = true;
+            }
+        }
+
         void BufferPreparer::processStateChanges(const QueueItem &item, bool &isFirst) {
             switch(item.type){
                 case QueueItem::BAR:
-                    if(_curState.shaderType != NO_SHADER){
-                        _drawOps.push_back(DrawOpCreator::create<SET_SHADER>(NO_SHADER));
-                        _curState.shaderType = NO_SHADER;
-                        isFirst = true;
-                    }
+                    disableShader(isFirst);
                     useFillTexture(isFirst);
                     break;
                 case QueueItem::SINGLE_PIXEL:
-                    if(_curState.shaderType != NO_SHADER){
-                        _drawOps.push_back(DrawOpCreator::create<SET_SHADER>(NO_SHADER));
-                        _curState.shaderType = NO_SHADER;
-                        isFirst = true;
-                    }
+                    disableShader(isFirst);
                     disableTexture(isFirst);
                     break;
                 case QueueItem::PIXEL_CONTAINER:
-                    if(_curState.shaderType != NO_SHADER){
-                        _drawOps.push_back(DrawOpCreator::create<SET_SHADER>(NO_SHADER));
-                        _curState.shaderType = NO_SHADER;
-                        isFirst = true;
-                    }
+                    disableShader(isFirst);
                     disableTexture(isFirst);
                     _drawOps.push_back(DrawOpCreator::create<SET_PIXEL_TEXTURE>(item.data.pixelContainer));
                     isFirst = true;
@@ -181,12 +177,14 @@ namespace directgraph{
                             _drawOps.push_back(DrawOpCreator::create<REMOVE_TEXTURE>());
                             isFirst = true;
                         }
-                        if(_shaderMan->supportsEllipse() &&
-                           _curState.shaderType != ELLIPSE_SHADER
-                        ){
-                            _drawOps.push_back(DrawOpCreator::create<SET_SHADER>(ELLIPSE_SHADER));
-                            _curState.shaderType = ELLIPSE_SHADER;
-                            isFirst = true;
+                        if(_shaderMan->supportsEllipse()){
+                            if(_curState.shaderType != ELLIPSE_SHADER) {
+                                _drawOps.push_back(DrawOpCreator::create<SET_SHADER>(ELLIPSE_SHADER));
+                                _curState.shaderType = ELLIPSE_SHADER;
+                                isFirst = true;
+                            }
+                        } else {
+                            disableShader(isFirst);
                         }
                     }
                     break;
@@ -201,25 +199,30 @@ namespace directgraph{
             TypeSize res;
             switch(item.type){
                 case QueueItem::PIXEL_CONTAINER:
-                    res.sizeMult = sizeof(PrimitiveCreator::TexturedVertex);
+                    res.sizeMult = sizeof(TexturedVertex);
                     res.drawDataType = TEXTURED_VERTEX;
                     break;
                 case QueueItem::BAR:
                     if (_curState.fillPattern != SOLID_FILL) {
-                        res.sizeMult = sizeof(PrimitiveCreator::TexturedRectVertex);
+                        res.sizeMult = sizeof(TexturedRectVertex);
                         res.drawDataType = TEXTURED_RECT_VERTEX;
                     } else {
-                        res.sizeMult = sizeof(PrimitiveCreator::RectVertex);
+                        res.sizeMult = sizeof(RectVertex);
                         res.drawDataType = RECT_VERTEX;
                     }
                     break;
                 case QueueItem::SINGLE_PIXEL:
-                    res.sizeMult = sizeof(PrimitiveCreator::RectVertex);
+                    res.sizeMult = sizeof(RectVertex);
                     res.drawDataType = RECT_VERTEX;
                     break;
                 case QueueItem::FILLELLIPSE:
-                    res.sizeMult = sizeof(PrimitiveCreator::EllipseVertex);
-                    res.drawDataType = ELLIPSE_VERTEX;
+                    if(_shaderMan->supportsEllipse()) {
+                        res.sizeMult = sizeof(EllipseVertex);
+                        res.drawDataType = ELLIPSE_VERTEX;
+                    } else {
+                        res.sizeMult = sizeof(RectVertex);
+                        res.drawDataType = RECT_VERTEX;
+                    }
                     break;
                 default: break;
             }
@@ -239,13 +242,22 @@ namespace directgraph{
                     );
                 } else {
                     if(item.type == QueueItem::FILLELLIPSE){
-                        curVertMem = _primCreator.genEllipseDegenerate(
-                                curVertMem,
-                                prevX, prevY,
-                                _helper->toPixelsX(item.data.fillellipse.x - item.data.fillellipse.xradius),
-                                _helper->toPixelsY(item.data.fillellipse.y - item.data.fillellipse.yradius),
-                                _width, _height
-                        );
+                        if(_shaderMan->supportsEllipse()) {
+                            curVertMem = _primCreator.genEllipseDegenerate(
+                                    curVertMem,
+                                    prevX, prevY,
+                                    _helper->toPixelsX(item.data.fillellipse.x - item.data.fillellipse.xradius),
+                                    _helper->toPixelsY(item.data.fillellipse.y - item.data.fillellipse.yradius),
+                                    _width, _height
+                            );
+                        } else {
+                            curVertMem = _primCreator.genDegenerate(
+                                    curVertMem,
+                                    prevX, prevY,
+                                    _helper->toPixelsX(item.data.fillellipse.x),
+                                    _helper->toPixelsY(item.data.fillellipse.y - item.data.fillellipse.yradius)
+                            );
+                        }
                     } else {
                         curVertMem = _primCreator.genDegenerate(
                                 curVertMem,
@@ -284,6 +296,18 @@ namespace directgraph{
                         );
                         prevX = _helper->toPixelsX(item.data.fillellipse.x + item.data.fillellipse.xradius);
                         prevY = _helper->toPixelsY(item.data.fillellipse.y + item.data.fillellipse.yradius);
+                    } else {
+                        curVertMem = _primCreator.genEllipse(curVertMem,
+                                                             _helper->toPixelsX(item.data.fillellipse.x),
+                                                             _helper->toPixelsY(item.data.fillellipse.y),
+                                                             static_cast<uint_fast32_t>(_helper->toPixelsX(item.data.fillellipse.xradius)),
+                                                             static_cast<uint_fast32_t>(_helper->toPixelsY(item.data.fillellipse.yradius)),
+                                                             _curGenDataVars.fillColor,
+                                                             prevX,
+                                                             prevY
+                        );
+                        prevX = _helper->toPixelsX(item.data.fillellipse.x);
+                        prevY = _helper->toPixelsY(item.data.fillellipse.y - item.data.fillellipse.yradius);
                     }
                     break;
                 case QueueItem::BAR:
@@ -341,15 +365,26 @@ namespace directgraph{
                         item.type == QueueItem::FILLELLIPSE
                 ) {
                     TypeSize ts = getTypeSize(item);
-                    uint_fast32_t curNumVertices =
-                        (isFirst) ?
-                        VERTICES_IN_QUAD :
-                        VERTICES_IN_QUAD * 2 - VERTICES_TRIANGLES_DIFF
-                    ;
+                    uint_fast32_t curNumVertices;
+                    if(item.type == QueueItem::FILLELLIPSE && !_shaderMan->supportsEllipse()){
+                        curNumVertices = _primCreator.getNumEllipseVertices(
+                                static_cast<uint_fast32_t>(_helper->toPixelsX(item.data.fillellipse.xradius)),
+                                static_cast<uint_fast32_t>(_helper->toPixelsY(item.data.fillellipse.yradius))
+                        );
+                        if(!isFirst){
+                            curNumVertices += 2;
+                        }
+                    } else {
+                        curNumVertices =
+                                (isFirst) ?
+                                VERTICES_IN_QUAD :
+                                VERTICES_IN_QUAD + 2
+                        ;
+                    }
                     uint_fast32_t curUsedSize = static_cast<uint_fast32_t>(
                             static_cast<uint8_t*>(curVertMem) - static_cast<uint8_t*>(_vertMem)
                     );
-                    uint_fast32_t newUsedSize = curUsedSize * ts.sizeMult;
+                    uint_fast32_t newUsedSize = curUsedSize + curNumVertices * ts.sizeMult;
                     if (newUsedSize > maxSize) {
                         _canReadMore = false;
                         break;
@@ -361,7 +396,6 @@ namespace directgraph{
                     } else {
                         _drawOps.back().data.items.numItems += curNumVertices;
                     }
-                    curUsedSize = newUsedSize;
                     processDrawItem(item, isFirst, curVertMem, prevX, prevY);
                 } else {
                     switch (item.type){
