@@ -15,7 +15,7 @@ namespace directgraph {
                     uint_fast32_t rx,
                     uint_fast32_t ry
             );
-            RectVertex* genEllipse(
+            ColorVertex* genEllipse(
                     void *memoryVoid,
                     int_fast32_t centerX,
                     int_fast32_t centerY,

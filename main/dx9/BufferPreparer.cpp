@@ -207,12 +207,12 @@ namespace directgraph{
                         res.sizeMult = sizeof(TexturedRectVertex);
                         res.drawDataType = TEXTURED_RECT_VERTEX;
                     } else {
-                        res.sizeMult = sizeof(RectVertex);
+                        res.sizeMult = sizeof(ColorVertex);
                         res.drawDataType = RECT_VERTEX;
                     }
                     break;
                 case QueueItem::SINGLE_PIXEL:
-                    res.sizeMult = sizeof(RectVertex);
+                    res.sizeMult = sizeof(ColorVertex);
                     res.drawDataType = RECT_VERTEX;
                     break;
                 case QueueItem::FILLELLIPSE:
@@ -220,7 +220,7 @@ namespace directgraph{
                         res.sizeMult = sizeof(EllipseVertex);
                         res.drawDataType = ELLIPSE_VERTEX;
                     } else {
-                        res.sizeMult = sizeof(RectVertex);
+                        res.sizeMult = sizeof(ColorVertex);
                         res.drawDataType = RECT_VERTEX;
                     }
                     break;

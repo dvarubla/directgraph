@@ -12,7 +12,7 @@ namespace directgraph{
 
         }
 
-        RectVertex *EllipseHelper::genEllipse(
+        ColorVertex *EllipseHelper::genEllipse(
                 void *memoryVoid,
                 int_fast32_t centerX, int_fast32_t centerY,
                 uint_fast32_t rx, uint_fast32_t ry,
@@ -33,7 +33,7 @@ namespace directgraph{
                 swap = true;
             }
             uint_fast32_t numVertices = getNumEllipseVertices(rx, ry);
-            RectVertex *memory = static_cast<RectVertex *>(memoryVoid);
+            ColorVertex *memory = static_cast<ColorVertex *>(memoryVoid);
             for(uint_fast32_t i = 0; i <= minR; i++) {
                 uint_fast32_t cur = (swap) ? (minR - i) : i;
                 float first;
@@ -47,7 +47,7 @@ namespace directgraph{
                 }
                 if (i == 0) {
                     for (uint_fast32_t j = 0; j < (numVertices - 1); j += 3) {
-                        memory[j] = VertexCreator::create<RectVertex>(
+                        memory[j] = VertexCreator::create<ColorVertex>(
                                 centerX + first - 0.5f,
                                 centerY - second - 0.5f,
                                 0.0f,
@@ -55,7 +55,7 @@ namespace directgraph{
                                 color
                         );
                     }
-                    memory[numVertices - 1] = VertexCreator::create<RectVertex>(
+                    memory[numVertices - 1] = VertexCreator::create<ColorVertex>(
                             centerX + first - 0.5f,
                             centerY - second - 0.5f,
                             0.0f,
@@ -63,7 +63,7 @@ namespace directgraph{
                             color
                     );
                     uint_fast32_t oppIndex = convertIndex(2 * minR);
-                    memory[oppIndex] = VertexCreator::create<RectVertex>(
+                    memory[oppIndex] = VertexCreator::create<ColorVertex>(
                             centerX + first - 0.5f,
                             centerY + second - 0.5f,
                             0.0f,
@@ -72,7 +72,7 @@ namespace directgraph{
                     );
                 } else if (i == minR) {
                     uint_fast32_t curIndex = convertIndex(minR);
-                    memory[curIndex] = VertexCreator::create<RectVertex>(
+                    memory[curIndex] = VertexCreator::create<ColorVertex>(
                             centerX + first - 0.5f + EXTRA_OFFSET,
                             centerY - second - 0.5f,
                             0.0f,
@@ -80,7 +80,7 @@ namespace directgraph{
                             color
                     );
                     uint_fast32_t oppIndex = convertIndex(3 * minR);
-                    memory[oppIndex] = VertexCreator::create<RectVertex>(
+                    memory[oppIndex] = VertexCreator::create<ColorVertex>(
                             centerX - first - 0.5f,
                             centerY + second - 0.5f,
                             0.0f,
@@ -108,7 +108,7 @@ namespace directgraph{
                             x = centerX - first - 0.5f;
                             y = centerY - second - 0.5f;
                         }
-                        memory[index] = VertexCreator::create<RectVertex>(
+                        memory[index] = VertexCreator::create<ColorVertex>(
                                 x, y,
                                 0.0f, 1.0f, color
                         );

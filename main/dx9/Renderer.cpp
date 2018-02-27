@@ -198,7 +198,7 @@ namespace directgraph {
                         setFVF = false;
                         switch (it->data.items.type) {
                             case BufferPreparer::RECT_VERTEX:
-                                stride = sizeof(RectVertex);
+                                stride = sizeof(ColorVertex);
                                 fvf = RECT_VERTEX_FVF;
                                 setFVF = true;
                                 break;

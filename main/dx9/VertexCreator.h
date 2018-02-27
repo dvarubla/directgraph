@@ -8,7 +8,7 @@ namespace directgraph {
             DWORD color;
         };
 
-        struct RectVertex {
+        struct ColorVertex {
             float x, y, z, rhw;
             DWORD color;
         };

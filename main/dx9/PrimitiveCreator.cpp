@@ -4,14 +4,14 @@
 
 namespace directgraph{
     namespace dx9{
-        RectVertex *
+        ColorVertex *
         PrimitiveCreator::genDegenerate(
                 void *verticesVoid,
                 int_fast32_t startX, int_fast32_t startY,
                 int_fast32_t endX, int_fast32_t endY
         ) {
-            RectVertex *vertices = static_cast<RectVertex*>(verticesVoid);
-            (*vertices) = VertexCreator::create<RectVertex>(
+            ColorVertex *vertices = static_cast<ColorVertex*>(verticesVoid);
+            (*vertices) = VertexCreator::create<ColorVertex>(
                     static_cast<float>(startX) - 0.5f,
                     static_cast<float>(startY) - 0.5f,
                     0.0f,
@@ -19,7 +19,7 @@ namespace directgraph{
                     D3DCOLOR_ARGB(0, 0, 0, 0)
             );
             vertices++;
-            *vertices = VertexCreator::create<RectVertex>(
+            *vertices = VertexCreator::create<ColorVertex>(
                     static_cast<float>(endX) - 0.5f,
                     static_cast<float>(endY) - 0.5f,
                     0.0f,
@@ -87,15 +87,15 @@ namespace directgraph{
             return vertices;
         }
 
-        RectVertex *
+        ColorVertex *
         PrimitiveCreator::genQuad(
                 void *verticesVoid,
                 int_fast32_t startX, int_fast32_t startY,
                 int_fast32_t endX, int_fast32_t endY,
                 uint_fast32_t color
         ) {
-            RectVertex *vertices = static_cast<RectVertex*>(verticesVoid);
-            *vertices = VertexCreator::create<RectVertex>(
+            ColorVertex *vertices = static_cast<ColorVertex*>(verticesVoid);
+            *vertices = VertexCreator::create<ColorVertex>(
                     static_cast<float>(startX) - 0.5f,
                     static_cast<float>(startY) - 0.5f,
                     0.0f,
@@ -103,7 +103,7 @@ namespace directgraph{
                     swap_color(color)
             );
             vertices++;
-            *vertices = VertexCreator::create<RectVertex>(
+            *vertices = VertexCreator::create<ColorVertex>(
                     static_cast<float>(endX) - 0.5f,
                     static_cast<float>(startY) - 0.5f,
                     0.0f,
@@ -111,7 +111,7 @@ namespace directgraph{
                     swap_color(color)
             );
             vertices++;
-            *vertices = VertexCreator::create<RectVertex>(
+            *vertices = VertexCreator::create<ColorVertex>(
                     static_cast<float>(startX) - 0.5f,
                     static_cast<float>(endY) - 0.5f,
                     0.0f,
@@ -119,7 +119,7 @@ namespace directgraph{
                     swap_color(color)
             );
             vertices++;
-            *vertices = VertexCreator::create<RectVertex>(
+            *vertices = VertexCreator::create<ColorVertex>(
                     static_cast<float>(endX) - 0.5f,
                     static_cast<float>(endY) - 0.5f,
                     0.0f,
@@ -273,7 +273,7 @@ namespace directgraph{
             return vertices;
         }
 
-        RectVertex *
+        ColorVertex *
         PrimitiveCreator::genEllipse(void *verticesVoid,
                                      int_fast32_t centerX, int_fast32_t centerY,
                                      uint_fast32_t rx, uint_fast32_t ry, uint_fast32_t color,

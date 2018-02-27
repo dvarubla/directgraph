@@ -12,7 +12,7 @@ namespace directgraph {
         public:
             PrimitiveCreator();
 
-            RectVertex *genDegenerate(
+            ColorVertex *genDegenerate(
                     void *verticesVoid,
                     int_fast32_t startX, int_fast32_t startY,
                     int_fast32_t endX, int_fast32_t endY
@@ -24,7 +24,7 @@ namespace directgraph {
                     int_fast32_t endX, int_fast32_t endY
             );
 
-            RectVertex *genQuad(
+            ColorVertex *genQuad(
                     void *verticesVoid,
                     int_fast32_t startX, int_fast32_t startY,
                     int_fast32_t endX, int_fast32_t endY,
@@ -66,7 +66,7 @@ namespace directgraph {
                     uint_fast32_t color
             );
 
-            RectVertex* genEllipse(
+            ColorVertex* genEllipse(
                     void *verticesVoid,
                     int_fast32_t centerX,
                     int_fast32_t centerY,

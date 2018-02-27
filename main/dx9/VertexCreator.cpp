@@ -3,9 +3,9 @@
 namespace directgraph{
     namespace dx9{
         template<>
-        RectVertex
-        VertexCreator::create<RectVertex>(float x, float y, float z, float rhw, DWORD color) {
-            RectVertex v = {x, y, z, rhw, color};
+        ColorVertex
+        VertexCreator::create<ColorVertex>(float x, float y, float z, float rhw, DWORD color) {
+            ColorVertex v = {x, y, z, rhw, color};
             return v;
         }
 
