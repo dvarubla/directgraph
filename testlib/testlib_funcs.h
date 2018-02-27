@@ -3,7 +3,6 @@
 #include <windows.h>
 #include <string>
 #include <vector>
-#include <iostream>
 #include "ImageTester.h"
 #include "BitmapWrap.h"
 #include "ImageTest.h"
