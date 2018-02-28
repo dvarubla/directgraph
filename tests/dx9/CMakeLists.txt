@@ -1,6 +1,6 @@
 project(dx9_tests)
 
-set(SHADERS_RES_FILE "${CMAKE_BINARY_DIR}/resources/shaders.res")
+set(SHADERS_RES_FILE "${OUTPUT_RES}")
 set_source_files_properties(
         "${SHADERS_RES_FILE}"
         PROPERTIES

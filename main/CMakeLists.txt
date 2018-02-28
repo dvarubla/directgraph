@@ -36,7 +36,14 @@ target_include_directories(directgraph_common BEFORE PUBLIC "${CMAKE_CURRENT_SOU
 add_library(directgraph_dx9_int INTERFACE)
 target_link_libraries(directgraph_dx9_int INTERFACE directgraph_common directgraph_dx9_renderer)
 
-add_library(directgraph_dx9 SHARED ${API_FILES})
+set_source_files_properties(
+        "${OUTPUT_RES}"
+        PROPERTIES
+        EXTERNAL_OBJECT true
+        GENERATED true
+)
+
+add_library(directgraph_dx9 SHARED ${API_FILES} ${OUTPUT_RES})
 set_target_properties(
         directgraph_dx9 PROPERTIES
         COMPILE_FLAGS "${COMMON_COMPILE_FLAGS}"

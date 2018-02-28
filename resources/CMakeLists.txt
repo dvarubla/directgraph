@@ -40,7 +40,7 @@ get_filename_component(RC_FILE_PATH ${SHADER_RC} ABSOLUTE)
 get_filename_component(RESOURCES_PATH "." ABSOLUTE)
 get_filename_component(SHADER_RC_NAME_WE ${SHADER_RC} NAME_WE)
 
-set(OUTPUT_RES "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${SHADER_RC_NAME_WE}.res")
+set(OUTPUT_RES "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${SHADER_RC_NAME_WE}.res" CACHE INTERNAL "")
 
 add_custom_command(
         OUTPUT "${OUTPUT_RES}"

@@ -15,6 +15,7 @@ set_target_properties(
         directgraph_dx9_renderer PROPERTIES
         COMPILE_FLAGS "${COMMON_COMPILE_FLAGS}"
 )
+add_dependencies(directgraph_dx9_renderer static_res)
 
 set(LIB_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/include" "." "${CMAKE_BINARY_DIR}" "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/main")
 
