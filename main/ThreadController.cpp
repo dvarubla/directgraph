@@ -61,6 +61,9 @@ namespace directgraph{
     }
 
     void ThreadController::fillellipse(float x, float y, float xradius, float yradius) {
+        if(!_paramsChecker.checkEllipse(x, y, xradius, yradius)){
+            return;
+        }
         QueueItem item = QueueItemCreator::create<QueueItem::FILLELLIPSE>(x, y, xradius, yradius);
         writeItemHelper(item);
     }
@@ -92,9 +95,7 @@ namespace directgraph{
 
     void ThreadController::putpixel(int_fast32_t x, int_fast32_t y, uint_fast32_t color) {
         if(
-                x < 0 || y < 0 ||
-                static_cast<uint_fast32_t>(x) >= _pixContFactory->getMaxWidth() ||
-                static_cast<uint_fast32_t>(y) >= _pixContFactory->getMaxHeight()
+            !_paramsChecker.checkPixel(x, y, _pixContFactory->getMaxWidth(), _pixContFactory->getMaxHeight())
         ){
             return;
         }

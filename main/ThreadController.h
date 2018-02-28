@@ -4,6 +4,7 @@
 #include "Queue.h"
 #include "CommonProps.h"
 #include "IController.h"
+#include "ParamsChecker.h"
 
 namespace directgraph {
     class ThreadController: public IController{
@@ -18,6 +19,7 @@ namespace directgraph {
         IMyWindow *_window;
         Queue _queue;
         QueueReader _reader;
+        ParamsChecker _paramsChecker;
         LONG volatile _threadStarted;
         LONG volatile _numDrawMsgs;
 
