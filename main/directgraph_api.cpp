@@ -158,6 +158,20 @@ void DIRECTGRAPH_EXPORT putpixel(uint32_t x, uint32_t y, uint32_t color){
     )
 }
 
+void DIRECTGRAPH_EXPORT fillellipse(float x, float y, float xradius, float yradius) {
+    EXC_CALL_WRAP(
+    getWindowManager()->getCurrentWindowAndLock().controller->fillellipse(x, y, xradius, yradius);
+    getWindowManager()->releaseCurrentWindowLock();
+    )
+}
+
+void DIRECTGRAPH_EXPORT setlinestyle(line_styles linestyle, uint32_t pattern, uint32_t thickness) {
+    EXC_CALL_WRAP(
+    getWindowManager()->getCurrentWindowAndLock().controller->setlinestyle(linestyle, pattern, thickness);
+    getWindowManager()->releaseCurrentWindowLock();
+    )
+}
+
 void DIRECTGRAPH_EXPORT setfillstyle(fill_patterns pattern, uint32_t color){
     EXC_CALL_WRAP(
     getWindowManager()->getCurrentWindowAndLock().controller->setfillstyle(pattern, color);

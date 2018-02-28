@@ -60,6 +60,16 @@ namespace directgraph{
         writeItemHelper(item);
     }
 
+    void ThreadController::fillellipse(float x, float y, float xradius, float yradius) {
+        QueueItem item = QueueItemCreator::create<QueueItem::FILLELLIPSE>(x, y, xradius, yradius);
+        writeItemHelper(item);
+    }
+
+    void ThreadController::setlinestyle(uint_fast8_t linestyle, uint_fast32_t pattern, uint_fast32_t thickness) {
+        QueueItem item = QueueItemCreator::create<QueueItem::SETLINESTYLE>(linestyle, pattern, thickness);
+        writeItemHelper(item);
+    }
+
     void ThreadController::bar(float left, float top, float right, float bottom) {
         QueueItem item = QueueItemCreator::create<QueueItem::BAR>(left, top, right, bottom);
         writeItemHelper(item);

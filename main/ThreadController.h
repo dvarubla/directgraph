@@ -41,7 +41,9 @@ namespace directgraph {
         void init();
         void clear();
         void bar(float left, float top, float right, float bottom);
+        void fillellipse(float x, float y, float xradius, float yradius);
         void setfillstyle(uint_fast8_t fillStyle, uint_fast32_t color);
+        void setlinestyle(uint_fast8_t linestyle, uint_fast32_t pattern, uint_fast32_t thickness);
         void setfillpattern(const char *fillpattern, uint_fast32_t color);
         void setbgcolor(uint_fast32_t color);
         void putpixel(int_fast32_t x, int_fast32_t y, uint_fast32_t color);

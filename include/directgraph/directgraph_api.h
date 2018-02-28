@@ -9,6 +9,10 @@
 extern "C" {
 #endif
 
+void DIRECTGRAPH_EXPORT fillellipse(float x, float y, float xradius, float yradius);
+
+void DIRECTGRAPH_EXPORT setlinestyle(line_styles linestyle, uint32_t pattern, uint32_t thickness);
+
 void DIRECTGRAPH_EXPORT bar(float left, float top, float right, float bottom);
 
 void DIRECTGRAPH_EXPORT putpixel(uint32_t x, uint32_t y, uint32_t color);
