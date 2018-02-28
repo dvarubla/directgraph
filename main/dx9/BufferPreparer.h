@@ -16,7 +16,6 @@ namespace directgraph {
                 SET_FILL_PATTERN,
                 SET_USER_FILL_PATTERN,
                 SET_BG_COLOR,
-                SET_SHADER,
                 ITEMS,
                 SET_PIXEL_TEXTURE,
                 SET_LINE_STYLE
@@ -49,11 +48,9 @@ namespace directgraph {
                     } items;
                     uint8_t lineStyle;
                     IPixelContainer *pixelContainer;
-                    ShaderType shaderType;
                 } data;
             };
             struct DevDrawState{
-                ShaderType shaderType;
                 TextureState textureState;
                 uint_fast8_t fillPattern;
                 uint_fast8_t lineStyle;
@@ -87,6 +84,7 @@ namespace directgraph {
             uint_fast32_t _pixelTextureWidth;
             uint_fast32_t _pixelTextureHeight;
             GenDataVars _curGenDataVars;
+            ShaderType _shaderType;
             uint_fast32_t _curUsedSize;
             uint_fast32_t _lastOffset;
             bool _canReadMore;

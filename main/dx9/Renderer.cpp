@@ -30,7 +30,6 @@ namespace directgraph {
             _initialVars.bgColor = props.fillColor;
             _initialVars.fillStyle = _curState.fillPattern;
             _initialVars.bgColor = _curState.bgColor;
-            _curState.shaderType = BufferPreparer::NO_SHADER;
         }
 
         void Renderer::setWindow(HWND hwnd) {
@@ -141,14 +140,6 @@ namespace directgraph {
             } else {
                 _patTextHelper->setFillPattern(_curState.fillPattern, _curState.bgColor);
             }
-            switch (_curState.shaderType) {
-                case BufferPreparer::NO_SHADER:
-                    _shaderMan->removeShaders();
-                    break;
-                case BufferPreparer::ELLIPSE_SHADER:
-                    _shaderMan->setEllipse();
-                    break;
-            }
         }
 
         void Renderer::prepare(IQueueReader *reader) {
@@ -223,7 +214,12 @@ namespace directgraph {
                                 stride
                         );
                         if (setFVF) {
+                            _shaderMan->removeShaders();
                             _device->SetFVF(fvf);
+                        } else {
+                            if(it->data.items.type == BufferPreparer::ELLIPSE_VERTEX){
+                                _shaderMan->setEllipse();
+                            }
                         }
                         _device->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, it->data.items.numItems);
                         if (it->data.items.type == BufferPreparer::TEXTURED_VERTEX) {
@@ -283,17 +279,6 @@ namespace directgraph {
                         _device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
                         _device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
                         _device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
-                    }
-                        break;
-                    case BufferPreparer::SET_SHADER : {
-                        switch (it->data.shaderType) {
-                            case BufferPreparer::NO_SHADER:
-                                _shaderMan->removeShaders();
-                                break;
-                            case BufferPreparer::ELLIPSE_SHADER:
-                                _shaderMan->setEllipse();
-                                break;
-                        }
                     }
                         break;
                     case BufferPreparer::REMOVE_TEXTURE:

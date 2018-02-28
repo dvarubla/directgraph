@@ -28,14 +28,6 @@ namespace directgraph{
             op.data.fillPattern = static_cast<uint8_t>(fillPattern);
             return op;
         }
-        
-        template<>
-        BufferPreparer::DrawOp DrawOpCreator::create<BufferPreparer::SET_SHADER>(uint_fast32_t shaderType) {
-            BufferPreparer::DrawOp op;
-            op.type = BufferPreparer::SET_SHADER;
-            op.data.shaderType = static_cast<BufferPreparer::ShaderType>(shaderType);
-            return op;
-        }
 
         template<>
         BufferPreparer::DrawOp DrawOpCreator::create<BufferPreparer::SET_BG_COLOR>(uint32_t bgColor) {
@@ -87,7 +79,7 @@ namespace directgraph{
         ): _shaderMan(shaderMan), _memSize(memSize), _helper(helper),
            _width(width), _height(height),
            _pixelTextureWidth(pxTextureWidth), _pixelTextureHeight(pxTextureHeight),
-           _curGenDataVars(vars), _curUsedSize(0), _lastOffset(0), _canReadMore(true)
+           _curGenDataVars(vars), _curUsedSize(0), _lastOffset(0), _canReadMore(true), _shaderType(NO_SHADER)
         {
             _vertMem = malloc(memSize);
             if (_vertMem == NULL) {
@@ -145,9 +137,8 @@ namespace directgraph{
         }
 
         void BufferPreparer::disableShader(bool &isFirst) {
-            if(_curState.shaderType != NO_SHADER){
-                _drawOps.push_back(DrawOpCreator::create<SET_SHADER>(NO_SHADER));
-                _curState.shaderType = NO_SHADER;
+            if(_shaderType != NO_SHADER){
+                _shaderType = NO_SHADER;
                 isFirst = true;
             }
         }
@@ -178,10 +169,9 @@ namespace directgraph{
                             isFirst = true;
                         }
                         if(_shaderMan->supportsEllipse()){
-                            if(_curState.shaderType != ELLIPSE_SHADER) {
-                                _drawOps.push_back(DrawOpCreator::create<SET_SHADER>(ELLIPSE_SHADER));
-                                _curState.shaderType = ELLIPSE_SHADER;
+                            if(_shaderType != ELLIPSE_SHADER) {
                                 isFirst = true;
+                                _shaderType = ELLIPSE_SHADER;
                             }
                         } else {
                             disableShader(isFirst);
@@ -352,7 +342,7 @@ namespace directgraph{
             int_fast32_t prevX = 0, prevY = 0;
             bool isFirst = true;
             void *curVertMem = (static_cast<uint8_t*>(_vertMem) + _curUsedSize);
-            if(_curState.userFillPattern != NULL){
+            if(_patterns.empty() && _curState.userFillPattern != NULL){
                 _patterns.push_back(_curState.userFillPattern);
             }
             for (readIndex = offset; readIndex < size; readIndex++) {
