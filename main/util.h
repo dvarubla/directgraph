@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 #include <cmath>
+#include <string>
+#include <sstream>
 
 namespace directgraph{
     uint_fast32_t swap_color(uint_fast32_t color);
@@ -29,5 +31,12 @@ namespace directgraph{
 #else
         return std::log(val) / std::log((T)2);
 #endif
+    }
+
+    template <typename T>
+    std::wstring to_wstring(const T &input){
+        std::wstringstream strm;
+        strm << input;
+        return strm.str();
     }
 }

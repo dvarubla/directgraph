@@ -13,6 +13,7 @@ namespace directgraph {
             void createVertexShader(uint_fast32_t name, uint_fast32_t type, IDirect3DVertexShader9 *&shader);
             void createPixelShader(uint_fast32_t name, uint_fast32_t type, IDirect3DPixelShader9 *&shader);
             bool _supportsEllipse;
+            void tryDeleteRes();
         public:
             ShaderManager(IFeatures *features, IDirect3DDevice9 *device);
             ~ShaderManager();
