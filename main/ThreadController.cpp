@@ -79,6 +79,7 @@ namespace directgraph{
     }
 
     void ThreadController::setfillstyle(uint_fast8_t fillStyle, uint_fast32_t color) {
+        _paramsChecker.checkFillStyle(fillStyle);
         QueueItem item = QueueItemCreator::create<QueueItem::SETFILLSTYLE>(fillStyle, color);
         writeItemHelper(item);
     }
