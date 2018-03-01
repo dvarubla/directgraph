@@ -102,7 +102,7 @@ namespace directgraph {
             void disableShader(bool &isFirst);
         public:
             BufferPreparer(
-                    uint_fast32_t memSize, const DevDrawState *state, DPIHelper *helper,
+                    uint_fast32_t memSize, const DevDrawState &state, DPIHelper *helper,
                     ShaderManager *shaderMan,
                     uint_fast32_t width, uint_fast32_t height,
                     uint_fast32_t pxTextureWidth, uint_fast32_t pxTextureHeight,

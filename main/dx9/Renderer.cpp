@@ -109,7 +109,7 @@ namespace directgraph {
             );
 
             _bufPreparer = new BufferPreparer(
-                    VERTEX_BUFFER_SIZE, &_curState, _helper, _shaderMan,
+                    VERTEX_BUFFER_SIZE, _curState, _helper, _shaderMan,
                     pxWidth, pxHeight,
                     pixelTextureWidth, pixelTextureHeight, _initialVars
             );

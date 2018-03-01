@@ -70,7 +70,7 @@ namespace directgraph{
 
         BufferPreparer::BufferPreparer(
                 uint_fast32_t memSize,
-                const BufferPreparer::DevDrawState *state,
+                const BufferPreparer::DevDrawState &state,
                 DPIHelper *helper,
                 ShaderManager *shaderMan,
                 uint_fast32_t width, uint_fast32_t height,
@@ -89,8 +89,8 @@ namespace directgraph{
                         std::wstring(L"Can't allocate memory for vertices")
                 );
             }
-            _lastState = *state;
-            _curState = *state;
+            _lastState = state;
+            _curState = state;
         }
 
         void BufferPreparer::useFillTexture(bool &isFirst) {
