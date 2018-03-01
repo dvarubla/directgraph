@@ -323,13 +323,14 @@ namespace directgraph{
                     prevX = _helper->toPixelsX(item.data.bar.right);
                     prevY = _helper->toPixelsY(item.data.bar.bottom);
                     break;
-                case QueueItem::PIXEL_CONTAINER:
+                case QueueItem::PIXEL_CONTAINER: {
                     Rectangle coords = item.data.pixelContainer->getCoords();
                     curVertMem = _primCreator.genTexQuad(
                             curVertMem,
                             coords.left, coords.top, coords.right, coords.bottom,
                             _pixelTextureWidth, _pixelTextureHeight
                     );
+                }
                     break;
                 default:break;
             }
