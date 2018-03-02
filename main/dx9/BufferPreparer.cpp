@@ -30,9 +30,9 @@ namespace directgraph{
         }
 
         template<>
-        BufferPreparer::DrawOp DrawOpCreator::create<BufferPreparer::SET_BG_COLOR>(uint32_t bgColor) {
+        BufferPreparer::DrawOp DrawOpCreator::create<BufferPreparer::SET_TEX_BG_COLOR>(uint32_t bgColor) {
             BufferPreparer::DrawOp op;
-            op.type = BufferPreparer::SET_BG_COLOR;
+            op.type = BufferPreparer::SET_TEX_BG_COLOR;
             op.data.bgColor = bgColor;
             return op;
         }
@@ -79,7 +79,7 @@ namespace directgraph{
         ): _shaderMan(shaderMan), _memSize(memSize), _helper(helper),
            _width(width), _height(height),
            _pixelTextureWidth(pxTextureWidth), _pixelTextureHeight(pxTextureHeight),
-           _curGenDataVars(vars), _curUsedSize(0), _lastOffset(0), _canReadMore(true), _shaderType(NO_SHADER)
+           _curGenDataVars(vars), _curUsedSize(0), _lastOffset(0), _canReadMore(true)
         {
             _vertMem = malloc(memSize);
             if (_vertMem == NULL) {
@@ -91,13 +91,20 @@ namespace directgraph{
             }
             _lastState = state;
             _curState = state;
+            setInitialSettings();
         }
 
-        void BufferPreparer::useFillTexture(bool &isFirst) {
+        void BufferPreparer::setInitialSettings() {
+            _curSettings.shaderType = NO_SHADER;
+            _curSettings.bgColorSet = false;
+            _curSettings.textureSet = false;
+        }
+
+        void BufferPreparer::useFillTexture() {
             if(_curState.userFillPattern != _lastState.userFillPattern && _lastState.fillPattern == USER_FILL) {
                 _drawOps.push_back(DrawOpCreator::create<SET_USER_FILL_PATTERN>(_lastState.userFillPattern));
                 _curState.userFillPattern = _lastState.userFillPattern;
-                isFirst = true;
+                _isFirst = true;
             }
 
             bool patternChanged = false;
@@ -106,75 +113,83 @@ namespace directgraph{
                 _curState.fillPattern = _lastState.fillPattern;
                 patternChanged = true;
             }
+            if(!_curSettings.textureSet){
+                _curSettings.textureSet = true;
+                patternChanged = true;
+            }
 
             if (_curState.fillPattern == SOLID_FILL) {
                 if(patternChanged || _curState.textureState != NO_TEXTURE) {
                     _curState.textureState = NO_TEXTURE;
                     _drawOps.push_back(DrawOpCreator::create<REMOVE_TEXTURE>());
-                    isFirst = true;
+                    _isFirst = true;
                 }
             } else {
                 if(patternChanged || _curState.textureState != FILL_TEXTURE) {
                     _curState.textureState = FILL_TEXTURE;
                     _drawOps.push_back(DrawOpCreator::create<SET_FILL_PATTERN>(_curState.fillPattern));
-                    isFirst = true;
+                    _isFirst = true;
                 }
             }
 
-            if(_curState.bgColor != _lastState.bgColor && _curState.fillPattern != SOLID_FILL){
-                _drawOps.push_back(DrawOpCreator::create<SET_BG_COLOR>(_lastState.bgColor));
+            if(
+                    (!_curSettings.bgColorSet || _curState.bgColor != _lastState.bgColor) && 
+                    _curState.fillPattern != SOLID_FILL
+            ){
+                _drawOps.push_back(DrawOpCreator::create<SET_TEX_BG_COLOR>(_lastState.bgColor));
                 _curState.bgColor = _lastState.bgColor;
-                isFirst = true;
+                _isFirst = true;
+                _curSettings.bgColorSet = true;
             }
         }
 
-        void BufferPreparer::disableTexture(bool &isFirst) {
+        void BufferPreparer::disableTexture() {
             if(_curState.textureState != NO_TEXTURE){
                 _curState.textureState = NO_TEXTURE;
                 _drawOps.push_back(DrawOpCreator::create<REMOVE_TEXTURE>());
-                isFirst = true;
+                _isFirst = true;
             }
         }
 
-        void BufferPreparer::disableShader(bool &isFirst) {
-            if(_shaderType != NO_SHADER){
-                _shaderType = NO_SHADER;
-                isFirst = true;
+        void BufferPreparer::disableShader() {
+            if(_curSettings.shaderType != NO_SHADER){
+                _curSettings.shaderType = NO_SHADER;
+                _isFirst = true;
             }
         }
 
-        void BufferPreparer::processStateChanges(const QueueItem &item, bool &isFirst) {
+        void BufferPreparer::processStateChanges(const QueueItem &item) {
             switch(item.type){
                 case QueueItem::BAR:
-                    disableShader(isFirst);
-                    useFillTexture(isFirst);
+                    disableShader();
+                    useFillTexture();
                     break;
                 case QueueItem::SINGLE_PIXEL:
-                    disableShader(isFirst);
-                    disableTexture(isFirst);
+                    disableShader();
+                    disableTexture();
                     break;
                 case QueueItem::PIXEL_CONTAINER:
-                    disableShader(isFirst);
-                    disableTexture(isFirst);
+                    disableShader();
+                    disableTexture();
                     _drawOps.push_back(DrawOpCreator::create<SET_PIXEL_TEXTURE>(item.data.pixelContainer));
-                    isFirst = true;
+                    _isFirst = true;
                     break;
                 case QueueItem::FILLELLIPSE:
-                    useFillTexture(isFirst);
+                    useFillTexture();
                     if(_lastState.lineStyle == NULL_LINE){
                         if(_curState.lineStyle != NULL_LINE || _curState.textureState != NO_TEXTURE) {
                             _curState.textureState = NO_TEXTURE;
                             _curState.lineStyle = NULL_LINE;
                             _drawOps.push_back(DrawOpCreator::create<REMOVE_TEXTURE>());
-                            isFirst = true;
+                            _isFirst = true;
                         }
                         if(_shaderMan->supportsEllipse()){
-                            if(_shaderType != ELLIPSE_SHADER) {
-                                isFirst = true;
-                                _shaderType = ELLIPSE_SHADER;
+                            if(_curSettings.shaderType != ELLIPSE_SHADER) {
+                                _isFirst = true;
+                                _curSettings.shaderType = ELLIPSE_SHADER;
                             }
                         } else {
-                            disableShader(isFirst);
+                            disableShader();
                         }
                     }
                     break;
@@ -220,9 +235,9 @@ namespace directgraph{
         }
 
         void BufferPreparer::processDrawItem(
-                const QueueItem &item, bool &isFirst, void *&curVertMem, int_fast32_t &prevX, int_fast32_t &prevY
+                const QueueItem &item, void *&curVertMem, int_fast32_t &prevX, int_fast32_t &prevY
         ) {
-            if (!isFirst) {
+            if (!_isFirst) {
                 if (_curState.fillPattern != SOLID_FILL) {
                     curVertMem = _primCreator.genFillDegenerate(
                             curVertMem,
@@ -334,21 +349,21 @@ namespace directgraph{
                     break;
                 default:break;
             }
-            isFirst = (item.type == QueueItem::PIXEL_CONTAINER);
+            _isFirst = (item.type == QueueItem::PIXEL_CONTAINER);
         }
 
         void BufferPreparer::prepareBuffer(IQueueReader *reader, uint_fast32_t offset, uint_fast32_t maxSize) {
             uint_fast32_t size = reader->getSize();
             uint_fast32_t readIndex = 0;
             int_fast32_t prevX = 0, prevY = 0;
-            bool isFirst = true;
+            _isFirst = true;
             void *curVertMem = (static_cast<uint8_t*>(_vertMem) + _curUsedSize);
             if(_patterns.empty() && _curState.userFillPattern != NULL){
                 _patterns.push_back(_curState.userFillPattern);
             }
             for (readIndex = offset; readIndex < size; readIndex++) {
                 QueueItem &item = reader->getAt(readIndex);
-                processStateChanges(item, isFirst);
+                processStateChanges(item);
                 if (
                         item.type == QueueItem::SINGLE_PIXEL ||
                         item.type == QueueItem::BAR ||
@@ -362,12 +377,12 @@ namespace directgraph{
                                 static_cast<uint_fast32_t>(_helper->toPixelsX(item.data.fillellipse.xradius)),
                                 static_cast<uint_fast32_t>(_helper->toPixelsY(item.data.fillellipse.yradius))
                         );
-                        if(!isFirst){
+                        if(!_isFirst){
                             curNumVertices += 2;
                         }
                     } else {
                         curNumVertices =
-                                (isFirst) ?
+                                (_isFirst) ?
                                 VERTICES_IN_QUAD :
                                 VERTICES_IN_QUAD + 2
                         ;
@@ -380,14 +395,14 @@ namespace directgraph{
                         _canReadMore = false;
                         break;
                     }
-                    if(isFirst){
+                    if(_isFirst){
                         _drawOps.push_back(DrawOpCreator::create<ITEMS>(
                                 curUsedSize, curNumVertices - VERTICES_TRIANGLES_DIFF, ts.drawDataType
                         ));
                     } else {
                         _drawOps.back().data.items.numItems += curNumVertices;
                     }
-                    processDrawItem(item, isFirst, curVertMem, prevX, prevY);
+                    processDrawItem(item, curVertMem, prevX, prevY);
                 } else {
                     switch (item.type){
                         case QueueItem::BGCOLOR:
@@ -438,6 +453,7 @@ namespace directgraph{
             _drawOps.clear();
             _curUsedSize = 0;
             _canReadMore = true;
+            setInitialSettings();
         }
 
         BufferPreparer::DrawOpVector::iterator

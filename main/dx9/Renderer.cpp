@@ -131,17 +131,6 @@ namespace directgraph {
             delete [] _curState.userFillPattern;
         }
 
-        void Renderer::setInitialState() {
-            if(_curState.userFillPattern != NULL){
-                _patTextHelper->setUserFillPattern(_curState.userFillPattern);
-            }
-            if(_curState.fillPattern == SOLID_FILL){
-                _patTextHelper->unsetPattern();
-            } else {
-                _patTextHelper->setFillPattern(_curState.fillPattern, _curState.bgColor);
-            }
-        }
-
         void Renderer::prepare(IQueueReader *reader) {
              _bufPreparer->prepareBuffer(reader, 0, VERTEX_BUFFER_SIZE);
             if(_bufPreparer->isFull()){
@@ -154,7 +143,6 @@ namespace directgraph {
 
         void Renderer::draw(IQueueReader *reader) {
             _device->SetRenderTarget(0, _backBuffer);
-            setInitialState();
             _device->BeginScene();
             if(_bufPreparer->isFull()){
                 copyToVBuffer();
@@ -238,9 +226,9 @@ namespace directgraph {
                         _patTextHelper->setUserFillPattern(_curState.userFillPattern);
                     }
                         break;
-                    case BufferPreparer::SET_BG_COLOR: {
+                    case BufferPreparer::SET_TEX_BG_COLOR: {
                         _curState.bgColor = it->data.bgColor;
-                        _patTextHelper->setFillPattern(_curState.fillPattern, _curState.bgColor);
+                        _patTextHelper->changeBgColor(_curState.fillPattern, _curState.bgColor);
                     }
                         break;
                     case BufferPreparer::CLEAR: {

@@ -21,7 +21,7 @@ namespace directgraph{
         }
 
         template<uint_fast32_t DispMode>
-        void PatternTexturesHelper<DispMode>::setFillPattern(uint_fast8_t  pattern, uint_fast32_t bgColor) {
+        void PatternTexturesHelper<DispMode>::setFillPattern(uint_fast8_t pattern, uint_fast32_t bgColor) {
             bool setStandardPattern = true;
             if(pattern == USER_FILL){
                 if(!_haveUserPattern){
@@ -45,7 +45,28 @@ namespace directgraph{
                         false
                 );
             }
-            setTexture(pattern, bgColor);
+            setTexture(pattern);
+        }
+
+        template<uint_fast32_t DispMode>
+        void PatternTexturesHelper<DispMode>::setBgColorConstant(uint_fast32_t bgColor) {
+            _device->SetTextureStageState(0, D3DTSS_CONSTANT, swap_color(bgColor));
+        }
+
+        template<uint_fast32_t DispMode>
+        void PatternTexturesHelper<DispMode>::setBgColor(uint_fast32_t bgColor) {
+            if(_haveConstantSupport){
+                setBgColorConstant(bgColor);
+            }
+        }
+
+        template<uint_fast32_t DispMode>
+        void PatternTexturesHelper<DispMode>::changeBgColor(uint_fast8_t pattern, uint_fast32_t bgColor) {
+            if(_haveConstantSupport){
+                setBgColorConstant(bgColor);
+            } else {
+                setFillPattern(pattern, bgColor);
+            }
         }
 
         template<uint_fast32_t DispMode>
@@ -101,7 +122,7 @@ namespace directgraph{
         }
 
         template<uint_fast32_t DispMode>
-        void PatternTexturesHelper<DispMode>::setTexture(uint_fast8_t index, uint_fast32_t bgColor) {
+        void PatternTexturesHelper<DispMode>::setTexture(uint_fast8_t index) {
             if(index >= NUM_TOTAL_FPATTERNS){
                 THROW_EXC_CODE(WException, UNREACHABLE_CODE, std::wstring(L"Bad pattern index"));
             }
@@ -109,9 +130,8 @@ namespace directgraph{
             _device->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
             _device->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
             _device->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
-            if(_haveConstantSupport) {
+            if (_haveConstantSupport) {
                 _device->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_CONSTANT);
-                _device->SetTextureStageState(0, D3DTSS_CONSTANT, swap_color(bgColor));
             } else {
                 _device->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
             }

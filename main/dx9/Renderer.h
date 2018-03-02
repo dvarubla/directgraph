@@ -52,8 +52,6 @@ namespace directgraph {
 
             void doRender();
 
-            void setInitialState();
-
         public:
             Renderer(Common *common, DPIHelper *helper, float width, float height, const CommonProps &props);
 

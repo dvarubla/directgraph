@@ -15,7 +15,7 @@ namespace directgraph {
                 REMOVE_TEXTURE,
                 SET_FILL_PATTERN,
                 SET_USER_FILL_PATTERN,
-                SET_BG_COLOR,
+                SET_TEX_BG_COLOR,
                 ITEMS,
                 SET_PIXEL_TEXTURE,
                 SET_LINE_STYLE
@@ -84,22 +84,28 @@ namespace directgraph {
             uint_fast32_t _pixelTextureWidth;
             uint_fast32_t _pixelTextureHeight;
             GenDataVars _curGenDataVars;
-            ShaderType _shaderType;
+            struct CurSettings{
+                bool textureSet;
+                bool bgColorSet;
+                ShaderType shaderType;
+            } _curSettings;
+            bool _isFirst;
             uint_fast32_t _curUsedSize;
             uint_fast32_t _lastOffset;
             bool _canReadMore;
-            void processStateChanges(const QueueItem &item, bool &isFirst);
+            void processStateChanges(const QueueItem &item);
             struct TypeSize{
                 uint_fast32_t sizeMult;
                 DrawDataType drawDataType;
             };
             TypeSize getTypeSize(const QueueItem &item);
             void processDrawItem(
-                    const QueueItem &item, bool &isFirst, void *&curVertMem, int_fast32_t &prevX, int_fast32_t &prevY
+                    const QueueItem &item, void *&curVertMem, int_fast32_t &prevX, int_fast32_t &prevY
             );
-            void useFillTexture(bool &isFirst);
-            void disableTexture(bool &isFirst);
-            void disableShader(bool &isFirst);
+            void useFillTexture();
+            void disableTexture();
+            void disableShader();
+            void setInitialSettings();
         public:
             BufferPreparer(
                     uint_fast32_t memSize, const DevDrawState &state, DPIHelper *helper,
