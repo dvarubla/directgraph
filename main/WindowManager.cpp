@@ -163,4 +163,26 @@ namespace directgraph{
     void WindowManager::releaseWindowLock() {
         _mapLock.endRead();
     }
+
+    WindowManagerScopedLock::WindowManagerScopedLock(
+            WindowManager *winMan, DirectgraphWinIndex index
+    ): _winMan(winMan), _lockType(WINDOW_BY_INDEX){
+        data.controller = _winMan->getWindowByIndexAndLock(index);
+        data.index = index;
+    }
+
+    WindowManagerScopedLock::WindowManagerScopedLock(WindowManager *winMan): _winMan(winMan), _lockType(CURRENT_WINDOW){
+        data = _winMan->getCurrentWindowAndLock();
+    }
+
+    WindowManagerScopedLock::~WindowManagerScopedLock() {
+        switch (_lockType){
+            case CURRENT_WINDOW:
+                _winMan->releaseCurrentWindowLock();
+                break;
+            case WINDOW_BY_INDEX:
+                _winMan->releaseWindowLock();
+                break;
+        }
+    }
 };

@@ -56,5 +56,19 @@ namespace directgraph {
         void onClose(void *param);
         ~WindowManager();
     };
+
+    class WindowManagerScopedLock{
+    private:
+        WindowManager *_winMan;
+        enum LockType{
+            CURRENT_WINDOW,
+            WINDOW_BY_INDEX
+        } _lockType;
+    public:
+        WindowManagerScopedLock(WindowManager *winMan, DirectgraphWinIndex index);
+        WindowManagerScopedLock(WindowManager *winMan);
+        ~WindowManagerScopedLock();
+        WindowManager::ControllerAndIndex data;
+    };
 }
 
