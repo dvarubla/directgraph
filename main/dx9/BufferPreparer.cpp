@@ -307,9 +307,7 @@ namespace directgraph{
                                                              _helper->toPixelsY(item.data.fillellipse.y),
                                                              static_cast<uint_fast32_t>(_helper->toPixelsX(item.data.fillellipse.xradius)),
                                                              static_cast<uint_fast32_t>(_helper->toPixelsY(item.data.fillellipse.yradius)),
-                                                             _curGenDataVars.fillColor,
-                                                             prevX,
-                                                             prevY
+                                                             _curGenDataVars.fillColor
                         );
                         prevX = _helper->toPixelsX(item.data.fillellipse.x);
                         prevY = _helper->toPixelsY(item.data.fillellipse.y - item.data.fillellipse.yradius);

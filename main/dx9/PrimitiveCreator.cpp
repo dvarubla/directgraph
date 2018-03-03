@@ -276,11 +276,9 @@ namespace directgraph{
         ColorVertex *
         PrimitiveCreator::genEllipse(void *verticesVoid,
                                      int_fast32_t centerX, int_fast32_t centerY,
-                                     uint_fast32_t rx, uint_fast32_t ry, uint_fast32_t color,
-                                     int_fast32_t &prevX,
-                                     int_fast32_t &prevY
+                                     uint_fast32_t rx, uint_fast32_t ry, uint_fast32_t color
         ) {
-            return _ellipseHelper.genEllipse(verticesVoid, centerX, centerY, rx, ry, color, prevX, prevY);
+            return _ellipseHelper.genEllipse(verticesVoid, centerX, centerY, rx, ry, color);
         }
 
         uint_fast32_t PrimitiveCreator::getNumEllipseVertices(uint_fast32_t rx, uint_fast32_t ry) {
