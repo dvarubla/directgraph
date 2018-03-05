@@ -25,8 +25,16 @@ namespace directgraph{
         }
 
         template<>
-        Color2Vertex VertexCreator::create<Color2Vertex>(float x, float y, float z, float rhw, DWORD color, DWORD color2) {
-            Color2Vertex v = {x, y, z, rhw, color, color2};
+        Color2Vertex VertexCreator::create<Color2Vertex>(float x, float y, float z, float rhw, DWORD color1, DWORD color2) {
+            Color2Vertex v = {x, y, z, rhw, color1, color2};
+            return v;
+        }
+
+        template<>
+        TexturedColor2Vertex VertexCreator::create<TexturedColor2Vertex>(
+                float x, float y, float z, float rhw, DWORD color1, DWORD color2, float tu, float tv
+        ) {
+            TexturedColor2Vertex v = {x, y, z, rhw, color1, color2, tu, tv};
             return v;
         }
     }

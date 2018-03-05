@@ -11,6 +11,10 @@ namespace directgraph{
             return _shaderMan->supportsTexturedBar();
         }
 
+        bool BufferPreparerParams::supportsTexturedEllipse() {
+            return _shaderMan->supportsTexturedEllipse();
+        }
+
         bool BufferPreparerParams::needRecreateTexture() {
             return _needRecreateTexture;
         }

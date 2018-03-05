@@ -7,8 +7,11 @@ endif()
 set(SHADER_SRCS
         shaders/ps_1_4/ellipse.hlsl
         shaders/ps_1_4/textured_bar.hlsl
+        shaders/ps_1_4/textured_ellipse.hlsl
+
         shaders/vs_1_1/center_bar.hlsl
         shaders/vs_1_1/textured_bar.hlsl
+        shaders/vs_1_1/textured_center_bar.hlsl
 )
 set(INCLUDE_FILE common_res.h)
 set(SHADER_RC shaders/shaders.rc)

@@ -305,15 +305,15 @@ namespace directgraph{
         ) {
             ColorVertex *vertices = static_cast<ColorVertex*>(verticesVoid);
             (*vertices) = VertexCreator::create<ColorVertex>(
-                    static_cast<float>(2.0 * (startX - 0.5) / width - 1),
-                    static_cast<float>(1 - 2.0 * (startY - 0.5) / height),
+                    coordToPositionX(startX, width),
+                    coordToPositionY(startY, height),
                     0.0f, 0.0f,
                     D3DCOLOR_ARGB(0, 0, 0, 0)
             );
             vertices++;
             *vertices = VertexCreator::create<ColorVertex>(
-                    static_cast<float>(2.0f * (endX - 0.5) / width - 1),
-                    static_cast<float>(1 - 2.0f * (endY - 0.5) / height),
+                    coordToPositionX(endX, width),
+                    coordToPositionY(endY, height),
                     0.0f, 0.0f,
                     D3DCOLOR_ARGB(0, 0, 0, 0)
             );
@@ -348,6 +348,71 @@ namespace directgraph{
             vertices++;
             *vertices = VertexCreator::create<ColorVertex>(
                     centerXTrans, centerYTrans, radiusXTrans, radiusYTrans, swap_color(color)
+            );
+            vertices++;
+            return vertices;
+        }
+
+        TexturedColor2Vertex *
+        PrimitiveCreator::genTexEllipseDegenerate(void *verticesVoid, int_fast32_t startX, int_fast32_t startY,
+                                                  int_fast32_t endX, int_fast32_t endY, uint_fast32_t width,
+                                                  uint_fast32_t height) {
+            TexturedColor2Vertex *vertices = static_cast<TexturedColor2Vertex*>(verticesVoid);
+            (*vertices) = VertexCreator::create<TexturedColor2Vertex>(
+                    coordToPositionX(startX, width),
+                    coordToPositionY(startY, height),
+                    0.0f, 0.0f,
+                    D3DCOLOR_ARGB(0, 0, 0, 0),
+                    D3DCOLOR_ARGB(0, 0, 0, 0),
+                    0.0f, 0.0f
+            );
+            vertices++;
+            *vertices = VertexCreator::create<TexturedColor2Vertex>(
+                    coordToPositionX(endX, width),
+                    coordToPositionY(endY, height),
+                    0.0f, 0.0f,
+                    D3DCOLOR_ARGB(0, 0, 0, 0),
+                    D3DCOLOR_ARGB(0, 0, 0, 0),
+                    0.0f, 0.0f
+            );
+            vertices++;
+            return vertices;
+        }
+
+        TexturedColor2Vertex *
+        PrimitiveCreator::genTexEllipseQuad(void *verticesVoid, int_fast32_t centerX, int_fast32_t centerY,
+                                            int_fast32_t radiusX, int_fast32_t radiusY,
+                                            uint_fast32_t color1, uint_fast32_t color2,
+                                            uint_fast32_t width, uint_fast32_t height) {
+            float centerXTrans = coordToPositionX(centerX, width);
+            float radiusXTrans = static_cast<float>(1.0 * radiusX / width);
+            float centerYTrans = coordToPositionY(centerY, height);
+            float radiusYTrans = static_cast<float>(1.0 * radiusY / height);
+            float textureRight = (2.0f * radiusX) / FPATTERN_SIZE;
+            float textureBottom = (2.0f * radiusY) / FPATTERN_SIZE;
+            TexturedColor2Vertex *vertices = static_cast<TexturedColor2Vertex*>(verticesVoid);
+            *vertices = VertexCreator::create<TexturedColor2Vertex>(
+                    centerXTrans, centerYTrans, -radiusXTrans, -radiusYTrans,
+                    swap_color(color1), swap_color(color2),
+                    0.0f, 0.0f
+            );
+            vertices++;
+            *vertices = VertexCreator::create<TexturedColor2Vertex>(
+                    centerXTrans, centerYTrans, radiusXTrans, -radiusYTrans,
+                    swap_color(color1), swap_color(color2),
+                    textureRight, 0.0f
+            );
+            vertices++;
+            *vertices = VertexCreator::create<TexturedColor2Vertex>(
+                    centerXTrans, centerYTrans, -radiusXTrans, radiusYTrans,
+                    swap_color(color1), swap_color(color2),
+                    0.0f, textureBottom
+            );
+            vertices++;
+            *vertices = VertexCreator::create<TexturedColor2Vertex>(
+                    centerXTrans, centerYTrans, radiusXTrans, radiusYTrans,
+                    swap_color(color1), swap_color(color2),
+                    textureRight, textureBottom
             );
             vertices++;
             return vertices;

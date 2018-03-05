@@ -27,11 +27,14 @@ namespace directgraph {
                 TEXTURED_COLOR_VERTEX,
                 TEXTURED_VERTEX,
                 COLOR2_VERTEX,
-                ELLIPSE_VERTEX
+                ELLIPSE_VERTEX,
+                TEXTURED_ELLIPSE_VERTEX
             };
             enum ShaderType{
                 NO_SHADER,
-                ELLIPSE_SHADER
+                ELLIPSE_SHADER,
+                TEXTURED_ELLIPSE_SHADER,
+                TEXTURED_BAR_SHADER
             };
             enum TextureState{
                 NO_TEXTURE,
@@ -108,6 +111,7 @@ namespace directgraph {
             );
             void useFillTexture(bool useBgColor);
             void disableTexture();
+            void useLineStyle();
             void disableShader();
             void setInitialSettings();
         public:
@@ -127,6 +131,8 @@ namespace directgraph {
             bool isFull();
             uint_fast32_t getLastOffset();
             void resetOffset();
+
+            void genDegenerates(const QueueItem &item, void *&curVertMem, int_fast32_t &prevX, int_fast32_t &prevY);
         };
 
         class DrawOpCreator{

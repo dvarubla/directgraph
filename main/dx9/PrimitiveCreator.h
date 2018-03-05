@@ -84,6 +84,21 @@ namespace directgraph {
                     uint_fast32_t color
             );
 
+            TexturedColor2Vertex *genTexEllipseDegenerate(
+                    void *verticesVoid,
+                    int_fast32_t startX, int_fast32_t startY,
+                    int_fast32_t endX, int_fast32_t endY,
+                    uint_fast32_t width, uint_fast32_t height
+            );
+
+            TexturedColor2Vertex *genTexEllipseQuad(
+                    void *verticesVoid,
+                    int_fast32_t centerX, int_fast32_t centerY,
+                    int_fast32_t radiusX, int_fast32_t radiusY,
+                    uint_fast32_t color1, uint_fast32_t color2,
+                    uint_fast32_t width, uint_fast32_t height
+            );
+
             ColorVertex* genEllipse(
                     void *verticesVoid,
                     int_fast32_t centerX,

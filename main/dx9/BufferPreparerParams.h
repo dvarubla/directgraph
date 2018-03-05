@@ -16,6 +16,7 @@ namespace directgraph {
         public:
             bool supportsEllipse();
             bool supportsTexturedBar();
+            bool supportsTexturedEllipse();
             bool needRecreateTexture();
             uint_fast32_t getWidth();
             uint_fast32_t getHeight();

@@ -5,3 +5,6 @@ ELLIPSE_P1_4 IDR_PIXEL_SHADER "shaders/ps_1_4/ellipse.obj"
 
 TEXTURED_BAR_V1_1 IDR_VERTEX_SHADER "shaders/vs_1_1/textured_bar.obj"
 TEXTURED_BAR_P1_4 IDR_PIXEL_SHADER "shaders/ps_1_4/textured_bar.obj"
+
+TEXTURED_CENTER_BAR_V1_1 IDR_VERTEX_SHADER "shaders/vs_1_1/textured_center_bar.obj"
+TEXTURED_ELLIPSE_P1_4 IDR_PIXEL_SHADER "shaders/ps_1_4/textured_ellipse.obj"

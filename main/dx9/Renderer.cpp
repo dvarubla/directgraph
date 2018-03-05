@@ -205,6 +205,10 @@ namespace directgraph {
                                 stride = sizeof(Color2Vertex);
                                 setFVF = false;
                                 break;
+                            case BufferPreparer::TEXTURED_ELLIPSE_VERTEX:
+                                stride = sizeof(TexturedColor2Vertex);
+                                setFVF = false;
+                                break;
                         }
                         _device->SetStreamSource(
                                 0, _vertBuffer,
@@ -215,10 +219,17 @@ namespace directgraph {
                             _shaderMan->removeShaders();
                             _device->SetFVF(fvf);
                         } else {
-                            if(it->data.items.type == BufferPreparer::ELLIPSE_VERTEX){
-                                _shaderMan->setEllipse();
-                            } else if(it->data.items.type == BufferPreparer::COLOR2_VERTEX){
-                                _shaderMan->setTexturedBar();
+                            switch(it->data.items.type){
+                                case BufferPreparer::COLOR2_VERTEX:
+                                    _shaderMan->setTexturedBar();
+                                    break;
+                                case BufferPreparer::ELLIPSE_VERTEX:
+                                    _shaderMan->setEllipse();
+                                    break;
+                                case BufferPreparer::TEXTURED_ELLIPSE_VERTEX:
+                                    _shaderMan->setTexturedEllipse();
+                                    break;
+                                default: break;
                             }
                         }
                         _device->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, it->data.items.numItems);
