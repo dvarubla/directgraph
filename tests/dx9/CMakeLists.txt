@@ -31,6 +31,8 @@ set(DX9_PIXEL_CONTAINER_SRC dx9_pixel_container.cpp ${SHADERS_RES_FILE} ../stubs
 dx9_test(dx9_pixel_container "${DX9_PIXEL_CONTAINER_SRC}")
 set(DX9_BAR_FILLSTYLE_SRC dx9_bar_fillstyle.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp ../stubs/FeaturesStub.h)
 dx9_test(dx9_bar_fillstyle "${DX9_BAR_FILLSTYLE_SRC}")
+set(DX9_BAR_FILLSTYLE_NO_SHADER dx9_bar_fillstyle_no_shader.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp ../stubs/FeaturesStub.h)
+dx9_test(dx9_bar_fillstyle_no_shader "${DX9_BAR_FILLSTYLE_NO_SHADER}")
 set(DX9_BAR_FILLSTYLE_OLD_SRC dx9_bar_fillstyle_old.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp ../stubs/FeaturesStub.h)
 dx9_test(dx9_bar_fillstyle_old "${DX9_BAR_FILLSTYLE_OLD_SRC}")
 set(DX9_FILLELLIPSE_SRC dx9_fillellipse.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp ../stubs/FeaturesStub.h)

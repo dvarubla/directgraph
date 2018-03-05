@@ -30,6 +30,17 @@ namespace directgraph{
         }
 
         template<>
+        BufferPreparer::DrawOp DrawOpCreator::create<BufferPreparer::SET_FILL_PATTERN_COLOR>(
+                uint_fast32_t fillPattern, uint_fast32_t bgColor
+        ) {
+            BufferPreparer::DrawOp op;
+            op.type = BufferPreparer::SET_FILL_PATTERN_COLOR;
+            op.data.fillPatternColor.fillPattern = static_cast<uint8_t>(fillPattern);
+            op.data.fillPatternColor.bgColor = bgColor;
+            return op;
+        }
+
+        template<>
         BufferPreparer::DrawOp DrawOpCreator::create<BufferPreparer::SET_TEX_BG_COLOR>(uint32_t bgColor) {
             BufferPreparer::DrawOp op;
             op.type = BufferPreparer::SET_TEX_BG_COLOR;
@@ -69,16 +80,10 @@ namespace directgraph{
         }
 
         BufferPreparer::BufferPreparer(
-                uint_fast32_t memSize,
-                const BufferPreparer::DevDrawState &state,
-                DPIHelper *helper,
-                ShaderManager *shaderMan,
-                uint_fast32_t width, uint_fast32_t height,
-                uint_fast32_t pxTextureWidth, uint_fast32_t pxTextureHeight,
+                uint_fast32_t memSize, const DevDrawState &state, DPIHelper *helper,
+                BufferPreparerParams *bufPrepParams,
                 const GenDataVars &vars
-        ): _shaderMan(shaderMan), _memSize(memSize), _helper(helper),
-           _width(width), _height(height),
-           _pixelTextureWidth(pxTextureWidth), _pixelTextureHeight(pxTextureHeight),
+        ): _bufPrepParams(bufPrepParams), _memSize(memSize), _helper(helper),
            _curGenDataVars(vars), _curUsedSize(0), _lastOffset(0), _canReadMore(true)
         {
             _vertMem = malloc(memSize);
@@ -98,9 +103,10 @@ namespace directgraph{
             _curSettings.shaderType = NO_SHADER;
             _curSettings.bgColorSet = false;
             _curSettings.textureSet = false;
+            _curSettings.fillPatternRecreated = true;
         }
 
-        void BufferPreparer::useFillTexture() {
+        void BufferPreparer::useFillTexture(bool useBgColor) {
             if(_curState.userFillPattern != _lastState.userFillPattern && _lastState.fillPattern == USER_FILL) {
                 _drawOps.push_back(DrawOpCreator::create<SET_USER_FILL_PATTERN>(_lastState.userFillPattern));
                 _curState.userFillPattern = _lastState.userFillPattern;
@@ -117,6 +123,25 @@ namespace directgraph{
                 _curSettings.textureSet = true;
                 patternChanged = true;
             }
+            if(_bufPrepParams->needRecreateTexture() && !_curSettings.fillPatternRecreated && useBgColor){
+                patternChanged = true;
+            }
+
+            if(useBgColor){
+                if(
+                        (!_curSettings.bgColorSet || _curState.bgColor != _lastState.bgColor) &&
+                        _curState.fillPattern != SOLID_FILL
+                ){
+                    _curSettings.bgColorSet = true;
+                    _curState.bgColor = _lastState.bgColor;
+                    if (_bufPrepParams->needRecreateTexture()) {
+                        patternChanged = true;
+                    } else {
+                        _drawOps.push_back(DrawOpCreator::create<SET_TEX_BG_COLOR>(_lastState.bgColor));
+                        _isFirst = true;
+                    }
+                }
+            }
 
             if (_curState.fillPattern == SOLID_FILL) {
                 if(patternChanged || _curState.textureState != NO_TEXTURE) {
@@ -127,19 +152,16 @@ namespace directgraph{
             } else {
                 if(patternChanged || _curState.textureState != FILL_TEXTURE) {
                     _curState.textureState = FILL_TEXTURE;
-                    _drawOps.push_back(DrawOpCreator::create<SET_FILL_PATTERN>(_curState.fillPattern));
+                    if(_bufPrepParams->needRecreateTexture()){
+                        _drawOps.push_back(DrawOpCreator::create<SET_FILL_PATTERN_COLOR>(
+                                _curState.fillPattern, _curState.bgColor
+                        ));
+                    } else {
+                        _drawOps.push_back(DrawOpCreator::create<SET_FILL_PATTERN>(_curState.fillPattern));
+                    }
+                    _curSettings.fillPatternRecreated = useBgColor;
                     _isFirst = true;
                 }
-            }
-
-            if(
-                    (!_curSettings.bgColorSet || _curState.bgColor != _lastState.bgColor) && 
-                    _curState.fillPattern != SOLID_FILL
-            ){
-                _drawOps.push_back(DrawOpCreator::create<SET_TEX_BG_COLOR>(_lastState.bgColor));
-                _curState.bgColor = _lastState.bgColor;
-                _isFirst = true;
-                _curSettings.bgColorSet = true;
             }
         }
 
@@ -162,7 +184,7 @@ namespace directgraph{
             switch(item.type){
                 case QueueItem::BAR:
                     disableShader();
-                    useFillTexture();
+                    useFillTexture(!_bufPrepParams->supportsTexturedBar());
                     break;
                 case QueueItem::SINGLE_PIXEL:
                     disableShader();
@@ -175,15 +197,15 @@ namespace directgraph{
                     _isFirst = true;
                     break;
                 case QueueItem::FILLELLIPSE:
-                    useFillTexture();
+                    useFillTexture(true);
                     if(_lastState.lineStyle == NULL_LINE){
-                        if(_curState.lineStyle != NULL_LINE || _curState.textureState != NO_TEXTURE) {
+                        if(_curState.textureState == LINE_TEXTURE && _curState.lineStyle != NULL_LINE) {
                             _curState.textureState = NO_TEXTURE;
                             _curState.lineStyle = NULL_LINE;
                             _drawOps.push_back(DrawOpCreator::create<REMOVE_TEXTURE>());
                             _isFirst = true;
                         }
-                        if(_shaderMan->supportsEllipse()){
+                        if(_bufPrepParams->supportsEllipse()){
                             if(_curSettings.shaderType != ELLIPSE_SHADER) {
                                 _isFirst = true;
                                 _curSettings.shaderType = ELLIPSE_SHADER;
@@ -209,8 +231,13 @@ namespace directgraph{
                     break;
                 case QueueItem::BAR:
                     if (_curState.fillPattern != SOLID_FILL) {
-                        res.sizeMult = sizeof(TexturedRectVertex);
-                        res.drawDataType = TEXTURED_RECT_VERTEX;
+                        if(_bufPrepParams->supportsTexturedBar()){
+                            res.sizeMult = sizeof(TexturedRectVertex);
+                            res.drawDataType = COLOR2_VERTEX;
+                        } else {
+                            res.sizeMult = sizeof(TexturedRectVertex);
+                            res.drawDataType = TEXTURED_RECT_VERTEX;
+                        }
                     } else {
                         res.sizeMult = sizeof(ColorVertex);
                         res.drawDataType = RECT_VERTEX;
@@ -221,7 +248,7 @@ namespace directgraph{
                     res.drawDataType = RECT_VERTEX;
                     break;
                 case QueueItem::FILLELLIPSE:
-                    if(_shaderMan->supportsEllipse()) {
+                    if(_bufPrepParams->supportsEllipse()) {
                         res.sizeMult = sizeof(EllipseVertex);
                         res.drawDataType = ELLIPSE_VERTEX;
                     } else {
@@ -239,41 +266,62 @@ namespace directgraph{
         ) {
             if (!_isFirst) {
                 if (_curState.fillPattern != SOLID_FILL) {
-                    curVertMem = _primCreator.genFillDegenerate(
-                            curVertMem,
-                            prevX, prevY,
-                            _helper->toPixelsX(item.data.bar.left),
-                            _helper->toPixelsY(item.data.bar.top)
-                    );
+                    switch(item.type) {
+                            case QueueItem::BAR: {
+                            if(_bufPrepParams->supportsTexturedBar()){
+                                curVertMem = _primCreator.genFillCol2Degenerate(
+                                        curVertMem,
+                                        prevX, prevY,
+                                        _helper->toPixelsX(item.data.bar.left),
+                                        _helper->toPixelsY(item.data.bar.top),
+                                        _bufPrepParams->getWidth(), _bufPrepParams->getHeight()
+                                );
+                            } else {
+                                curVertMem = _primCreator.genFillDegenerate(
+                                        curVertMem,
+                                        prevX, prevY,
+                                        _helper->toPixelsX(item.data.bar.left),
+                                        _helper->toPixelsY(item.data.bar.top)
+                                );
+                            }
+                        }
+                            break;
+                        default:
+                            break;
+                    }
                 } else {
-                    if(item.type == QueueItem::FILLELLIPSE){
-                        if(_shaderMan->supportsEllipse()) {
-                            curVertMem = _primCreator.genEllipseDegenerate(
-                                    curVertMem,
-                                    prevX, prevY,
-                                    _helper->toPixelsX(item.data.fillellipse.x - item.data.fillellipse.xradius),
-                                    _helper->toPixelsY(item.data.fillellipse.y - item.data.fillellipse.yradius),
-                                    _width, _height
-                            );
-                        } else {
+                    switch(item.type){
+                        case QueueItem::FILLELLIPSE: {
+                            if (_bufPrepParams->supportsEllipse()) {
+                                curVertMem = _primCreator.genEllipseDegenerate(
+                                        curVertMem,
+                                        prevX, prevY,
+                                        _helper->toPixelsX(item.data.fillellipse.x - item.data.fillellipse.xradius),
+                                        _helper->toPixelsY(item.data.fillellipse.y - item.data.fillellipse.yradius),
+                                        _bufPrepParams->getWidth(), _bufPrepParams->getHeight()
+                                );
+                            } else {
+                                curVertMem = _primCreator.genDegenerate(
+                                        curVertMem,
+                                        prevX, prevY,
+                                        _helper->toPixelsX(item.data.fillellipse.x),
+                                        _helper->toPixelsY(item.data.fillellipse.y - item.data.fillellipse.yradius)
+                                );
+                            }
+                        }
+                            break;
+                        default:
                             curVertMem = _primCreator.genDegenerate(
                                     curVertMem,
                                     prevX, prevY,
-                                    _helper->toPixelsX(item.data.fillellipse.x),
-                                    _helper->toPixelsY(item.data.fillellipse.y - item.data.fillellipse.yradius)
+                                    ((item.type == QueueItem::SINGLE_PIXEL) ?
+                                     static_cast<int_fast32_t>(item.data.singlePixel.x) :
+                                     _helper->toPixelsX(item.data.bar.left)),
+                                    ((item.type == QueueItem::SINGLE_PIXEL) ?
+                                     static_cast<int_fast32_t>(item.data.singlePixel.y) :
+                                     _helper->toPixelsY(item.data.bar.top))
                             );
-                        }
-                    } else {
-                        curVertMem = _primCreator.genDegenerate(
-                                curVertMem,
-                                prevX, prevY,
-                                ((item.type == QueueItem::SINGLE_PIXEL) ?
-                                 static_cast<int_fast32_t>(item.data.singlePixel.x) :
-                                 _helper->toPixelsX(item.data.bar.left)),
-                                ((item.type == QueueItem::SINGLE_PIXEL) ?
-                                 static_cast<int_fast32_t>(item.data.singlePixel.y) :
-                                 _helper->toPixelsY(item.data.bar.top))
-                        );
+                            break;
                     }
                 }
             }
@@ -290,13 +338,13 @@ namespace directgraph{
                     prevY = item.data.singlePixel.y + 1;
                     break;
                 case QueueItem::FILLELLIPSE:
-                    if(_shaderMan->supportsEllipse()) {
+                    if(_bufPrepParams->supportsEllipse()) {
                         curVertMem = _primCreator.genEllipseQuad(curVertMem,
                                                                  _helper->toPixelsX(item.data.fillellipse.x),
                                                                  _helper->toPixelsY(item.data.fillellipse.y),
                                                                  _helper->toPixelsX(item.data.fillellipse.xradius),
                                                                  _helper->toPixelsY(item.data.fillellipse.yradius),
-                                                                 _width, _height,
+                                                                 _bufPrepParams->getWidth(), _bufPrepParams->getHeight(),
                                                                  _curGenDataVars.fillColor
                         );
                         prevX = _helper->toPixelsX(item.data.fillellipse.x + item.data.fillellipse.xradius);
@@ -315,13 +363,25 @@ namespace directgraph{
                     break;
                 case QueueItem::BAR:
                     if (_curState.fillPattern != SOLID_FILL) {
-                        curVertMem = _primCreator.genFillQuad(curVertMem,
-                                                              _helper->toPixelsX(item.data.bar.left),
-                                                              _helper->toPixelsY(item.data.bar.top),
-                                                              _helper->toPixelsX(item.data.bar.right),
-                                                              _helper->toPixelsY(item.data.bar.bottom),
-                                                              _curGenDataVars.fillColor
-                        );
+                        if(_bufPrepParams->supportsTexturedBar()){
+                            curVertMem = _primCreator.genFillCol2Quad(curVertMem,
+                                                                  _helper->toPixelsX(item.data.bar.left),
+                                                                  _helper->toPixelsY(item.data.bar.top),
+                                                                  _helper->toPixelsX(item.data.bar.right),
+                                                                  _helper->toPixelsY(item.data.bar.bottom),
+                                                                  _curGenDataVars.fillColor, _curGenDataVars.bgColor,
+                                                                  _bufPrepParams->getWidth(), _bufPrepParams->getHeight()
+
+                            );
+                        } else {
+                            curVertMem = _primCreator.genFillQuad(curVertMem,
+                                                                  _helper->toPixelsX(item.data.bar.left),
+                                                                  _helper->toPixelsY(item.data.bar.top),
+                                                                  _helper->toPixelsX(item.data.bar.right),
+                                                                  _helper->toPixelsY(item.data.bar.bottom),
+                                                                  _curGenDataVars.fillColor
+                            );
+                        }
                     } else {
                         curVertMem = _primCreator.genQuad(curVertMem,
                                                           _helper->toPixelsX(item.data.bar.left),
@@ -341,7 +401,7 @@ namespace directgraph{
                     curVertMem = _primCreator.genTexQuad(
                             curVertMem,
                             coords.left, coords.top, coords.right, coords.bottom,
-                            _pixelTextureWidth, _pixelTextureHeight
+                            _bufPrepParams->getPxTextureWidth(), _bufPrepParams->getPxTextureHeight()
                     );
                 }
                     break;
@@ -370,7 +430,7 @@ namespace directgraph{
                 ) {
                     TypeSize ts = getTypeSize(item);
                     uint_fast32_t curNumVertices;
-                    if(item.type == QueueItem::FILLELLIPSE && !_shaderMan->supportsEllipse()){
+                    if(item.type == QueueItem::FILLELLIPSE && !_bufPrepParams->supportsEllipse()){
                         curNumVertices = _primCreator.getNumEllipseVertices(
                                 static_cast<uint_fast32_t>(_helper->toPixelsX(item.data.fillellipse.xradius)),
                                 static_cast<uint_fast32_t>(_helper->toPixelsY(item.data.fillellipse.yradius))

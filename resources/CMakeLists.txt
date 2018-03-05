@@ -4,7 +4,12 @@ if("$ENV{DXSDK_DIR}" STREQUAL "")
     message( FATAL_ERROR "Don't know where DirectXSDK directory is." )
 endif()
 
-set(SHADER_SRCS shaders/ps_1_4/ellipse.hlsl shaders/vs_1_1/center_bar.hlsl)
+set(SHADER_SRCS
+        shaders/ps_1_4/ellipse.hlsl
+        shaders/ps_1_4/textured_bar.hlsl
+        shaders/vs_1_1/center_bar.hlsl
+        shaders/vs_1_1/textured_bar.hlsl
+)
 set(INCLUDE_FILE common_res.h)
 set(SHADER_RC shaders/shaders.rc)
 

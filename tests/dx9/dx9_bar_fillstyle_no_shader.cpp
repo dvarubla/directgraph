@@ -3,7 +3,7 @@
 #include <directgraph/directgraph_constants.h>
 #include "common.h"
 
-class DX9BarFillstyleOldTest : public ImageTest, public CommonSimple {
+class DX9BarFillstyleNoShaderTest : public ImageTest, public CommonSimple {
 public:
     NiceMock<QueueReaderStub> _readerStub;
     IMyWindow *win;
@@ -11,28 +11,26 @@ public:
     static float HEIGHT;
     IFeatures::ShaderVersion noShVer;
 
-    DX9BarFillstyleOldTest() {
+    DX9BarFillstyleNoShaderTest() {
         IFeatures::ShaderVersion t = {0, 0};
         noShVer = t;
         startThread();
         FeaturesStub *fstub = setupFeatures();
-        ON_CALL(*fstub, getPatternTexFormat()).WillByDefault(testing::Return(ColorFormat::AR5G5B5));
-        ON_CALL(*fstub, supportsTexConst()).WillByDefault(testing::Return(false));
         ON_CALL(*fstub, getVertexShaderVer()).WillByDefault(testing::Return(noShVer));
         ON_CALL(*fstub, getPixelShaderVer()).WillByDefault(testing::Return(noShVer));
         win = createWindow(WIDTH, HEIGHT);
         addOnCall(_readerStub);
     }
 
-    ~DX9BarFillstyleOldTest(){
+    ~DX9BarFillstyleNoShaderTest(){
 
     }
 };
 
-float DX9BarFillstyleOldTest::WIDTH = 200;
-float DX9BarFillstyleOldTest::HEIGHT = 300;
+float DX9BarFillstyleNoShaderTest::WIDTH = 200;
+float DX9BarFillstyleNoShaderTest::HEIGHT = 300;
 
-IMG_TEST_F(DX9BarFillstyleOldTest, LineFill8x8){
+IMG_TEST_F(DX9BarFillstyleNoShaderTest, LineFill8x8){
     QueueItem items[] = {
             QueueItemCreator::create<QueueItem::CLEAR>(),
             QueueItemCreator::create<QueueItem::BGCOLOR>(0x0000FF),
@@ -43,7 +41,7 @@ IMG_TEST_F(DX9BarFillstyleOldTest, LineFill8x8){
     return afterTestSimple(win, &_readerStub);
 }
 
-IMG_TEST_F(DX9BarFillstyleOldTest, LineFill){
+IMG_TEST_F(DX9BarFillstyleNoShaderTest, LineFill){
     QueueItem items[] = {
             QueueItemCreator::create<QueueItem::CLEAR>(),
             QueueItemCreator::create<QueueItem::BGCOLOR>(0x0000FF),
@@ -54,7 +52,7 @@ IMG_TEST_F(DX9BarFillstyleOldTest, LineFill){
     return afterTestSimple(win, &_readerStub);
 }
 
-IMG_TEST_F(DX9BarFillstyleOldTest, HatchFill){
+IMG_TEST_F(DX9BarFillstyleNoShaderTest, HatchFill){
     QueueItem items[] = {
             QueueItemCreator::create<QueueItem::CLEAR>(),
             QueueItemCreator::create<QueueItem::BGCOLOR>(0x0000FF),
@@ -65,7 +63,7 @@ IMG_TEST_F(DX9BarFillstyleOldTest, HatchFill){
     return afterTestSimple(win, &_readerStub);
 }
 
-IMG_TEST_F(DX9BarFillstyleOldTest, LineFill4Bars){
+IMG_TEST_F(DX9BarFillstyleNoShaderTest, LineFill4Bars){
     QueueItem items[] = {
             QueueItemCreator::create<QueueItem::CLEAR>(),
             QueueItemCreator::create<QueueItem::BGCOLOR>(0x0000FF),
@@ -82,7 +80,7 @@ IMG_TEST_F(DX9BarFillstyleOldTest, LineFill4Bars){
     return afterTestSimple(win, &_readerStub);
 }
 
-IMG_TEST_F(DX9BarFillstyleOldTest, DifferentFill4Bars){
+IMG_TEST_F(DX9BarFillstyleNoShaderTest, DifferentFill4Bars){
     QueueItem items[] = {
             QueueItemCreator::create<QueueItem::CLEAR>(),
             QueueItemCreator::create<QueueItem::BGCOLOR>(0x0000FF),
@@ -99,7 +97,7 @@ IMG_TEST_F(DX9BarFillstyleOldTest, DifferentFill4Bars){
     return afterTestSimple(win, &_readerStub);
 }
 
-IMG_TEST_F(DX9BarFillstyleOldTest, DifferentFill5Bars){
+IMG_TEST_F(DX9BarFillstyleNoShaderTest, DifferentFill5Bars){
     QueueItem items[] = {
             QueueItemCreator::create<QueueItem::CLEAR>(),
             QueueItemCreator::create<QueueItem::BGCOLOR>(0x0000FF),
@@ -118,7 +116,7 @@ IMG_TEST_F(DX9BarFillstyleOldTest, DifferentFill5Bars){
     return afterTestSimple(win, &_readerStub);
 }
 
-IMG_TEST_F(DX9BarFillstyleOldTest, UserPattern){
+IMG_TEST_F(DX9BarFillstyleNoShaderTest, UserPattern){
     uint8_t pattern[] = {0xFF, 0xEE, 0xDD, 0xCC, 0xBB, 0xAA, 0x99, 0x88};
     QueueItem items[] = {
             QueueItemCreator::create<QueueItem::CLEAR>(),
@@ -130,7 +128,7 @@ IMG_TEST_F(DX9BarFillstyleOldTest, UserPattern){
     return afterTestSimple(win, &_readerStub);
 }
 
-IMG_TEST_F(DX9BarFillstyleOldTest, UserFill){
+IMG_TEST_F(DX9BarFillstyleNoShaderTest, UserFill){
     uint8_t pattern[] = {0xFF, 0xEE, 0xDD, 0xCC, 0xBB, 0xAA, 0x99, 0x88};
     QueueItem items[] = {
             QueueItemCreator::create<QueueItem::CLEAR>(),
@@ -144,7 +142,7 @@ IMG_TEST_F(DX9BarFillstyleOldTest, UserFill){
     return afterTestSimple(win, &_readerStub);
 }
 
-IMG_TEST_F(DX9BarFillstyleOldTest, UserPatternThenSolidFill){
+IMG_TEST_F(DX9BarFillstyleNoShaderTest, UserPatternThenSolidFill){
     uint8_t pattern[] = {0xFF, 0xEE, 0xDD, 0xCC, 0xBB, 0xAA, 0x99, 0x88};
     QueueItem items[] = {
             QueueItemCreator::create<QueueItem::CLEAR>(),
@@ -153,6 +151,30 @@ IMG_TEST_F(DX9BarFillstyleOldTest, UserPatternThenSolidFill){
             QueueItemCreator::create<QueueItem::BAR>(WIDTH/4, HEIGHT/4, WIDTH/4*3, HEIGHT/4*3),
             QueueItemCreator::create<QueueItem::SETFILLSTYLE>(SOLID_FILL, 0x00CC00),
             QueueItemCreator::create<QueueItem::BAR>(0, 0, WIDTH/4, HEIGHT/4)
+    };
+    _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
+    return afterTestSimple(win, &_readerStub);
+}
+
+IMG_TEST_F(DX9BarFillstyleNoShaderTest, EmptyFill){
+    QueueItem items[] = {
+            QueueItemCreator::create<QueueItem::CLEAR>(),
+            QueueItemCreator::create<QueueItem::BGCOLOR>(0x0000FF),
+            QueueItemCreator::create<QueueItem::SETFILLSTYLE>(EMPTY_FILL, 0x00CC00),
+            QueueItemCreator::create<QueueItem::BAR>(0, 0, WIDTH/4, HEIGHT/4)
+    };
+    _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
+    return afterTestSimple(win, &_readerStub);
+}
+
+IMG_TEST_F(DX9BarFillstyleNoShaderTest, EmptyFillThenSolid){
+    QueueItem items[] = {
+            QueueItemCreator::create<QueueItem::CLEAR>(),
+            QueueItemCreator::create<QueueItem::BGCOLOR>(0x0000FF),
+            QueueItemCreator::create<QueueItem::SETFILLSTYLE>(EMPTY_FILL, 0x00CC00),
+            QueueItemCreator::create<QueueItem::BAR>(0, 0, WIDTH/4, HEIGHT/4),
+            QueueItemCreator::create<QueueItem::SETFILLSTYLE>(SOLID_FILL, 0x00CC00),
+            QueueItemCreator::create<QueueItem::BAR>(WIDTH/4, HEIGHT/4, WIDTH/2, HEIGHT/2)
     };
     _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
     return afterTestSimple(win, &_readerStub);

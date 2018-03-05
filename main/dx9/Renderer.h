@@ -28,6 +28,7 @@ namespace directgraph {
             DPIHelper *_helper;
             BufferPreparer *_bufPreparer;
             ShaderManager *_shaderMan;
+            BufferPreparerParams *_bufPrepParams;
             BufferPreparer::GenDataVars _initialVars;
             HWND _hwnd;
             float _width, _height;

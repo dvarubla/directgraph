@@ -16,7 +16,7 @@ namespace directgraph {
     namespace dx9 {
         Renderer::Renderer(Common *common, DPIHelper *helper, float width, float height, const CommonProps &props)
                 : _swapChain(NULL), _vertBuffer(NULL), _pixelTexture(NULL), _patTextHelper(NULL), _bufPreparer(NULL), 
-                  _shaderMan(NULL)
+                  _shaderMan(NULL), _bufPrepParams(NULL)
         {
             _helper = helper;
             _width = width;
@@ -108,10 +108,15 @@ namespace directgraph {
                     _device
             );
 
-            _bufPreparer = new BufferPreparer(
-                    VERTEX_BUFFER_SIZE, _curState, _helper, _shaderMan,
+            _bufPrepParams = new BufferPreparerParams(
+                    _shaderMan,
+                    !_common->getFeatures()->supportsTexConst(),
                     pxWidth, pxHeight,
-                    pixelTextureWidth, pixelTextureHeight, _initialVars
+                    pixelTextureWidth, pixelTextureHeight
+            );
+
+            _bufPreparer = new BufferPreparer(
+                    VERTEX_BUFFER_SIZE, _curState, _helper, _bufPrepParams, _initialVars
             );
         }
 
@@ -129,6 +134,7 @@ namespace directgraph {
             delete _shaderMan;
             delete _pixContFactory;
             delete [] _curState.userFillPattern;
+            delete _bufPrepParams;
         }
 
         void Renderer::prepare(IQueueReader *reader) {
@@ -195,6 +201,10 @@ namespace directgraph {
                                 stride = sizeof(EllipseVertex);
                                 setFVF = false;
                                 break;
+                            case BufferPreparer::COLOR2_VERTEX:
+                                stride = sizeof(Color2Vertex);
+                                setFVF = false;
+                                break;
                         }
                         _device->SetStreamSource(
                                 0, _vertBuffer,
@@ -207,6 +217,8 @@ namespace directgraph {
                         } else {
                             if(it->data.items.type == BufferPreparer::ELLIPSE_VERTEX){
                                 _shaderMan->setEllipse();
+                            } else if(it->data.items.type == BufferPreparer::COLOR2_VERTEX){
+                                _shaderMan->setTexturedBar();
                             }
                         }
                         _device->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, it->data.items.numItems);
@@ -218,17 +230,24 @@ namespace directgraph {
                         break;
                     case BufferPreparer::SET_FILL_PATTERN: {
                         _curState.fillPattern = it->data.fillPattern;
-                        _patTextHelper->setFillPattern(_curState.fillPattern, _curState.bgColor);
+                        _patTextHelper->setFillPattern(_curState.fillPattern);
+                    }
+                        break;
+                    case BufferPreparer::SET_FILL_PATTERN_COLOR: {
+                        _curState.fillPattern = it->data.fillPatternColor.fillPattern;
+                        _curState.bgColor = it->data.fillPatternColor.bgColor;
+                        _patTextHelper->setFillPatternBgColor(_curState.fillPattern, _curState.bgColor);
                     }
                         break;
                     case BufferPreparer::SET_USER_FILL_PATTERN: {
                         _curState.userFillPattern = it->data.userFillPattern;
+                        _curState.textureState = BufferPreparer::FILL_TEXTURE;
                         _patTextHelper->setUserFillPattern(_curState.userFillPattern);
                     }
                         break;
                     case BufferPreparer::SET_TEX_BG_COLOR: {
                         _curState.bgColor = it->data.bgColor;
-                        _patTextHelper->changeBgColor(_curState.fillPattern, _curState.bgColor);
+                        _patTextHelper->setBgColor(_curState.bgColor);
                     }
                         break;
                     case BufferPreparer::CLEAR: {

@@ -130,6 +130,86 @@ namespace directgraph{
             return vertices;
         }
 
+        Color2Vertex *
+        PrimitiveCreator::genFillCol2Degenerate(void *verticesVoid, int_fast32_t startX, int_fast32_t startY,
+                                                int_fast32_t endX, int_fast32_t endY,
+                                                uint_fast32_t width, uint_fast32_t height) {
+            float startXTrans = static_cast<float>(2.0 * (startX - 0.5)/ width - 1);
+            float endXTrans = static_cast<float>(2.0 * (endX - 0.5)/ width - 1);
+            float startYTrans = static_cast<float>(1 - 2.0 * (startY - 0.5)/ height);
+            float endYTrans = static_cast<float>(1 - 2.0 * (endY - 0.5)/ height);
+            Color2Vertex *vertices = static_cast<Color2Vertex*>(verticesVoid);
+            (*vertices) = VertexCreator::create<Color2Vertex>(
+                    startXTrans,
+                    startYTrans,
+                    0.0f,
+                    0.0f,
+                    D3DCOLOR_ARGB(0, 0, 0, 0),
+                    D3DCOLOR_ARGB(0, 0, 0, 0)
+            );
+            vertices++;
+            *vertices = VertexCreator::create<Color2Vertex>(
+                    endXTrans,
+                    endYTrans,
+                    0.0f,
+                    0.0f,
+                    D3DCOLOR_ARGB(0, 0, 0, 0),
+                    D3DCOLOR_ARGB(0, 0, 0, 0)
+            );
+            vertices++;
+            return vertices;
+        }
+
+        Color2Vertex *
+        PrimitiveCreator::genFillCol2Quad(void *verticesVoid, int_fast32_t startX, int_fast32_t startY,
+                                          int_fast32_t endX, int_fast32_t endY, uint_fast32_t color1,
+                                          uint_fast32_t color2, uint_fast32_t width, uint_fast32_t height) {
+            Color2Vertex *vertices = static_cast<Color2Vertex*>(verticesVoid);
+            float textureRight = (endX - startX) / 8.0f;
+            float textureBottom = (endY - startY) / 8.0f;
+            float startXTrans = static_cast<float>(2.0 * (startX - 0.5)/ width - 1);
+            float endXTrans = static_cast<float>(2.0 * (endX - 0.5)/ width - 1);
+            float startYTrans = static_cast<float>(1 - 2.0 * (startY - 0.5)/ height);
+            float endYTrans = static_cast<float>(1 - 2.0 * (endY - 0.5)/ height);
+            *vertices = VertexCreator::create<Color2Vertex>(
+                    startXTrans,
+                    startYTrans,
+                    0.0f,
+                    0.0f,
+                    static_cast<DWORD>(swap_color(color1)),
+                    static_cast<DWORD>(swap_color(color2))
+            );
+            vertices++;
+            *vertices = VertexCreator::create<Color2Vertex>(
+                    endXTrans,
+                    startYTrans,
+                    textureRight,
+                    0.0f,
+                    static_cast<DWORD>(swap_color(color1)),
+                    static_cast<DWORD>(swap_color(color2))
+            );
+            vertices++;
+            *vertices = VertexCreator::create<Color2Vertex>(
+                    startXTrans,
+                    endYTrans,
+                    0.0f,
+                    textureBottom,
+                    static_cast<DWORD>(swap_color(color1)),
+                    static_cast<DWORD>(swap_color(color2))
+            );
+            vertices++;
+            *vertices = VertexCreator::create<Color2Vertex>(
+                    endXTrans,
+                    endYTrans,
+                    textureRight,
+                    textureBottom,
+                    static_cast<DWORD>(swap_color(color1)),
+                    static_cast<DWORD>(swap_color(color2))
+            );
+            vertices++;
+            return vertices;
+        }
+
         TexturedRectVertex *
         PrimitiveCreator::genFillQuad(
                 void *verticesVoid,

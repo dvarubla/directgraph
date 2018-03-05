@@ -5,6 +5,7 @@
 #include <vector>
 #include "PrimitiveCreator.h"
 #include "ShaderManager.h"
+#include "BufferPreparerParams.h"
 
 namespace directgraph {
     namespace dx9 {
@@ -14,6 +15,7 @@ namespace directgraph {
                 CLEAR,
                 REMOVE_TEXTURE,
                 SET_FILL_PATTERN,
+                SET_FILL_PATTERN_COLOR,
                 SET_USER_FILL_PATTERN,
                 SET_TEX_BG_COLOR,
                 ITEMS,
@@ -24,6 +26,7 @@ namespace directgraph {
                 RECT_VERTEX,
                 TEXTURED_RECT_VERTEX,
                 TEXTURED_VERTEX,
+                COLOR2_VERTEX,
                 ELLIPSE_VERTEX
             };
             enum ShaderType{
@@ -38,6 +41,10 @@ namespace directgraph {
             struct DrawOp{
                 DrawOpType type;
                 union {
+                    struct FillPatternColor {
+                        uint8_t fillPattern;
+                        uint32_t bgColor;
+                    } fillPatternColor;
                     uint8_t fillPattern;
                     uint32_t bgColor;
                     char *userFillPattern;
@@ -71,22 +78,19 @@ namespace directgraph {
             const static int TRIANGLES_IN_QUAD = 2;
             const static int VERTICES_IN_QUAD = 4;
 
+            BufferPreparerParams *_bufPrepParams;
             PrimitiveCreator _primCreator;
-            ShaderManager *_shaderMan;
             void *_vertMem;
             uint_fast32_t _memSize;
             DevDrawState _lastState, _curState;
             DrawOpVector _drawOps;
             CharPVector _patterns;
             DPIHelper *_helper;
-            uint_fast32_t _width;
-            uint_fast32_t _height;
-            uint_fast32_t _pixelTextureWidth;
-            uint_fast32_t _pixelTextureHeight;
             GenDataVars _curGenDataVars;
             struct CurSettings{
                 bool textureSet;
                 bool bgColorSet;
+                bool fillPatternRecreated;
                 ShaderType shaderType;
             } _curSettings;
             bool _isFirst;
@@ -102,16 +106,14 @@ namespace directgraph {
             void processDrawItem(
                     const QueueItem &item, void *&curVertMem, int_fast32_t &prevX, int_fast32_t &prevY
             );
-            void useFillTexture();
+            void useFillTexture(bool useBgColor);
             void disableTexture();
             void disableShader();
             void setInitialSettings();
         public:
             BufferPreparer(
                     uint_fast32_t memSize, const DevDrawState &state, DPIHelper *helper,
-                    ShaderManager *shaderMan,
-                    uint_fast32_t width, uint_fast32_t height,
-                    uint_fast32_t pxTextureWidth, uint_fast32_t pxTextureHeight,
+                    BufferPreparerParams *bufPrepParams,
                     const GenDataVars &vars
             );
             ~BufferPreparer();
@@ -133,6 +135,8 @@ namespace directgraph {
             static BufferPreparer::DrawOp create();
             template <BufferPreparer::DrawOpType T>
             static BufferPreparer::DrawOp create(uint_fast32_t);
+            template <BufferPreparer::DrawOpType T>
+            static BufferPreparer::DrawOp create(uint_fast32_t, uint_fast32_t);
             template <BufferPreparer::DrawOpType T>
             static BufferPreparer::DrawOp create(char *userFillPattern);
             template <BufferPreparer::DrawOpType T>

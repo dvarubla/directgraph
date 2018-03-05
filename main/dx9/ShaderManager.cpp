@@ -8,8 +8,10 @@
 namespace directgraph {
     namespace dx9 {
         ShaderManager::ShaderManager(IFeatures *features, IDirect3DDevice9 *device):
-                _device(device), _supportsEllipse(false),
-                _centerBarV11Shader(NULL), _ellipseP14Shader(NULL), _centerBarV11Decl(NULL) {
+                _device(device), _supportsEllipse(false), _supportsTexturedBar(false),
+                _centerBarV11Shader(NULL), _ellipseP14Shader(NULL), _centerBarV11Decl(NULL),
+                _texturedBarV11Shader(NULL), _texturedBarP14Shader(NULL), _texturedBarV11Decl(NULL)
+        {
             try {
                 IFeatures::ShaderVersion vertexVer = features->getVertexShaderVer();
                 IFeatures::ShaderVersion pixelVer = features->getPixelShaderVer();
@@ -32,6 +34,26 @@ namespace directgraph {
                         );
                     }
                 }
+                IFeatures::ShaderVersion texturedBarVertexVer = {1, 1};
+                IFeatures::ShaderVersion texturedBarPixelVer = {1, 4};
+                if (texturedBarVertexVer <= vertexVer && texturedBarPixelVer <= pixelVer) {
+                    _supportsTexturedBar = true;
+                    createVertexShader(TEXTURED_BAR_V1_1, IDR_VERTEX_SHADER, _texturedBarV11Shader);
+                    createPixelShader(TEXTURED_BAR_P1_4, IDR_PIXEL_SHADER, _texturedBarP14Shader);
+                    D3DVERTEXELEMENT9 decl[] = {
+                            {0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+                            {0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0},
+                            {0, 20, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 1},
+                            D3DDECL_END()
+                    };
+                    if (_device->CreateVertexDeclaration(decl, &_texturedBarV11Decl) != D3D_OK) {
+                        THROW_EXC_CODE(
+                                Exception,
+                                DX9_CANT_CREATE_VDECL,
+                                L"Can't create textured bar vertex declaration"
+                        );
+                    }
+                }
             } catch(const WException &){
                 tryDeleteRes();
                 throw;
@@ -40,6 +62,16 @@ namespace directgraph {
 
         bool ShaderManager::supportsEllipse() {
             return _supportsEllipse;
+        }
+
+        bool ShaderManager::supportsTexturedBar() {
+            return _supportsTexturedBar;
+        }
+
+        void ShaderManager::setTexturedBar() {
+            _device->SetVertexDeclaration(_texturedBarV11Decl);
+            _device->SetVertexShader(_texturedBarV11Shader);
+            _device->SetPixelShader(_texturedBarP14Shader);
         }
 
         void ShaderManager::setEllipse() {
@@ -111,14 +143,19 @@ namespace directgraph {
         }
 
         void ShaderManager::tryDeleteRes() {
-            if(_centerBarV11Decl != NULL) {
-                _centerBarV11Decl->Release();
-            }
-            if(_centerBarV11Shader != NULL) {
-                _centerBarV11Shader->Release();
-            }
-            if(_ellipseP14Shader != NULL) {
-                _ellipseP14Shader->Release();
+            IUnknown *delArr[] = {
+                    _centerBarV11Decl,
+                    _centerBarV11Shader,
+                    _ellipseP14Shader,
+
+                    _texturedBarV11Decl,
+                    _texturedBarV11Shader,
+                    _texturedBarP14Shader
+            };
+            for(uint_fast32_t i = 0; i < sizeof(delArr)/sizeof(IUnknown*); i++){
+                if(delArr[i] != NULL){
+                    delArr[i]->Release();
+                }
             }
         }
     }

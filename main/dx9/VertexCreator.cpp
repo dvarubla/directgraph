@@ -30,5 +30,11 @@ namespace directgraph{
             TexturedRectVertex v = {x, y, z, rhw, color, tu, tv};
             return v;
         }
+
+        template<>
+        Color2Vertex VertexCreator::create<Color2Vertex>(float x, float y, float z, float rhw, DWORD color, DWORD color2) {
+            Color2Vertex v = {x, y, z, rhw, color, color2};
+            return v;
+        }
     }
 }

@@ -15,13 +15,16 @@ namespace directgraph{
             }
             if(haveConstantSupport) {
                 for(uint_fast8_t i = 0; i < NUM_STANDARD_FPATTERNS; i++) {
-                    createFPattern(i, 0, reinterpret_cast<const char *>(fillPatterns[i]), false);
+                    createFPattern(i, 0, reinterpret_cast<const char *>(fillPatterns[i]), false, true);
                 }
             }
         }
 
         template<uint_fast32_t DispMode>
-        void PatternTexturesHelper<DispMode>::setFillPattern(uint_fast8_t pattern, uint_fast32_t bgColor) {
+        void PatternTexturesHelper<DispMode>::setFillPattern(
+                uint_fast8_t pattern, uint_fast32_t bgColor,
+                bool needRecreate
+        ) {
             bool setStandardPattern = true;
             if(pattern == USER_FILL){
                 if(!_haveUserPattern){
@@ -32,20 +35,34 @@ namespace directgraph{
                     createFPattern(
                             USER_PATTERN_INDEX, bgColor,
                             reinterpret_cast<const char *>(_userPattern),
-                            _needCreateUserPattern
+                            _needCreateUserPattern,
+                            needRecreate
                     );
                     _needCreateUserPattern = false;
                 }
             }
             if(setStandardPattern){
                 pattern -= FIRST_FPATTERN;
-                createFPattern(
-                        pattern, bgColor,
-                        reinterpret_cast<const char *>(fillPatterns[pattern]),
-                        false
-                );
+                if(needRecreate) {
+                    createFPattern(
+                            pattern, bgColor,
+                            reinterpret_cast<const char *>(fillPatterns[pattern]),
+                            false,
+                            true
+                    );
+                }
             }
             setTexture(pattern);
+        }
+
+        template<uint_fast32_t DispMode>
+        void PatternTexturesHelper<DispMode>::setFillPattern(uint_fast8_t pattern) {
+            setFillPattern(pattern, 0, false);
+        }
+
+        template<uint_fast32_t DispMode>
+        void PatternTexturesHelper<DispMode>::setFillPatternBgColor(uint_fast8_t pattern, uint_fast32_t bgColor) {
+            setFillPattern(pattern, bgColor, true);
         }
 
         template<uint_fast32_t DispMode>
@@ -55,18 +72,7 @@ namespace directgraph{
 
         template<uint_fast32_t DispMode>
         void PatternTexturesHelper<DispMode>::setBgColor(uint_fast32_t bgColor) {
-            if(_haveConstantSupport){
-                setBgColorConstant(bgColor);
-            }
-        }
-
-        template<uint_fast32_t DispMode>
-        void PatternTexturesHelper<DispMode>::changeBgColor(uint_fast8_t pattern, uint_fast32_t bgColor) {
-            if(_haveConstantSupport){
-                setBgColorConstant(bgColor);
-            } else {
-                setFillPattern(pattern, bgColor);
-            }
+            setBgColorConstant(bgColor);
         }
 
         template<uint_fast32_t DispMode>
@@ -86,7 +92,7 @@ namespace directgraph{
         template<uint_fast32_t DispMode>
         void PatternTexturesHelper<DispMode>::createFPattern(
                 uint_fast8_t index, uint_fast32_t bgColor, const char *pattern,
-                bool forceCreate
+                bool forceCreate, bool needRecreate
         ) {
             bool needCreate = false;
             if(_textures[index].texture == NULL) {
@@ -100,7 +106,7 @@ namespace directgraph{
             }
             if(
                     needCreate || forceCreate ||
-                    (!_haveConstantSupport && _textures[index].color != bgColor)
+                    (needRecreate && _textures[index].color != bgColor)
             ) {
                 D3DLOCKED_RECT outRect;
                 _textures[index].texture->LockRect(0, &outRect, NULL, 0);

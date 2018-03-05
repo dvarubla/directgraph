@@ -44,6 +44,21 @@ namespace directgraph {
                     uint_fast32_t color
             );
 
+            Color2Vertex *genFillCol2Degenerate(
+                    void *verticesVoid,
+                    int_fast32_t startX, int_fast32_t startY,
+                    int_fast32_t endX, int_fast32_t endY,
+                    uint_fast32_t width, uint_fast32_t height
+            );
+
+            Color2Vertex *genFillCol2Quad(
+                    void *verticesVoid,
+                    int_fast32_t startX, int_fast32_t startY,
+                    int_fast32_t endX, int_fast32_t endY,
+                    uint_fast32_t color1, uint_fast32_t color2,
+                    uint_fast32_t width, uint_fast32_t height
+            );
+
             TexturedVertex *genTexQuad(
                     void *verticesVoid,
                     int_fast32_t startX, int_fast32_t startY,

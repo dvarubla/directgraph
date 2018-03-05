@@ -12,6 +12,13 @@ namespace directgraph {
             float x, y, z, rhw;
             DWORD color;
         };
+
+        struct Color2Vertex {
+            float x, y, z, rhw;
+            DWORD color1;
+            DWORD color2;
+        };
+
         struct TexturedVertex {
             float x, y, z, rhw;
             float tu, tv;
@@ -27,6 +34,11 @@ namespace directgraph {
             template<typename T>
             static T create(
                     float x, float y, float z, float rhw, DWORD color
+            );
+
+            template<typename T>
+            static T create(
+                    float x, float y, float z, float rhw, DWORD color, DWORD color2
             );
 
             template<typename T>
