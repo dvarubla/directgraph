@@ -23,8 +23,8 @@ namespace directgraph {
                 SET_LINE_STYLE
             };
             enum DrawDataType{
-                RECT_VERTEX,
-                TEXTURED_RECT_VERTEX,
+                COLOR_VERTEX,
+                TEXTURED_COLOR_VERTEX,
                 TEXTURED_VERTEX,
                 COLOR2_VERTEX,
                 ELLIPSE_VERTEX

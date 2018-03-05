@@ -57,14 +57,14 @@ namespace directgraph{
             return vertices;
         }
         
-        TexturedRectVertex *
+        TexturedColorVertex *
         PrimitiveCreator::genFillDegenerate(
                 void *verticesVoid,
                 int_fast32_t startX, int_fast32_t startY,
                 int_fast32_t endX, int_fast32_t endY
         ) {
-            TexturedRectVertex *vertices = static_cast<TexturedRectVertex*>(verticesVoid);
-            (*vertices) = VertexCreator::create<TexturedRectVertex>(
+            TexturedColorVertex *vertices = static_cast<TexturedColorVertex*>(verticesVoid);
+            (*vertices) = VertexCreator::create<TexturedColorVertex>(
                     static_cast<float>(startX) - 0.5f,
                     static_cast<float>(startY) - 0.5f,
                     0.0f,
@@ -74,7 +74,7 @@ namespace directgraph{
                     0.0f
             );
             vertices++;
-            *vertices = VertexCreator::create<TexturedRectVertex>(
+            *vertices = VertexCreator::create<TexturedColorVertex>(
                     static_cast<float>(endX) - 0.5f,
                     static_cast<float>(endY) - 0.5f,
                     0.0f,
@@ -134,10 +134,10 @@ namespace directgraph{
         PrimitiveCreator::genFillCol2Degenerate(void *verticesVoid, int_fast32_t startX, int_fast32_t startY,
                                                 int_fast32_t endX, int_fast32_t endY,
                                                 uint_fast32_t width, uint_fast32_t height) {
-            float startXTrans = static_cast<float>(2.0 * (startX - 0.5)/ width - 1);
-            float endXTrans = static_cast<float>(2.0 * (endX - 0.5)/ width - 1);
-            float startYTrans = static_cast<float>(1 - 2.0 * (startY - 0.5)/ height);
-            float endYTrans = static_cast<float>(1 - 2.0 * (endY - 0.5)/ height);
+            float startXTrans = coordToPositionX(startX, width);
+            float endXTrans = coordToPositionX(endX, width);
+            float startYTrans = coordToPositionY(startY, height);
+            float endYTrans = coordToPositionY(endY, height);
             Color2Vertex *vertices = static_cast<Color2Vertex*>(verticesVoid);
             (*vertices) = VertexCreator::create<Color2Vertex>(
                     startXTrans,
@@ -165,12 +165,12 @@ namespace directgraph{
                                           int_fast32_t endX, int_fast32_t endY, uint_fast32_t color1,
                                           uint_fast32_t color2, uint_fast32_t width, uint_fast32_t height) {
             Color2Vertex *vertices = static_cast<Color2Vertex*>(verticesVoid);
-            float textureRight = (endX - startX) / 8.0f;
-            float textureBottom = (endY - startY) / 8.0f;
-            float startXTrans = static_cast<float>(2.0 * (startX - 0.5)/ width - 1);
-            float endXTrans = static_cast<float>(2.0 * (endX - 0.5)/ width - 1);
-            float startYTrans = static_cast<float>(1 - 2.0 * (startY - 0.5)/ height);
-            float endYTrans = static_cast<float>(1 - 2.0 * (endY - 0.5)/ height);
+            float textureRight = 1.0f * (endX - startX) / FPATTERN_SIZE;
+            float textureBottom = 1.0f * (endY - startY) / FPATTERN_SIZE;
+            float startXTrans = coordToPositionX(startX, width);
+            float endXTrans = coordToPositionX(endX, width);
+            float startYTrans = coordToPositionY(startY, height);
+            float endYTrans = coordToPositionY(endY, height);
             *vertices = VertexCreator::create<Color2Vertex>(
                     startXTrans,
                     startYTrans,
@@ -210,17 +210,17 @@ namespace directgraph{
             return vertices;
         }
 
-        TexturedRectVertex *
+        TexturedColorVertex *
         PrimitiveCreator::genFillQuad(
                 void *verticesVoid,
                 int_fast32_t startX, int_fast32_t startY,
                 int_fast32_t endX, int_fast32_t endY,
                 uint_fast32_t color
         ) {
-            TexturedRectVertex *vertices = static_cast<TexturedRectVertex*>(verticesVoid);
-            float textureRight = (endX - startX) / 8.0f;
-            float textureBottom = (endY - startY) / 8.0f;
-            *vertices = VertexCreator::create<TexturedRectVertex>(
+            TexturedColorVertex *vertices = static_cast<TexturedColorVertex*>(verticesVoid);
+            float textureRight = 1.0f * (endX - startX) / FPATTERN_SIZE;
+            float textureBottom = 1.0f * (endY - startY) / FPATTERN_SIZE;
+            *vertices = VertexCreator::create<TexturedColorVertex>(
                     static_cast<float>(startX) - 0.5f,
                     static_cast<float>(startY) - 0.5f,
                     0.0f,
@@ -230,7 +230,7 @@ namespace directgraph{
                     0.0f
             );
             vertices++;
-            *vertices = VertexCreator::create<TexturedRectVertex>(
+            *vertices = VertexCreator::create<TexturedColorVertex>(
                     static_cast<float>(endX) - 0.5f,
                     static_cast<float>(startY) - 0.5f,
                     0.0f,
@@ -240,7 +240,7 @@ namespace directgraph{
                     0.0f
             );
             vertices++;
-            *vertices = VertexCreator::create<TexturedRectVertex>(
+            *vertices = VertexCreator::create<TexturedColorVertex>(
                     static_cast<float>(startX) - 0.5f,
                     static_cast<float>(endY) - 0.5f,
                     0.0f,
@@ -250,7 +250,7 @@ namespace directgraph{
                     textureBottom
             );
             vertices++;
-            *vertices = VertexCreator::create<TexturedRectVertex>(
+            *vertices = VertexCreator::create<TexturedColorVertex>(
                     static_cast<float>(endX) - 0.5f,
                     static_cast<float>(endY) - 0.5f,
                     0.0f,
@@ -297,21 +297,21 @@ namespace directgraph{
         PrimitiveCreator::PrimitiveCreator() {
         }
 
-        EllipseVertex *
+        ColorVertex *
         PrimitiveCreator::genEllipseDegenerate(
                 void *verticesVoid, int_fast32_t startX, int_fast32_t startY,
                 int_fast32_t endX, int_fast32_t endY,
                 uint_fast32_t width, uint_fast32_t height
         ) {
-            EllipseVertex *vertices = static_cast<EllipseVertex*>(verticesVoid);
-            (*vertices) = VertexCreator::create<EllipseVertex>(
+            ColorVertex *vertices = static_cast<ColorVertex*>(verticesVoid);
+            (*vertices) = VertexCreator::create<ColorVertex>(
                     static_cast<float>(2.0 * (startX - 0.5) / width - 1),
                     static_cast<float>(1 - 2.0 * (startY - 0.5) / height),
                     0.0f, 0.0f,
                     D3DCOLOR_ARGB(0, 0, 0, 0)
             );
             vertices++;
-            *vertices = VertexCreator::create<EllipseVertex>(
+            *vertices = VertexCreator::create<ColorVertex>(
                     static_cast<float>(2.0f * (endX - 0.5) / width - 1),
                     static_cast<float>(1 - 2.0f * (endY - 0.5) / height),
                     0.0f, 0.0f,
@@ -321,7 +321,7 @@ namespace directgraph{
             return vertices;
         }
 
-        EllipseVertex *
+        ColorVertex *
         PrimitiveCreator::genEllipseQuad(
                 void *verticesVoid,
                 int_fast32_t centerX, int_fast32_t centerY,
@@ -329,24 +329,24 @@ namespace directgraph{
                 uint_fast32_t width, uint_fast32_t height,
                 uint_fast32_t color
         ) {
-            float centerXTrans = static_cast<float>(2.0 * (centerX - 0.5)/ width - 1);
+            float centerXTrans = coordToPositionX(centerX, width);
             float radiusXTrans = static_cast<float>(1.0 * radiusX / width);
-            float centerYTrans = static_cast<float>(1 - 2.0 * (centerY - 0.5) / height);
+            float centerYTrans = coordToPositionY(centerY, height);
             float radiusYTrans = static_cast<float>(1.0 * radiusY / height);
-            EllipseVertex *vertices = static_cast<EllipseVertex*>(verticesVoid);
-            *vertices = VertexCreator::create<EllipseVertex>(
+            ColorVertex *vertices = static_cast<ColorVertex*>(verticesVoid);
+            *vertices = VertexCreator::create<ColorVertex>(
                     centerXTrans, centerYTrans, -radiusXTrans, -radiusYTrans, swap_color(color)
             );
             vertices++;
-            *vertices = VertexCreator::create<EllipseVertex>(
+            *vertices = VertexCreator::create<ColorVertex>(
                     centerXTrans, centerYTrans, radiusXTrans, -radiusYTrans, swap_color(color)
             );
             vertices++;
-            *vertices = VertexCreator::create<EllipseVertex>(
+            *vertices = VertexCreator::create<ColorVertex>(
                     centerXTrans, centerYTrans, -radiusXTrans, radiusYTrans, swap_color(color)
             );
             vertices++;
-            *vertices = VertexCreator::create<EllipseVertex>(
+            *vertices = VertexCreator::create<ColorVertex>(
                     centerXTrans, centerYTrans, radiusXTrans, radiusYTrans, swap_color(color)
             );
             vertices++;
@@ -363,6 +363,14 @@ namespace directgraph{
 
         uint_fast32_t PrimitiveCreator::getNumEllipseVertices(uint_fast32_t rx, uint_fast32_t ry) {
             return _ellipseHelper.getNumEllipseVertices(rx, ry);
+        }
+
+        float PrimitiveCreator::coordToPositionX(int_fast32_t coord, uint_fast32_t width) {
+            return static_cast<float>(2.0 * (coord - 0.5) / width - 1);
+        }
+
+        float PrimitiveCreator::coordToPositionY(int_fast32_t coord, uint_fast32_t height) {
+            return static_cast<float>(1 - 2.0 * (coord - 0.5) / height);
         }
     }
 }

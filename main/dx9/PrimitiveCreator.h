@@ -3,12 +3,15 @@
 #include <stdint.h>
 #include "EllipseHelper.h"
 #include "VertexCreator.h"
+#include "patterns.h"
 
 namespace directgraph {
     namespace dx9 {
         class PrimitiveCreator {
         private:
             EllipseHelper _ellipseHelper;
+            float coordToPositionX(int_fast32_t coord, uint_fast32_t width);
+            float coordToPositionY(int_fast32_t coord, uint_fast32_t height);
         public:
             PrimitiveCreator();
 
@@ -31,13 +34,13 @@ namespace directgraph {
                     uint_fast32_t color
             );
 
-            TexturedRectVertex *genFillDegenerate(
+            TexturedColorVertex *genFillDegenerate(
                     void *verticesVoid,
                     int_fast32_t startX, int_fast32_t startY,
                     int_fast32_t endX, int_fast32_t endY
             );
 
-            TexturedRectVertex *genFillQuad(
+            TexturedColorVertex *genFillQuad(
                     void *verticesVoid,
                     int_fast32_t startX, int_fast32_t startY,
                     int_fast32_t endX, int_fast32_t endY,
@@ -66,14 +69,14 @@ namespace directgraph {
                     uint_fast32_t maxX, uint_fast32_t maxY
             );
 
-            EllipseVertex *genEllipseDegenerate(
+            ColorVertex *genEllipseDegenerate(
                     void *verticesVoid,
                     int_fast32_t startX, int_fast32_t startY,
                     int_fast32_t endX, int_fast32_t endY,
                     uint_fast32_t width, uint_fast32_t height
             );
 
-            EllipseVertex *genEllipseQuad(
+            ColorVertex *genEllipseQuad(
                     void *verticesVoid,
                     int_fast32_t centerX, int_fast32_t centerY,
                     int_fast32_t radiusX, int_fast32_t radiusY,

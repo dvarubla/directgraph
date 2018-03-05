@@ -232,28 +232,28 @@ namespace directgraph{
                 case QueueItem::BAR:
                     if (_curState.fillPattern != SOLID_FILL) {
                         if(_bufPrepParams->supportsTexturedBar()){
-                            res.sizeMult = sizeof(TexturedRectVertex);
+                            res.sizeMult = sizeof(TexturedColorVertex);
                             res.drawDataType = COLOR2_VERTEX;
                         } else {
-                            res.sizeMult = sizeof(TexturedRectVertex);
-                            res.drawDataType = TEXTURED_RECT_VERTEX;
+                            res.sizeMult = sizeof(TexturedColorVertex);
+                            res.drawDataType = TEXTURED_COLOR_VERTEX;
                         }
                     } else {
                         res.sizeMult = sizeof(ColorVertex);
-                        res.drawDataType = RECT_VERTEX;
+                        res.drawDataType = COLOR_VERTEX;
                     }
                     break;
                 case QueueItem::SINGLE_PIXEL:
                     res.sizeMult = sizeof(ColorVertex);
-                    res.drawDataType = RECT_VERTEX;
+                    res.drawDataType = COLOR_VERTEX;
                     break;
                 case QueueItem::FILLELLIPSE:
                     if(_bufPrepParams->supportsEllipse()) {
-                        res.sizeMult = sizeof(EllipseVertex);
+                        res.sizeMult = sizeof(ColorVertex);
                         res.drawDataType = ELLIPSE_VERTEX;
                     } else {
                         res.sizeMult = sizeof(ColorVertex);
-                        res.drawDataType = RECT_VERTEX;
+                        res.drawDataType = COLOR_VERTEX;
                     }
                     break;
                 default: break;

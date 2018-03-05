@@ -10,13 +10,6 @@ namespace directgraph{
         }
 
         template<>
-        EllipseVertex
-        VertexCreator::create<EllipseVertex>(float x, float y, float z, float rhw, DWORD color) {
-            EllipseVertex v = {x, y, z, rhw, color};
-            return v;
-        }
-
-        template<>
         TexturedVertex
         VertexCreator::create<TexturedVertex>(float x, float y, float z, float rhw, float tu, float tv) {
             TexturedVertex v = {x, y, z, rhw, tu, tv};
@@ -24,10 +17,10 @@ namespace directgraph{
         }
 
         template<>
-        TexturedRectVertex VertexCreator::create<TexturedRectVertex>(
+        TexturedColorVertex VertexCreator::create<TexturedColorVertex>(
                 float x, float y, float z, float rhw, DWORD color, float tu, float tv
         ) {
-            TexturedRectVertex v = {x, y, z, rhw, color, tu, tv};
+            TexturedColorVertex v = {x, y, z, rhw, color, tu, tv};
             return v;
         }
 

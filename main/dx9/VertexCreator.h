@@ -3,11 +3,6 @@
 
 namespace directgraph {
     namespace dx9 {
-        struct EllipseVertex {
-            float x, y, z, rhw;
-            DWORD color;
-        };
-
         struct ColorVertex {
             float x, y, z, rhw;
             DWORD color;
@@ -23,7 +18,7 @@ namespace directgraph {
             float x, y, z, rhw;
             float tu, tv;
         };
-        struct TexturedRectVertex {
+        struct TexturedColorVertex {
             float x, y, z, rhw;
             DWORD color;
             float tu, tv;
