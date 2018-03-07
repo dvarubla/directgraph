@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <stdint.h>
+#include "util.h"
 
 namespace directgraph {
     class DPIHelper {
@@ -20,6 +21,9 @@ namespace directgraph {
         int_fast32_t toPixelsX(float dip);
 
         int_fast32_t toPixelsY(float dip);
+
+        Coords toPixelsXY(float dipX, float dipY);
+        UCoords toPixelsXYU(float dipX, float dipY);
 
         void setDpiX(float dpiX);
 

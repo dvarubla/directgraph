@@ -297,18 +297,14 @@ namespace directgraph{
                         case QueueItem::BAR: {
                             if(_bufPrepParams->supportsTexturedBar()){
                                 curVertMem = _primCreator.genFillCol2Degenerate(
-                                        curVertMem,
-                                        _prevX, _prevY,
-                                        _helper->toPixelsX(item.data.bar.left),
-                                        _helper->toPixelsY(item.data.bar.top),
-                                        _bufPrepParams->getWidth(), _bufPrepParams->getHeight()
+                                        curVertMem, _prevCrds,
+                                        _helper->toPixelsXY(item.data.bar.left, item.data.bar.top),
+                                        genUCoords(_bufPrepParams->getWidth(), _bufPrepParams->getHeight())
                                 );
                             } else {
                                 curVertMem = _primCreator.genFillDegenerate(
-                                        curVertMem,
-                                        _prevX, _prevY,
-                                        _helper->toPixelsX(item.data.bar.left),
-                                        _helper->toPixelsY(item.data.bar.top)
+                                        curVertMem, _prevCrds,
+                                        _helper->toPixelsXY(item.data.bar.left, item.data.bar.top)
                                 );
                             }
                         }
@@ -316,11 +312,12 @@ namespace directgraph{
                         case QueueItem::FILLELLIPSE: {
                             if(_bufPrepParams->supportsTexturedEllipse()){
                                 curVertMem = _primCreator.genTexEllipseDegenerate(
-                                        curVertMem,
-                                        _prevX, _prevY,
-                                        _helper->toPixelsX(item.data.fillellipse.x - item.data.fillellipse.xradius),
-                                        _helper->toPixelsY(item.data.fillellipse.y - item.data.fillellipse.yradius),
-                                        _bufPrepParams->getWidth(), _bufPrepParams->getHeight()
+                                        curVertMem, _prevCrds,
+                                        _helper->toPixelsXY(
+                                                item.data.fillellipse.x - item.data.fillellipse.xradius,
+                                                item.data.fillellipse.y - item.data.fillellipse.yradius
+                                        ),
+                                        genUCoords(_bufPrepParams->getWidth(), _bufPrepParams->getHeight())
                                 );
                             }
                         }
@@ -333,41 +330,41 @@ namespace directgraph{
                         case QueueItem::FILLELLIPSE: {
                             if (_bufPrepParams->supportsEllipse()) {
                                 curVertMem = _primCreator.genEllipseDegenerate(
-                                        curVertMem,
-                                        _prevX, _prevY,
-                                        _helper->toPixelsX(item.data.fillellipse.x - item.data.fillellipse.xradius),
-                                        _helper->toPixelsY(item.data.fillellipse.y - item.data.fillellipse.yradius),
-                                        _bufPrepParams->getWidth(), _bufPrepParams->getHeight()
+                                        curVertMem, _prevCrds,
+                                        _helper->toPixelsXY(
+                                                item.data.fillellipse.x - item.data.fillellipse.xradius,
+                                                item.data.fillellipse.y - item.data.fillellipse.yradius
+                                        ),
+                                        genUCoords(_bufPrepParams->getWidth(), _bufPrepParams->getHeight())
                                 );
                             } else {
                                 curVertMem = _primCreator.genDegenerate(
-                                        curVertMem,
-                                        _prevX, _prevY,
-                                        _helper->toPixelsX(item.data.fillellipse.x),
-                                        _helper->toPixelsY(item.data.fillellipse.y - item.data.fillellipse.yradius)
+                                        curVertMem, _prevCrds,
+                                        _helper->toPixelsXY(item.data.fillellipse.x,
+                                                            item.data.fillellipse.y - item.data.fillellipse.yradius
+                                        )
                                 );
                             }
                         }
                             break;
                         case QueueItem::SINGLE_PIXEL:
                             curVertMem = _primCreator.genDegenerate(
-                                    curVertMem,
-                                    _prevX, _prevY,
+                                    curVertMem, _prevCrds,
+                                    genCoords(
                                     static_cast<int_fast32_t>(item.data.singlePixel.x),
                                     static_cast<int_fast32_t>(item.data.singlePixel.y)
+                                    )
                             );
                             break;
                         case QueueItem::BAR:
                             curVertMem = _primCreator.genDegenerate(
-                                    curVertMem,
-                                    _prevX, _prevY,
-                                    _helper->toPixelsX(item.data.bar.left),
-                                    _helper->toPixelsY(item.data.bar.top)
+                                    curVertMem, _prevCrds,
+                                    _helper->toPixelsXY(item.data.bar.left, item.data.bar.top)
                             );
                             break;
                         case QueueItem::CLEAR:
                             curVertMem = _primCreator.genDegenerate(
-                                    curVertMem, _prevX, _prevY, 0, 0
+                                    curVertMem, _prevCrds, genCoords(0, 0)
                             );
                             break;
                     }
@@ -382,67 +379,69 @@ namespace directgraph{
             switch(item.type){
                 case QueueItem::SINGLE_PIXEL:
                     curVertMem = _primCreator.genQuad(curVertMem,
-                                                      item.data.singlePixel.x,
-                                                      item.data.singlePixel.y,
-                                                      item.data.singlePixel.x + 1,
-                                                      item.data.singlePixel.y + 1,
+                                                      genCoords(item.data.singlePixel.x, item.data.singlePixel.y),
+                                                      genCoords(item.data.singlePixel.x + 1, item.data.singlePixel.y + 1),
                                                       item.data.singlePixel.color
                     );
-                    _prevX = item.data.singlePixel.x + 1;
-                    _prevY = item.data.singlePixel.y + 1;
+                    _prevCrds = genCoords(item.data.singlePixel.x + 1, item.data.singlePixel.y + 1);
                     break;
                 case QueueItem::CLEAR:
                     curVertMem = _primCreator.genQuad(curVertMem,
-                                                      0,
-                                                      0,
-                                                      _bufPrepParams->getWidth(),
-                                                      _bufPrepParams->getHeight(),
+                                                      genCoords(0, 0),
+                                                      genCoords(_bufPrepParams->getWidth(), _bufPrepParams->getHeight()),
                                                       0xFFFFFF
                     );
-                    _prevX = _bufPrepParams->getWidth();
-                    _prevY = _bufPrepParams->getHeight();
+                    _prevCrds = genCoords(_bufPrepParams->getWidth(), _bufPrepParams->getHeight());
                     break;
                 case QueueItem::FILLELLIPSE:
                     if (_stateHelper.textureUsed()) {
                         if (_bufPrepParams->supportsTexturedEllipse()) {
                             curVertMem = _primCreator.genTexEllipseQuad(curVertMem,
-                                                                     _helper->toPixelsX(item.data.fillellipse.x),
-                                                                     _helper->toPixelsY(item.data.fillellipse.y),
-                                                                     _helper->toPixelsX(item.data.fillellipse.xradius),
-                                                                     _helper->toPixelsY(item.data.fillellipse.yradius),
+                                                                     _helper->toPixelsXY(item.data.fillellipse.x, item.data.fillellipse.y),
+                                                                     _helper->toPixelsXYU(
+                                                                                item.data.fillellipse.xradius,
+                                                                                item.data.fillellipse.yradius
+                                                                     ),
                                                                      _stateHelper.getLastState().fillColor,
                                                                      _stateHelper.getLastState().bgColor,
-                                                                     _bufPrepParams->getWidth(),
-                                                                     _bufPrepParams->getHeight()
+                                                                     genUCoords(_bufPrepParams->getWidth(), _bufPrepParams->getHeight())
                             );
-                            _prevX = _helper->toPixelsX(item.data.fillellipse.x + item.data.fillellipse.xradius);
-                            _prevY = _helper->toPixelsY(item.data.fillellipse.y + item.data.fillellipse.yradius);
+                            _prevCrds = _helper->toPixelsXY(
+                                    item.data.fillellipse.x + item.data.fillellipse.xradius,
+                                    item.data.fillellipse.y + item.data.fillellipse.yradius
+                            );
                         }
                     } else {
                         if (_bufPrepParams->supportsEllipse()) {
                             curVertMem = _primCreator.genEllipseQuad(curVertMem,
-                                                                     _helper->toPixelsX(item.data.fillellipse.x),
-                                                                     _helper->toPixelsY(item.data.fillellipse.y),
-                                                                     _helper->toPixelsX(item.data.fillellipse.xradius),
-                                                                     _helper->toPixelsY(item.data.fillellipse.yradius),
-                                                                     _bufPrepParams->getWidth(),
-                                                                     _bufPrepParams->getHeight(),
+                                                                     _helper->toPixelsXY(item.data.fillellipse.x, item.data.fillellipse.y),
+                                                                     _helper->toPixelsXYU(
+                                                                             item.data.fillellipse.xradius,
+                                                                             item.data.fillellipse.yradius
+                                                                     ),
+                                                                     genUCoords(_bufPrepParams->getWidth(), _bufPrepParams->getHeight()),
                                                                      _stateHelper.getFillColor()
                             );
-                            _prevX = _helper->toPixelsX(item.data.fillellipse.x + item.data.fillellipse.xradius);
-                            _prevY = _helper->toPixelsY(item.data.fillellipse.y + item.data.fillellipse.yradius);
+                            _prevCrds = _helper->toPixelsXY(
+                                    item.data.fillellipse.x + item.data.fillellipse.xradius,
+                                    item.data.fillellipse.y + item.data.fillellipse.yradius
+                            );
                         } else {
                             curVertMem = _primCreator.genEllipse(curVertMem,
-                                                                 _helper->toPixelsX(item.data.fillellipse.x),
-                                                                 _helper->toPixelsY(item.data.fillellipse.y),
-                                                                 static_cast<uint_fast32_t>(_helper->toPixelsX(
-                                                                         item.data.fillellipse.xradius)),
-                                                                 static_cast<uint_fast32_t>(_helper->toPixelsY(
-                                                                         item.data.fillellipse.yradius)),
+                                                                 _helper->toPixelsXY(
+                                                                         item.data.fillellipse.x,
+                                                                         item.data.fillellipse.y
+                                                                 ),
+                                                                 _helper->toPixelsXYU(
+                                                                         item.data.fillellipse.xradius,
+                                                                         item.data.fillellipse.yradius
+                                                                 ),
                                                                  _stateHelper.getFillColor()
                             );
-                            _prevX = _helper->toPixelsX(item.data.fillellipse.x);
-                            _prevY = _helper->toPixelsY(item.data.fillellipse.y - item.data.fillellipse.yradius);
+                            _prevCrds = _helper->toPixelsXY(
+                                    item.data.fillellipse.x, 
+                                    item.data.fillellipse.y - item.data.fillellipse.yradius
+                            );
                         }
                     }
                     break;
@@ -450,43 +449,36 @@ namespace directgraph{
                     if (_stateHelper.textureUsed()) {
                         if(_bufPrepParams->supportsTexturedBar()){
                             curVertMem = _primCreator.genFillCol2Quad(curVertMem,
-                                                                  _helper->toPixelsX(item.data.bar.left),
-                                                                  _helper->toPixelsY(item.data.bar.top),
-                                                                  _helper->toPixelsX(item.data.bar.right),
-                                                                  _helper->toPixelsY(item.data.bar.bottom),
+                                                                  _helper->toPixelsXY(item.data.bar.left, item.data.bar.top),
+                                                                  _helper->toPixelsXY(item.data.bar.right, item.data.bar.bottom),
                                                                   _stateHelper.getLastState().fillColor,
                                                                   _stateHelper.getLastState().bgColor,
-                                                                  _bufPrepParams->getWidth(), _bufPrepParams->getHeight()
+                                                                  genUCoords(_bufPrepParams->getWidth(), _bufPrepParams->getHeight())
 
                             );
                         } else {
                             curVertMem = _primCreator.genFillQuad(curVertMem,
-                                                                  _helper->toPixelsX(item.data.bar.left),
-                                                                  _helper->toPixelsY(item.data.bar.top),
-                                                                  _helper->toPixelsX(item.data.bar.right),
-                                                                  _helper->toPixelsY(item.data.bar.bottom),
+                                                                  _helper->toPixelsXY(item.data.bar.left, item.data.bar.top),
+                                                                  _helper->toPixelsXY(item.data.bar.right, item.data.bar.bottom),
                                                                   _stateHelper.getLastState().fillColor
                             );
                         }
                     } else {
                         curVertMem = _primCreator.genQuad(curVertMem,
-                                                          _helper->toPixelsX(item.data.bar.left),
-                                                          _helper->toPixelsY(item.data.bar.top),
-                                                          _helper->toPixelsX(item.data.bar.right),
-                                                          _helper->toPixelsY(item.data.bar.bottom),
+                                                          _helper->toPixelsXY(item.data.bar.left, item.data.bar.top),
+                                                          _helper->toPixelsXY(item.data.bar.right, item.data.bar.bottom),
                                                           _stateHelper.getFillColor()
 
                         );
                     }
-                    _prevX = _helper->toPixelsX(item.data.bar.right);
-                    _prevY = _helper->toPixelsY(item.data.bar.bottom);
+                    _prevCrds = _helper->toPixelsXY(item.data.bar.right, item.data.bar.bottom);
                     break;
                 case QueueItem::PIXEL_CONTAINER: {
                     Rectangle coords = item.data.pixelContainer->getCoords();
                     curVertMem = _primCreator.genTexQuad(
                             curVertMem,
-                            coords.left, coords.top, coords.right, coords.bottom,
-                            _bufPrepParams->getPxTextureWidth(), _bufPrepParams->getPxTextureHeight()
+                            genCoords(coords.left, coords.top), genCoords(coords.right, coords.bottom),
+                            genUCoords(_bufPrepParams->getPxTextureWidth(), _bufPrepParams->getPxTextureHeight())
                     );
                 }
                     break;
@@ -518,8 +510,10 @@ namespace directgraph{
                     uint_fast32_t curNumVertices;
                     if(item.type == QueueItem::FILLELLIPSE && !_bufPrepParams->supportsEllipse()){
                         curNumVertices = _primCreator.getNumEllipseVertices(
-                                static_cast<uint_fast32_t>(_helper->toPixelsX(item.data.fillellipse.xradius)),
-                                static_cast<uint_fast32_t>(_helper->toPixelsY(item.data.fillellipse.yradius))
+                                _helper->toPixelsXYU(
+                                        item.data.fillellipse.xradius, 
+                                        item.data.fillellipse.yradius
+                                )
                         );
                         if(!_isFirst){
                             curNumVertices += 2;

@@ -32,6 +32,16 @@ namespace directgraph {
     DPIHelper::~DPIHelper() {
     }
 
+    Coords DPIHelper::toPixelsXY(float dipX, float dipY) {
+        Coords res = {toPixelsX(dipX), toPixelsY(dipY)};
+        return res;
+    }
+
+    UCoords DPIHelper::toPixelsXYU(float dipX, float dipY) {
+        UCoords res = {static_cast<uint_fast32_t>(toPixelsX(dipX)), static_cast<uint_fast32_t>(toPixelsY(dipY))};
+        return res;
+    }
+
     static volatile LONG canSetAware = 1;
 
     typedef enum _PROCESS_DPI_AWARENESS {

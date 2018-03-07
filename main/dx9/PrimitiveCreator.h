@@ -17,102 +17,96 @@ namespace directgraph {
 
             ColorVertex *genDegenerate(
                     void *verticesVoid,
-                    int_fast32_t startX, int_fast32_t startY,
-                    int_fast32_t endX, int_fast32_t endY
+                    Coords startCrds,
+                    Coords endCrds
             );
 
             TexturedVertex *genTexDegenerate(
                     void *verticesVoid,
-                    int_fast32_t startX, int_fast32_t startY,
-                    int_fast32_t endX, int_fast32_t endY
+                    Coords startCrds,
+                    Coords endCrds
             );
 
             ColorVertex *genQuad(
                     void *verticesVoid,
-                    int_fast32_t startX, int_fast32_t startY,
-                    int_fast32_t endX, int_fast32_t endY,
+                    Coords startCrds,
+                    Coords endCrds,
                     uint_fast32_t color
             );
 
             TexturedColorVertex *genFillDegenerate(
                     void *verticesVoid,
-                    int_fast32_t startX, int_fast32_t startY,
-                    int_fast32_t endX, int_fast32_t endY
+                    Coords startCrds,
+                    Coords endCrds
             );
 
             TexturedColorVertex *genFillQuad(
                     void *verticesVoid,
-                    int_fast32_t startX, int_fast32_t startY,
-                    int_fast32_t endX, int_fast32_t endY,
+                    Coords startCrds,
+                    Coords endCrds,
                     uint_fast32_t color
             );
 
             Color2Vertex *genFillCol2Degenerate(
                     void *verticesVoid,
-                    int_fast32_t startX, int_fast32_t startY,
-                    int_fast32_t endX, int_fast32_t endY,
-                    uint_fast32_t width, uint_fast32_t height
+                    Coords startCrds,
+                    Coords endCrds,
+                    UCoords maxCrds
             );
 
             Color2Vertex *genFillCol2Quad(
                     void *verticesVoid,
-                    int_fast32_t startX, int_fast32_t startY,
-                    int_fast32_t endX, int_fast32_t endY,
+                    Coords startCrds,
+                    Coords endCrds,
                     uint_fast32_t color1, uint_fast32_t color2,
-                    uint_fast32_t width, uint_fast32_t height
+                    UCoords maxCrds
             );
 
             TexturedVertex *genTexQuad(
                     void *verticesVoid,
-                    int_fast32_t startX, int_fast32_t startY,
-                    int_fast32_t endX, int_fast32_t endY,
-                    uint_fast32_t maxX, uint_fast32_t maxY
+                    Coords startCrds,
+                    Coords endCrds,
+                    UCoords maxCrds
             );
 
             ColorVertex *genEllipseDegenerate(
                     void *verticesVoid,
-                    int_fast32_t startX, int_fast32_t startY,
-                    int_fast32_t endX, int_fast32_t endY,
-                    uint_fast32_t width, uint_fast32_t height
+                    Coords startCrds,
+                    Coords endCrds,
+                    UCoords maxCrds
             );
 
             ColorVertex *genEllipseQuad(
                     void *verticesVoid,
-                    int_fast32_t centerX, int_fast32_t centerY,
-                    int_fast32_t radiusX, int_fast32_t radiusY,
-                    uint_fast32_t width, uint_fast32_t height,
+                    Coords centerCrds,
+                    UCoords radiusCrds,
+                    UCoords maxCrds,
                     uint_fast32_t color
             );
 
             TexturedColor2Vertex *genTexEllipseDegenerate(
-                    void *verticesVoid,
-                    int_fast32_t startX, int_fast32_t startY,
-                    int_fast32_t endX, int_fast32_t endY,
-                    uint_fast32_t width, uint_fast32_t height
+                    void *verticesVoid, Coords startCrds, Coords endCrds,
+                    UCoords maxCrds
             );
 
             TexturedColor2Vertex *genTexEllipseQuad(
-                    void *verticesVoid,
-                    int_fast32_t centerX, int_fast32_t centerY,
-                    int_fast32_t radiusX, int_fast32_t radiusY,
+                    void *verticesVoid, Coords centerCrds, UCoords radiusCrds,
                     uint_fast32_t color1, uint_fast32_t color2,
-                    uint_fast32_t width, uint_fast32_t height
+                    UCoords maxCrds
             );
 
             ColorVertex* genEllipse(
                     void *verticesVoid,
-                    int_fast32_t centerX,
-                    int_fast32_t centerY,
-                    uint_fast32_t rx,
-                    uint_fast32_t ry,
+                    Coords centerCrds,
+                    UCoords radiusCrds,
                     uint_fast32_t color
             );
 
             uint_fast32_t getNumEllipseVertices(
-                    uint_fast32_t rx,
-                    uint_fast32_t ry
+                    UCoords radiusCrds
             );
         };
+
     }
 }
 

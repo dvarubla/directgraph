@@ -70,7 +70,7 @@ namespace directgraph {
             PropertyManager _propMan;
             DPIHelper *_helper;
             bool _isFirst;
-            int_fast32_t _prevX, _prevY;
+            Coords _prevCrds;
             uint_fast32_t _curUsedSize;
             uint_fast32_t _lastOffset;
             bool _canReadMore;

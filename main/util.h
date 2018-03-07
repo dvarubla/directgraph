@@ -16,6 +16,20 @@ namespace directgraph{
     };
 
     template <typename T>
+    struct Vect{
+        T x;
+        T y;
+    };
+
+    typedef Vect<int_fast32_t> Coords;
+    typedef Vect<uint_fast32_t> UCoords;
+
+
+    UCoords genUCoords(uint_fast32_t x, uint_fast32_t y);
+
+    Coords genCoords(int_fast32_t x, int_fast32_t y);
+
+    template <typename T>
     T round(T val){
 #if _MSC_VER > 1800
         return std::round(val);
