@@ -18,7 +18,6 @@ namespace directgraph {
         private:
             const static int REGISTER_SIZE = 4;
             const static int VERTEX_BUFFER_SIZE = 1024 * 1024;
-            BufferPreparer::DevDrawState _curState;
 
             IDirect3D9 *_d3d;
             IDirect3DDevice9 *_device;
@@ -29,7 +28,7 @@ namespace directgraph {
             BufferPreparer *_bufPreparer;
             ShaderManager *_shaderMan;
             BufferPreparerParams *_bufPrepParams;
-            BufferPreparer::GenDataVars _initialVars;
+            CommonProps _props;
             HWND _hwnd;
             float _width, _height;
 
@@ -52,6 +51,8 @@ namespace directgraph {
             void copyToVBuffer();
 
             void doRender();
+
+            void restoreDevice();
 
         public:
             Renderer(Common *common, DPIHelper *helper, float width, float height, const CommonProps &props);

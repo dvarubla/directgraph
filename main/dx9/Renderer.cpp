@@ -16,20 +16,12 @@ namespace directgraph {
     namespace dx9 {
         Renderer::Renderer(Common *common, DPIHelper *helper, float width, float height, const CommonProps &props)
                 : _swapChain(NULL), _vertBuffer(NULL), _pixelTexture(NULL), _patTextHelper(NULL), _bufPreparer(NULL), 
-                  _shaderMan(NULL), _bufPrepParams(NULL)
+                  _shaderMan(NULL), _bufPrepParams(NULL), _props(props)
         {
             _helper = helper;
             _width = width;
             _height = height;
             _common = common;
-            _curState.fillPattern = props.fillStyle;
-            _curState.bgColor = props.bgColor;
-            _curState.userFillPattern = props.userFillPattern;
-            _curState.textureState = BufferPreparer::NO_TEXTURE;
-            _curState.lineStyle = props.lineStyle;
-            _initialVars.bgColor = props.fillColor;
-            _initialVars.fillStyle = _curState.fillPattern;
-            _initialVars.bgColor = _curState.bgColor;
         }
 
         void Renderer::setWindow(HWND hwnd) {
@@ -116,7 +108,7 @@ namespace directgraph {
             );
 
             _bufPreparer = new BufferPreparer(
-                    VERTEX_BUFFER_SIZE, _curState, _helper, _bufPrepParams, _initialVars
+                    VERTEX_BUFFER_SIZE, _helper, _props, _bufPrepParams
             );
         }
 
@@ -133,7 +125,6 @@ namespace directgraph {
             delete _bufPreparer;
             delete _shaderMan;
             delete _pixContFactory;
-            delete [] _curState.userFillPattern;
             delete _bufPrepParams;
         }
 
@@ -143,7 +134,7 @@ namespace directgraph {
                 draw(reader);
             } else {
                 reader->endReading(_bufPreparer->getLastOffset());
-                _bufPreparer->resetOffset();
+                _bufPreparer->resetLastOffset();
             }
         }
 
@@ -164,9 +155,17 @@ namespace directgraph {
                     break;
                 }
             }
+            restoreDevice();
             _device->EndScene();
             reader->endReading(_bufPreparer->getLastOffset());
-            _bufPreparer->resetOffset();
+            _bufPreparer->resetLastOffset();
+            _bufPreparer->endDraw();
+        }
+
+        void Renderer::restoreDevice() {
+            _patTextHelper->unsetPattern();
+            _device->SetTexture(0, NULL);
+            _device->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
         }
 
         PixelContainerCreator *Renderer::getPixContFactory() {
@@ -233,42 +232,25 @@ namespace directgraph {
                             }
                         }
                         _device->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, it->data.items.numItems);
-                        if (it->data.items.type == BufferPreparer::TEXTURED_VERTEX) {
-                            _device->SetTexture(0, NULL);
-                            _device->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
-                        }
                     }
                         break;
                     case BufferPreparer::SET_FILL_PATTERN: {
-                        _curState.fillPattern = it->data.fillPattern;
-                        _patTextHelper->setFillPattern(_curState.fillPattern);
+                        _patTextHelper->setFillPattern(it->data.fillPattern);
                     }
                         break;
                     case BufferPreparer::SET_FILL_PATTERN_COLOR: {
-                        _curState.fillPattern = it->data.fillPatternColor.fillPattern;
-                        _curState.bgColor = it->data.fillPatternColor.bgColor;
-                        _patTextHelper->setFillPatternBgColor(_curState.fillPattern, _curState.bgColor);
+                        _patTextHelper->setFillPatternBgColor(
+                                it->data.fillPatternColor.fillPattern,
+                                it->data.fillPatternColor.bgColor
+                        );
                     }
                         break;
                     case BufferPreparer::SET_USER_FILL_PATTERN: {
-                        _curState.userFillPattern = it->data.userFillPattern;
-                        _curState.textureState = BufferPreparer::FILL_TEXTURE;
-                        _patTextHelper->setUserFillPattern(_curState.userFillPattern);
+                        _patTextHelper->setUserFillPattern(it->data.userFillPattern);
                     }
                         break;
                     case BufferPreparer::SET_TEX_BG_COLOR: {
-                        _curState.bgColor = it->data.bgColor;
-                        _patTextHelper->setBgColor(_curState.bgColor);
-                    }
-                        break;
-                    case BufferPreparer::CLEAR: {
-                        _device->SetRenderTarget(0, _backBuffer);
-                        _device->Clear(
-                                0, NULL, D3DCLEAR_TARGET,
-                                D3DCOLOR_COLORVALUE(1.0, 1.0, 1.0, 1.0),
-                                1.0f,
-                                0
-                        );
+                        _patTextHelper->setBgColor(it->data.bgColor);
                     }
                         break;
                     case BufferPreparer::SET_PIXEL_TEXTURE: {
@@ -299,9 +281,12 @@ namespace directgraph {
                         _device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
                     }
                         break;
-                    case BufferPreparer::REMOVE_TEXTURE:
+                    case BufferPreparer::REMOVE_PATTERN_TEXTURE:
                         _patTextHelper->unsetPattern();
-                        _curState.textureState = BufferPreparer::NO_TEXTURE;
+                        break;
+                    case BufferPreparer::REMOVE_PIXEL_TEXTURE:
+                        _device->SetTexture(0, NULL);
+                        _device->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
                         break;
                 }
             }
