@@ -95,6 +95,10 @@ namespace directgraph {
                     THROW_EXC_CODE(WException, UNREACHABLE_CODE, L"Unknown format");
             }
 
+            _device->CreateDepthStencilSurface(
+                    pxWidth, pxHeight, D3DFMT_D16, D3DMULTISAMPLE_NONE, 0, TRUE, &_depthStencil, NULL
+            );
+
             _shaderMan = new ShaderManager(
                     _common->getFeatures(),
                     _device
@@ -104,7 +108,8 @@ namespace directgraph {
                     _shaderMan,
                     !_common->getFeatures()->supportsTexConst(),
                     pxWidth, pxHeight,
-                    pixelTextureWidth, pixelTextureHeight
+                    pixelTextureWidth, pixelTextureHeight,
+                    65536
             );
 
             _bufPreparer = new BufferPreparer(
@@ -140,14 +145,17 @@ namespace directgraph {
 
         void Renderer::draw(IQueueReader *reader) {
             _device->SetRenderTarget(0, _backBuffer);
+            _device->SetDepthStencilSurface(_depthStencil);
             _device->BeginScene();
             if(_bufPreparer->isFull()){
+                _bufPreparer->genOpsAndMemBlocks();
                 copyToVBuffer();
                 doRender();
                 _bufPreparer->clear();
             }
             while (true) {
                 _bufPreparer->prepareBuffer(reader, _bufPreparer->getLastOffset(), VERTEX_BUFFER_SIZE);
+                _bufPreparer->genOpsAndMemBlocks();
                 copyToVBuffer();
                 doRender();
                 _bufPreparer->clear();
@@ -159,7 +167,6 @@ namespace directgraph {
             _device->EndScene();
             reader->endReading(_bufPreparer->getLastOffset());
             _bufPreparer->resetLastOffset();
-            _bufPreparer->endDraw();
         }
 
         void Renderer::restoreDevice() {
@@ -173,6 +180,10 @@ namespace directgraph {
         }
 
         void Renderer::doRender() {
+            _device->Clear(0, NULL, D3DCLEAR_ZBUFFER, 0, 1.0f, 0);
+            _device->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
+            _device->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+            uint_fast32_t offset = 0;
             for(BufferPreparer::DrawOpVector::iterator it = _bufPreparer->drawOpsBegin(); it != _bufPreparer->drawOpsEnd(); ++it){
                 switch(it->type){
                     case BufferPreparer::ITEMS: {
@@ -197,7 +208,7 @@ namespace directgraph {
                                 setFVF = true;
                                 break;
                             case BufferPreparer::ELLIPSE_VERTEX:
-                                stride = sizeof(ColorVertex);
+                                stride = sizeof(TexturedColorVertexNoRHW);
                                 setFVF = false;
                                 break;
                             case BufferPreparer::COLOR2_VERTEX:
@@ -211,7 +222,7 @@ namespace directgraph {
                         }
                         _device->SetStreamSource(
                                 0, _vertBuffer,
-                                it->data.items.offset,
+                                offset,
                                 stride
                         );
                         if (setFVF) {
@@ -232,6 +243,7 @@ namespace directgraph {
                             }
                         }
                         _device->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, it->data.items.numItems);
+                        offset += it->data.items.size;
                     }
                         break;
                     case BufferPreparer::SET_FILL_PATTERN: {
@@ -288,18 +300,29 @@ namespace directgraph {
                         _device->SetTexture(0, NULL);
                         _device->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
                         break;
+                    case BufferPreparer::START_TRANSPARENT_DATA:
+                        _device->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+                        break;
                 }
             }
         }
 
         void Renderer::copyToVBuffer() {
-            void *vertMem = _bufPreparer->getBuffer();
             void *voidPointer;
+            uint8_t *curPointer;
             _vertBuffer->Lock(
                     0, _bufPreparer->getUsedSize(),
                     &voidPointer, D3DLOCK_DISCARD
             );
-            memcpy(voidPointer, vertMem, _bufPreparer->getUsedSize());
+            curPointer = static_cast<uint8_t *>(voidPointer);
+            for(
+                    BufferPreparer::MemBlockVector::iterator it = _bufPreparer->memBlocksBegin();
+                    it != _bufPreparer->memBlocksEnd();
+                    ++it
+            ) {
+                std::copy(it->mem, it->mem + it->size, curPointer);
+                curPointer += it->size;
+            }
             _vertBuffer->Unlock();
         }
     }

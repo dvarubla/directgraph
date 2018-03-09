@@ -9,9 +9,9 @@ void main(
         out float4 texOut0: TEXCOORD0,
         out float4 pxShaderPos : TEXCOORD1
 ){
-    positionOut = float4(positionIn.x + positionIn[2] * 2, positionIn.y - positionIn[3] * 2, 0.0f, 1.0f);
+    positionOut = float4(positionIn.x + texIn0[2] * 2, positionIn.y - texIn0[3] * 2, positionIn.z, 1.0f);
     colorOut0 = colorIn0;
     colorOut1 = colorIn1;
-    pxShaderPos = float4(sign(positionIn[2]), sign(positionIn[3]), 0.0f, 1.0f);
+    pxShaderPos = float4(sign(texIn0[2]), sign(texIn0[3]), 0.0f, 1.0f);
     texOut0 = texIn0;
 }

@@ -18,7 +18,8 @@ namespace directgraph {
             ColorVertex *genDegenerate(
                     void *verticesVoid,
                     Coords startCrds,
-                    Coords endCrds
+                    Coords endCrds,
+                    float z
             );
 
             TexturedVertex *genTexDegenerate(
@@ -31,19 +32,22 @@ namespace directgraph {
                     void *verticesVoid,
                     Coords startCrds,
                     Coords endCrds,
+                    float z,
                     uint_fast32_t color
             );
 
             TexturedColorVertex *genFillDegenerate(
                     void *verticesVoid,
                     Coords startCrds,
-                    Coords endCrds
+                    Coords endCrds,
+                    float z
             );
 
             TexturedColorVertex *genFillQuad(
                     void *verticesVoid,
                     Coords startCrds,
                     Coords endCrds,
+                    float z,
                     uint_fast32_t color
             );
 
@@ -51,13 +55,15 @@ namespace directgraph {
                     void *verticesVoid,
                     Coords startCrds,
                     Coords endCrds,
-                    UCoords maxCrds
+                    UCoords maxCrds,
+                    float z
             );
 
             Color2Vertex *genFillCol2Quad(
                     void *verticesVoid,
                     Coords startCrds,
                     Coords endCrds,
+                    float z,
                     uint_fast32_t color1, uint_fast32_t color2,
                     UCoords maxCrds
             );
@@ -66,31 +72,36 @@ namespace directgraph {
                     void *verticesVoid,
                     Coords startCrds,
                     Coords endCrds,
-                    UCoords maxCrds
+                    UCoords maxCrds,
+                    float z
             );
 
-            ColorVertex *genEllipseDegenerate(
+            TexturedColorVertexNoRHW *genEllipseDegenerate(
                     void *verticesVoid,
                     Coords startCrds,
                     Coords endCrds,
-                    UCoords maxCrds
+                    UCoords maxCrds,
+                    float z
             );
 
-            ColorVertex *genEllipseQuad(
+            TexturedColorVertexNoRHW * genEllipseQuad(
                     void *verticesVoid,
                     Coords centerCrds,
                     UCoords radiusCrds,
                     UCoords maxCrds,
+                    float z,
                     uint_fast32_t color
             );
 
             TexturedColor2Vertex *genTexEllipseDegenerate(
                     void *verticesVoid, Coords startCrds, Coords endCrds,
+                    float z,
                     UCoords maxCrds
             );
 
             TexturedColor2Vertex *genTexEllipseQuad(
                     void *verticesVoid, Coords centerCrds, UCoords radiusCrds,
+                    float z,
                     uint_fast32_t color1, uint_fast32_t color2,
                     UCoords maxCrds
             );
@@ -99,6 +110,7 @@ namespace directgraph {
                     void *verticesVoid,
                     Coords centerCrds,
                     UCoords radiusCrds,
+                    float z,
                     uint_fast32_t color
             );
 

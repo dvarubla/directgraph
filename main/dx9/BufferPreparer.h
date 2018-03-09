@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <main/IQueueReader.h>
 #include <vector>
+#include <unordered_map>
 #include <main/CommonProps.h>
 #include "PrimitiveCreator.h"
 #include "ShaderManager.h"
@@ -15,6 +16,7 @@ namespace directgraph {
         class BufferPreparer {
         public:
             enum DrawOpType{
+                START_TRANSPARENT_DATA,
                 REMOVE_PIXEL_TEXTURE,
                 REMOVE_PATTERN_TEXTURE,
                 SET_FILL_PATTERN,
@@ -44,7 +46,7 @@ namespace directgraph {
                     uint32_t bgColor;
                     char *userFillPattern;
                     struct Items{
-                        uint32_t offset;
+                        uint32_t size;
                         uint32_t numItems;
                         DrawDataType type;
                     } items;
@@ -54,41 +56,76 @@ namespace directgraph {
             };
             typedef std::vector<DrawOp> DrawOpVector;
             typedef std::vector<char*> CharPVector;
+            typedef std::vector<uint8_t> ByteVector;
+            typedef std::vector<uint32_t> OffsetVector;
+            struct MemBlock{
+                uint8_t *mem;
+                uint_fast32_t size;
+            };
+            typedef std::vector<MemBlock> MemBlockVector;
+            struct ItemsBuffer{
+                ByteVector vect;
+                OffsetVector offsets;
+                uint32_t numItems;
+                uint32_t sizeMult;
+                DrawDataType type;
+                Coords prevCrds;
+            };
 
             const static int VERTICES_TRIANGLES_DIFF = 2;
         private:
+            typedef std::unordered_map<ItemState, ItemsBuffer, ItemStateHash> BufferMap;
+            struct {
+                ByteVector vect;
+
+                uint32_t numItems;
+                DrawOpVector drawOps;
+                Coords prevCrds;
+            } _transpBuffer;
             const static int TRIANGLES_IN_QUAD = 2;
             const static int VERTICES_IN_QUAD = 4;
 
             BufferPreparerParams *_bufPrepParams;
             PrimitiveCreator _primCreator;
-            void *_vertMem;
             uint_fast32_t _memSize;
+            BufferMap _drawBuffers;
             DrawOpVector _drawOps;
+            MemBlockVector _memBlocks;
             CharPVector _patterns;
             StateHelper _stateHelper;
             PropertyManager _propMan;
             DPIHelper *_helper;
             bool _isFirst;
-            Coords _prevCrds;
+            uint_fast32_t _itemNum;
+            float _curZ;
             uint_fast32_t _curUsedSize;
             uint_fast32_t _lastOffset;
             bool _canReadMore;
             ItemState createItemState(const QueueItem &item);
-            bool processStateDiff(const ItemState &statePrev, const ItemState &stateCur);
+            bool isStateTransparent(const QueueItem &item, const ItemState &state);
+            bool processStateDiff(
+                    const ItemState &statePrev, const ItemState &stateCur,
+                    DrawOpVector &drawOps
+            );
             struct TypeSize{
                 uint_fast32_t sizeMult;
                 DrawDataType drawDataType;
             };
-            TypeSize getTypeSize(const QueueItem &item);
+            TypeSize getTypeSize(const QueueItem &item, const ItemState &state);
             void processDrawItem(
-                    const QueueItem &item, void *&curVertMem
+                    const QueueItem &item, void *&curVertMem,
+                    const ItemState &state
+            );
+            void getStartEndCoords(
+                    const QueueItem &item, const ItemState &state,
+                    Coords &startCrds, Coords &endCrds
             );
             void useFillTexture(ItemState &state, bool useBgColor);
             void disablePixelTexture(ItemState &state);
             void disableTexture(ItemState &state);
             void useLineStyle(ItemState &state);
             void disableShader(ItemState &state);
+            uint_fast32_t getNumVertices(const QueueItem &item);
         public:
             BufferPreparer(
                     uint_fast32_t memSize, DPIHelper *helper,
@@ -97,18 +134,24 @@ namespace directgraph {
             );
             ~BufferPreparer();
             void prepareBuffer(IQueueReader *reader, uint_fast32_t offset, uint_fast32_t maxSize);
-            void *getBuffer();
             void clear();
+            void genOpsAndMemBlocks();
             DrawOpVector::iterator drawOpsBegin();
             DrawOpVector::iterator drawOpsEnd();
+
+            MemBlockVector::iterator memBlocksBegin();
+            MemBlockVector::iterator memBlocksEnd();
             bool isEmpty();
             uint_fast32_t getUsedSize();
             bool isFull();
             uint_fast32_t getLastOffset();
             void resetLastOffset();
-            void endDraw();
 
-            void genDegenerates(const QueueItem &item, void *&curVertMem);
+            void genDegenerates(
+                    const QueueItem &item, void *&curVertMem,
+                    const Coords &startCrds, const Coords &endCrds,
+                    const ItemState &state
+            );
         };
 
         class DrawOpCreator{
@@ -123,7 +166,7 @@ namespace directgraph {
             static BufferPreparer::DrawOp create(char *userFillPattern);
             template <BufferPreparer::DrawOpType T>
             static BufferPreparer::DrawOp create(
-                    uint32_t offset, uint32_t numItems, BufferPreparer::DrawDataType type
+                    uint32_t size, uint32_t numItems, BufferPreparer::DrawDataType type
             );
             template <BufferPreparer::DrawOpType T>
             static BufferPreparer::DrawOp create(

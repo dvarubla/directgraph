@@ -13,6 +13,8 @@ namespace directgraph {
             uint_fast32_t _height;
             uint_fast32_t _pxTextureWidth;
             uint_fast32_t _pxTextureHeight;
+            uint_fast32_t _maxDepthValues;
+            float _depthIncrement;
         public:
             bool supportsEllipse();
             bool supportsTexturedBar();
@@ -22,12 +24,15 @@ namespace directgraph {
             uint_fast32_t getHeight();
             uint_fast32_t getPxTextureWidth();
             uint_fast32_t getPxTextureHeight();
+            float getDepthIncrement();
+            uint_fast32_t getMaxDepthValues();
 
             BufferPreparerParams(
                     ShaderManager *shaderMan,
                     bool needRecreateTexture,
                     uint_fast32_t width, uint_fast32_t height,
-                    uint_fast32_t pxTextureWidth, uint_fast32_t pxTextureHeight
+                    uint_fast32_t pxTextureWidth, uint_fast32_t pxTextureHeight,
+                    uint_fast32_t maxDepthValues
             );
         };
     }

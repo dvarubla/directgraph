@@ -79,11 +79,6 @@ namespace directgraph {
                             Exception, DX9_CANT_SET_RENDER_STATE, std::wstring(L"Can't disable cull mode")
                     );
                 }
-                if (_device->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE) != D3D_OK) {
-                    THROW_EXC_CODE(
-                            Exception, DX9_CANT_SET_RENDER_STATE, std::wstring(L"Can't disable z-buffer")
-                    );
-                }
             } catch (const std::exception &) {
                 _device->Release();
                 throw;

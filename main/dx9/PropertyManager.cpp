@@ -57,5 +57,40 @@ namespace directgraph {
             state[name].isSet = true;
             state[name].valP = valP;
         }
+
+        std::size_t ItemStateHash::operator()(const ItemState &state) const {
+            std::size_t res = 0;
+            for(uint_fast8_t i = 0; i < PropertyName::TOTAL_PROP_COUNT; i++){
+                res <<= 1;
+                if(state[i].isSet) {
+                    if (i == PropertyName::USER_FILL_PATTERN) {
+                        res ^= reinterpret_cast<std::size_t>(state[i].valP);
+                    } else {
+                        res ^= state[i].val;
+                    }
+                }
+            }
+            return res;
+        }
+
+        bool operator==(const ItemState &l, const ItemState &r){
+            for(uint_fast8_t i = 0; i < PropertyName::TOTAL_PROP_COUNT; i++){
+                if( (l[i].isSet && !r[i].isSet) || (!l[i].isSet && r[i].isSet)){
+                    return false;
+                }
+                if(l[i].isSet) {
+                    if (i == PropertyName::USER_FILL_PATTERN) {
+                        if(l[i].valP != r[i].valP){
+                            return false;
+                        }
+                    } else {
+                        if(l[i].val != r[i].val){
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
     }
 }

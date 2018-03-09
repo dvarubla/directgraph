@@ -53,6 +53,12 @@ namespace directgraph {
 
         typedef std::array<RenderProperty, PropertyName::TOTAL_PROP_COUNT> ItemState;
 
+        struct ItemStateHash {
+            std::size_t operator()(const ItemState &state) const;
+        };
+
+        bool operator==(const ItemState &l, const ItemState &r);
+
         class PropertyManager {
         public:
             PropertyManager();

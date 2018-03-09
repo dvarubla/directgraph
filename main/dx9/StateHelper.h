@@ -30,7 +30,7 @@ namespace directgraph {
 
             void resetState();
 
-            bool textureUsed();
+            bool fillTextureUsed(const ItemState &state);
         };
     }
 }

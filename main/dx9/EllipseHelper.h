@@ -21,6 +21,7 @@ namespace directgraph {
                     int_fast32_t centerY,
                     uint_fast32_t rx,
                     uint_fast32_t ry,
+                    float z,
                     uint_fast32_t color
             );
         };

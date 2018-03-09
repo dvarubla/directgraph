@@ -24,8 +24,8 @@ namespace directgraph {
             );
         }
 
-        bool StateHelper::textureUsed() {
-            return _curItemState[PropertyName::TEXTURE_STATE].val != TextureState::NO_TEXTURE;
+        bool StateHelper::fillTextureUsed(const ItemState &state) {
+            return state[PropertyName::TEXTURE_STATE].val == TextureState::FILL_TEXTURE;
         }
 
         void StateHelper::resetState() {

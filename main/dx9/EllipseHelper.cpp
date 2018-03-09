@@ -16,6 +16,7 @@ namespace directgraph{
                 void *memoryVoid,
                 int_fast32_t centerX, int_fast32_t centerY,
                 uint_fast32_t rx, uint_fast32_t ry,
+                float z,
                 uint_fast32_t color
         ) {
             color = swap_color(color);
@@ -48,7 +49,7 @@ namespace directgraph{
                         memory[j] = VertexCreator::create<ColorVertex>(
                                 centerX + first - 0.5f,
                                 centerY - second - 0.5f,
-                                0.0f,
+                                z,
                                 1.0f,
                                 color
                         );
@@ -56,7 +57,7 @@ namespace directgraph{
                     memory[numVertices - 1] = VertexCreator::create<ColorVertex>(
                             centerX + first - 0.5f,
                             centerY - second - 0.5f,
-                            0.0f,
+                            z,
                             1.0f,
                             color
                     );
@@ -64,7 +65,7 @@ namespace directgraph{
                     memory[oppIndex] = VertexCreator::create<ColorVertex>(
                             centerX + first - 0.5f,
                             centerY + second - 0.5f,
-                            0.0f,
+                            z,
                             1.0f,
                             color
                     );
@@ -73,7 +74,7 @@ namespace directgraph{
                     memory[curIndex] = VertexCreator::create<ColorVertex>(
                             centerX + first - 0.5f + EXTRA_OFFSET,
                             centerY - second - 0.5f,
-                            0.0f,
+                            z,
                             1.0f,
                             color
                     );
@@ -81,7 +82,7 @@ namespace directgraph{
                     memory[oppIndex] = VertexCreator::create<ColorVertex>(
                             centerX - first - 0.5f,
                             centerY + second - 0.5f,
-                            0.0f,
+                            z,
                             1.0f,
                             color
                     );
@@ -107,8 +108,7 @@ namespace directgraph{
                             y = centerY - second - 0.5f;
                         }
                         memory[index] = VertexCreator::create<ColorVertex>(
-                                x, y,
-                                0.0f, 1.0f, color
+                                x, y, z, 1.0f, color
                         );
                     }
                 }
