@@ -32,11 +32,11 @@ namespace directgraph {
             HWND _hwnd;
             float _width, _height;
 
-            const static DWORD RECT_VERTEX_FVF = D3DFVF_XYZRHW | D3DFVF_DIFFUSE;
+            const static DWORD COLOR_VERTEX_FVF = D3DFVF_XYZRHW | D3DFVF_DIFFUSE;
 
             const static DWORD TEXTURED_VERTEX_FVF = D3DFVF_XYZRHW | D3DFVF_TEX1;
 
-            const static DWORD TEXTURED_RECT_VERTEX_FVF = D3DFVF_XYZRHW |  D3DFVF_DIFFUSE | D3DFVF_TEX1;
+            const static DWORD TEXTURED_COLOR_VERTEX_FVF = D3DFVF_XYZRHW |  D3DFVF_DIFFUSE | D3DFVF_TEX1;
 
             IDirect3DVertexBuffer9 *_vertBuffer;
 

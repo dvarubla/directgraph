@@ -15,8 +15,8 @@ namespace directgraph{
 
         void *EllipseHelper::genEllipse(
                 void *memoryVoid,
-                Coords centerCrds,
-                UCoords radiusCrds,
+                const Coords & centerCrds,
+                const UCoords & radiusCrds,
                 float z,
                 uint_fast32_t color,
                 bool textured

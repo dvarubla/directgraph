@@ -26,8 +26,8 @@ namespace directgraph{
 
 
     UCoords genUCoords(uint_fast32_t x, uint_fast32_t y);
-
     Coords genCoords(int_fast32_t x, int_fast32_t y);
+    Coords genCoords(const UCoords &ucrds);
 
     template <typename T>
     T round(T val){

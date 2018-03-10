@@ -4,11 +4,10 @@
 
 namespace directgraph{
     namespace dx9{
-        ColorVertex *
-        PrimitiveCreator::genDegenerate(
+        void * PrimitiveCreator::genDegenerate(
                 void *verticesVoid,
-                Coords startCrds,
-                Coords endCrds,
+                const Coords &startCrds,
+                const Coords &endCrds,
                 float z
         ) {
             ColorVertex *vertices = static_cast<ColorVertex*>(verticesVoid);
@@ -28,39 +27,11 @@ namespace directgraph{
             vertices++;
             return vertices;
         }
-
-        TexturedVertex *
-        PrimitiveCreator::genTexDegenerate(
-                void *verticesVoid,
-                Coords startCrds,
-                Coords endCrds) {
-            TexturedVertex *vertices = static_cast<TexturedVertex*>(verticesVoid);
-            (*vertices) = VertexCreator::create<TexturedVertex>(
-                    static_cast<float>(startCrds.x) - 0.5f,
-                    static_cast<float>(startCrds.y) - 0.5f,
-                    0.0f,
-                    1.0f,
-                    0.0f,
-                    0.0f
-            );
-            vertices++;
-            *vertices = VertexCreator::create<TexturedVertex>(
-                    static_cast<float>(endCrds.x) - 0.5f,
-                    static_cast<float>(endCrds.y) - 0.5f,
-                    0.0f,
-                    1.0f,
-                    0.0f,
-                    0.0f
-            );
-            vertices++;
-            return vertices;
-        }
         
-        TexturedColorVertex *
-        PrimitiveCreator::genFillDegenerate(
+        void * PrimitiveCreator::genFillDegenerate(
                 void *verticesVoid,
-                Coords startCrds,
-                Coords endCrds,
+                const Coords &startCrds,
+                const Coords &endCrds,
                 float z
         ) {
             TexturedColorVertex *vertices = static_cast<TexturedColorVertex*>(verticesVoid);
@@ -85,11 +56,10 @@ namespace directgraph{
             return vertices;
         }
 
-        ColorVertex *
-        PrimitiveCreator::genQuad(
+        void * PrimitiveCreator::genQuad(
                 void *verticesVoid,
-                Coords startCrds,
-                Coords endCrds,
+                const Coords &startCrds,
+                const Coords &endCrds,
                 float z,
                 uint_fast32_t color
         ) {
@@ -125,10 +95,9 @@ namespace directgraph{
             return vertices;
         }
 
-        Color2Vertex *
-        PrimitiveCreator::genFillCol2Degenerate(void *verticesVoid, Coords startCrds,
-                                                Coords endCrds,
-                                                UCoords maxCrds,
+        void * PrimitiveCreator::genFillCol2Degenerate(void *verticesVoid, const Coords &startCrds,
+                                                const Coords &endCrds,
+                                                const UCoords &maxCrds,
                                                 float z
         ) {
             float startXTrans = coordToPositionX(startCrds.x, maxCrds.x);
@@ -157,12 +126,11 @@ namespace directgraph{
             return vertices;
         }
 
-        Color2Vertex *
-        PrimitiveCreator::genFillCol2Quad(void *verticesVoid,
-                                          Coords startCrds, Coords endCrds,
+        void * PrimitiveCreator::genFillCol2Quad(void *verticesVoid,
+                                          const Coords &startCrds, const Coords &endCrds,
                                           float z,
                                           uint_fast32_t color1, uint_fast32_t color2,
-                                          UCoords maxCrds
+                                          const UCoords &maxCrds
         ) {
             Color2Vertex *vertices = static_cast<Color2Vertex*>(verticesVoid);
             float textureRight = 1.0f * (endCrds.x - startCrds.x) / FPATTERN_SIZE;
@@ -214,11 +182,10 @@ namespace directgraph{
             return vertices;
         }
 
-        TexturedColorVertex *
-        PrimitiveCreator::genFillQuad(
+        void * PrimitiveCreator::genFillQuad(
                 void *verticesVoid,
-                Coords startCrds,
-                Coords endCrds,
+                const Coords &startCrds,
+                const Coords &endCrds,
                 float z,
                 uint_fast32_t color
         ) {
@@ -264,12 +231,11 @@ namespace directgraph{
             return vertices;
         }
 
-        TexturedVertex *
-        PrimitiveCreator::genTexQuad(
+        void * PrimitiveCreator::genTexQuad(
                 void *verticesVoid,
-                Coords startCrds,
-                Coords endCrds,
-                UCoords maxCrds,
+                const Coords &startCrds,
+                const Coords &endCrds,
+                const UCoords &maxCrds,
                 float z
         ) {
             TexturedVertex *vertices = static_cast<TexturedVertex*>(verticesVoid);
@@ -299,11 +265,10 @@ namespace directgraph{
         PrimitiveCreator::PrimitiveCreator() {
         }
 
-        TexturedColorVertexNoRHW *
-        PrimitiveCreator::genEllipseDegenerate(
-                void *verticesVoid, Coords startCrds,
-                Coords endCrds,
-                UCoords maxCrds,
+        void * PrimitiveCreator::genEllipseDegenerate(
+                void *verticesVoid, const Coords &startCrds,
+                const Coords &endCrds,
+                const UCoords &maxCrds,
                 float z
         ) {
             TexturedColorVertexNoRHW *vertices = static_cast<TexturedColorVertexNoRHW*>(verticesVoid);
@@ -326,12 +291,11 @@ namespace directgraph{
             return vertices;
         }
 
-        TexturedColorVertexNoRHW *
-        PrimitiveCreator::genEllipseQuad(
+        void * PrimitiveCreator::genEllipseQuad(
                 void *verticesVoid,
-                Coords centerCrds,
-                UCoords radiusCrds,
-                UCoords maxCrds,
+                const Coords &centerCrds,
+                const UCoords &radiusCrds,
+                const UCoords &maxCrds,
                 float z,
                 uint_fast32_t color
         ) {
@@ -359,11 +323,10 @@ namespace directgraph{
             return vertices;
         }
 
-        TexturedColor2Vertex *
-        PrimitiveCreator::genTexEllipseDegenerate(void *verticesVoid, 
-                                                  Coords startCrds, Coords endCrds,
+        void * PrimitiveCreator::genTexEllipseDegenerate(void *verticesVoid, 
+                                                  const Coords &startCrds, const Coords &endCrds,
                                                   float z,
-                                                  UCoords maxCrds) {
+                                                  const UCoords &maxCrds) {
             TexturedColor2Vertex *vertices = static_cast<TexturedColor2Vertex*>(verticesVoid);
             (*vertices) = VertexCreator::create<TexturedColor2Vertex>(
                     coordToPositionX(startCrds.x, maxCrds.x),
@@ -386,12 +349,11 @@ namespace directgraph{
             return vertices;
         }
 
-        TexturedColor2Vertex *
-        PrimitiveCreator::genTexEllipseQuad(void *verticesVoid, 
-                                            Coords centerCrds, UCoords radiusCrds,
+        void * PrimitiveCreator::genTexEllipseQuad(void *verticesVoid, 
+                                            const Coords &centerCrds, const UCoords &radiusCrds,
                                             float z,
                                             uint_fast32_t color1, uint_fast32_t color2,
-                                            UCoords maxCrds) {
+                                            const UCoords &maxCrds) {
             float centerXTrans = coordToPositionX(centerCrds.x, maxCrds.x);
             float radiusXTrans = static_cast<float>(1.0 * radiusCrds.x / maxCrds.x);
             float centerYTrans = coordToPositionY(centerCrds.y, maxCrds.y);
@@ -430,9 +392,8 @@ namespace directgraph{
             return vertices;
         }
 
-        void *
-        PrimitiveCreator::genEllipse(void *verticesVoid,
-                                     Coords centerCrds, UCoords radiusCrds,
+        void * PrimitiveCreator::genEllipse(void *verticesVoid,
+                                     const Coords &centerCrds, const UCoords &radiusCrds,
                                      float z,
                                      uint_fast32_t color,
                                      bool textured
@@ -440,7 +401,7 @@ namespace directgraph{
             return _ellipseHelper.genEllipse(verticesVoid, centerCrds, radiusCrds, z, color, textured);
         }
 
-        uint_fast32_t PrimitiveCreator::getNumEllipseVertices(UCoords radiusCrds) {
+        uint_fast32_t PrimitiveCreator::getNumEllipseVertices(const UCoords &radiusCrds) {
             return _ellipseHelper.getNumEllipseVertices(radiusCrds.x, radiusCrds.y);
         }
 

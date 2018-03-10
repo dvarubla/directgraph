@@ -19,29 +19,14 @@ namespace directgraph{
             return _needRecreateTexture;
         }
 
-        uint_fast32_t BufferPreparerParams::getWidth() {
-            return _width;
-        }
-
-        uint_fast32_t BufferPreparerParams::getHeight() {
-            return _height;
-        }
-
-        uint_fast32_t BufferPreparerParams::getPxTextureWidth() {
-            return _pxTextureWidth;
-        }
-
-        uint_fast32_t BufferPreparerParams::getPxTextureHeight() {
-            return _pxTextureHeight;
-        }
-
         BufferPreparerParams::BufferPreparerParams(
-                ShaderManager *shaderMan, bool needRecreateTexture,
-                uint_fast32_t width, uint_fast32_t height,
-                uint_fast32_t pxTextureWidth, uint_fast32_t pxTextureHeight,
+                ShaderManager *shaderMan,
+                bool needRecreateTexture,
+                const UCoords &maxCrds,
+                const UCoords &pxTextureCrds,
                 uint_fast32_t maxDepthValues
         ) : _shaderMan(shaderMan), _needRecreateTexture(needRecreateTexture),
-            _width(width), _height(height), _pxTextureWidth(pxTextureWidth), _pxTextureHeight(pxTextureHeight),
+            _maxCrds(maxCrds), _pxTextureCrds(pxTextureCrds),
             _maxDepthValues(maxDepthValues), _depthIncrement(1.0f / (maxDepthValues - 1)) {
         }
 
@@ -51,6 +36,14 @@ namespace directgraph{
 
         uint_fast32_t BufferPreparerParams::getMaxDepthValues() {
             return _maxDepthValues;
+        }
+
+        UCoords BufferPreparerParams::getMaxCoords() {
+            return _maxCrds;
+        }
+
+        UCoords BufferPreparerParams::getPxTextureCoords() {
+            return _pxTextureCrds;
         }
     }
 }

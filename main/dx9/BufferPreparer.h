@@ -111,14 +111,17 @@ namespace directgraph {
                 uint_fast32_t sizeMult;
                 DrawDataType drawDataType;
             };
+            struct StartEndCoords{
+                Coords start;
+                Coords end;
+            };
             TypeSize getTypeSize(const QueueItem &item, const ItemState &state);
             void processDrawItem(
                     const QueueItem &item, void *&curVertMem,
                     const ItemState &state
             );
-            void getStartEndCoords(
-                    const QueueItem &item, const ItemState &state,
-                    Coords &startCrds, Coords &endCrds
+            StartEndCoords getStartEndCoords(
+                    const QueueItem &item, const ItemState &state
             );
             void useFillTexture(ItemState &state, bool useBgColor);
             void disablePixelTexture(ItemState &state);

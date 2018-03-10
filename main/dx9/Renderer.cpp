@@ -107,8 +107,8 @@ namespace directgraph {
             _bufPrepParams = new BufferPreparerParams(
                     _shaderMan,
                     !_common->getFeatures()->supportsTexConst(),
-                    pxWidth, pxHeight,
-                    pixelTextureWidth, pixelTextureHeight,
+                    genUCoords(pxWidth, pxHeight),
+                    genUCoords(pixelTextureWidth, pixelTextureHeight),
                     65536
             );
 
@@ -155,9 +155,11 @@ namespace directgraph {
             }
             while (true) {
                 _bufPreparer->prepareBuffer(reader, _bufPreparer->getLastOffset(), VERTEX_BUFFER_SIZE);
-                _bufPreparer->genOpsAndMemBlocks();
-                copyToVBuffer();
-                doRender();
+                if(!_bufPreparer->isEmpty()) {
+                    _bufPreparer->genOpsAndMemBlocks();
+                    copyToVBuffer();
+                    doRender();
+                }
                 _bufPreparer->clear();
                 if (_bufPreparer->isEmpty()) {
                     break;
@@ -194,12 +196,12 @@ namespace directgraph {
                         switch (it->data.items.type) {
                             case BufferPreparer::COLOR_VERTEX:
                                 stride = sizeof(ColorVertex);
-                                fvf = RECT_VERTEX_FVF;
+                                fvf = COLOR_VERTEX_FVF;
                                 setFVF = true;
                                 break;
                             case BufferPreparer::TEXTURED_COLOR_VERTEX:
                                 stride = sizeof(TexturedColorVertex);
-                                fvf = TEXTURED_RECT_VERTEX_FVF;
+                                fvf = TEXTURED_COLOR_VERTEX_FVF;
                                 setFVF = true;
                                 break;
                             case BufferPreparer::TEXTURED_VERTEX:

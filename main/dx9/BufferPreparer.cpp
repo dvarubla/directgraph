@@ -313,7 +313,7 @@ namespace directgraph{
                         if(_bufPrepParams->supportsTexturedBar()){
                             curVertMem = _primCreator.genFillCol2Degenerate(
                                     curVertMem, startCrds, endCrds,
-                                    genUCoords(_bufPrepParams->getWidth(), _bufPrepParams->getHeight()),
+                                    _bufPrepParams->getMaxCoords(),
                                     _curZ
                             );
                         } else {
@@ -327,7 +327,7 @@ namespace directgraph{
                         if(_bufPrepParams->supportsTexturedEllipse()){
                             curVertMem = _primCreator.genTexEllipseDegenerate(
                                     curVertMem, startCrds, endCrds, _curZ,
-                                    genUCoords(_bufPrepParams->getWidth(), _bufPrepParams->getHeight())
+                                    _bufPrepParams->getMaxCoords()
                             );
                         } else {
                             curVertMem = _primCreator.genFillDegenerate(
@@ -345,7 +345,7 @@ namespace directgraph{
                         if (_bufPrepParams->supportsEllipse()) {
                             curVertMem = _primCreator.genEllipseDegenerate(
                                     curVertMem, startCrds, endCrds,
-                                    genUCoords(_bufPrepParams->getWidth(), _bufPrepParams->getHeight()),
+                                    _bufPrepParams->getMaxCoords(),
                                     _curZ
                             );
                         } else {
@@ -375,27 +375,27 @@ namespace directgraph{
             }
         }
 
-        void BufferPreparer::getStartEndCoords(
-                const QueueItem &item, const ItemState &state,
-                Coords &startCrds, Coords &endCrds
+        BufferPreparer::StartEndCoords BufferPreparer::getStartEndCoords(
+                const QueueItem &item, const ItemState &state
         ) {
+            StartEndCoords crds;
             switch(item.type){
                 case QueueItem::SINGLE_PIXEL:
-                    startCrds = genCoords(item.data.singlePixel.x, item.data.singlePixel.y);
-                    endCrds = genCoords(item.data.singlePixel.x + 1, item.data.singlePixel.y + 1);
+                    crds.start = genCoords(item.data.singlePixel.x, item.data.singlePixel.y);
+                    crds.end = genCoords(item.data.singlePixel.x + 1, item.data.singlePixel.y + 1);
                     break;
                 case QueueItem::CLEAR:
-                    startCrds = genCoords(0, 0);
-                    endCrds = genCoords(_bufPrepParams->getWidth(), _bufPrepParams->getHeight());
+                    crds.start = genCoords(0, 0);
+                    crds.end = genCoords(_bufPrepParams->getPxTextureCoords());
                     break;
                 case QueueItem::BAR:
-                    startCrds = _helper->toPixelsXY(item.data.bar.left, item.data.bar.top);
-                    endCrds = _helper->toPixelsXY(item.data.bar.right, item.data.bar.bottom);
+                    crds.start = _helper->toPixelsXY(item.data.bar.left, item.data.bar.top);
+                    crds.end = _helper->toPixelsXY(item.data.bar.right, item.data.bar.bottom);
                     break;
                 case QueueItem::PIXEL_CONTAINER: {
                     Rectangle coords = item.data.pixelContainer->getCoords();
-                    startCrds = genCoords(coords.left, coords.top);
-                    endCrds = genCoords(coords.right, coords.bottom);
+                    crds.start = genCoords(coords.left, coords.top);
+                    crds.end = genCoords(coords.right, coords.bottom);
                 }
                     break;
                 case QueueItem::FILLELLIPSE:
@@ -403,16 +403,16 @@ namespace directgraph{
                             _stateHelper.fillTextureUsed(state) && _bufPrepParams->supportsTexturedEllipse() ||
                             !_stateHelper.fillTextureUsed(state) && _bufPrepParams->supportsEllipse()
                     ){
-                        startCrds = _helper->toPixelsXY(
+                        crds.start = _helper->toPixelsXY(
                                 item.data.fillellipse.x - item.data.fillellipse.xradius,
                                 item.data.fillellipse.y - item.data.fillellipse.yradius
                         );
-                        endCrds = _helper->toPixelsXY(
+                        crds.end = _helper->toPixelsXY(
                                 item.data.fillellipse.x + item.data.fillellipse.xradius,
                                 item.data.fillellipse.y + item.data.fillellipse.yradius
                         );
                     } else {
-                        startCrds = endCrds = _helper->toPixelsXY(
+                        crds.start = crds.end = _helper->toPixelsXY(
                                 item.data.fillellipse.x,
                                 item.data.fillellipse.y - item.data.fillellipse.yradius
                         );
@@ -420,6 +420,7 @@ namespace directgraph{
 
                     break;
             }
+            return crds;
         }
 
         void BufferPreparer::processDrawItem(
@@ -438,7 +439,7 @@ namespace directgraph{
                 case QueueItem::CLEAR:
                     curVertMem = _primCreator.genQuad(curVertMem,
                                                       genCoords(0, 0),
-                                                      genCoords(_bufPrepParams->getWidth(), _bufPrepParams->getHeight()),
+                                                      genCoords(_bufPrepParams->getMaxCoords()),
                                                       _curZ,
                                                       0xFFFFFF
                     );
@@ -455,7 +456,7 @@ namespace directgraph{
                                                                      _curZ,
                                                                      _stateHelper.getLastState().fillColor,
                                                                      _stateHelper.getLastState().bgColor,
-                                                                     genUCoords(_bufPrepParams->getWidth(), _bufPrepParams->getHeight())
+                                                                     _bufPrepParams->getMaxCoords()
                             );
                         } else {
                             curVertMem = _primCreator.genEllipse(curVertMem,
@@ -480,7 +481,7 @@ namespace directgraph{
                                                                              item.data.fillellipse.xradius,
                                                                              item.data.fillellipse.yradius
                                                                      ),
-                                                                     genUCoords(_bufPrepParams->getWidth(), _bufPrepParams->getHeight()),
+                                                                     _bufPrepParams->getMaxCoords(),
                                                                      _curZ,
                                                                      _stateHelper.getFillColor()
                             );
@@ -510,7 +511,7 @@ namespace directgraph{
                                                                   _curZ,
                                                                   _stateHelper.getLastState().fillColor,
                                                                   _stateHelper.getLastState().bgColor,
-                                                                  genUCoords(_bufPrepParams->getWidth(), _bufPrepParams->getHeight())
+                                                                  _bufPrepParams->getMaxCoords()
 
                             );
                         } else {
@@ -536,7 +537,7 @@ namespace directgraph{
                     curVertMem = _primCreator.genTexQuad(
                             curVertMem,
                             genCoords(coords.left, coords.top), genCoords(coords.right, coords.bottom),
-                            genUCoords(_bufPrepParams->getPxTextureWidth(), _bufPrepParams->getPxTextureHeight()),
+                            _bufPrepParams->getPxTextureCoords(),
                             _curZ
                     );
                 }
@@ -622,14 +623,12 @@ namespace directgraph{
                             _transpBuffer.drawOps.back().data.items.numItems += curNumVertices;
                             _transpBuffer.drawOps.back().data.items.size += curNumVertices * ts.sizeMult;
                         }
-                        Coords startCrds;
-                        Coords endCrds;
-                        getStartEndCoords(item, lastState, startCrds, endCrds);
+                        StartEndCoords crds = getStartEndCoords(item, lastState);
                         if (!_isFirst) {
-                            genDegenerates(item, curMem, _transpBuffer.prevCrds, startCrds, lastState);
+                            genDegenerates(item, curMem, _transpBuffer.prevCrds, crds.start, lastState);
                         }
                         processDrawItem(item, curMem, lastState);
-                        _transpBuffer.prevCrds = startCrds;
+                        _transpBuffer.prevCrds = crds.start;
                     } else {
                         ItemsBuffer &buffer = _drawBuffers[lastState];
                         void *curMem;
@@ -647,14 +646,12 @@ namespace directgraph{
                             curMem = reinterpret_cast<void *>(&buffer.vect[0] + prevSize);
                             buffer.offsets.push_back(prevSize);
                         }
-                        Coords startCrds;
-                        Coords endCrds;
-                        getStartEndCoords(item, lastState, startCrds, endCrds);
+                        StartEndCoords crds = getStartEndCoords(item, lastState);
                         processDrawItem(item, curMem, lastState);
                         if (!_isFirst) {
-                            genDegenerates(item, curMem, endCrds, buffer.prevCrds, lastState);
+                            genDegenerates(item, curMem, crds.end, buffer.prevCrds, lastState);
                         }
-                        buffer.prevCrds = startCrds;
+                        buffer.prevCrds = crds.start;
                     }
                     if(_itemNum == 0){
                         _canReadMore = false;
@@ -710,6 +707,7 @@ namespace directgraph{
                         it->second.vect.size(), it->second.numItems - VERTICES_TRIANGLES_DIFF, it->second.type
                 ));
             }
+            _stateHelper.resetState();
             if(!_transpBuffer.vect.empty()) {
                 MemBlock transpBlock = {&_transpBuffer.vect[0], _transpBuffer.vect.size()};
                 _memBlocks.push_back(transpBlock);
@@ -720,6 +718,7 @@ namespace directgraph{
         }
 
         void BufferPreparer::clear() {
+            _stateHelper.resetState();
             _drawBuffers.clear();
             _transpBuffer.vect.clear();
             _transpBuffer.drawOps.clear();
@@ -747,7 +746,7 @@ namespace directgraph{
         }
 
         bool BufferPreparer::isEmpty() {
-            return _drawOps.empty();
+            return _curUsedSize == 0;
         }
 
         BufferPreparer::~BufferPreparer() {
