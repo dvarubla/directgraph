@@ -17,7 +17,8 @@ namespace directgraph {
 
             struct TextureBlock{
                 IDirect3DTexture9 *texture;
-                uint_fast32_t color;
+                uint_fast32_t bgColor;
+                uint_fast32_t fillColor;
             };
             const static int NUM_TOTAL_FPATTERNS = NUM_STANDARD_FPATTERNS + 1;
             const static int USER_PATTERN_INDEX = NUM_TOTAL_FPATTERNS - 1;
@@ -35,21 +36,29 @@ namespace directgraph {
             void createFPattern(
                     uint_fast8_t index,
                     uint_fast32_t bgColor,
+                    uint_fast32_t fillColor,
                     const char *pattern,
                     bool forceCreate,
-                    bool needRecreate
+                    bool needRecreate,
+                    bool useTransparency
             );
-            void setTexture(uint_fast8_t index);
+            void setTexture(uint_fast8_t index, bool useTransparency);
             void setBgColorConstant(uint_fast32_t bgColor);
-            void setFillPattern(uint_fast8_t pattern, uint_fast32_t bgColor, bool needRecreate);
+            void setFillPattern(
+                    uint_fast8_t pattern,
+                    uint_fast32_t bgColor,
+                    uint_fast32_t fillColor,
+                    bool needRecreate, bool useTransparency
+            );
         public:
             PatternTexturesHelper(IDirect3DDevice9 *device, D3DFORMAT textureFormat, bool haveConstantSupport);
             ~PatternTexturesHelper();
             void setUserFillPattern(const char *pattern);
             virtual void setBgColor(uint_fast32_t bgColor);
-            virtual void setFillPattern(uint_fast8_t pattern);
-            virtual void setFillPatternBgColor(uint_fast8_t pattern, uint_fast32_t bgColor);
-            void unsetPattern();
+            virtual void setFillPattern(uint_fast8_t pattern, bool useTransparency);
+            virtual void setFillPatternBgFillColor(uint_fast8_t pattern, uint_fast32_t bgColor, uint_fast32_t fillColor);
+            virtual void setFillPatternBgColor(uint_fast8_t pattern, uint_fast32_t bgColor, bool useTransparency);
+            void unsetPattern(bool useTransparency);
         };
     }
 }

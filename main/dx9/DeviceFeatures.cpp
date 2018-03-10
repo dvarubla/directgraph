@@ -22,12 +22,38 @@ namespace directgraph{
                     _displayMode.Format,
                     0,
                     D3DRTYPE_TEXTURE,
+                    D3DFMT_A8R8G8B8
+            ) == D3D_OK){
+                return ColorFormat::A8R8G8B8;
+            }
+            if(_d3d->CheckDeviceFormat(
+                    D3DADAPTER_DEFAULT,
+                    D3DDEVTYPE_HAL,
+                    _displayMode.Format,
+                    0,
+                    D3DRTYPE_TEXTURE,
                     D3DFMT_A1R5G5B5
             ) == D3D_OK){
                 return ColorFormat::AR5G5B5;
             }
             THROW_EXC_CODE(
                     Exception, DX9_NO_TEXTURE_FORMAT, std::wstring(L"No suitable format for pattern textures")
+            );
+        }
+
+        ColorFormat::Format DeviceFeatures::getTranspPatternTexFormat() {
+            if(_d3d->CheckDeviceFormat(
+                    D3DADAPTER_DEFAULT,
+                    D3DDEVTYPE_HAL,
+                    _displayMode.Format,
+                    0,
+                    D3DRTYPE_TEXTURE,
+                    D3DFMT_A4R4G4B4
+            ) == D3D_OK){
+                return ColorFormat::A4R4G4B4;
+            }
+            THROW_EXC_CODE(
+                    Exception, DX9_NO_TEXTURE_FORMAT, std::wstring(L"No suitable format for transparent pattern textures")
             );
         }
 

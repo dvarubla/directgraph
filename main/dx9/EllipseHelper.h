@@ -9,13 +9,13 @@ namespace directgraph {
         class EllipseHelper {
         private:
             const static float EXTRA_OFFSET;
-            uint_fast32_t convertIndex(uint_fast32_t index);
             uint_fast32_t _color;
             float _z;
             double _minX;
             double _minY;
             ColorVertex createVertex(double x, double y);
             TexturedColorVertex createTexturedVertex(double x, double y);
+            void createVertices(void *memory, double x, double y, uint_fast32_t index, bool textured);
         public:
             EllipseHelper();
             uint_fast32_t getNumEllipseVertices(

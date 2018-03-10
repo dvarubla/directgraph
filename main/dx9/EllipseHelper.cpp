@@ -13,6 +13,28 @@ namespace directgraph{
 
         }
 
+        void EllipseHelper::createVertices(void *memory, double x, double y, uint_fast32_t index, bool textured) {
+            ColorVertex *memoryCol;
+            TexturedColorVertex *memoryTextured;
+            if(textured){
+                memoryTextured = static_cast<TexturedColorVertex *>(memory);
+            } else {
+                memoryCol = static_cast<ColorVertex *>(memory);
+            }
+            if(textured){
+                memoryTextured[index * 2 - 1] = createTexturedVertex(x, y);
+            } else {
+                memoryCol[index * 2 - 1] = createVertex(x, y);
+            }
+            if(index % 2 == 0){
+                if(textured){
+                    memoryTextured[index * 2 - 2] = createTexturedVertex(x, y);
+                } else {
+                    memoryCol[index * 2 - 2] = createVertex(x, y);
+                }
+            }
+        }
+
         void *EllipseHelper::genEllipse(
                 void *memoryVoid,
                 const Coords & centerCrds,
@@ -22,7 +44,7 @@ namespace directgraph{
                 bool textured
         ) {
             _z = z;
-            _color = swap_color(color);
+            _color = swap_color_transp(color);
             if(textured) {
                 _minX = static_cast<double>(centerCrds.x - radiusCrds.x);
                 _minY = static_cast<double>(centerCrds.y - radiusCrds.y);
@@ -59,7 +81,7 @@ namespace directgraph{
                     second = maxR * sqrt(1 - (first / minR) * (first / minR));
                 }
                 if (i == 0) {
-                    for (uint_fast32_t j = 0; j < (numVertices - 1); j += 3) {
+                    for (uint_fast32_t j = 0; j < (numVertices - 1); j += 4) {
                         if(textured){
                             memoryTextured[j] = createTexturedVertex(
                                     centerCrds.x + first,
@@ -72,75 +94,46 @@ namespace directgraph{
                             );
                         }
                     }
-                    uint_fast32_t oppIndex = convertIndex(2 * minR);
                     if(textured){
                         memoryTextured[numVertices - 1] = createTexturedVertex(
                                 centerCrds.x + first,
                                 centerCrds.y - second 
-                        );
-                        memoryTextured[oppIndex] = createTexturedVertex(
-                                centerCrds.x + first,
-                                centerCrds.y + second 
                         );
                     } else {
                         memoryCol[numVertices - 1] = createVertex(
                                 centerCrds.x + first,
                                 centerCrds.y - second 
                         );
-                        memoryCol[oppIndex] = createVertex(
-                                centerCrds.x + first,
-                                centerCrds.y + second 
-                        );
                     }
+                    uint_fast32_t oppIndex = 2 * minR;
+                    createVertices(memoryVoid, centerCrds.x + first, centerCrds.y + second, oppIndex, textured);
                 } else if (i == minR) {
-                    uint_fast32_t curIndex = convertIndex(minR);
-                    uint_fast32_t oppIndex = convertIndex(3 * minR);
-                    if(textured){
-                        memoryTextured[curIndex] = createTexturedVertex(
-                                centerCrds.x + first + EXTRA_OFFSET,
-                                centerCrds.y - second 
-                        );
-                        memoryTextured[oppIndex] = createTexturedVertex(
-                                centerCrds.x - first ,
-                                centerCrds.y + second 
-                        );
-                    } else {
-                        memoryCol[curIndex] = createVertex(
-                                centerCrds.x + first + EXTRA_OFFSET,
-                                centerCrds.y - second 
-                        );
-                        memoryCol[oppIndex] = createVertex(
-                                centerCrds.x - first ,
-                                centerCrds.y + second 
-                        );
-                    }
-
+                    uint_fast32_t curIndex = minR;
+                    uint_fast32_t oppIndex = 3 * minR;
+                    createVertices(memoryVoid, centerCrds.x + first + EXTRA_OFFSET, centerCrds.y - second, curIndex, textured);
+                    createVertices(memoryVoid, centerCrds.x - first, centerCrds.y + second, oppIndex, textured);
                 } else {
                     for (uint_fast32_t j = 0; j < 4; j++) {
                         uint_fast32_t index;
                         double x, y;
                         if (j == 0) {
-                            index = convertIndex(i);
+                            index = i;
                             x = centerCrds.x + first + EXTRA_OFFSET;
                             y = centerCrds.y - second;
                         } else if (j == 1) {
-                            index = convertIndex(2 * minR - i);
+                            index = 2 * minR - i;
                             x = centerCrds.x + first + EXTRA_OFFSET;
                             y = centerCrds.y + second;
                         } else if (j == 2) {
-                            index = convertIndex(2 * minR + i);
+                            index = 2 * minR + i;
                             x = centerCrds.x - first;
                             y = centerCrds.y + second;
                         } else {
-                            index = convertIndex(4 * minR - i);
+                            index = 4 * minR - i;
                             x = centerCrds.x - first;
                             y = centerCrds.y - second;
                         }
-                        if(textured){
-                            memoryTextured[index] = createTexturedVertex(x, y);
-                        } else {
-                            memoryCol[index] = createVertex(x, y);
-                        }
+                        createVertices(memoryVoid, x, y, index, textured);
                     }
                 }
             }
@@ -154,15 +147,9 @@ namespace directgraph{
         uint_fast32_t EllipseHelper::getNumEllipseVertices(
                 uint_fast32_t rx, uint_fast32_t ry
         ) {
-            uint_fast32_t numPoints = std::min(rx, ry) * 4;
-            return (numPoints - 1) / 2 + numPoints + 1;
+            uint_fast32_t numPoints = std::min(rx, ry);
+            return (numPoints * 4 - 1) / 2 * 4 + 3;
         }
-
-        uint_fast32_t EllipseHelper::convertIndex(uint_fast32_t index) {
-            uint_fast32_t t = (1 - index % 2);
-            return 3 * ((index - t) / 2) + t + 1;
-        }
-
         ColorVertex EllipseHelper::createVertex(
                 double x, double y
         ) {

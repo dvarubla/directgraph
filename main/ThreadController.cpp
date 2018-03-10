@@ -102,7 +102,8 @@ namespace directgraph{
         }
 
         EnterCriticalSection(&_addCS);
-        _pixContFactory->addPixel(static_cast<uint_fast32_t>(x), static_cast<uint_fast32_t>(y), color);
+        _pixContFactory->addPixel(static_cast<uint_fast32_t>(x), static_cast<uint_fast32_t>(y),
+                                  color_remove_alpha(color));
         LeaveCriticalSection(&_addCS);
     }
 

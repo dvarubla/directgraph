@@ -77,8 +77,15 @@ namespace directgraph {
                 );
             }
 
+            bool needTranspPatTextHelper = false;
 
             switch(_common->getFeatures()->getPatternTexFormat()){
+                case ColorFormat::A8R8G8B8:
+                    _patTextHelper = new PatternTexturesHelper<ColorFormat::A8R8G8B8>(
+                            _device, D3DFMT_A8R8G8B8,
+                            _common->getFeatures()->supportsTexConst()
+                    );
+                    break;
                 case ColorFormat::A8:
                     _patTextHelper = new PatternTexturesHelper<ColorFormat::A8>(
                             _device, D3DFMT_A8,
@@ -90,9 +97,27 @@ namespace directgraph {
                             _device, D3DFMT_A1R5G5B5,
                             _common->getFeatures()->supportsTexConst()
                     );
+                    if(!_common->getFeatures()->supportsTexConst()) {
+                        needTranspPatTextHelper = true;
+                    }
                     break;
                 default:
                     THROW_EXC_CODE(WException, UNREACHABLE_CODE, L"Unknown format");
+            }
+
+            if(needTranspPatTextHelper){
+                switch(_common->getFeatures()->getTranspPatternTexFormat()){
+                    case ColorFormat::A4R4G4B4:
+                        _transpPatTextHelper = new PatternTexturesHelper<ColorFormat::A4R4G4B4>(
+                                _device, D3DFMT_A4R4G4B4,
+                                false
+                        );
+                        break;
+                    default:
+                        THROW_EXC_CODE(WException, UNREACHABLE_CODE, L"Unknown format");
+                }
+            } else {
+                _transpPatTextHelper = _patTextHelper;
             }
 
             _device->CreateDepthStencilSurface(
@@ -123,6 +148,9 @@ namespace directgraph {
             }
             if (_vertBuffer != NULL) {
                 _vertBuffer->Release();
+            }
+            if(_transpPatTextHelper != _patTextHelper){
+                delete _transpPatTextHelper;
             }
             delete _patTextHelper;
             _common->deleteSwapChain(_swapChain);
@@ -172,7 +200,7 @@ namespace directgraph {
         }
 
         void Renderer::restoreDevice() {
-            _patTextHelper->unsetPattern();
+            _patTextHelper->unsetPattern(true);
             _device->SetTexture(0, NULL);
             _device->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
         }
@@ -186,6 +214,8 @@ namespace directgraph {
             _device->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
             _device->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
             uint_fast32_t offset = 0;
+            IPatternTexturesHelper *curPatTextHelper = _patTextHelper;
+            bool transpStarted = false;
             for(BufferPreparer::DrawOpVector::iterator it = _bufPreparer->drawOpsBegin(); it != _bufPreparer->drawOpsEnd(); ++it){
                 switch(it->type){
                     case BufferPreparer::ITEMS: {
@@ -249,22 +279,34 @@ namespace directgraph {
                     }
                         break;
                     case BufferPreparer::SET_FILL_PATTERN: {
-                        _patTextHelper->setFillPattern(it->data.fillPattern);
+                        curPatTextHelper->setFillPattern(
+                                it->data.fillPattern,
+                                transpStarted
+                        );
                     }
                         break;
                     case BufferPreparer::SET_FILL_PATTERN_COLOR: {
-                        _patTextHelper->setFillPatternBgColor(
+                        curPatTextHelper->setFillPatternBgColor(
                                 it->data.fillPatternColor.fillPattern,
-                                it->data.fillPatternColor.bgColor
+                                it->data.fillPatternColor.bgColor,
+                                transpStarted
+                        );
+                    }
+                        break;
+                    case BufferPreparer::SET_FILL_PATTERN_TWO_COLORS: {
+                        curPatTextHelper->setFillPatternBgFillColor(
+                                it->data.fillPatternTwoColors.fillPattern,
+                                it->data.fillPatternTwoColors.bgColor,
+                                it->data.fillPatternTwoColors.fillColor
                         );
                     }
                         break;
                     case BufferPreparer::SET_USER_FILL_PATTERN: {
-                        _patTextHelper->setUserFillPattern(it->data.userFillPattern);
+                        curPatTextHelper->setUserFillPattern(it->data.userFillPattern);
                     }
                         break;
                     case BufferPreparer::SET_TEX_BG_COLOR: {
-                        _patTextHelper->setBgColor(it->data.bgColor);
+                        curPatTextHelper->setBgColor(it->data.bgColor);
                     }
                         break;
                     case BufferPreparer::SET_PIXEL_TEXTURE: {
@@ -289,21 +331,32 @@ namespace directgraph {
                         _pixelTexture->UnlockRect(0);
                         delete cont;
                         _device->SetTexture(0, _pixelTexture);
+                        if(!transpStarted){
+                            _device->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+                            _device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+                            _device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+                            _device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+                        }
+                    }
+                        break;
+                    case BufferPreparer::REMOVE_PATTERN_TEXTURE:
+                        curPatTextHelper->unsetPattern(transpStarted);
+                        break;
+                    case BufferPreparer::REMOVE_PIXEL_TEXTURE:
+                        _device->SetTexture(0, NULL);
+                        if(!transpStarted) {
+                            _device->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+                        }
+                        break;
+                    case BufferPreparer::START_TRANSPARENT_DATA:
+                        restoreDevice();
+                        curPatTextHelper = _transpPatTextHelper;
+                        _device->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+                        transpStarted = true;
                         _device->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
                         _device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
                         _device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
                         _device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
-                    }
-                        break;
-                    case BufferPreparer::REMOVE_PATTERN_TEXTURE:
-                        _patTextHelper->unsetPattern();
-                        break;
-                    case BufferPreparer::REMOVE_PIXEL_TEXTURE:
-                        _device->SetTexture(0, NULL);
-                        _device->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
-                        break;
-                    case BufferPreparer::START_TRANSPARENT_DATA:
-                        _device->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
                         break;
                 }
             }

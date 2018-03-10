@@ -19,6 +19,8 @@ namespace directgraph {
 
             ColorFormat::Format getPatternTexFormat();
 
+            ColorFormat::Format getTranspPatternTexFormat();
+
             void getDeviceFlags(D3DDEVTYPE &devType, DWORD &flags);
 
             bool supportsTexConst();

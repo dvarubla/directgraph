@@ -99,6 +99,7 @@ FeaturesStub *CommonSimple::setupFeatures() {
     _dx9Wf->getCommon()->setFeatures(fstub);
     ON_CALL(*fstub, getDeviceFlags(_, _)).WillByDefault(Invoke(_curFeatures, &IFeatures::getDeviceFlags));
     ON_CALL(*fstub, getPatternTexFormat()).WillByDefault(Invoke(_curFeatures, &IFeatures::getPatternTexFormat));
+    ON_CALL(*fstub, getTranspPatternTexFormat()).WillByDefault(Invoke(_curFeatures, &IFeatures::getTranspPatternTexFormat));
     ON_CALL(*fstub, getDisplayMode()).WillByDefault(Invoke(_curFeatures, &IFeatures::getDisplayMode));
     ON_CALL(*fstub, supportsTexConst()).WillByDefault(Invoke(_curFeatures, &IFeatures::supportsTexConst));
     ON_CALL(*fstub, getVertexShaderVer()).WillByDefault(Invoke(_curFeatures, &IFeatures::getVertexShaderVer));

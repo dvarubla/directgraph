@@ -44,7 +44,7 @@ namespace directgraph {
 
             IDirect3DSurface9 *_depthStencil;
 
-            IPatternTexturesHelper *_patTextHelper;
+            IPatternTexturesHelper *_patTextHelper, *_transpPatTextHelper;
 
             PixelContainerCreator *_pixContFactory;
 

@@ -6,6 +6,12 @@
 #include <sstream>
 
 namespace directgraph{
+    uint_fast32_t swap_color_transp(uint_fast32_t color);
+
+    uint_fast32_t color_remove_alpha(uint_fast32_t color);
+
+    bool color_has_alpha(uint_fast32_t color);
+
     uint_fast32_t swap_color(uint_fast32_t color);
 
     struct Rectangle{

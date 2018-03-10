@@ -11,6 +11,8 @@ namespace directgraph {
 
             MOCK_METHOD0(getImageTexFormat, ColorFormat::Format());
 
+            MOCK_METHOD0(getTranspPatternTexFormat, ColorFormat::Format());
+
             MOCK_METHOD0(getPatternTexFormat, ColorFormat::Format());
 
             MOCK_METHOD0(getDisplayMode, D3DFORMAT ());

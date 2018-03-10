@@ -1,4 +1,5 @@
 #include <directgraph/directgraph_constants.h>
+#include <main/util.h>
 #include "StateHelper.h"
 
 namespace directgraph {

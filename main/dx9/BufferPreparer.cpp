@@ -48,6 +48,18 @@ namespace directgraph{
         }
 
         template<>
+        BufferPreparer::DrawOp DrawOpCreator::create<BufferPreparer::SET_FILL_PATTERN_TWO_COLORS>(
+                uint_fast32_t fillPattern, uint_fast32_t bgColor, uint_fast32_t fillColor
+        ) {
+            BufferPreparer::DrawOp op;
+            op.type = BufferPreparer::SET_FILL_PATTERN_TWO_COLORS;
+            op.data.fillPatternTwoColors.fillPattern = static_cast<uint8_t>(fillPattern);
+            op.data.fillPatternTwoColors.bgColor = bgColor;
+            op.data.fillPatternTwoColors.fillColor = fillColor;
+            return op;
+        }
+
+        template<>
         BufferPreparer::DrawOp DrawOpCreator::create<BufferPreparer::SET_TEX_BG_COLOR>(uint32_t bgColor) {
             BufferPreparer::DrawOp op;
             op.type = BufferPreparer::SET_TEX_BG_COLOR;
@@ -96,7 +108,7 @@ namespace directgraph{
         {
         }
 
-        void BufferPreparer::useFillTexture(ItemState &state, bool useBgColor) {
+        void BufferPreparer::useFillTexture(ItemState &state, bool useBgColor, bool useFillColorIfTransp) {
             if (_stateHelper.getLastState().fillPattern == SOLID_FILL || _stateHelper.getLastState().fillPattern == EMPTY_FILL){
                 _propMan.setProp(state, PropertyName::TEXTURE_STATE, TextureState::NO_TEXTURE);
             } else {
@@ -111,6 +123,15 @@ namespace directgraph{
                 }
                 if(useBgColor){
                     _propMan.setProp(state, PropertyName::BG_COLOR, _stateHelper.getLastState().bgColor);
+                    if(
+                            useFillColorIfTransp &&
+                            (
+                                    color_has_alpha(_stateHelper.getLastState().fillColor) ||
+                                    color_has_alpha(_stateHelper.getLastState().bgColor)
+                            )
+                    ){
+                        _propMan.setProp(state, PropertyName::FILL_COLOR, _stateHelper.getLastState().fillColor);
+                    }
                 }
             }
         }
@@ -138,7 +159,10 @@ namespace directgraph{
             switch(item.type){
                 case QueueItem::BAR:
                     disablePixelTexture(state);
-                    useFillTexture(state, !_bufPrepParams->supportsTexturedBar());
+                    useFillTexture(
+                            state,
+                            !_bufPrepParams->supportsTexturedBar(), _bufPrepParams->needRecreateTexture()
+                    );
                     if(_bufPrepParams->supportsTexturedBar() && _stateHelper.fillTextureUsed(state)){
                         _propMan.setProp(state, PropertyName::SHADER_TYPE, ShaderType::TEXTURED_BAR_SHADER);
                     } else {
@@ -157,7 +181,11 @@ namespace directgraph{
                     break;
                 case QueueItem::FILLELLIPSE:
                     disablePixelTexture(state);
-                    useFillTexture(state, !_bufPrepParams->supportsTexturedBar());
+                    useFillTexture(
+                            state,
+                            !_bufPrepParams->supportsTexturedEllipse(),
+                            _bufPrepParams->needRecreateTexture()
+                    );
                     if(_stateHelper.getLastState().lineStyle == NULL_LINE){
                         if(_stateHelper.fillTextureUsed(state)){
                             if(_bufPrepParams->supportsTexturedEllipse()){
@@ -184,8 +212,19 @@ namespace directgraph{
             return state;
         }
 
-        bool BufferPreparer::isStateTransparent(const QueueItem &item, const ItemState &) {
+        bool BufferPreparer::isStateTransparent(const QueueItem &item, const ItemState & state) {
             if(item.type == QueueItem::PIXEL_CONTAINER){
+                return true;
+            }
+            if (
+                    (
+                        item.type == QueueItem::BAR ||
+                        item.type == QueueItem::FILLELLIPSE
+                    ) && (
+                        color_has_alpha(_stateHelper.getLastState().fillColor) ||
+                        (_stateHelper.fillTextureUsed(state) && color_has_alpha(_stateHelper.getLastState().bgColor))
+                    )
+            ) {
                 return true;
             }
             return false;
@@ -193,7 +232,7 @@ namespace directgraph{
 
         bool BufferPreparer::processStateDiff(
                 const ItemState &statePrev, const ItemState &stateCur,
-                DrawOpVector &drawOps
+                DrawOpVector &drawOps, bool isTransp
         ) {
             ItemState stateDiff = _propMan.itemStateDiff(statePrev, stateCur);
             bool isFirst = false;
@@ -223,12 +262,25 @@ namespace directgraph{
                 isFirst = true;
             }
             if(_bufPrepParams->needRecreateTexture()){
-                if (stateDiff[PropertyName::FILL_PATTERN].isSet || stateDiff[PropertyName::BG_COLOR].isSet){
-                    _drawOps.push_back(
-                            DrawOpCreator::create<SET_FILL_PATTERN_COLOR>(
-                                    stateCur[PropertyName::FILL_PATTERN].val,
-                                    stateCur[PropertyName::BG_COLOR].val
-                            ));
+                if (
+                        stateDiff[PropertyName::FILL_PATTERN].isSet ||
+                        stateDiff[PropertyName::BG_COLOR].isSet ||
+                        (isTransp && stateDiff[PropertyName::FILL_COLOR].isSet)
+                ){
+                    if(isTransp){
+                        drawOps.push_back(
+                                DrawOpCreator::create<SET_FILL_PATTERN_TWO_COLORS>(
+                                        stateCur[PropertyName::FILL_PATTERN].val,
+                                        stateCur[PropertyName::BG_COLOR].val,
+                                        stateCur[PropertyName::FILL_COLOR].val
+                                ));
+                    } else {
+                        drawOps.push_back(
+                                DrawOpCreator::create<SET_FILL_PATTERN_COLOR>(
+                                        stateCur[PropertyName::FILL_PATTERN].val,
+                                        stateCur[PropertyName::BG_COLOR].val
+                                ));
+                    }
                     isFirst = true;
                 }
             } else {
@@ -586,7 +638,7 @@ namespace directgraph{
                     ItemState lastState = createItemState(item);
                     bool isTransparent = isStateTransparent(item, lastState);
                     if(isTransparent){
-                        _isFirst = processStateDiff(_stateHelper.getCurItemState(), lastState, _transpBuffer.drawOps)
+                        _isFirst = processStateDiff(_stateHelper.getCurItemState(), lastState, _transpBuffer.drawOps, true)
                                    || _transpBuffer.vect.empty();
                         _stateHelper.getCurItemState() = lastState;
                     } else {
@@ -701,13 +753,12 @@ namespace directgraph{
                         break;
                     }
                 }
-                processStateDiff(_stateHelper.getCurItemState(), lastState, _drawOps);
+                processStateDiff(_stateHelper.getCurItemState(), lastState, _drawOps, false);
                 _stateHelper.getCurItemState() = lastState;
                 _drawOps.push_back(DrawOpCreator::create<ITEMS>(
                         it->second.vect.size(), it->second.numItems - VERTICES_TRIANGLES_DIFF, it->second.type
                 ));
             }
-            _stateHelper.resetState();
             if(!_transpBuffer.vect.empty()) {
                 MemBlock transpBlock = {&_transpBuffer.vect[0], _transpBuffer.vect.size()};
                 _memBlocks.push_back(transpBlock);

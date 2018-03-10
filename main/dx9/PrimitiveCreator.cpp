@@ -68,28 +68,28 @@ namespace directgraph{
                     static_cast<float>(startCrds.x) - 0.5f,
                     static_cast<float>(startCrds.y) - 0.5f,
                     z, 1.0f,
-                    swap_color(color)
+                    swap_color_transp(color)
             );
             vertices++;
             *vertices = VertexCreator::create<ColorVertex>(
                     static_cast<float>(endCrds.x) - 0.5f,
                     static_cast<float>(startCrds.y) - 0.5f,
                     z, 1.0f,
-                    swap_color(color)
+                    swap_color_transp(color)
             );
             vertices++;
             *vertices = VertexCreator::create<ColorVertex>(
                     static_cast<float>(startCrds.x) - 0.5f,
                     static_cast<float>(endCrds.y) - 0.5f,
                     z, 1.0f,
-                    swap_color(color)
+                    swap_color_transp(color)
             );
             vertices++;
             *vertices = VertexCreator::create<ColorVertex>(
                     static_cast<float>(endCrds.x) - 0.5f,
                     static_cast<float>(endCrds.y) - 0.5f,
                     z, 1.0f,
-                    swap_color(color)
+                    swap_color_transp(color)
             );
             vertices++;
             return vertices;
@@ -143,8 +143,8 @@ namespace directgraph{
                     startXTrans,
                     startYTrans,
                     z,
-                    static_cast<DWORD>(swap_color(color1)),
-                    static_cast<DWORD>(swap_color(color2)),
+                    static_cast<DWORD>(swap_color_transp(color1)),
+                    static_cast<DWORD>(swap_color_transp(color2)),
                     0.0f,
                     0.0f
             );
@@ -153,8 +153,8 @@ namespace directgraph{
                     endXTrans,
                     startYTrans,
                     z,
-                    static_cast<DWORD>(swap_color(color1)),
-                    static_cast<DWORD>(swap_color(color2)),
+                    static_cast<DWORD>(swap_color_transp(color1)),
+                    static_cast<DWORD>(swap_color_transp(color2)),
                     textureRight,
                     0.0f
             );
@@ -163,8 +163,8 @@ namespace directgraph{
                     startXTrans,
                     endYTrans,
                     z,
-                    static_cast<DWORD>(swap_color(color1)),
-                    static_cast<DWORD>(swap_color(color2)),
+                    static_cast<DWORD>(swap_color_transp(color1)),
+                    static_cast<DWORD>(swap_color_transp(color2)),
                     0.0f,
                     textureBottom
             );
@@ -173,8 +173,8 @@ namespace directgraph{
                     endXTrans,
                     endYTrans,
                     z,
-                    static_cast<DWORD>(swap_color(color1)),
-                    static_cast<DWORD>(swap_color(color2)),
+                    static_cast<DWORD>(swap_color_transp(color1)),
+                    static_cast<DWORD>(swap_color_transp(color2)),
                     textureRight,
                     textureBottom
             );
@@ -196,7 +196,7 @@ namespace directgraph{
                     static_cast<float>(startCrds.x) - 0.5f,
                     static_cast<float>(startCrds.y) - 0.5f,
                     z, 1.0f,
-                    swap_color(color),
+                    swap_color_transp(color),
                     0.0f,
                     0.0f
             );
@@ -205,7 +205,7 @@ namespace directgraph{
                     static_cast<float>(endCrds.x) - 0.5f,
                     static_cast<float>(startCrds.y) - 0.5f,
                     z, 1.0f,
-                    swap_color(color),
+                    swap_color_transp(color),
                     textureRight,
                     0.0f
             );
@@ -214,7 +214,7 @@ namespace directgraph{
                     static_cast<float>(startCrds.x) - 0.5f,
                     static_cast<float>(endCrds.y) - 0.5f,
                     z, 1.0f,
-                    swap_color(color),
+                    swap_color_transp(color),
                     0.0f,
                     textureBottom
             );
@@ -223,7 +223,7 @@ namespace directgraph{
                     static_cast<float>(endCrds.x) - 0.5f,
                     static_cast<float>(endCrds.y) - 0.5f,
                     z, 1.0f,
-                    swap_color(color),
+                    swap_color_transp(color),
                     textureRight,
                     textureBottom
             );
@@ -305,19 +305,19 @@ namespace directgraph{
             float radiusYTrans = static_cast<float>(1.0 * radiusCrds.y / maxCrds.y);
             TexturedColorVertexNoRHW *vertices = static_cast<TexturedColorVertexNoRHW*>(verticesVoid);
             *vertices = VertexCreator::create<TexturedColorVertexNoRHW>(
-                    centerXTrans, centerYTrans, z, static_cast<DWORD>(swap_color(color)), -radiusXTrans, -radiusYTrans
+                    centerXTrans, centerYTrans, z, static_cast<DWORD>(swap_color_transp(color)), -radiusXTrans, -radiusYTrans
             );
             vertices++;
             *vertices = VertexCreator::create<TexturedColorVertexNoRHW>(
-                    centerXTrans, centerYTrans, z, static_cast<DWORD>(swap_color(color)), radiusXTrans, -radiusYTrans
+                    centerXTrans, centerYTrans, z, static_cast<DWORD>(swap_color_transp(color)), radiusXTrans, -radiusYTrans
             );
             vertices++;
             *vertices = VertexCreator::create<TexturedColorVertexNoRHW>(
-                    centerXTrans, centerYTrans, z, static_cast<DWORD>(swap_color(color)), -radiusXTrans, radiusYTrans
+                    centerXTrans, centerYTrans, z, static_cast<DWORD>(swap_color_transp(color)), -radiusXTrans, radiusYTrans
             );
             vertices++;
             *vertices = VertexCreator::create<TexturedColorVertexNoRHW>(
-                    centerXTrans, centerYTrans, z, static_cast<DWORD>(swap_color(color)), radiusXTrans, radiusYTrans
+                    centerXTrans, centerYTrans, z, static_cast<DWORD>(swap_color_transp(color)), radiusXTrans, radiusYTrans
             );
             vertices++;
             return vertices;
@@ -363,28 +363,28 @@ namespace directgraph{
             TexturedColor2Vertex *vertices = static_cast<TexturedColor2Vertex*>(verticesVoid);
             *vertices = VertexCreator::create<TexturedColor2Vertex>(
                     centerXTrans, centerYTrans, z,
-                    swap_color(color1), swap_color(color2),
+                    swap_color_transp(color1), swap_color_transp(color2),
                     0.0f, 0.0f,
                     -radiusXTrans, -radiusYTrans
             );
             vertices++;
             *vertices = VertexCreator::create<TexturedColor2Vertex>(
                     centerXTrans, centerYTrans, z,
-                    swap_color(color1), swap_color(color2),
+                    swap_color_transp(color1), swap_color_transp(color2),
                     textureRight, 0.0f,
                     radiusXTrans, -radiusYTrans
             );
             vertices++;
             *vertices = VertexCreator::create<TexturedColor2Vertex>(
                     centerXTrans, centerYTrans, z,
-                    swap_color(color1), swap_color(color2),
+                    swap_color_transp(color1), swap_color_transp(color2),
                     0.0f, textureBottom,
                     -radiusXTrans, radiusYTrans
             );
             vertices++;
             *vertices = VertexCreator::create<TexturedColor2Vertex>(
                     centerXTrans, centerYTrans, z,
-                    swap_color(color1), swap_color(color2),
+                    swap_color_transp(color1), swap_color_transp(color2),
                     textureRight, textureBottom,
                     radiusXTrans, radiusYTrans
             );

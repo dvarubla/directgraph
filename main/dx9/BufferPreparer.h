@@ -21,6 +21,7 @@ namespace directgraph {
                 REMOVE_PATTERN_TEXTURE,
                 SET_FILL_PATTERN,
                 SET_FILL_PATTERN_COLOR,
+                SET_FILL_PATTERN_TWO_COLORS,
                 SET_USER_FILL_PATTERN,
                 SET_TEX_BG_COLOR,
                 ITEMS,
@@ -42,6 +43,11 @@ namespace directgraph {
                         uint8_t fillPattern;
                         uint32_t bgColor;
                     } fillPatternColor;
+                    struct FillPatternTwoColors {
+                        uint8_t fillPattern;
+                        uint32_t bgColor;
+                        uint32_t fillColor;
+                    } fillPatternTwoColors;
                     uint8_t fillPattern;
                     uint32_t bgColor;
                     char *userFillPattern;
@@ -105,7 +111,7 @@ namespace directgraph {
             bool isStateTransparent(const QueueItem &item, const ItemState &state);
             bool processStateDiff(
                     const ItemState &statePrev, const ItemState &stateCur,
-                    DrawOpVector &drawOps
+                    DrawOpVector &drawOps, bool isTransp
             );
             struct TypeSize{
                 uint_fast32_t sizeMult;
@@ -123,7 +129,7 @@ namespace directgraph {
             StartEndCoords getStartEndCoords(
                     const QueueItem &item, const ItemState &state
             );
-            void useFillTexture(ItemState &state, bool useBgColor);
+            void useFillTexture(ItemState &state, bool useBgColor, bool useFillColorIfTransp);
             void disablePixelTexture(ItemState &state);
             void disableTexture(ItemState &state);
             void useLineStyle(ItemState &state);
@@ -165,6 +171,8 @@ namespace directgraph {
             static BufferPreparer::DrawOp create(uint_fast32_t);
             template <BufferPreparer::DrawOpType T>
             static BufferPreparer::DrawOp create(uint_fast32_t, uint_fast32_t);
+            template <BufferPreparer::DrawOpType T>
+            static BufferPreparer::DrawOp create(uint_fast32_t, uint_fast32_t, uint_fast32_t);
             template <BufferPreparer::DrawOpType T>
             static BufferPreparer::DrawOp create(char *userFillPattern);
             template <BufferPreparer::DrawOpType T>
