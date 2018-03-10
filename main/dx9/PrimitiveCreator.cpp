@@ -430,13 +430,14 @@ namespace directgraph{
             return vertices;
         }
 
-        ColorVertex *
+        void *
         PrimitiveCreator::genEllipse(void *verticesVoid,
                                      Coords centerCrds, UCoords radiusCrds,
                                      float z,
-                                     uint_fast32_t color
+                                     uint_fast32_t color,
+                                     bool textured
         ) {
-            return _ellipseHelper.genEllipse(verticesVoid, centerCrds.x, centerCrds.y, radiusCrds.x, radiusCrds.y, z, color);
+            return _ellipseHelper.genEllipse(verticesVoid, centerCrds, radiusCrds, z, color, textured);
         }
 
         uint_fast32_t PrimitiveCreator::getNumEllipseVertices(UCoords radiusCrds) {

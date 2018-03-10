@@ -39,6 +39,8 @@ set(DX9_FILLELLIPSE_SRC dx9_fillellipse.cpp ${SHADERS_RES_FILE} ../stubs/QueueRe
 dx9_test(dx9_fillellipse "${DX9_FILLELLIPSE_SRC}")
 set(DX9_FILLELLIPSE_STYLE_SRC dx9_fillellipse_style.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp ../stubs/FeaturesStub.h)
 dx9_test(dx9_fillellipse_style "${DX9_FILLELLIPSE_STYLE_SRC}")
+set(DX9_FILLELLIPSE_STYLE_OLD_SRC dx9_fillellipse_style_old.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp ../stubs/FeaturesStub.h)
+dx9_test(dx9_fillellipse_style_old "${DX9_FILLELLIPSE_STYLE_OLD_SRC}")
 set(DX9_FILLELLIPSE_OLD_SRC dx9_fillellipse_old.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp ../stubs/FeaturesStub.h)
 dx9_test(dx9_fillellipse_old "${DX9_FILLELLIPSE_OLD_SRC}")
 

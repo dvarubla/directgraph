@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <main/patterns.h>
 #include "EllipseHelper.h"
 #include "util.h"
 
@@ -12,31 +13,44 @@ namespace directgraph{
 
         }
 
-        ColorVertex *EllipseHelper::genEllipse(
+        void *EllipseHelper::genEllipse(
                 void *memoryVoid,
-                int_fast32_t centerX, int_fast32_t centerY,
-                uint_fast32_t rx, uint_fast32_t ry,
+                Coords centerCrds,
+                UCoords radiusCrds,
                 float z,
-                uint_fast32_t color
+                uint_fast32_t color,
+                bool textured
         ) {
-            color = swap_color(color);
+            _z = z;
+            _color = swap_color(color);
+            if(textured) {
+                _minX = static_cast<double>(centerCrds.x - radiusCrds.x);
+                _minY = static_cast<double>(centerCrds.y - radiusCrds.y);
+            }
+            
             bool swap;
             uint_fast32_t minR, maxR;
-            if(ry > rx){
-                maxR = ry;
-                minR = rx;
+            if(radiusCrds.y > radiusCrds.x){
+                maxR = radiusCrds.y;
+                minR = radiusCrds.x;
                 swap = false;
             } else {
-                maxR = rx;
-                minR = ry;
+                maxR = radiusCrds.x;
+                minR = radiusCrds.y;
                 swap = true;
             }
-            uint_fast32_t numVertices = getNumEllipseVertices(rx, ry);
-            ColorVertex *memory = static_cast<ColorVertex *>(memoryVoid);
+            uint_fast32_t numVertices = getNumEllipseVertices(radiusCrds.x, radiusCrds.y);
+            ColorVertex *memoryCol;
+            TexturedColorVertex *memoryTextured;
+            if(textured){
+                memoryTextured = static_cast<TexturedColorVertex *>(memoryVoid);
+            } else {
+                memoryCol = static_cast<ColorVertex *>(memoryVoid);
+            }
             for(uint_fast32_t i = 0; i <= minR; i++) {
                 uint_fast32_t cur = (swap) ? (minR - i) : i;
-                float first;
-                float second;
+                double first;
+                double second;
                 if (swap) {
                     second = static_cast<float>(cur);
                     first = maxR * sqrt(1 - (second / minR) * (second / minR));
@@ -46,74 +60,95 @@ namespace directgraph{
                 }
                 if (i == 0) {
                     for (uint_fast32_t j = 0; j < (numVertices - 1); j += 3) {
-                        memory[j] = VertexCreator::create<ColorVertex>(
-                                centerX + first - 0.5f,
-                                centerY - second - 0.5f,
-                                z,
-                                1.0f,
-                                color
+                        if(textured){
+                            memoryTextured[j] = createTexturedVertex(
+                                    centerCrds.x + first,
+                                    centerCrds.y - second 
+                            );
+                        } else {
+                            memoryCol[j] = createVertex(
+                                    centerCrds.x + first ,
+                                    centerCrds.y - second 
+                            );
+                        }
+                    }
+                    uint_fast32_t oppIndex = convertIndex(2 * minR);
+                    if(textured){
+                        memoryTextured[numVertices - 1] = createTexturedVertex(
+                                centerCrds.x + first,
+                                centerCrds.y - second 
+                        );
+                        memoryTextured[oppIndex] = createTexturedVertex(
+                                centerCrds.x + first,
+                                centerCrds.y + second 
+                        );
+                    } else {
+                        memoryCol[numVertices - 1] = createVertex(
+                                centerCrds.x + first,
+                                centerCrds.y - second 
+                        );
+                        memoryCol[oppIndex] = createVertex(
+                                centerCrds.x + first,
+                                centerCrds.y + second 
                         );
                     }
-                    memory[numVertices - 1] = VertexCreator::create<ColorVertex>(
-                            centerX + first - 0.5f,
-                            centerY - second - 0.5f,
-                            z,
-                            1.0f,
-                            color
-                    );
-                    uint_fast32_t oppIndex = convertIndex(2 * minR);
-                    memory[oppIndex] = VertexCreator::create<ColorVertex>(
-                            centerX + first - 0.5f,
-                            centerY + second - 0.5f,
-                            z,
-                            1.0f,
-                            color
-                    );
                 } else if (i == minR) {
                     uint_fast32_t curIndex = convertIndex(minR);
-                    memory[curIndex] = VertexCreator::create<ColorVertex>(
-                            centerX + first - 0.5f + EXTRA_OFFSET,
-                            centerY - second - 0.5f,
-                            z,
-                            1.0f,
-                            color
-                    );
                     uint_fast32_t oppIndex = convertIndex(3 * minR);
-                    memory[oppIndex] = VertexCreator::create<ColorVertex>(
-                            centerX - first - 0.5f,
-                            centerY + second - 0.5f,
-                            z,
-                            1.0f,
-                            color
-                    );
+                    if(textured){
+                        memoryTextured[curIndex] = createTexturedVertex(
+                                centerCrds.x + first + EXTRA_OFFSET,
+                                centerCrds.y - second 
+                        );
+                        memoryTextured[oppIndex] = createTexturedVertex(
+                                centerCrds.x - first ,
+                                centerCrds.y + second 
+                        );
+                    } else {
+                        memoryCol[curIndex] = createVertex(
+                                centerCrds.x + first + EXTRA_OFFSET,
+                                centerCrds.y - second 
+                        );
+                        memoryCol[oppIndex] = createVertex(
+                                centerCrds.x - first ,
+                                centerCrds.y + second 
+                        );
+                    }
+
                 } else {
                     for (uint_fast32_t j = 0; j < 4; j++) {
                         uint_fast32_t index;
-                        float x, y;
+                        double x, y;
                         if (j == 0) {
                             index = convertIndex(i);
-                            x = centerX + first - 0.5f + EXTRA_OFFSET;
-                            y = centerY - second - 0.5f;
+                            x = centerCrds.x + first + EXTRA_OFFSET;
+                            y = centerCrds.y - second;
                         } else if (j == 1) {
                             index = convertIndex(2 * minR - i);
-                            x = centerX + first - 0.5f + EXTRA_OFFSET;
-                            y = centerY + second - 0.5f;
+                            x = centerCrds.x + first + EXTRA_OFFSET;
+                            y = centerCrds.y + second;
                         } else if (j == 2) {
                             index = convertIndex(2 * minR + i);
-                            x = centerX - first - 0.5f;
-                            y = centerY + second - 0.5f;
+                            x = centerCrds.x - first;
+                            y = centerCrds.y + second;
                         } else {
                             index = convertIndex(4 * minR - i);
-                            x = centerX - first - 0.5f;
-                            y = centerY - second - 0.5f;
+                            x = centerCrds.x - first;
+                            y = centerCrds.y - second;
                         }
-                        memory[index] = VertexCreator::create<ColorVertex>(
-                                x, y, z, 1.0f, color
-                        );
+                        if(textured){
+                            memoryTextured[index] = createTexturedVertex(x, y);
+                        } else {
+                            memoryCol[index] = createVertex(x, y);
+                        }
                     }
                 }
             }
-            return memory + numVertices;
+            if(textured){
+                return memoryTextured + numVertices;
+            } else {
+                return memoryCol + numVertices;
+            }
         }
 
         uint_fast32_t EllipseHelper::getNumEllipseVertices(
@@ -126,6 +161,22 @@ namespace directgraph{
         uint_fast32_t EllipseHelper::convertIndex(uint_fast32_t index) {
             uint_fast32_t t = (1 - index % 2);
             return 3 * ((index - t) / 2) + t + 1;
+        }
+
+        ColorVertex EllipseHelper::createVertex(
+                double x, double y
+        ) {
+            return VertexCreator::create<ColorVertex>(
+                    static_cast<float>(x - 0.5), static_cast<float>(y - 0.5), _z, 1.0f, _color
+            );
+        }
+
+        TexturedColorVertex EllipseHelper::createTexturedVertex(double x, double y) {
+            return VertexCreator::create<TexturedColorVertex>(
+                    static_cast<float>(x - 0.5), static_cast<float>(y - 0.5), _z, 1.0f, _color,
+                    static_cast<float>((x - _minX) / FPATTERN_SIZE),
+                    static_cast<float>((y - _minY) / FPATTERN_SIZE)
+            );
         }
     }
 }

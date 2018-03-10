@@ -157,11 +157,13 @@ namespace directgraph{
                     break;
                 case QueueItem::FILLELLIPSE:
                     disablePixelTexture(state);
-                    useFillTexture(state, true);
+                    useFillTexture(state, !_bufPrepParams->supportsTexturedBar());
                     if(_stateHelper.getLastState().lineStyle == NULL_LINE){
                         if(_stateHelper.fillTextureUsed(state)){
                             if(_bufPrepParams->supportsTexturedEllipse()){
                                 _propMan.setProp(state, PropertyName::SHADER_TYPE, ShaderType::TEXTURED_ELLIPSE_SHADER);
+                            } else {
+                                disableShader(state);
                             }
                         } else {
                             if (_bufPrepParams->supportsEllipse()) {
@@ -282,6 +284,9 @@ namespace directgraph{
                         if(_bufPrepParams->supportsTexturedEllipse()){
                             res.sizeMult = sizeof(TexturedColor2Vertex);
                             res.drawDataType = TEXTURED_ELLIPSE_VERTEX;
+                        } else {
+                            res.sizeMult = sizeof(TexturedColorVertex);
+                            res.drawDataType = TEXTURED_COLOR_VERTEX;
                         }
                     } else {
                         if (_bufPrepParams->supportsEllipse()) {
@@ -323,6 +328,10 @@ namespace directgraph{
                             curVertMem = _primCreator.genTexEllipseDegenerate(
                                     curVertMem, startCrds, endCrds, _curZ,
                                     genUCoords(_bufPrepParams->getWidth(), _bufPrepParams->getHeight())
+                            );
+                        } else {
+                            curVertMem = _primCreator.genFillDegenerate(
+                                    curVertMem, startCrds, endCrds, _curZ
                             );
                         }
                     }
@@ -448,6 +457,20 @@ namespace directgraph{
                                                                      _stateHelper.getLastState().bgColor,
                                                                      genUCoords(_bufPrepParams->getWidth(), _bufPrepParams->getHeight())
                             );
+                        } else {
+                            curVertMem = _primCreator.genEllipse(curVertMem,
+                                                                 _helper->toPixelsXY(
+                                                                         item.data.fillellipse.x,
+                                                                         item.data.fillellipse.y
+                                                                 ),
+                                                                 _helper->toPixelsXYU(
+                                                                         item.data.fillellipse.xradius,
+                                                                         item.data.fillellipse.yradius
+                                                                 ),
+                                                                 _curZ,
+                                                                 _stateHelper.getLastState().fillColor,
+                                                                 true
+                            );
                         }
                     } else {
                         if (_bufPrepParams->supportsEllipse()) {
@@ -472,7 +495,8 @@ namespace directgraph{
                                                                          item.data.fillellipse.yradius
                                                                  ),
                                                                  _curZ,
-                                                                 _stateHelper.getFillColor()
+                                                                 _stateHelper.getFillColor(),
+                                                                 false
                             );
                         }
                     }

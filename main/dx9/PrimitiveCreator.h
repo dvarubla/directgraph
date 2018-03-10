@@ -106,12 +106,13 @@ namespace directgraph {
                     UCoords maxCrds
             );
 
-            ColorVertex* genEllipse(
+            void* genEllipse(
                     void *verticesVoid,
                     Coords centerCrds,
                     UCoords radiusCrds,
                     float z,
-                    uint_fast32_t color
+                    uint_fast32_t color,
+                    bool textured
             );
 
             uint_fast32_t getNumEllipseVertices(
