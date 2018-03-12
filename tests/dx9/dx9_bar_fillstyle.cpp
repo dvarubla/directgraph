@@ -121,6 +121,21 @@ IMG_TEST_F(DX9BarFillstyleTest, UserPattern){
     return afterTestSimple(win, &_readerStub);
 }
 
+IMG_TEST_F(DX9BarFillstyleTest, UserPattern2Times){
+    uint8_t pattern[] = {0xFF, 0xEE, 0xDD, 0xCC, 0xBB, 0xAA, 0x99, 0x88};
+    uint8_t pattern2[] = {0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0xFF};
+    QueueItem items[] = {
+            QueueItemCreator::create<QueueItem::CLEAR>(),
+            QueueItemCreator::create<QueueItem::BGCOLOR>(0xFFFFFF),
+            QueueItemCreator::create<QueueItem::SETFILLPATTERN>(reinterpret_cast<char*>(pattern), 0x0000FF),
+            QueueItemCreator::create<QueueItem::BAR>(WIDTH/4, HEIGHT/4, WIDTH/2, HEIGHT/2),
+            QueueItemCreator::create<QueueItem::SETFILLPATTERN>(reinterpret_cast<char*>(pattern2), 0x0000FF),
+            QueueItemCreator::create<QueueItem::BAR>(WIDTH/2, HEIGHT/2, 3*WIDTH/4, 3*HEIGHT/4)
+    };
+    _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
+    return afterTestSimple(win, &_readerStub);
+}
+
 IMG_TEST_F(DX9BarFillstyleTest, UserFill){
     uint8_t pattern[] = {0xFF, 0xEE, 0xDD, 0xCC, 0xBB, 0xAA, 0x99, 0x88};
     QueueItem items[] = {

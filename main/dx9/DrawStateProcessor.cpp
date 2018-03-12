@@ -71,6 +71,7 @@ namespace directgraph{
                 case QueueItem::PIXEL_CONTAINER:
                     disableShader(state);
                     disableTexture(state);
+                    _propMan->setProp(state, PropertyName::PIXEL_TEXTURE_STATE, PixelTextureState::PIXEL_TEXTURE);
                     _propMan->setPropP(state, PropertyName::PIXEL_CONTAINER, item.data.pixelContainer);
                     break;
                 case QueueItem::FILLELLIPSE:
@@ -178,9 +179,9 @@ namespace directgraph{
                     isFirst = true;
                 }
             } else {
-                if (stateDiff[PropertyName::FILL_PATTERN].isSet) {
+                if (stateDiff[PropertyName::FILL_PATTERN].isSet || stateDiff[PropertyName::USER_FILL_PATTERN].isSet) {
                     drawOps.push_back(
-                            DrawOpCreator::create<DrawOpType::SET_FILL_PATTERN>(stateDiff[PropertyName::FILL_PATTERN].val));
+                            DrawOpCreator::create<DrawOpType::SET_FILL_PATTERN>(stateCur[PropertyName::FILL_PATTERN].val));
                     isFirst = true;
                 }
                 if (stateDiff[PropertyName::BG_COLOR].isSet) {
