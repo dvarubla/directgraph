@@ -29,7 +29,7 @@ set(COMMON_LIB_FILES ${INCLUDE_FILES} ${COMMON_FILES})
 add_library(directgraph_common ${COMMON_LIB_FILES})
 set_target_properties(
         directgraph_common PROPERTIES
-        COMPILE_FLAGS "${COMMON_COMPILE_FLAGS}"
+        COMPILE_FLAGS "${COMMON_COMPILE_FLAGS}" LINK_FLAGS "${EXTRA_LINK_FLAGS}"
 )
 target_include_directories(directgraph_common BEFORE PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/include")
 
@@ -46,7 +46,7 @@ set_source_files_properties(
 add_library(directgraph_dx9 SHARED ${API_FILES} ${OUTPUT_RES})
 set_target_properties(
         directgraph_dx9 PROPERTIES
-        COMPILE_FLAGS "${COMMON_COMPILE_FLAGS}"
+        COMPILE_FLAGS "${COMMON_COMPILE_FLAGS}" LINK_FLAGS "${EXTRA_LINK_FLAGS}"
 )
 target_link_libraries(directgraph_dx9 directgraph_dx9_int)
 target_compile_definitions(directgraph_dx9 PUBLIC DIRECTGRAPH_EXPORTS)

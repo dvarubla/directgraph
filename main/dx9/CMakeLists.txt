@@ -13,7 +13,7 @@ set(DX9_FILES
 add_library(directgraph_dx9_renderer ${DX9_FILES})
 set_target_properties(
         directgraph_dx9_renderer PROPERTIES
-        COMPILE_FLAGS "${COMMON_COMPILE_FLAGS}"
+        COMPILE_FLAGS "${COMMON_COMPILE_FLAGS}" LINK_FLAGS "${EXTRA_LINK_FLAGS}"
 )
 add_dependencies(directgraph_dx9_renderer static_res)
 
