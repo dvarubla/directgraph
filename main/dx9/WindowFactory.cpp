@@ -16,11 +16,11 @@ namespace directgraph{
         }
 
         IMyWindow *WindowFactory::createDPIWindow(
-                const wchar_t *name, float width, float height,
+                const wchar_t *name,
+                float width, float height,
+                float dpiX, float dpiY,
                 const CommonProps &props
         ) {
-            float dpiX, dpiY;
-            _common->getDpi(dpiX, dpiY);
             DPIHelper *helper = new DPIHelper(dpiX, dpiY);
             return commonCreateWindow(helper, name, width, height, props);
         }
@@ -68,6 +68,12 @@ namespace directgraph{
 
         Common *WindowFactory::getCommon() {
             return _common;
+        }
+
+        IWindowFactory::DPIInfo WindowFactory::getDPIInfo() {
+            DPIInfo info;
+            _common->getDpi(info.dpiX, info.dpiY);
+            return info;
         }
     }
 }

@@ -19,6 +19,7 @@ public:
     static DWORD windowThreadId;
     IFeatures *_curFeatures;
     IMyWindow* createWindow(float w, float h);
+    IMyWindow* createDPIWindow(float w, float h, float dpiX, float dpiY);
     BitmapWrap* afterTestSimple(IMyWindow *win, IQueueReader *reader);
     void addOnCall(NiceMock<QueueReaderStub> &readerStub);
     FeaturesStub* setupFeatures();

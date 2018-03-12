@@ -49,5 +49,8 @@ dx9_test(dx9_transparency "${DX9_TRANSPARENCY_SRC}")
 set(DX9_TRANSPARENCY_NO_SHADER_SRC dx9_transparency_no_shader.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp ../stubs/FeaturesStub.h)
 dx9_test(dx9_transparency_no_shader "${DX9_TRANSPARENCY_NO_SHADER_SRC}")
 
+set(DX9_DIFFERENT_DPI_SRC dx9_different_dpi.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp ../stubs/FeaturesStub.h)
+dx9_test(dx9_different_dpi "${DX9_DIFFERENT_DPI_SRC}")
+
 set(DX9_INT1_SRC dx9_int1.cpp ${SHADERS_RES_FILE} CommonIntegration.h CommonIntegration.cpp ../stubs/WindowFactoryStub.cpp)
 dx9_test(dx9_int1 "${DX9_INT1_SRC}")

@@ -7,6 +7,7 @@ using testing::Invoke;
 static const int MSG_CODE = WM_USER + 6000;
 static const int MSG_CREATE = WM_USER + 6001;
 static const int MSG_DESTROY = WM_USER + 6002;
+static const int MSG_CREATE_DPI = WM_USER + 6003;
 
 BitmapWrap *CommonSimple::afterTestSimple(IMyWindow *win, IQueueReader *reader) {
     while(reader->getSize() != 0) {
@@ -37,6 +38,13 @@ struct DrawParam{
     float h;
 };
 
+struct DrawDPIParam{
+    float w;
+    float h;
+    float dpiX;
+    float dpiY;
+};
+
 static DWORD WINAPI mainWindowThread(LPVOID param){
     Param p = *reinterpret_cast<Param*>(param);
     MSG msg;
@@ -49,6 +57,15 @@ static DWORD WINAPI mainWindowThread(LPVOID param){
         if(msg.message == MSG_CREATE){
             DrawParam *drawParam = reinterpret_cast<DrawParam*>(msg.wParam);
             win = CommonSimple::_dx9Wf->createPixelWindow(L"Hello", drawParam->w, drawParam->h, props);
+            win->show();
+            windowSent = false;
+        } else if(msg.message == MSG_CREATE_DPI){
+            DrawDPIParam *drawDPIParam = reinterpret_cast<DrawDPIParam*>(msg.wParam);
+            win = CommonSimple::_dx9Wf->createDPIWindow(
+                    L"Hello", drawDPIParam->w, drawDPIParam->h,
+                    drawDPIParam->dpiX, drawDPIParam->dpiY,
+                    props
+            );
             win->show();
             windowSent = false;
         } else if(msg.message == MSG_DESTROY){
@@ -81,6 +98,16 @@ IMyWindow* CommonSimple::createWindow(float w, float h) {
     MSG msg;
     DrawParam dp = {w, h};
     PostThreadMessage(windowThreadId, MSG_CREATE, reinterpret_cast<WPARAM>(&dp), 0);
+    GetMessage(&msg, NULL, MSG_CODE, MSG_CODE);
+    IMyWindow *win = reinterpret_cast<IMyWindow *>(msg.wParam);
+    return win;
+}
+
+IMyWindow* CommonSimple::createDPIWindow(float w, float h, float dpiX, float dpiY) {
+    startThread();
+    MSG msg;
+    DrawDPIParam dp = {w, h, dpiX, dpiY};
+    PostThreadMessage(windowThreadId, MSG_CREATE_DPI, reinterpret_cast<WPARAM>(&dp), 0);
     GetMessage(&msg, NULL, MSG_CODE, MSG_CODE);
     IMyWindow *win = reinterpret_cast<IMyWindow *>(msg.wParam);
     return win;
