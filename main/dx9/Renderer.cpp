@@ -172,6 +172,7 @@ namespace directgraph {
         }
 
         void Renderer::draw(IQueueReader *reader) {
+            _common->lock();
             _device->SetRenderTarget(0, _backBuffer);
             _device->SetDepthStencilSurface(_depthStencil);
             _device->BeginScene();
@@ -195,6 +196,7 @@ namespace directgraph {
             }
             restoreDevice();
             _device->EndScene();
+            _common->unlock();
             reader->endReading(_bufPreparer->getLastOffset());
             _bufPreparer->resetLastOffset();
         }

@@ -9,6 +9,11 @@
 extern "C" {
 #endif
 
+void DIRECTGRAPH_EXPORT delay(uint32_t msec);
+
+void DIRECTGRAPH_EXPORT resize(float width, float height);
+
+
 void DIRECTGRAPH_EXPORT fillellipse(float x, float y, float xradius, float yradius);
 
 void DIRECTGRAPH_EXPORT setlinestyle(line_styles linestyle, uint32_t pattern, uint32_t thickness);
@@ -23,15 +28,27 @@ void DIRECTGRAPH_EXPORT setfillpattern(const char *fillpattern, uint32_t color);
 
 void DIRECTGRAPH_EXPORT setbgcolor(uint32_t color);
 
-void DIRECTGRAPH_EXPORT delay(uint32_t msec);
-
-void DIRECTGRAPH_EXPORT resize(float width, float height);
-
-WPARAM DIRECTGRAPH_EXPORT directgraph_mainloop();
-
 void DIRECTGRAPH_EXPORT directgraph_repaint();
 
+
+void DIRECTGRAPH_EXPORT fillellipsew(DirectgraphWinIndex index, float x, float y, float xradius, float yradius);
+
+void DIRECTGRAPH_EXPORT setlinestylew(DirectgraphWinIndex index, line_styles linestyle, uint32_t pattern, uint32_t thickness);
+
+void DIRECTGRAPH_EXPORT barw(DirectgraphWinIndex index, float left, float top, float right, float bottom);
+
+void DIRECTGRAPH_EXPORT putpixelw(DirectgraphWinIndex index, uint32_t x, uint32_t y, uint32_t color);
+
+void DIRECTGRAPH_EXPORT setfillstylew(DirectgraphWinIndex index, fill_patterns pattern, uint32_t color);
+
+void DIRECTGRAPH_EXPORT setfillpatternw(DirectgraphWinIndex index, const char *fillpattern, uint32_t color);
+
+void DIRECTGRAPH_EXPORT setbgcolorw(DirectgraphWinIndex index, uint32_t color);
+
 void DIRECTGRAPH_EXPORT directgraph_repaintw(DirectgraphWinIndex index);
+
+
+WPARAM DIRECTGRAPH_EXPORT directgraph_mainloop();
 
 DirectgraphWinIndex DIRECTGRAPH_EXPORT directgraph_create_window(const wchar_t *name, float width, float height);
 

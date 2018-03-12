@@ -205,6 +205,55 @@ void DIRECTGRAPH_EXPORT directgraph_repaint(){
     )
 }
 
+void DIRECTGRAPH_EXPORT fillellipsew(DirectgraphWinIndex index, float x, float y, float xradius, float yradius){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager(), index);
+            lock.data.controller->fillellipse(x, y, xradius, yradius);
+    )
+}
+
+void DIRECTGRAPH_EXPORT setlinestylew(DirectgraphWinIndex index, line_styles linestyle, uint32_t pattern, uint32_t thickness){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager(), index);
+            lock.data.controller->setlinestyle(linestyle, pattern, thickness);
+    )
+}
+
+void DIRECTGRAPH_EXPORT barw(DirectgraphWinIndex index, float left, float top, float right, float bottom){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager(), index);
+            lock.data.controller->bar(left, top, right, bottom);
+    )
+}
+
+void DIRECTGRAPH_EXPORT putpixelw(DirectgraphWinIndex index, uint32_t x, uint32_t y, uint32_t color){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager(), index);
+            lock.data.controller->putpixel(x, y, color);
+    )
+}
+
+void DIRECTGRAPH_EXPORT setfillstylew(DirectgraphWinIndex index, fill_patterns pattern, uint32_t color){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager(), index);
+            lock.data.controller->setfillstyle(pattern, color);
+    )
+}
+
+void DIRECTGRAPH_EXPORT setfillpatternw(DirectgraphWinIndex index, const char *fillpattern, uint32_t color){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager(), index);
+            lock.data.controller->setfillpattern(fillpattern, color);
+    )
+}
+
+void DIRECTGRAPH_EXPORT setbgcolorw(DirectgraphWinIndex index, uint32_t color){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager(), index);
+            lock.data.controller->setbgcolor(color);
+    )
+}
+
 void DIRECTGRAPH_EXPORT directgraph_repaintw(DirectgraphWinIndex index){
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager(), index);
