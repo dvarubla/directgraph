@@ -56,7 +56,7 @@ namespace directgraph{
                             _transpBuffer.vect.resize(curNumVertices * ts.sizeMult);
                             curMem = reinterpret_cast<void *>(&_transpBuffer.vect[0]);
                         } else {
-                            uint_fast32_t prevSize = _transpBuffer.vect.size();
+                            uint_fast32_t prevSize = static_cast<uint_fast32_t>(_transpBuffer.vect.size());
                             _transpBuffer.numItems += curNumVertices;
                             _transpBuffer.vect.resize(_transpBuffer.vect.size() + curNumVertices * ts.sizeMult);
                             curMem = reinterpret_cast<void *>(&_transpBuffer.vect[0] + prevSize);
@@ -87,7 +87,7 @@ namespace directgraph{
                             curMem = reinterpret_cast<void *>(&buffer.vect[0]);
                             buffer.offsets.push_back(0);
                         } else {
-                            uint_fast32_t prevSize = buffer.vect.size();
+                            uint_fast32_t prevSize = static_cast<uint_fast32_t>(buffer.vect.size());
                             buffer.numItems += curNumVertices;
                             buffer.vect.resize(buffer.vect.size() + curNumVertices * ts.sizeMult);
                             curMem = reinterpret_cast<void *>(&buffer.vect[0] + prevSize);
@@ -137,8 +137,8 @@ namespace directgraph{
             _stateHelper.resetState();
             for(BufferMap::iterator it = _drawBuffers.begin(); it != _drawBuffers.end(); ++it){
                 ItemState lastState = it->first;
-                it->second.offsets.push_back(it->second.vect.size());
-                for(uint_fast32_t i = it->second.offsets.size() - 2; ; i--){
+                it->second.offsets.push_back(static_cast<uint_fast32_t>(it->second.vect.size()));
+                for(uint_fast32_t i = static_cast<uint_fast32_t>(it->second.offsets.size()) - 2; ; i--){
                     MemBlock block = {
                             &it->second.vect[it->second.offsets[i]],
                             static_cast<uint_fast32_t>(it->second.offsets[i + 1] - it->second.offsets[i])
@@ -151,11 +151,12 @@ namespace directgraph{
                 _drawStateProc.processStateDiff(_stateHelper.getCurItemState(), lastState, _drawOps, false);
                 _stateHelper.getCurItemState() = lastState;
                 _drawOps.push_back(DrawOpCreator::create<DrawOpType::ITEMS>(
-                        it->second.vect.size(), it->second.numItems - VERTICES_TRIANGLES_DIFF, it->second.type
+                        static_cast<uint_fast32_t>(it->second.vect.size()),
+                        it->second.numItems - VERTICES_TRIANGLES_DIFF, it->second.type
                 ));
             }
             if(!_transpBuffer.vect.empty()) {
-                MemBlock transpBlock = {&_transpBuffer.vect[0], _transpBuffer.vect.size()};
+                MemBlock transpBlock = {&_transpBuffer.vect[0], static_cast<uint_fast32_t>(_transpBuffer.vect.size())};
                 _memBlocks.push_back(transpBlock);
                 _drawOps.push_back(DrawOpCreator::create<DrawOpType::START_TRANSPARENT_DATA>());
                 std::copy(_transpBuffer.drawOps.begin(), _transpBuffer.drawOps.end(), std::back_inserter(_drawOps));
