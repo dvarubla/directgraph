@@ -134,7 +134,7 @@ namespace directgraph {
                     !_common->getFeatures()->supportsTexConst(),
                     genUCoords(pxWidth, pxHeight),
                     genUCoords(pixelTextureWidth, pixelTextureHeight),
-                    65536
+                   65535
             );
 
             _bufPreparer = new BufferPreparer(

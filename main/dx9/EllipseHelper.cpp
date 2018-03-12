@@ -46,8 +46,8 @@ namespace directgraph{
             _z = z;
             _color = swap_color_transp(color);
             if(textured) {
-                _minX = static_cast<double>(centerCrds.x - radiusCrds.x);
-                _minY = static_cast<double>(centerCrds.y - radiusCrds.y);
+                _minX = static_cast<double>(centerCrds.x - static_cast<int_fast32_t>(radiusCrds.x));
+                _minY = static_cast<double>(centerCrds.y - static_cast<int_fast32_t>(radiusCrds.y));
             }
             
             bool swap;

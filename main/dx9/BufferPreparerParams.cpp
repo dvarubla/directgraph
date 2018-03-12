@@ -27,7 +27,7 @@ namespace directgraph{
                 uint_fast32_t maxDepthValues
         ) : _shaderMan(shaderMan), _needRecreateTexture(needRecreateTexture),
             _maxCrds(maxCrds), _pxTextureCrds(pxTextureCrds),
-            _maxDepthValues(maxDepthValues), _depthIncrement(1.0f / (maxDepthValues - 1)) {
+            _maxDepthValues(maxDepthValues), _depthIncrement(1.0f / (maxDepthValues)) {
         }
 
         float BufferPreparerParams::getDepthIncrement() {
