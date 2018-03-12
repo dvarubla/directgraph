@@ -216,38 +216,38 @@ namespace directgraph {
             uint_fast32_t offset = 0;
             IPatternTexturesHelper *curPatTextHelper = _patTextHelper;
             bool transpStarted = false;
-            for(BufferPreparer::DrawOpVector::iterator it = _bufPreparer->drawOpsBegin(); it != _bufPreparer->drawOpsEnd(); ++it){
+            for(DrawOpVector::iterator it = _bufPreparer->drawOpsBegin(); it != _bufPreparer->drawOpsEnd(); ++it){
                 switch(it->type){
-                    case BufferPreparer::ITEMS: {
+                    case DrawOpType::ITEMS: {
                         UINT stride;
                         DWORD fvf;
                         bool setFVF;
                         setFVF = false;
                         switch (it->data.items.type) {
-                            case BufferPreparer::COLOR_VERTEX:
+                            case DrawDataType::COLOR_VERTEX:
                                 stride = sizeof(ColorVertex);
                                 fvf = COLOR_VERTEX_FVF;
                                 setFVF = true;
                                 break;
-                            case BufferPreparer::TEXTURED_COLOR_VERTEX:
+                            case DrawDataType::TEXTURED_COLOR_VERTEX:
                                 stride = sizeof(TexturedColorVertex);
                                 fvf = TEXTURED_COLOR_VERTEX_FVF;
                                 setFVF = true;
                                 break;
-                            case BufferPreparer::TEXTURED_VERTEX:
+                            case DrawDataType::TEXTURED_VERTEX:
                                 stride = sizeof(TexturedVertex);
                                 fvf = TEXTURED_VERTEX_FVF;
                                 setFVF = true;
                                 break;
-                            case BufferPreparer::ELLIPSE_VERTEX:
+                            case DrawDataType::ELLIPSE_VERTEX:
                                 stride = sizeof(TexturedColorVertexNoRHW);
                                 setFVF = false;
                                 break;
-                            case BufferPreparer::COLOR2_VERTEX:
+                            case DrawDataType::COLOR2_VERTEX:
                                 stride = sizeof(Color2Vertex);
                                 setFVF = false;
                                 break;
-                            case BufferPreparer::TEXTURED_ELLIPSE_VERTEX:
+                            case DrawDataType::TEXTURED_ELLIPSE_VERTEX:
                                 stride = sizeof(TexturedColor2Vertex);
                                 setFVF = false;
                                 break;
@@ -262,13 +262,13 @@ namespace directgraph {
                             _device->SetFVF(fvf);
                         } else {
                             switch(it->data.items.type){
-                                case BufferPreparer::COLOR2_VERTEX:
+                                case DrawDataType::COLOR2_VERTEX:
                                     _shaderMan->setTexturedBar();
                                     break;
-                                case BufferPreparer::ELLIPSE_VERTEX:
+                                case DrawDataType::ELLIPSE_VERTEX:
                                     _shaderMan->setEllipse();
                                     break;
-                                case BufferPreparer::TEXTURED_ELLIPSE_VERTEX:
+                                case DrawDataType::TEXTURED_ELLIPSE_VERTEX:
                                     _shaderMan->setTexturedEllipse();
                                     break;
                                 default: break;
@@ -278,14 +278,14 @@ namespace directgraph {
                         offset += it->data.items.size;
                     }
                         break;
-                    case BufferPreparer::SET_FILL_PATTERN: {
+                    case DrawOpType::SET_FILL_PATTERN: {
                         curPatTextHelper->setFillPattern(
                                 it->data.fillPattern,
                                 transpStarted
                         );
                     }
                         break;
-                    case BufferPreparer::SET_FILL_PATTERN_COLOR: {
+                    case DrawOpType::SET_FILL_PATTERN_COLOR: {
                         curPatTextHelper->setFillPatternBgColor(
                                 it->data.fillPatternColor.fillPattern,
                                 it->data.fillPatternColor.bgColor,
@@ -293,7 +293,7 @@ namespace directgraph {
                         );
                     }
                         break;
-                    case BufferPreparer::SET_FILL_PATTERN_TWO_COLORS: {
+                    case DrawOpType::SET_FILL_PATTERN_TWO_COLORS: {
                         curPatTextHelper->setFillPatternBgFillColor(
                                 it->data.fillPatternTwoColors.fillPattern,
                                 it->data.fillPatternTwoColors.bgColor,
@@ -301,15 +301,15 @@ namespace directgraph {
                         );
                     }
                         break;
-                    case BufferPreparer::SET_USER_FILL_PATTERN: {
+                    case DrawOpType::SET_USER_FILL_PATTERN: {
                         curPatTextHelper->setUserFillPattern(it->data.userFillPattern);
                     }
                         break;
-                    case BufferPreparer::SET_TEX_BG_COLOR: {
+                    case DrawOpType::SET_TEX_BG_COLOR: {
                         curPatTextHelper->setBgColor(it->data.bgColor);
                     }
                         break;
-                    case BufferPreparer::SET_PIXEL_TEXTURE: {
+                    case DrawOpType::SET_PIXEL_TEXTURE: {
                         IPixelContainer *cont = it->data.pixelContainer;
                         Rectangle coords = cont->getCoords();
                         uint_fast32_t height = coords.bottom - coords.top;
@@ -339,16 +339,16 @@ namespace directgraph {
                         }
                     }
                         break;
-                    case BufferPreparer::REMOVE_PATTERN_TEXTURE:
+                    case DrawOpType::REMOVE_PATTERN_TEXTURE:
                         curPatTextHelper->unsetPattern(transpStarted);
                         break;
-                    case BufferPreparer::REMOVE_PIXEL_TEXTURE:
+                    case DrawOpType::REMOVE_PIXEL_TEXTURE:
                         _device->SetTexture(0, NULL);
                         if(!transpStarted) {
                             _device->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
                         }
                         break;
-                    case BufferPreparer::START_TRANSPARENT_DATA:
+                    case DrawOpType::START_TRANSPARENT_DATA:
                         restoreDevice();
                         curPatTextHelper = _transpPatTextHelper;
                         _device->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
