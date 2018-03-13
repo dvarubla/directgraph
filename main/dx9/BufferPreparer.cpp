@@ -76,7 +76,7 @@ namespace directgraph{
                             _drawItemProc.genDegenerates(item, curMem, _transpBuffer.prevCrds, crds.start, lastState);
                         }
                         _drawItemProc.processDrawItem(item, curMem, lastState);
-                        _transpBuffer.prevCrds = crds.start;
+                        _transpBuffer.prevCrds = crds.end;
                     } else {
                         ItemsBuffer &buffer = _drawBuffers[lastState];
                         void *curMem;
