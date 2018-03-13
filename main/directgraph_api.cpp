@@ -14,6 +14,11 @@ struct CreateWinMsg{
     DWORD threadId;
 };
 
+struct GetDPIMsg{
+    IWindowFactory::DPIInfo *dpiInfo;
+    DWORD threadId;
+};
+
 static LONG volatile mainThreadStarted = 0;
 static DWORD mainThreadId = 0;
 
@@ -67,6 +72,20 @@ WPARAM DIRECTGRAPH_EXPORT directgraph_mainloop() {
                         reinterpret_cast<WPARAM>(ptrMem), true
                 );
             }
+        } else if(msg.message == DIRECTGRAPH_GET_DPI){
+            GetDPIMsg *dpiMsg = reinterpret_cast<GetDPIMsg *>(msg.wParam);
+            try {
+                tryCreateWindowManager();
+                *dpiMsg->dpiInfo = getWindowManager()->getDPIInfo();
+                PostThreadMessage(dpiMsg->threadId, DIRECTGRAPH_REPLY, 0, false);
+            } catch(const std::exception &) {
+                std::exception_ptr *ptrMem = new std::exception_ptr;
+                *ptrMem = std::current_exception();
+                PostThreadMessage(
+                        dpiMsg->threadId, DIRECTGRAPH_REPLY,
+                        reinterpret_cast<WPARAM>(ptrMem), true
+                );
+            }
         } else if(msg.message == DIRECTGRAPH_WND_CREATED){
             num_windows++;
         } else if(msg.message == DIRECTGRAPH_WND_DESTROY){
@@ -95,10 +114,70 @@ WPARAM DIRECTGRAPH_EXPORT directgraph_mainloop() {
 }
 
 DirectgraphWinIndex DIRECTGRAPH_EXPORT directgraph_create_window(const wchar_t *name, float width, float height){
+    DirectgraphWinParams *params = directgraph_create_winparams();
+    params->name = name;
+    params->width = width;
+    params->height = height;
+    DirectgraphWinIndex index = directgraph_create_window_params(params);
+    directgraph_destroy_winparams(params);
+    return index;
+}
+
+void DIRECTGRAPH_EXPORT directgraph_get_dpi(float *dpix, float *dpiy){
+    IWindowFactory::DPIInfo info = {0, 0};
+    if(InterlockedCompareExchange(&mainThreadStarted, 0, 0)){
+        MSG msg;
+        GetDPIMsg dpiMsg = {&info, GetCurrentThreadId()};
+        PostThreadMessage(mainThreadId, DIRECTGRAPH_GET_DPI, reinterpret_cast<WPARAM>(&dpiMsg), 0);
+        GetMessage(&msg, NULL, DIRECTGRAPH_REPLY, DIRECTGRAPH_REPLY);
+        EXC_CALL_WRAP(
+                rethrow_exc_wparam(msg);
+        )
+    } else {
+        EXC_CALL_WRAP(
+                tryCreateWindowManager();
+                info = getWindowManager()->getDPIInfo();
+        )
+    }
+    *dpix = info.dpiX;
+    *dpiy = info.dpiY;
+}
+
+DIRECTGRAPH_EXPORT DirectgraphWinParams* directgraph_create_winparams(){
+    DirectgraphWinParams *params = new DirectgraphWinParams;
+    params->width = 200;
+    params->height = 200;
+    params->name = L"Directgraph";
+    params->dpiX = DPIHelper::DEFAULT_DPIX;
+    params->dpiY = DPIHelper::DEFAULT_DPIY;
+    params->controller = DIRECTGRAPH_MULT_THREAD_CTRL;
+    params->renderer = DIRECTGRAPH_DX9_RENDERER;
+    return params;
+}
+
+void DIRECTGRAPH_EXPORT directgraph_winparams_set_size(DirectgraphWinParams *params, float width, float height){
+    params->width = width;
+    params->height = height;
+}
+
+void DIRECTGRAPH_EXPORT directgraph_winparams_set_dpi(DirectgraphWinParams *params, float dpix, float dpiy){
+    params->dpiX = dpix;
+    params->dpiY = dpiy;
+}
+
+void DIRECTGRAPH_EXPORT directgraph_winparams_set_name(DirectgraphWinParams *params, const wchar_t *name){
+    params->name = name;
+}
+
+void DIRECTGRAPH_EXPORT directgraph_destroy_winparams(DirectgraphWinParams *params){
+    delete params;
+}
+
+DirectgraphWinIndex DIRECTGRAPH_EXPORT directgraph_create_window_params(const DirectgraphWinParams *params){
     if(InterlockedCompareExchange(&mainThreadStarted, 0, 0)){
         MSG msg;
         CreateWinMsg createMsg = {
-                {width, height, name, DIRECTGRAPH_MULT_THREAD_CTRL, DIRECTGRAPH_DX9_RENDERER},
+                *params,
                 GetCurrentThreadId()
         };
         PostThreadMessage(mainThreadId, DIRECTGRAPH_WND_CREATE, reinterpret_cast<WPARAM>(&createMsg), 0);
@@ -112,11 +191,10 @@ DirectgraphWinIndex DIRECTGRAPH_EXPORT directgraph_create_window(const wchar_t *
         directgraph_repaintw(index);
         return index;
     } else {
-        DirectgraphWinParams params = {width, height, name, DIRECTGRAPH_MULT_THREAD_CTRL, DIRECTGRAPH_DX9_RENDERER};
         DirectgraphWinIndex index = WindowManager::NO_CURRENT_WINDOW;
         EXC_CALL_WRAP(
                 tryCreateWindowManager();
-                index = createWindow(params);
+                index = createWindow(*params);
         )
         return index;
     }

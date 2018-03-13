@@ -10,17 +10,17 @@
 #include "RWRPLock.h"
 #include "IControllerFactory.h"
 
-namespace directgraph {
-    struct DirectgraphWinParams{
-        float width;
-        float height;
-        const wchar_t *name;
-        DirectgraphControllerType controller;
-        DirectgraphRendererType renderer;
-        float dpiX;
-        float dpiY;
-    };
+struct DirectgraphWinParams{
+    float width;
+    float height;
+    const wchar_t *name;
+    DirectgraphControllerType controller;
+    DirectgraphRendererType renderer;
+    float dpiX;
+    float dpiY;
+};
 
+namespace directgraph {
     class WindowManager: public NullWindowListener {
     private:
         struct WindowData{
@@ -37,6 +37,7 @@ namespace directgraph {
         DirectgraphWinIndex _curWindowIndex;
         RWRPLock _mapLock;
         RWRPLock _curWindowLock;
+        CRITICAL_SECTION _dpiCS;
         LONG volatile _curMapIndex;
     public:
         struct ControllerAndIndex{
@@ -53,6 +54,7 @@ namespace directgraph {
         void releaseCurrentWindowLock();
         IController *getWindowByIndexAndLock(DirectgraphWinIndex index);
         void releaseWindowLock();
+        IWindowFactory::DPIInfo getDPIInfo();
         void onClose(void *param);
         ~WindowManager();
     };

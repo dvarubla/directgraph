@@ -50,6 +50,22 @@ void DIRECTGRAPH_EXPORT directgraph_repaintw(DirectgraphWinIndex index);
 
 WPARAM DIRECTGRAPH_EXPORT directgraph_mainloop();
 
+
+void DIRECTGRAPH_EXPORT directgraph_get_dpi(float *dpix, float *dpiy);
+
+DIRECTGRAPH_EXPORT DirectgraphWinParams* directgraph_create_winparams();
+
+void DIRECTGRAPH_EXPORT directgraph_winparams_set_size(DirectgraphWinParams *params, float width, float height);
+
+void DIRECTGRAPH_EXPORT directgraph_winparams_set_dpi(DirectgraphWinParams *params, float dpix, float dpiy);
+
+void DIRECTGRAPH_EXPORT directgraph_winparams_set_name(DirectgraphWinParams *params, const wchar_t *name);
+
+void DIRECTGRAPH_EXPORT directgraph_destroy_winparams(DirectgraphWinParams *params);
+
+DirectgraphWinIndex DIRECTGRAPH_EXPORT directgraph_create_window_params(const DirectgraphWinParams *params);
+
+
 DirectgraphWinIndex DIRECTGRAPH_EXPORT directgraph_create_window(const wchar_t *name, float width, float height);
 
 void DIRECTGRAPH_EXPORT directgraph_destroy_window(DirectgraphWinIndex index);

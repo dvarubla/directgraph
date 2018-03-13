@@ -14,6 +14,7 @@ void CommonIntegration::initWindowManager() {
     }
     wfstub = new NiceMock<WindowFactoryStub>();
     ON_CALL(*wfstub, createPixelWindow(_, _, _, _)).WillByDefault(Invoke(this, &CommonIntegration::createPixelWindow));
+    ON_CALL(*wfstub, createDPIWindow(_, _, _, _, _, _)).WillByDefault(Invoke(this, &CommonIntegration::createDPIWindow));
     ON_CALL(*wfstub, deleteWindow(_)).WillByDefault(Invoke(wf, &IWindowFactory::deleteWindow));
     if(wman == NULL){
         std::vector<IWindowFactory*> vect;
@@ -42,4 +43,10 @@ BitmapWrap *CommonIntegration::afterTestSimple(DirectgraphWinIndex index) {
 
 CommonIntegration::~CommonIntegration() {
     delete wfstub;
+}
+
+IMyWindow *CommonIntegration::createDPIWindow(const wchar_t *name, float width, float height, float dpiX, float dpiY,
+                                              const CommonProps &props) {
+    _curWindow = wf->createDPIWindow(name, width, height, dpiX, dpiY, props);
+    return _curWindow;
 }

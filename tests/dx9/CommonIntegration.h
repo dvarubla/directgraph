@@ -17,6 +17,7 @@ public:
     IMyWindow *_curWindow;
     void initWindowManager();
     IMyWindow * createPixelWindow(const wchar_t *name, float width, float height, const CommonProps &props);
+    IMyWindow * createDPIWindow(const wchar_t *name, float width, float height, float dpiX, float dpiY, const CommonProps &props);
     BitmapWrap* afterTestSimple(DirectgraphWinIndex index);
     ~CommonIntegration();
 };

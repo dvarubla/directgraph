@@ -3,11 +3,14 @@
 
 #include "directgraph_stdint.h"
 
+typedef struct DirectgraphWinParams DirectgraphWinParams;
+
 typedef enum DirectgraphEvent{
     DIRECTGRAPH_WND_CREATED = 60000,
     DIRECTGRAPH_WND_CREATE,
     DIRECTGRAPH_WND_DESTROY,
     DIRECTGRAPH_WND_DESTROYED,
+    DIRECTGRAPH_GET_DPI,
     DIRECTGRAPH_REPLY
 } DirectgraphEvent;
 

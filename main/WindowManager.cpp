@@ -14,6 +14,7 @@ namespace directgraph{
             IControllerFactory *ctrlFactory
     ): _rendFactories(rendFactories), _ctrlFactory(ctrlFactory), _curWindowIndex(NO_CURRENT_WINDOW), _curMapIndex(0)
     {
+        InitializeCriticalSection(&_dpiCS);
     }
 
     void WindowManager::setCurrentWindow(DirectgraphWinIndex winIndex) {
@@ -43,9 +44,9 @@ namespace directgraph{
         IController *controller = NULL;
         CommonProps props = get_default_common_props();
         try {
-            win = _rendFactories[params.renderer]->createPixelWindow(
-                    params.name, params.width,
-                    params.height, props
+            win = _rendFactories[params.renderer]->createDPIWindow(
+                    params.name, params.width, params.height,
+                    params.dpiX, params.dpiY, props
             );
             win->show();
             win->addListener(this, index);
@@ -123,6 +124,7 @@ namespace directgraph{
             delete(_rendFactories[i]);
         }
         delete _ctrlFactory;
+        DeleteCriticalSection(&_dpiCS);
     }
 
     WindowManager::ControllerAndIndex WindowManager::getCurrentWindowAndLock(bool throwExc) {
@@ -162,6 +164,13 @@ namespace directgraph{
 
     void WindowManager::releaseWindowLock() {
         _mapLock.endRead();
+    }
+
+    IWindowFactory::DPIInfo WindowManager::getDPIInfo() {
+        EnterCriticalSection(&_dpiCS);
+        IWindowFactory::DPIInfo info = _rendFactories[0]->getDPIInfo();
+        LeaveCriticalSection(&_dpiCS);
+        return info;
     }
 
     WindowManagerScopedLock::WindowManagerScopedLock(

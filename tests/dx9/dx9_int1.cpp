@@ -19,8 +19,8 @@ public:
         p.height = HEIGHT;
         p.renderer = DIRECTGRAPH_DX9_RENDERER;
         p.controller = DIRECTGRAPH_MULT_THREAD_CTRL;
-        p.dpiX = 0;
-        p.dpiY = 0;
+        p.dpiX = 96.0f;
+        p.dpiY = 96.0f;
         _curIndex = wman->createWindow(p);
     }
 };
