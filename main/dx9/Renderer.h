@@ -24,13 +24,12 @@ namespace directgraph {
             IDirect3DSwapChain9 *_swapChain;
             IDirect3DSurface9 *_backBuffer;
             Common *_common;
-            DPIHelper *_helper;
             BufferPreparer *_bufPreparer;
             ShaderManager *_shaderMan;
             BufferPreparerParams *_bufPrepParams;
             CommonProps _props;
             HWND _hwnd;
-            float _width, _height;
+            uint32_t _width, _height;
 
             const static DWORD COLOR_VERTEX_FVF = D3DFVF_XYZRHW | D3DFVF_DIFFUSE;
 
@@ -57,7 +56,7 @@ namespace directgraph {
             void restoreDevice();
 
         public:
-            Renderer(Common *common, DPIHelper *helper, float width, float height, const CommonProps &props);
+            Renderer(Common *common, uint32_t width, uint32_t height, const CommonProps &props);
 
             void prepare(IQueueReader *reader);
 

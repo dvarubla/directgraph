@@ -13,8 +13,7 @@ void CommonIntegration::initWindowManager() {
         wf = new WindowFactory();
     }
     wfstub = new NiceMock<WindowFactoryStub>();
-    ON_CALL(*wfstub, createPixelWindow(_, _, _, _)).WillByDefault(Invoke(this, &CommonIntegration::createPixelWindow));
-    ON_CALL(*wfstub, createDPIWindow(_, _, _, _, _, _)).WillByDefault(Invoke(this, &CommonIntegration::createDPIWindow));
+    ON_CALL(*wfstub, createWindow(_, _, _, _)).WillByDefault(Invoke(this, &CommonIntegration::createWindow));
     ON_CALL(*wfstub, deleteWindow(_)).WillByDefault(Invoke(wf, &IWindowFactory::deleteWindow));
     if(wman == NULL){
         std::vector<IWindowFactory*> vect;
@@ -23,9 +22,9 @@ void CommonIntegration::initWindowManager() {
     }
 }
 
-IMyWindow* CommonIntegration::createPixelWindow(const wchar_t *name, float width, float height,
+IMyWindow* CommonIntegration::createWindow(const wchar_t *name, uint32_t width, uint32_t height,
                                                 const CommonProps &props) {
-    _curWindow = wf->createPixelWindow(name, width, height, props);
+    _curWindow = wf->createWindow(name, width, height, props);
     return _curWindow;
 }
 
@@ -43,10 +42,4 @@ BitmapWrap *CommonIntegration::afterTestSimple(DirectgraphWinIndex index) {
 
 CommonIntegration::~CommonIntegration() {
     delete wfstub;
-}
-
-IMyWindow *CommonIntegration::createDPIWindow(const wchar_t *name, float width, float height, float dpiX, float dpiY,
-                                              const CommonProps &props) {
-    _curWindow = wf->createDPIWindow(name, width, height, dpiX, dpiY, props);
-    return _curWindow;
 }

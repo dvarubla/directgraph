@@ -5,7 +5,7 @@
 
 namespace directgraph{
     template<>
-    QueueItem QueueItemCreator::create<QueueItem::SETFILLSTYLE>(uint8_t fillStyle, uint32_t color) {
+    QueueItem QueueItemCreator::create<QueueItem::SETFILLSTYLE>(uint8_t fillStyle, uint_fast32_t color) {
         QueueItem item;
         item.type = QueueItem::SETFILLSTYLE;
         item.data.setfillstyle.fillStyle = fillStyle;
@@ -14,7 +14,7 @@ namespace directgraph{
     }
 
     template<>
-    QueueItem QueueItemCreator::create<QueueItem::BAR>(float left, float top, float right, float bottom) {
+    QueueItem QueueItemCreator::create<QueueItem::BAR>(int_fast32_t left, int_fast32_t top, int_fast32_t right, int_fast32_t bottom) {
         QueueItem item;
         item.type = QueueItem::BAR;
         item.data.bar.left = left;
@@ -25,7 +25,7 @@ namespace directgraph{
     }
 
     template<>
-    QueueItem QueueItemCreator::create<QueueItem::FILLELLIPSE>(float x, float y, float xradius, float yradius) {
+    QueueItem QueueItemCreator::create<QueueItem::FILLELLIPSE>(int_fast32_t x, int_fast32_t y, uint_fast32_t xradius, uint_fast32_t yradius) {
         QueueItem item;
         item.type = QueueItem::FILLELLIPSE;
         item.data.fillellipse.x = x;
@@ -36,7 +36,7 @@ namespace directgraph{
     }
 
     template<>
-    QueueItem QueueItemCreator::create<QueueItem::SINGLE_PIXEL>(uint32_t x, uint32_t y, uint32_t color) {
+    QueueItem QueueItemCreator::create<QueueItem::SINGLE_PIXEL>(uint_fast32_t x, uint_fast32_t y, uint_fast32_t color) {
         QueueItem item;
         item.type = QueueItem::SINGLE_PIXEL;
         item.data.singlePixel.x = x;
@@ -46,7 +46,7 @@ namespace directgraph{
     }
 
     template<>
-    QueueItem QueueItemCreator::create<QueueItem::SETLINESTYLE>(uint32_t linestyle, uint32_t pattern, uint32_t thickness) {
+    QueueItem QueueItemCreator::create<QueueItem::SETLINESTYLE>(uint_fast32_t linestyle, uint_fast32_t pattern, uint_fast32_t thickness) {
         QueueItem item;
         item.type = QueueItem::SETLINESTYLE;
         item.data.setlinestyle.linestyle = static_cast<uint8_t>(linestyle);
@@ -71,7 +71,7 @@ namespace directgraph{
     }
 
     template<>
-    QueueItem QueueItemCreator::create<QueueItem::BGCOLOR>(uint32_t color) {
+    QueueItem QueueItemCreator::create<QueueItem::BGCOLOR>(uint_fast32_t color) {
         QueueItem item;
         item.type = QueueItem::BGCOLOR;
         item.data.bgColor = color;
@@ -79,7 +79,7 @@ namespace directgraph{
     }
 
     template<>
-    QueueItem QueueItemCreator::create<QueueItem::SETFILLPATTERN>(const char *fillPattern, uint32_t color) {
+    QueueItem QueueItemCreator::create<QueueItem::SETFILLPATTERN>(const char *fillPattern, uint_fast32_t color) {
         QueueItem item;
         item.type = QueueItem::SETFILLPATTERN;
         item.data.setfillpattern.fillPattern = new char[FPATTERN_SIZE];

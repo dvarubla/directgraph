@@ -22,17 +22,17 @@ public:
     void addPointsLine(
             ThreadController &tc,
             std::vector<QueueItem> &items,
-            uint_fast32_t line,
+            int_fast32_t line,
             uint_fast32_t &cnt
     ){
         QueueItem item;
-        for(uint_fast32_t j = 0; j < 200; j++, cnt++){
+        for(int_fast32_t j = 0; j < 200; j++, cnt++){
             item = QueueItemCreator::create<QueueItem::SETFILLSTYLE>(SOLID_FILL, cnt % 0xFF);
             items.push_back(item);
             tc.setfillstyle(SOLID_FILL, cnt % 0xFF);
-            item = QueueItemCreator::create<QueueItem::BAR>((float)j, (float)line, (float)j + 1, (float)line + 1);
+            item = QueueItemCreator::create<QueueItem::BAR>(j, line, j + 1, line + 1);
             items.push_back(item);
-            tc.bar((float)j, (float)line, (float)j + 1, (float)line + 1);
+            tc.bar(j, line, j + 1, line + 1);
             if(cnt % 10 == 0){
                 Sleep(rand() % 5);
             }

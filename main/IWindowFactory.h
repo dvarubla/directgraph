@@ -14,11 +14,7 @@ namespace directgraph {
 
         virtual ~IWindowFactory() {}
 
-        virtual IMyWindow *createDPIWindow(
-                const wchar_t *name, float width, float height, float dpiX, float dpiY, const CommonProps &props
-        ) = 0;
-
-        virtual IMyWindow *createPixelWindow(const wchar_t *name, float width, float height, const CommonProps &props) = 0;
+        virtual IMyWindow *createWindow(const wchar_t *name, uint32_t width, uint32_t height, const CommonProps &props) = 0;
 
         virtual void deleteWindow(IMyWindow *win) = 0;
     };

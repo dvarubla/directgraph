@@ -6,8 +6,8 @@ class DX9SinglePixelTest : public ImageTest, public CommonSimple {
 public:
     NiceMock<QueueReaderStub> _readerStub;
     IMyWindow *win;
-    static float WIDTH;
-    static float HEIGHT;
+    static uint32_t WIDTH;
+    static uint32_t HEIGHT;
 
     DX9SinglePixelTest() {
         win = createWindow(WIDTH, HEIGHT);
@@ -19,8 +19,8 @@ public:
     }
 };
 
-float DX9SinglePixelTest::WIDTH = 200;
-float DX9SinglePixelTest::HEIGHT = 300;
+uint32_t DX9SinglePixelTest::WIDTH = 200;
+uint32_t DX9SinglePixelTest::HEIGHT = 300;
 
 IMG_TEST_F(DX9SinglePixelTest, OnePixel){
     QueueItem items[] = {

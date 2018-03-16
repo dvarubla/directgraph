@@ -138,8 +138,8 @@ namespace directgraph {
                     crds.end = genCoords(_bufPrepParams->getPxTextureCoords());
                     break;
                 case QueueItem::BAR:
-                    crds.start = _helper->toPixelsXY(item.data.bar.left, item.data.bar.top);
-                    crds.end = _helper->toPixelsXY(item.data.bar.right, item.data.bar.bottom);
+                    crds.start = genCoords(item.data.bar.left, item.data.bar.top);
+                    crds.end = genCoords(item.data.bar.right, item.data.bar.bottom);
                     break;
                 case QueueItem::PIXEL_CONTAINER: {
                     Rectangle coords = item.data.pixelContainer->getCoords();
@@ -152,16 +152,16 @@ namespace directgraph {
                             _stateHelper->fillTextureUsed(state) && _bufPrepParams->supportsTexturedEllipse() ||
                             !_stateHelper->fillTextureUsed(state) && _bufPrepParams->supportsEllipse()
                             ){
-                        crds.start = _helper->toPixelsXY(
+                        crds.start = genCoords(
                                 item.data.fillellipse.x - item.data.fillellipse.xradius,
                                 item.data.fillellipse.y - item.data.fillellipse.yradius
                         );
-                        crds.end = _helper->toPixelsXY(
+                        crds.end = genCoords(
                                 item.data.fillellipse.x + item.data.fillellipse.xradius,
                                 item.data.fillellipse.y + item.data.fillellipse.yradius
                         );
                     } else {
-                        crds.start = crds.end = _helper->toPixelsXY(
+                        crds.start = crds.end = genCoords(
                                 item.data.fillellipse.x,
                                 item.data.fillellipse.y - item.data.fillellipse.yradius
                         );
@@ -197,8 +197,8 @@ namespace directgraph {
                     if (_stateHelper->fillTextureUsed(state)) {
                         if (_bufPrepParams->supportsTexturedEllipse()) {
                             curVertMem = _primCreator.genTexEllipseQuad(curVertMem,
-                                                                        _helper->toPixelsXY(item.data.fillellipse.x, item.data.fillellipse.y),
-                                                                        _helper->toPixelsXYU(
+                                                                        genCoords(item.data.fillellipse.x, item.data.fillellipse.y),
+                                                                        genUCoords(
                                                                                 item.data.fillellipse.xradius,
                                                                                 item.data.fillellipse.yradius
                                                                         ),
@@ -209,11 +209,11 @@ namespace directgraph {
                             );
                         } else {
                             curVertMem = _primCreator.genEllipse(curVertMem,
-                                                                 _helper->toPixelsXY(
+                                                                 genCoords(
                                                                          item.data.fillellipse.x,
                                                                          item.data.fillellipse.y
                                                                  ),
-                                                                 _helper->toPixelsXYU(
+                                                                 genUCoords(
                                                                          item.data.fillellipse.xradius,
                                                                          item.data.fillellipse.yradius
                                                                  ),
@@ -225,8 +225,8 @@ namespace directgraph {
                     } else {
                         if (_bufPrepParams->supportsEllipse()) {
                             curVertMem = _primCreator.genEllipseQuad(curVertMem,
-                                                                     _helper->toPixelsXY(item.data.fillellipse.x, item.data.fillellipse.y),
-                                                                     _helper->toPixelsXYU(
+                                                                     genCoords(item.data.fillellipse.x, item.data.fillellipse.y),
+                                                                     genUCoords(
                                                                              item.data.fillellipse.xradius,
                                                                              item.data.fillellipse.yradius
                                                                      ),
@@ -236,11 +236,11 @@ namespace directgraph {
                             );
                         } else {
                             curVertMem = _primCreator.genEllipse(curVertMem,
-                                                                 _helper->toPixelsXY(
+                                                                 genCoords(
                                                                          item.data.fillellipse.x,
                                                                          item.data.fillellipse.y
                                                                  ),
-                                                                 _helper->toPixelsXYU(
+                                                                 genUCoords(
                                                                          item.data.fillellipse.xradius,
                                                                          item.data.fillellipse.yradius
                                                                  ),
@@ -255,8 +255,8 @@ namespace directgraph {
                     if (_stateHelper->fillTextureUsed(state)) {
                         if(_bufPrepParams->supportsTexturedBar()){
                             curVertMem = _primCreator.genFillCol2Quad(curVertMem,
-                                                                      _helper->toPixelsXY(item.data.bar.left, item.data.bar.top),
-                                                                      _helper->toPixelsXY(item.data.bar.right, item.data.bar.bottom),
+                                                                      genCoords(item.data.bar.left, item.data.bar.top),
+                                                                      genCoords(item.data.bar.right, item.data.bar.bottom),
                                                                       _curZ,
                                                                       _stateHelper->getLastState().fillColor,
                                                                       _stateHelper->getLastState().bgColor,
@@ -265,16 +265,16 @@ namespace directgraph {
                             );
                         } else {
                             curVertMem = _primCreator.genFillQuad(curVertMem,
-                                                                  _helper->toPixelsXY(item.data.bar.left, item.data.bar.top),
-                                                                  _helper->toPixelsXY(item.data.bar.right, item.data.bar.bottom),
+                                                                  genCoords(item.data.bar.left, item.data.bar.top),
+                                                                  genCoords(item.data.bar.right, item.data.bar.bottom),
                                                                   _curZ,
                                                                   _stateHelper->getLastState().fillColor
                             );
                         }
                     } else {
                         curVertMem = _primCreator.genQuad(curVertMem,
-                                                          _helper->toPixelsXY(item.data.bar.left, item.data.bar.top),
-                                                          _helper->toPixelsXY(item.data.bar.right, item.data.bar.bottom),
+                                                          genCoords(item.data.bar.left, item.data.bar.top),
+                                                          genCoords(item.data.bar.right, item.data.bar.bottom),
                                                           _curZ,
                                                           _stateHelper->getFillColor()
 
@@ -299,7 +299,7 @@ namespace directgraph {
             uint_fast32_t curNumVertices;
             if(item.type == QueueItem::FILLELLIPSE && !_bufPrepParams->supportsEllipse()){
                 curNumVertices = _primCreator.getNumEllipseVertices(
-                        _helper->toPixelsXYU(
+                        genUCoords(
                                 item.data.fillellipse.xradius,
                                 item.data.fillellipse.yradius
                         )
@@ -336,8 +336,8 @@ namespace directgraph {
         }
 
         DrawItemProcessor::DrawItemProcessor(
-                StateHelper *stateHelper, BufferPreparerParams *bufPrepParams, DPIHelper *dpiHelper
-        ): _stateHelper(stateHelper), _bufPrepParams(bufPrepParams), _helper(dpiHelper) {
+                StateHelper *stateHelper, BufferPreparerParams *bufPrepParams
+        ): _stateHelper(stateHelper), _bufPrepParams(bufPrepParams) {
             resetItemCount();
         }
     }

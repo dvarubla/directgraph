@@ -16,14 +16,13 @@ namespace directgraph {
 
             StateHelper *_stateHelper;
             BufferPreparerParams *_bufPrepParams;
-            DPIHelper *_helper;
             PrimitiveCreator _primCreator;
             float _curZ;
             uint_fast32_t _itemNum;
 
             void setCurZ();
         public:
-            DrawItemProcessor(StateHelper *stateHelper, BufferPreparerParams *bufPrepParams, DPIHelper *dpiHelper);
+            DrawItemProcessor(StateHelper *stateHelper, BufferPreparerParams *bufPrepParams);
             struct TypeSize{
                 uint_fast32_t sizeMult;
                 DrawDataType::Type drawDataType;

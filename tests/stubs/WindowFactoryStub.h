@@ -8,9 +8,7 @@ namespace directgraph {
     public:
         MOCK_METHOD0(getDPIInfo, DPIInfo ());
 
-        MOCK_METHOD6(createDPIWindow, IMyWindow *(const wchar_t *name, float width, float height, float dpiX, float dpiY, const CommonProps &props));
-
-        MOCK_METHOD4(createPixelWindow, IMyWindow *(const wchar_t *name, float width, float height, const CommonProps &props));
+        MOCK_METHOD4(createWindow, IMyWindow *(const wchar_t *name, uint32_t width, uint32_t height, const CommonProps &props));
 
         MOCK_METHOD1(deleteWindow, void (IMyWindow *win));
     };

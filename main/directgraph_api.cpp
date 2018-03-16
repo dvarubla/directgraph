@@ -113,7 +113,7 @@ WPARAM DIRECTGRAPH_EXPORT directgraph_mainloop() {
     return 0;
 }
 
-DirectgraphWinIndex DIRECTGRAPH_EXPORT directgraph_create_window(const wchar_t *name, float width, float height){
+DirectgraphWinIndex DIRECTGRAPH_EXPORT directgraph_create_window(const wchar_t *name, uint32_t width, uint32_t height){
     DirectgraphWinParams *params = directgraph_create_winparams();
     params->name = name;
     params->width = width;
@@ -148,21 +148,14 @@ DIRECTGRAPH_EXPORT DirectgraphWinParams* directgraph_create_winparams(){
     params->width = 200;
     params->height = 200;
     params->name = L"Directgraph";
-    params->dpiX = DPIHelper::DEFAULT_DPIX;
-    params->dpiY = DPIHelper::DEFAULT_DPIY;
     params->controller = DIRECTGRAPH_MULT_THREAD_CTRL;
     params->renderer = DIRECTGRAPH_DX9_RENDERER;
     return params;
 }
 
-void DIRECTGRAPH_EXPORT directgraph_winparams_set_size(DirectgraphWinParams *params, float width, float height){
+void DIRECTGRAPH_EXPORT directgraph_winparams_set_size(DirectgraphWinParams *params, uint32_t width, uint32_t height){
     params->width = width;
     params->height = height;
-}
-
-void DIRECTGRAPH_EXPORT directgraph_winparams_set_dpi(DirectgraphWinParams *params, float dpix, float dpiy){
-    params->dpiX = dpix;
-    params->dpiY = dpiy;
 }
 
 void DIRECTGRAPH_EXPORT directgraph_winparams_set_name(DirectgraphWinParams *params, const wchar_t *name){
@@ -218,25 +211,25 @@ void DIRECTGRAPH_EXPORT directgraph_wait_for_main_thread(){
     }
 }
 
-void DIRECTGRAPH_EXPORT resize(float width, float height){
+void DIRECTGRAPH_EXPORT resize(uint32_t width, uint32_t height){
     directgraph_create_window(L"Directgraph", width, height);
 }
 
-void DIRECTGRAPH_EXPORT bar(float left, float top, float right, float bottom){
+void DIRECTGRAPH_EXPORT bar(int32_t left, int32_t top, int32_t right, int32_t bottom){
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager());
             lock.data.controller->bar(left, top, right, bottom);
     )
 }
 
-void DIRECTGRAPH_EXPORT putpixel(uint32_t x, uint32_t y, uint32_t color){
+void DIRECTGRAPH_EXPORT putpixel(int32_t x, int32_t y, uint32_t color){
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager());
             lock.data.controller->putpixel(x, y, color);
     )
 }
 
-void DIRECTGRAPH_EXPORT fillellipse(float x, float y, float xradius, float yradius) {
+void DIRECTGRAPH_EXPORT fillellipse(int32_t x, int32_t y, uint32_t xradius, uint32_t yradius) {
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager());
             lock.data.controller->fillellipse(x, y, xradius, yradius);
@@ -283,7 +276,7 @@ void DIRECTGRAPH_EXPORT directgraph_repaint(){
     )
 }
 
-void DIRECTGRAPH_EXPORT fillellipsew(DirectgraphWinIndex index, float x, float y, float xradius, float yradius){
+void DIRECTGRAPH_EXPORT fillellipsew(DirectgraphWinIndex index, int32_t x, int32_t y, uint32_t xradius, uint32_t yradius){
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager(), index);
             lock.data.controller->fillellipse(x, y, xradius, yradius);
@@ -297,14 +290,14 @@ void DIRECTGRAPH_EXPORT setlinestylew(DirectgraphWinIndex index, line_styles lin
     )
 }
 
-void DIRECTGRAPH_EXPORT barw(DirectgraphWinIndex index, float left, float top, float right, float bottom){
+void DIRECTGRAPH_EXPORT barw(DirectgraphWinIndex index, int32_t left, int32_t top, int32_t right, int32_t bottom){
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager(), index);
             lock.data.controller->bar(left, top, right, bottom);
     )
 }
 
-void DIRECTGRAPH_EXPORT putpixelw(DirectgraphWinIndex index, uint32_t x, uint32_t y, uint32_t color){
+void DIRECTGRAPH_EXPORT putpixelw(DirectgraphWinIndex index, int32_t x, int32_t y, uint32_t color){
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager(), index);
             lock.data.controller->putpixel(x, y, color);

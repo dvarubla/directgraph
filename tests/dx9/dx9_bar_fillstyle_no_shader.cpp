@@ -7,8 +7,8 @@ class DX9BarFillstyleNoShaderTest : public ImageTest, public CommonSimple {
 public:
     NiceMock<QueueReaderStub> _readerStub;
     IMyWindow *win;
-    static float WIDTH;
-    static float HEIGHT;
+    static int32_t WIDTH;
+    static int32_t HEIGHT;
     IFeatures::ShaderVersion noShVer;
 
     DX9BarFillstyleNoShaderTest() {
@@ -27,8 +27,8 @@ public:
     }
 };
 
-float DX9BarFillstyleNoShaderTest::WIDTH = 200;
-float DX9BarFillstyleNoShaderTest::HEIGHT = 300;
+int32_t DX9BarFillstyleNoShaderTest::WIDTH = 200;
+int32_t DX9BarFillstyleNoShaderTest::HEIGHT = 300;
 
 IMG_TEST_F(DX9BarFillstyleNoShaderTest, LineFill8x8){
     QueueItem items[] = {
@@ -136,7 +136,7 @@ IMG_TEST_F(DX9BarFillstyleNoShaderTest, UserFill){
             QueueItemCreator::create<QueueItem::SETFILLPATTERN>(reinterpret_cast<char*>(pattern), 0x0000FF),
             QueueItemCreator::create<QueueItem::BAR>(WIDTH/4, HEIGHT/4, WIDTH/4*3, HEIGHT/4*3),
             QueueItemCreator::create<QueueItem::SETFILLSTYLE>(USER_FILL, 0xFF00FF),
-            QueueItemCreator::create<QueueItem::BAR>(3*WIDTH/8, 3*HEIGHT/8, 5*WIDTH/8, 5*HEIGHT/8)
+            QueueItemCreator::create<QueueItem::BAR>(3*WIDTH/8, 3*HEIGHT/8 + 1, 5*WIDTH/8, 5*HEIGHT/8 + 1)
     };
     _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
     return afterTestSimple(win, &_readerStub);

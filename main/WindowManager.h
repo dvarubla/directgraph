@@ -11,13 +11,11 @@
 #include "IControllerFactory.h"
 
 struct DirectgraphWinParams{
-    float width;
-    float height;
+    uint32_t width;
+    uint32_t height;
     const wchar_t *name;
     DirectgraphControllerType controller;
     DirectgraphRendererType renderer;
-    float dpiX;
-    float dpiY;
 };
 
 namespace directgraph {

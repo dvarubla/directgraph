@@ -60,7 +60,7 @@ namespace directgraph{
         writeItemHelper(item);
     }
 
-    void ThreadController::fillellipse(float x, float y, float xradius, float yradius) {
+    void ThreadController::fillellipse(int_fast32_t x, int_fast32_t y, uint_fast32_t xradius, uint_fast32_t yradius) {
         if(!_paramsChecker.checkEllipse(x, y, xradius, yradius)){
             return;
         }
@@ -73,7 +73,7 @@ namespace directgraph{
         writeItemHelper(item);
     }
 
-    void ThreadController::bar(float left, float top, float right, float bottom) {
+    void ThreadController::bar(int_fast32_t left, int_fast32_t top, int_fast32_t right, int_fast32_t bottom) {
         QueueItem item = QueueItemCreator::create<QueueItem::BAR>(left, top, right, bottom);
         writeItemHelper(item);
     }

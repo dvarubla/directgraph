@@ -53,7 +53,6 @@ namespace directgraph {
             CharPVector _patterns;
             StateHelper _stateHelper;
             PropertyManager _propMan;
-            DPIHelper *_helper;
             DrawItemProcessor _drawItemProc;
             DrawStateProcessor _drawStateProc;
             bool _isFirst;
@@ -62,7 +61,7 @@ namespace directgraph {
             bool _canReadMore;
         public:
             BufferPreparer(
-                    uint_fast32_t memSize, DPIHelper *helper,
+                    uint_fast32_t memSize,
                     const CommonProps &props,
                     BufferPreparerParams *bufPrepParams
             );

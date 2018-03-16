@@ -3,45 +3,6 @@
 #include "util.h"
 
 namespace directgraph {
-
-    DPIHelper::DPIHelper(float dpiX, float dpiY) : _dpiX(dpiX), _dpiY(dpiY) {
-    }
-
-    const float DPIHelper::DEFAULT_DPIX = 96.0f;
-    const float DPIHelper::DEFAULT_DPIY = 96.0f;
-
-    int_fast32_t DPIHelper::toPixelsX(float dip) {
-        return static_cast<int_fast32_t>(round(dip * _dpiX / DEFAULT_DPIX));
-    }
-
-    int_fast32_t DPIHelper::toPixelsY(float dip) {
-        return static_cast<int_fast32_t>(round(dip * _dpiY / DEFAULT_DPIY));
-    }
-
-    DPIHelper::DPIHelper() {
-    }
-
-    void DPIHelper::setDpiX(float dpiX) {
-        _dpiX = dpiX;
-    }
-
-    void DPIHelper::setDpiY(float dpiY) {
-        _dpiY = dpiY;
-    }
-
-    DPIHelper::~DPIHelper() {
-    }
-
-    Coords DPIHelper::toPixelsXY(float dipX, float dipY) {
-        Coords res = {toPixelsX(dipX), toPixelsY(dipY)};
-        return res;
-    }
-
-    UCoords DPIHelper::toPixelsXYU(float dipX, float dipY) {
-        UCoords res = {static_cast<uint_fast32_t>(toPixelsX(dipX)), static_cast<uint_fast32_t>(toPixelsY(dipY))};
-        return res;
-    }
-
     static volatile LONG canSetAware = 1;
 
     typedef enum _PROCESS_DPI_AWARENESS {

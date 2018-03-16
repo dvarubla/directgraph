@@ -7,8 +7,8 @@ class DX9BarFillstyleTest : public ImageTest, public CommonSimple {
 public:
     NiceMock<QueueReaderStub> _readerStub;
     IMyWindow *win;
-    static float WIDTH;
-    static float HEIGHT;
+    static int32_t WIDTH;
+    static int32_t HEIGHT;
 
     DX9BarFillstyleTest() {
         win = createWindow(WIDTH, HEIGHT);
@@ -20,8 +20,8 @@ public:
     }
 };
 
-float DX9BarFillstyleTest::WIDTH = 200;
-float DX9BarFillstyleTest::HEIGHT = 300;
+int32_t DX9BarFillstyleTest::WIDTH = 200;
+int32_t DX9BarFillstyleTest::HEIGHT = 300;
 
 IMG_TEST_F(DX9BarFillstyleTest, LineFill8x8){
     QueueItem items[] = {
@@ -144,7 +144,7 @@ IMG_TEST_F(DX9BarFillstyleTest, UserFill){
             QueueItemCreator::create<QueueItem::SETFILLPATTERN>(reinterpret_cast<char*>(pattern), 0x0000FF),
             QueueItemCreator::create<QueueItem::BAR>(WIDTH/4, HEIGHT/4, WIDTH/4*3, HEIGHT/4*3),
             QueueItemCreator::create<QueueItem::SETFILLSTYLE>(USER_FILL, 0xFF00FF),
-            QueueItemCreator::create<QueueItem::BAR>(3*WIDTH/8, 3*HEIGHT/8, 5*WIDTH/8, 5*HEIGHT/8)
+            QueueItemCreator::create<QueueItem::BAR>(3*WIDTH/8, 3*HEIGHT/8 + 1, 5*WIDTH/8, 5*HEIGHT/8 + 1)
     };
     _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
     return afterTestSimple(win, &_readerStub);

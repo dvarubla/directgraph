@@ -14,11 +14,10 @@
 
 namespace directgraph {
     namespace dx9 {
-        Renderer::Renderer(Common *common, DPIHelper *helper, float width, float height, const CommonProps &props)
+        Renderer::Renderer(Common *common, uint32_t width, uint32_t height, const CommonProps &props)
                 : _swapChain(NULL), _vertBuffer(NULL), _pixelTexture(NULL), _patTextHelper(NULL), _bufPreparer(NULL), 
                   _shaderMan(NULL), _bufPrepParams(NULL), _props(props)
         {
-            _helper = helper;
             _width = width;
             _height = height;
             _common = common;
@@ -36,14 +35,12 @@ namespace directgraph {
         }
 
         void Renderer::createDeviceRes() {
-            uint_fast32_t pxWidth = static_cast<uint_fast32_t>(_helper->toPixelsX(_width));
-            uint_fast32_t pxHeight = static_cast<uint_fast32_t>(_helper->toPixelsY(_height));
-            _swapChain = _common->createSwapChain(_hwnd, pxWidth, pxHeight);
+            _swapChain = _common->createSwapChain(_hwnd, _width, _height);
             _swapChain->GetDevice(&_device);
             _swapChain->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &_backBuffer);
 
-            uint_fast32_t pixelTextureWidth = static_cast<uint_fast32_t>(1 << (uint_fast32_t) ceil(log2<double>(pxWidth)));
-            uint_fast32_t pixelTextureHeight = static_cast<uint_fast32_t>(1 << (uint_fast32_t) ceil(log2<double>(pxHeight)));
+            uint_fast32_t pixelTextureWidth = static_cast<uint_fast32_t>(1 << (uint_fast32_t) ceil(log2<double>(_width)));
+            uint_fast32_t pixelTextureHeight = static_cast<uint_fast32_t>(1 << (uint_fast32_t) ceil(log2<double>(_height)));
 
             ColorFormat::Format pxFormat = _common->getFeatures()->getImageTexFormat();
 
@@ -62,7 +59,7 @@ namespace directgraph {
                 THROW_EXC_CODE(Exception, DX9_CANT_CREATE_TEXTURE, std::wstring(L"Can't create texture"));
             };
 
-            _pixContFactory = new PixelContainerCreator(pxWidth, pxHeight, pxFormat);
+            _pixContFactory = new PixelContainerCreator(_width, _height, pxFormat);
 
             if (_device->CreateVertexBuffer(VERTEX_BUFFER_SIZE,
                                             D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY,
@@ -121,7 +118,7 @@ namespace directgraph {
             }
 
             _device->CreateDepthStencilSurface(
-                    pxWidth, pxHeight, D3DFMT_D16, D3DMULTISAMPLE_NONE, 0, TRUE, &_depthStencil, NULL
+                    _width, _height, D3DFMT_D16, D3DMULTISAMPLE_NONE, 0, TRUE, &_depthStencil, NULL
             );
 
             _shaderMan = new ShaderManager(
@@ -132,13 +129,13 @@ namespace directgraph {
             _bufPrepParams = new BufferPreparerParams(
                     _shaderMan,
                     !_common->getFeatures()->supportsTexConst(),
-                    genUCoords(pxWidth, pxHeight),
+                    genUCoords(_width, _height),
                     genUCoords(pixelTextureWidth, pixelTextureHeight),
                    65535
             );
 
             _bufPreparer = new BufferPreparer(
-                    VERTEX_BUFFER_SIZE, _helper, _props, _bufPrepParams
+                    VERTEX_BUFFER_SIZE, _props, _bufPrepParams
             );
         }
 
@@ -154,7 +151,6 @@ namespace directgraph {
             }
             delete _patTextHelper;
             _common->deleteSwapChain(_swapChain);
-            delete _helper;
             delete _bufPreparer;
             delete _shaderMan;
             delete _pixContFactory;

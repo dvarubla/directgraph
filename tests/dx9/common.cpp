@@ -34,15 +34,8 @@ struct Param{
 };
 
 struct DrawParam{
-    float w;
-    float h;
-};
-
-struct DrawDPIParam{
-    float w;
-    float h;
-    float dpiX;
-    float dpiY;
+    uint32_t w;
+    uint32_t h;
 };
 
 static DWORD WINAPI mainWindowThread(LPVOID param){
@@ -56,16 +49,7 @@ static DWORD WINAPI mainWindowThread(LPVOID param){
     while (GetMessageW(&msg, NULL, 0, 0)){
         if(msg.message == MSG_CREATE){
             DrawParam *drawParam = reinterpret_cast<DrawParam*>(msg.wParam);
-            win = CommonSimple::_dx9Wf->createPixelWindow(L"Hello", drawParam->w, drawParam->h, props);
-            win->show();
-            windowSent = false;
-        } else if(msg.message == MSG_CREATE_DPI){
-            DrawDPIParam *drawDPIParam = reinterpret_cast<DrawDPIParam*>(msg.wParam);
-            win = CommonSimple::_dx9Wf->createDPIWindow(
-                    L"Hello", drawDPIParam->w, drawDPIParam->h,
-                    drawDPIParam->dpiX, drawDPIParam->dpiY,
-                    props
-            );
+            win = CommonSimple::_dx9Wf->createWindow(L"Hello", drawParam->w, drawParam->h, props);
             win->show();
             windowSent = false;
         } else if(msg.message == MSG_DESTROY){
@@ -93,7 +77,7 @@ void CommonSimple::startThread() {
     }
 }
 
-IMyWindow* CommonSimple::createWindow(float w, float h) {
+IMyWindow* CommonSimple::createWindow(uint32_t w, uint32_t h) {
     startThread();
     MSG msg;
     DrawParam dp = {w, h};
@@ -102,17 +86,6 @@ IMyWindow* CommonSimple::createWindow(float w, float h) {
     IMyWindow *win = reinterpret_cast<IMyWindow *>(msg.wParam);
     return win;
 }
-
-IMyWindow* CommonSimple::createDPIWindow(float w, float h, float dpiX, float dpiY) {
-    startThread();
-    MSG msg;
-    DrawDPIParam dp = {w, h, dpiX, dpiY};
-    PostThreadMessage(windowThreadId, MSG_CREATE_DPI, reinterpret_cast<WPARAM>(&dp), 0);
-    GetMessage(&msg, NULL, MSG_CODE, MSG_CODE);
-    IMyWindow *win = reinterpret_cast<IMyWindow *>(msg.wParam);
-    return win;
-}
-
 void CommonSimple::addOnCall(NiceMock<QueueReaderStub> &readerStub) {
     ON_CALL(readerStub, addItems(_, _)).WillByDefault(Invoke(&readerStub, &QueueReaderStub::addItemsImpl));
     ON_CALL(readerStub, getSize()).WillByDefault(Invoke(&readerStub, &QueueReaderStub::getSizeImpl));

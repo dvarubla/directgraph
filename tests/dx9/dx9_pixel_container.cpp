@@ -8,8 +8,8 @@ class DX9PixelContainerTest : public ImageTest, public CommonSimple {
 public:
     NiceMock<QueueReaderStub> _readerStub;
     IMyWindow *win;
-    static float WIDTH;
-    static float HEIGHT;
+    static uint32_t WIDTH;
+    static uint32_t HEIGHT;
 
     DX9PixelContainerTest() {
         win = createWindow(WIDTH, HEIGHT);
@@ -36,8 +36,8 @@ public:
     }
 };
 
-float DX9PixelContainerTest::WIDTH = 200;
-float DX9PixelContainerTest::HEIGHT = 300;
+uint32_t DX9PixelContainerTest::WIDTH = 200;
+uint32_t DX9PixelContainerTest::HEIGHT = 300;
 
 IMG_TEST_F(DX9PixelContainerTest, TwoPixels){
     QueueItem items[2];

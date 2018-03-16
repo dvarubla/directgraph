@@ -8,11 +8,11 @@
 namespace directgraph{
     namespace dx9{
         BufferPreparer::BufferPreparer(
-                uint_fast32_t memSize, DPIHelper *helper,
+                uint_fast32_t memSize,
                 const CommonProps &props,
                 BufferPreparerParams *bufPrepParams
-        ): _bufPrepParams(bufPrepParams), _memSize(memSize), _stateHelper(&_propMan, props), _helper(helper),
-           _drawItemProc(&_stateHelper, _bufPrepParams, _helper), _drawStateProc(&_stateHelper, _bufPrepParams, &_propMan),
+        ): _bufPrepParams(bufPrepParams), _memSize(memSize), _stateHelper(&_propMan, props),
+           _drawItemProc(&_stateHelper, _bufPrepParams), _drawStateProc(&_stateHelper, _bufPrepParams, &_propMan),
            _isFirst(true), _curUsedSize(0), _lastOffset(0), _canReadMore(true)
         {
         }

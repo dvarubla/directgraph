@@ -44,9 +44,8 @@ namespace directgraph{
         IController *controller = NULL;
         CommonProps props = get_default_common_props();
         try {
-            win = _rendFactories[params.renderer]->createDPIWindow(
-                    params.name, params.width, params.height,
-                    params.dpiX, params.dpiY, props
+            win = _rendFactories[params.renderer]->createWindow(
+                    params.name, params.width, params.height, props
             );
             win->show();
             win->addListener(this, index);

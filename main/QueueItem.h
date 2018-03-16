@@ -32,10 +32,11 @@ namespace directgraph{
                 uint32_t thickness;
             } setlinestyle;
             struct BarItem{
-                float left, top, right, bottom;
+                int32_t left, top, right, bottom;
             } bar;
             struct FillEllipseItem{
-                float x, y, xradius, yradius;
+                int32_t x, y;
+                uint32_t xradius, yradius;
             } fillellipse;
             struct SinglePixelItem{
                 uint32_t x, y;
@@ -50,15 +51,17 @@ namespace directgraph{
         template <QueueItem::QueueItemType T>
         static QueueItem create();
         template <QueueItem::QueueItemType T>
-        static QueueItem create(uint8_t fillStyle, uint32_t color);
+        static QueueItem create(uint8_t fillStyle, uint_fast32_t color);
         template <QueueItem::QueueItemType T>
-        static QueueItem create(const char *fillPattern, uint32_t color);
+        static QueueItem create(const char *fillPattern, uint_fast32_t color);
         template <QueueItem::QueueItemType T>
-        static QueueItem create(uint32_t color);
+        static QueueItem create(uint_fast32_t color);
         template <QueueItem::QueueItemType T>
-        static QueueItem create(float, float, float, float);
+        static QueueItem create(int_fast32_t, int_fast32_t, int_fast32_t, int_fast32_t);
         template <QueueItem::QueueItemType T>
-        static QueueItem create(uint32_t, uint32_t , uint32_t );
+        static QueueItem create(int_fast32_t, int_fast32_t, uint_fast32_t, uint_fast32_t);
+        template <QueueItem::QueueItemType T>
+        static QueueItem create(uint_fast32_t, uint_fast32_t , uint_fast32_t );
         template <QueueItem::QueueItemType T>
         static QueueItem create(IPixelContainer *pixelContainer);
     };

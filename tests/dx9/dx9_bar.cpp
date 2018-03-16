@@ -12,8 +12,8 @@ class DX9BarTest: public ImageTest, public CommonSimple{
 public:
     NiceMock<QueueReaderStub> _readerStub;
     IMyWindow *win;
-    static float WIDTH;
-    static float HEIGHT;
+    static int32_t WIDTH;
+    static int32_t HEIGHT;
 
     DX9BarTest() {
         win = createWindow(WIDTH, HEIGHT);
@@ -24,8 +24,8 @@ public:
     }
 };
 
-float DX9BarTest::WIDTH = 200;
-float DX9BarTest::HEIGHT = 300;
+int32_t DX9BarTest::WIDTH = 200;
+int32_t DX9BarTest::HEIGHT = 300;
 
 IMG_TEST_F(DX9BarTest, SimpleBar){
     QueueItem items[] = {

@@ -3,15 +3,9 @@
 #include "util.h"
 
 namespace directgraph{
-    bool ParamsChecker::checkEllipse(float , float , float rx, float ry) {
+    bool ParamsChecker::checkEllipse(int32_t , int32_t , uint32_t rx, uint32_t ry) {
         if(rx == 0 || ry == 0){
             return false;
-        }
-        if(rx < 0){
-            THROW_EXC_CODE(WException, WRONG_DRAW_PARAM, L"X radius " + to_wstring(rx) + L" must be greater than 0 ");
-        }
-        if(ry < 0){
-            THROW_EXC_CODE(WException, WRONG_DRAW_PARAM, L"Y radius " + to_wstring(ry) + L" must be greater than 0 ");
         }
         return true;
     }

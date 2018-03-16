@@ -12,8 +12,8 @@ class DX9FillEllipseTest: public ImageTest, public CommonSimple{
 public:
     NiceMock<QueueReaderStub> _readerStub;
     IMyWindow *win;
-    static float WIDTH;
-    static float HEIGHT;
+    static int32_t WIDTH;
+    static int32_t HEIGHT;
 
     DX9FillEllipseTest() {
         win = createWindow(WIDTH, HEIGHT);
@@ -24,15 +24,15 @@ public:
     }
 };
 
-float DX9FillEllipseTest::WIDTH = 200;
-float DX9FillEllipseTest::HEIGHT = 200;
+int32_t DX9FillEllipseTest::WIDTH = 200;
+int32_t DX9FillEllipseTest::HEIGHT = 200;
 
 IMG_TEST_F(DX9FillEllipseTest, SimpleEllipse){
     QueueItem items[] = {
             QueueItemCreator::create<QueueItem::CLEAR>(),
             QueueItemCreator::create<QueueItem::SETLINESTYLE>(NULL_LINE, 0, 0),
             QueueItemCreator::create<QueueItem::SETFILLSTYLE>(SOLID_FILL, 0x00BBFF),
-            QueueItemCreator::create<QueueItem::FILLELLIPSE>(WIDTH/4, HEIGHT/2, WIDTH/4, HEIGHT/2)
+            QueueItemCreator::create<QueueItem::FILLELLIPSE>(WIDTH/4, HEIGHT/2, static_cast<uint32_t>(WIDTH/4), static_cast<uint32_t>(HEIGHT/2))
     };
     _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
     return afterTestSimple(win, &_readerStub);
@@ -43,13 +43,13 @@ IMG_TEST_F(DX9FillEllipseTest, Ellipse4){
             QueueItemCreator::create<QueueItem::CLEAR>(),
             QueueItemCreator::create<QueueItem::SETLINESTYLE>(NULL_LINE, 0, 0),
             QueueItemCreator::create<QueueItem::SETFILLSTYLE>(SOLID_FILL, 0x00BBFF),
-            QueueItemCreator::create<QueueItem::FILLELLIPSE>(WIDTH/2, HEIGHT/2, WIDTH/2, HEIGHT/2),
+            QueueItemCreator::create<QueueItem::FILLELLIPSE>(WIDTH/2, HEIGHT/2, static_cast<uint32_t>(WIDTH/2), static_cast<uint32_t>(HEIGHT/2)),
             QueueItemCreator::create<QueueItem::SETFILLSTYLE>(SOLID_FILL, 0x0000FF),
-            QueueItemCreator::create<QueueItem::FILLELLIPSE>(WIDTH/4, HEIGHT/5, WIDTH/4, HEIGHT/5),
+            QueueItemCreator::create<QueueItem::FILLELLIPSE>(WIDTH/4, HEIGHT/5, static_cast<uint32_t>(WIDTH/4), static_cast<uint32_t>(HEIGHT/5)),
             QueueItemCreator::create<QueueItem::SETFILLSTYLE>(SOLID_FILL, 0xFF0000),
-            QueueItemCreator::create<QueueItem::FILLELLIPSE>(3*WIDTH/4, HEIGHT/5, WIDTH/4, HEIGHT/5),
+            QueueItemCreator::create<QueueItem::FILLELLIPSE>(3*WIDTH/4, HEIGHT/5, static_cast<uint32_t>(WIDTH/4), static_cast<uint32_t>(HEIGHT/5)),
             QueueItemCreator::create<QueueItem::SETFILLSTYLE>(SOLID_FILL, 0xFFFF00),
-            QueueItemCreator::create<QueueItem::FILLELLIPSE>(WIDTH/2, 4*HEIGHT/5, WIDTH/2, HEIGHT/5)
+            QueueItemCreator::create<QueueItem::FILLELLIPSE>(WIDTH/2, 4*HEIGHT/5, static_cast<uint32_t>(WIDTH/2), static_cast<uint32_t>(HEIGHT/5))
     };
     _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
     return afterTestSimple(win, &_readerStub);
@@ -62,9 +62,9 @@ IMG_TEST_F(DX9FillEllipseTest, CircleOutside){
             QueueItemCreator::create<QueueItem::SETFILLSTYLE>(SOLID_FILL, 0x00CCDD),
             QueueItemCreator::create<QueueItem::BAR>(-WIDTH/4, -HEIGHT/4, WIDTH - WIDTH/4, HEIGHT - HEIGHT/4),
             QueueItemCreator::create<QueueItem::SETFILLSTYLE>(SOLID_FILL, 0xFF0000),
-            QueueItemCreator::create<QueueItem::BAR>(WIDTH / 8, 0.117634f * HEIGHT, WIDTH, HEIGHT),
+            QueueItemCreator::create<QueueItem::BAR>(WIDTH / 8, static_cast<int_fast32_t>(0.117634f * HEIGHT) + 1, WIDTH, HEIGHT),
             QueueItemCreator::create<QueueItem::SETFILLSTYLE>(SOLID_FILL, 0x00BBFF),
-            QueueItemCreator::create<QueueItem::FILLELLIPSE>(-WIDTH * 2, -HEIGHT * 2, WIDTH * 3, HEIGHT * 3)
+            QueueItemCreator::create<QueueItem::FILLELLIPSE>(-WIDTH * 2, -HEIGHT * 2, static_cast<uint32_t>(WIDTH * 3), static_cast<uint32_t>(HEIGHT * 3))
     };
     _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
     return afterTestSimple(win, &_readerStub);
@@ -75,11 +75,11 @@ IMG_TEST_F(DX9FillEllipseTest, EllipseThenBar2){
             QueueItemCreator::create<QueueItem::CLEAR>(),
             QueueItemCreator::create<QueueItem::SETLINESTYLE>(NULL_LINE, 0, 0),
             QueueItemCreator::create<QueueItem::SETFILLSTYLE>(SOLID_FILL, 0x00BBFF),
-            QueueItemCreator::create<QueueItem::FILLELLIPSE>(WIDTH/2, HEIGHT/2, WIDTH/2, HEIGHT/2),
+            QueueItemCreator::create<QueueItem::FILLELLIPSE>(WIDTH/2, HEIGHT/2, static_cast<uint32_t>(WIDTH/2), static_cast<uint32_t>(HEIGHT/2)),
             QueueItemCreator::create<QueueItem::SETFILLSTYLE>(SOLID_FILL, 0xFF0000),
             QueueItemCreator::create<QueueItem::BAR>(0, 0, WIDTH/8, HEIGHT/8),
             QueueItemCreator::create<QueueItem::SETFILLSTYLE>(SOLID_FILL, 0x0000FF),
-            QueueItemCreator::create<QueueItem::FILLELLIPSE>(WIDTH/4, HEIGHT/5, WIDTH/4, HEIGHT/5),
+            QueueItemCreator::create<QueueItem::FILLELLIPSE>(WIDTH/4, HEIGHT/5, static_cast<uint32_t>(WIDTH/4), static_cast<uint32_t>(HEIGHT/5)),
             QueueItemCreator::create<QueueItem::BAR>(WIDTH/2, HEIGHT/2, 3*WIDTH/4, 3*HEIGHT/4)
     };
     _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
@@ -91,7 +91,7 @@ IMG_TEST_F(DX9FillEllipseTest, Ellipse1px){
             QueueItemCreator::create<QueueItem::CLEAR>(),
             QueueItemCreator::create<QueueItem::SETLINESTYLE>(NULL_LINE, 0, 0),
             QueueItemCreator::create<QueueItem::SETFILLSTYLE>(SOLID_FILL, 0x00BBFF),
-            QueueItemCreator::create<QueueItem::FILLELLIPSE>(WIDTH/2, HEIGHT/2, 1, 1)
+            QueueItemCreator::create<QueueItem::FILLELLIPSE>(WIDTH/2, HEIGHT/2, static_cast<uint32_t>(1), static_cast<uint32_t>(1))
     };
     _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
     return afterTestSimple(win, &_readerStub);
@@ -102,7 +102,7 @@ IMG_TEST_F(DX9FillEllipseTest, Ellipse2px){
             QueueItemCreator::create<QueueItem::CLEAR>(),
             QueueItemCreator::create<QueueItem::SETLINESTYLE>(NULL_LINE, 0, 0),
             QueueItemCreator::create<QueueItem::SETFILLSTYLE>(SOLID_FILL, 0x00BBFF),
-            QueueItemCreator::create<QueueItem::FILLELLIPSE>(WIDTH/2, HEIGHT/2, 2, 2)
+            QueueItemCreator::create<QueueItem::FILLELLIPSE>(WIDTH/2, HEIGHT/2, static_cast<uint32_t>(2), static_cast<uint32_t>(2))
     };
     _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
     return afterTestSimple(win, &_readerStub);

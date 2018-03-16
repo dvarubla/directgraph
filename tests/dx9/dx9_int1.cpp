@@ -4,8 +4,8 @@
 
 class DX9Int1Test: public ImageTest, public CommonIntegration{
 public:
-    static float WIDTH;
-    static float HEIGHT;
+    static uint32_t WIDTH;
+    static uint32_t HEIGHT;
     DirectgraphWinIndex _curIndex;
     DX9Int1Test(){
         initWindowManager();
@@ -19,14 +19,12 @@ public:
         p.height = HEIGHT;
         p.renderer = DIRECTGRAPH_DX9_RENDERER;
         p.controller = DIRECTGRAPH_MULT_THREAD_CTRL;
-        p.dpiX = 96.0f;
-        p.dpiY = 96.0f;
         _curIndex = wman->createWindow(p);
     }
 };
 
-float DX9Int1Test::WIDTH = 561;
-float DX9Int1Test::HEIGHT = 401;
+uint32_t DX9Int1Test::WIDTH = 561;
+uint32_t DX9Int1Test::HEIGHT = 401;
 
 IMG_TEST_F(DX9Int1Test, Vehicle){
     IController *ctrl = wman->getCurrentWindowAndLock().controller;
@@ -36,7 +34,12 @@ IMG_TEST_F(DX9Int1Test, Vehicle){
     ctrl->setfillstyle(SOLID_FILL, 0xFFFFFF);
     for(uint_fast32_t i = 0; i < HEIGHT/10; i++){
         for(uint_fast32_t j = 0; j < WIDTH/10; j++){
-            ctrl->bar(j * 10 + 1.0f, i * 10 + 1.0f, (j + 1) * 10.0f, (i + 1) * 10.0f);
+            ctrl->bar(
+                    static_cast<int_fast32_t>(j * 10 + 1.0f),
+                    static_cast<int_fast32_t>(i * 10 + 1.0f),
+                    static_cast<int_fast32_t>((j + 1) * 10.0f),
+                    static_cast<int_fast32_t>((i + 1) * 10.0f)
+            );
         }
     }
     ctrl->setbgcolor(0xAAAAAA);

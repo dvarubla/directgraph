@@ -11,16 +11,16 @@ extern "C" {
 
 void DIRECTGRAPH_EXPORT delay(uint32_t msec);
 
-void DIRECTGRAPH_EXPORT resize(float width, float height);
+void DIRECTGRAPH_EXPORT resize(uint32_t width, uint32_t height);
 
 
-void DIRECTGRAPH_EXPORT fillellipse(float x, float y, float xradius, float yradius);
+void DIRECTGRAPH_EXPORT fillellipse(int32_t x, int32_t y, uint32_t xradius, uint32_t yradius);
 
 void DIRECTGRAPH_EXPORT setlinestyle(line_styles linestyle, uint32_t pattern, uint32_t thickness);
 
-void DIRECTGRAPH_EXPORT bar(float left, float top, float right, float bottom);
+void DIRECTGRAPH_EXPORT bar(int32_t left, int32_t top, int32_t right, int32_t bottom);
 
-void DIRECTGRAPH_EXPORT putpixel(uint32_t x, uint32_t y, uint32_t color);
+void DIRECTGRAPH_EXPORT putpixel(int32_t x, int32_t y, uint32_t color);
 
 void DIRECTGRAPH_EXPORT setfillstyle(fill_patterns pattern, uint32_t color);
 
@@ -31,13 +31,13 @@ void DIRECTGRAPH_EXPORT setbgcolor(uint32_t color);
 void DIRECTGRAPH_EXPORT directgraph_repaint();
 
 
-void DIRECTGRAPH_EXPORT fillellipsew(DirectgraphWinIndex index, float x, float y, float xradius, float yradius);
+void DIRECTGRAPH_EXPORT fillellipsew(DirectgraphWinIndex index, int32_t x, int32_t y, uint32_t xradius, uint32_t yradius);
 
 void DIRECTGRAPH_EXPORT setlinestylew(DirectgraphWinIndex index, line_styles linestyle, uint32_t pattern, uint32_t thickness);
 
-void DIRECTGRAPH_EXPORT barw(DirectgraphWinIndex index, float left, float top, float right, float bottom);
+void DIRECTGRAPH_EXPORT barw(DirectgraphWinIndex index, int32_t left, int32_t top, int32_t right, int32_t bottom);
 
-void DIRECTGRAPH_EXPORT putpixelw(DirectgraphWinIndex index, uint32_t x, uint32_t y, uint32_t color);
+void DIRECTGRAPH_EXPORT putpixelw(DirectgraphWinIndex index, int32_t x, int32_t y, uint32_t color);
 
 void DIRECTGRAPH_EXPORT setfillstylew(DirectgraphWinIndex index, fill_patterns pattern, uint32_t color);
 
@@ -55,9 +55,7 @@ void DIRECTGRAPH_EXPORT directgraph_get_dpi(float *dpix, float *dpiy);
 
 DIRECTGRAPH_EXPORT DirectgraphWinParams* directgraph_create_winparams();
 
-void DIRECTGRAPH_EXPORT directgraph_winparams_set_size(DirectgraphWinParams *params, float width, float height);
-
-void DIRECTGRAPH_EXPORT directgraph_winparams_set_dpi(DirectgraphWinParams *params, float dpix, float dpiy);
+void DIRECTGRAPH_EXPORT directgraph_winparams_set_size(DirectgraphWinParams *params, uint32_t width, uint32_t height);
 
 void DIRECTGRAPH_EXPORT directgraph_winparams_set_name(DirectgraphWinParams *params, const wchar_t *name);
 
@@ -66,7 +64,7 @@ void DIRECTGRAPH_EXPORT directgraph_destroy_winparams(DirectgraphWinParams *para
 DirectgraphWinIndex DIRECTGRAPH_EXPORT directgraph_create_window_params(const DirectgraphWinParams *params);
 
 
-DirectgraphWinIndex DIRECTGRAPH_EXPORT directgraph_create_window(const wchar_t *name, float width, float height);
+DirectgraphWinIndex DIRECTGRAPH_EXPORT directgraph_create_window(const wchar_t *name, uint32_t width, uint32_t height);
 
 void DIRECTGRAPH_EXPORT directgraph_destroy_window(DirectgraphWinIndex index);
 
