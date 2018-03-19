@@ -8,8 +8,10 @@ namespace directgraph{
         enum QueueItemType{
             CLEAR = 0,
             BGCOLOR,
+            COLOR,
             SETFILLSTYLE,
             BAR,
+            RECTANGLE,
             SINGLE_PIXEL,
             PIXEL_CONTAINER,
             SETFILLPATTERN,
@@ -17,6 +19,7 @@ namespace directgraph{
             FILLELLIPSE
         } type;
         union{
+            uint32_t color;
             uint32_t bgColor;
             struct FillStyleItem{
                 uint8_t fillStyle;
@@ -34,6 +37,9 @@ namespace directgraph{
             struct BarItem{
                 int32_t left, top, right, bottom;
             } bar;
+            struct RectangleItem{
+                int32_t left, top, right, bottom;
+            } rectangle;
             struct FillEllipseItem{
                 int32_t x, y;
                 uint32_t xradius, yradius;

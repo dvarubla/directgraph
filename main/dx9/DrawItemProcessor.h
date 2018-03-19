@@ -4,6 +4,7 @@
 #include "DrawOpCreator.h"
 #include "BufferPreparerParams.h"
 #include "PrimitiveCreator.h"
+#include "misc.h"
 #include <main/QueueItem.h>
 #include <main/DPIHelper.h>
 
@@ -11,9 +12,6 @@ namespace directgraph {
     namespace dx9 {
         class DrawItemProcessor {
         private:
-            const static int TRIANGLES_IN_QUAD = 2;
-            const static int VERTICES_IN_QUAD = 4;
-
             StateHelper *_stateHelper;
             BufferPreparerParams *_bufPrepParams;
             PrimitiveCreator _primCreator;
@@ -27,17 +25,18 @@ namespace directgraph {
                 uint_fast32_t sizeMult;
                 DrawDataType::Type drawDataType;
             };
-            struct StartEndCoords{
-                Coords start;
-                Coords end;
+            struct NumVertices{
+                uint_fast32_t degenerate;
+                uint_fast32_t primitive;
             };
             bool canCreateMoreItems();
             void nextItem();
             void resetItemCount();
-            uint_fast32_t getNumVertices(const QueueItem &item, bool isFirst);
+            NumVertices getNumVertices(const QueueItem &item, bool isFirst);
             TypeSize getTypeSize(const QueueItem &item, const ItemState &state);
             void processDrawItem(
                     const QueueItem &item, void *&curVertMem,
+                    uint_fast32_t &numVertices,
                     const ItemState &state
             );
             StartEndCoords getStartEndCoords(

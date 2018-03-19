@@ -8,6 +8,9 @@ namespace directgraph {
         uint_fast8_t fillStyle;
         uint_fast32_t fillColor;
         uint_fast32_t bgColor;
+        uint_fast32_t drawColor;
+        uint_fast32_t lineThickness;
+        uint_fast32_t linePattern;
         char *userFillPattern;
     };
 

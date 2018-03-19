@@ -25,6 +25,17 @@ namespace directgraph{
     }
 
     template<>
+    QueueItem QueueItemCreator::create<QueueItem::RECTANGLE>(int_fast32_t left, int_fast32_t top, int_fast32_t right, int_fast32_t bottom) {
+        QueueItem item;
+        item.type = QueueItem::RECTANGLE;
+        item.data.bar.left = left;
+        item.data.bar.top = top;
+        item.data.bar.right = right;
+        item.data.bar.bottom = bottom;
+        return item;
+    }
+
+    template<>
     QueueItem QueueItemCreator::create<QueueItem::FILLELLIPSE>(int_fast32_t x, int_fast32_t y, uint_fast32_t xradius, uint_fast32_t yradius) {
         QueueItem item;
         item.type = QueueItem::FILLELLIPSE;
@@ -71,10 +82,18 @@ namespace directgraph{
     }
 
     template<>
-    QueueItem QueueItemCreator::create<QueueItem::BGCOLOR>(uint_fast32_t color) {
+    QueueItem QueueItemCreator::create<QueueItem::BGCOLOR>(uint_fast32_t bgColor) {
         QueueItem item;
         item.type = QueueItem::BGCOLOR;
-        item.data.bgColor = color;
+        item.data.bgColor = bgColor;
+        return item;
+    }
+
+    template<>
+    QueueItem QueueItemCreator::create<QueueItem::COLOR>(uint_fast32_t color) {
+        QueueItem item;
+        item.type = QueueItem::COLOR;
+        item.data.color = color;
         return item;
     }
 

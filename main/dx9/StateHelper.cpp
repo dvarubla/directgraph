@@ -12,8 +12,11 @@ namespace directgraph {
         StateHelper::StateHelper(PropertyManager *propMan, const CommonProps &props): _propMan(propMan) {
             _lastState.fillPattern = props.fillStyle;
             _lastState.bgColor = props.bgColor;
+            _lastState.drawColor = props.drawColor;
             _lastState.userFillPattern = props.userFillPattern;
             _lastState.lineStyle = props.lineStyle;
+            _lastState.lineThickness = props.lineThickness;
+            _lastState.linePattern = props.linePattern;
             _curItemState = _propMan->getInitialItemState();
         }
 

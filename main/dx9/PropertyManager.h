@@ -18,6 +18,7 @@ namespace directgraph {
                 FILL_PATTERN = 0,
                 USER_FILL_PATTERN,
                 LINE_STYLE,
+                LINE_PATTERN,
                 FILL_COLOR,
                 BG_COLOR,
                 SHADER_TYPE,

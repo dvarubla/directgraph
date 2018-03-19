@@ -56,7 +56,7 @@ namespace directgraph {
         };
 
         typedef std::vector<DrawOp> DrawOpVector;
-        
+
         class DrawOpCreator{
         public:
             template <uint_fast32_t T>

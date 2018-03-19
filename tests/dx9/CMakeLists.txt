@@ -23,6 +23,8 @@ function(dx9_test name src)
     set_tests_properties(${name} PROPERTIES LABELS "dx9")
 endfunction()
 
+set(DX9_RECTANGLE_SRC dx9_rectangle.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp ../stubs/FeaturesStub.h)
+dx9_test(dx9_rectangle "${DX9_RECTANGLE_SRC}")
 set(DX9_BAR_SRC dx9_bar.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp ../stubs/FeaturesStub.h)
 dx9_test(dx9_bar "${DX9_BAR_SRC}")
 set(DX9_SINGLE_PIXEL_SRC dx9_single_pixel.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp ../stubs/FeaturesStub.h)

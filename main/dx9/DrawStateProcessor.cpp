@@ -31,7 +31,7 @@ namespace directgraph{
         }
 
         void DrawStateProcessor::useLineStyle(ItemState &state) {
-            if(_stateHelper->getLastState().lineStyle == NULL_LINE){
+            if(_stateHelper->getLastState().lineStyle == NULL_LINE || _stateHelper->getLastState().lineStyle == SOLID_LINE){
                 _propMan->setProp(state, PropertyName::TEXTURE_STATE, TextureState::NO_TEXTURE);
             }
         }
@@ -62,6 +62,11 @@ namespace directgraph{
                     } else {
                         disableShader(state);
                     }
+                    break;
+                case QueueItem::RECTANGLE:
+                    disablePixelTexture(state);
+                    disableShader(state);
+                    useLineStyle(state);
                     break;
                 case QueueItem::SINGLE_PIXEL:
                     disablePixelTexture(state);
@@ -120,6 +125,11 @@ namespace directgraph{
                             (_stateHelper->fillTextureUsed(state) && color_has_alpha(_stateHelper->getLastState().bgColor))
                     )
                     ) {
+                return true;
+            }
+            if(
+                item.type == QueueItem::RECTANGLE && color_has_alpha(_stateHelper->getLastState().drawColor)
+            ){
                 return true;
             }
             return false;

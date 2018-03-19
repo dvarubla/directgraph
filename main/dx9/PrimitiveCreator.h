@@ -3,13 +3,18 @@
 #include <stdint.h>
 #include "EllipseHelper.h"
 #include "VertexCreator.h"
+#include "misc.h"
 #include "patterns.h"
+#include "RectangleHelper.h"
+#include "SimplePrimHelper.h"
 
 namespace directgraph {
     namespace dx9 {
         class PrimitiveCreator {
         private:
             EllipseHelper _ellipseHelper;
+            SimplePrimHelper _simplePrimHelper;
+            RectangleHelper _rectangleHelper;
             float coordToPositionX(int_fast32_t coord, uint_fast32_t width);
             float coordToPositionY(int_fast32_t coord, uint_fast32_t height);
         public:
@@ -111,6 +116,21 @@ namespace directgraph {
 
             uint_fast32_t getNumEllipseVertices(
                     const UCoords &radiusCrds
+            );
+
+            void * genRectangle(
+                    void *verticesVoid,
+                    const Coords &startCrds,
+                    const Coords &endCrds,
+                    uint_fast32_t thickness,
+                    float z,
+                    uint_fast32_t color
+            );
+
+            StartEndCoords getRectangleCoords(
+                    const Coords &startCrds,
+                    const Coords &endCrds,
+                    uint_fast32_t thickness
             );
         };
 

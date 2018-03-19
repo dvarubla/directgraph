@@ -1,6 +1,5 @@
 #include <directgraph/directgraph_constants.h>
 #include "CommonProps.h"
-#include <cstdlib>
 
 namespace directgraph{
     CommonProps get_default_common_props() {
@@ -10,6 +9,9 @@ namespace directgraph{
         props.bgColor = 0xFFFFFF;
         props.userFillPattern = NULL;
         props.lineStyle = SOLID_LINE;
+        props.drawColor = 0x000000;
+        props.lineThickness = 1;
+        props.linePattern = 0;
         return props;
     }
 }

@@ -1,3 +1,4 @@
+#include <main/QueueItem.h>
 #include "DrawItemProcessor.h"
 #include "VertexCreator.h"
 
@@ -6,6 +7,10 @@ namespace directgraph {
         DrawItemProcessor::TypeSize DrawItemProcessor::getTypeSize(const QueueItem &item, const ItemState &state) {
             TypeSize res;
             switch(item.type){
+                case QueueItem::RECTANGLE:
+                    res.sizeMult = sizeof(ColorVertex);
+                    res.drawDataType = DrawDataType::COLOR_VERTEX;
+                    break;
                 case QueueItem::PIXEL_CONTAINER:
                     res.sizeMult = sizeof(TexturedVertex);
                     res.drawDataType = DrawDataType::TEXTURED_VERTEX;
@@ -13,7 +18,7 @@ namespace directgraph {
                 case QueueItem::BAR:
                     if (_stateHelper->fillTextureUsed(state)) {
                         if(_bufPrepParams->supportsTexturedBar()){
-                            res.sizeMult = sizeof(TexturedColorVertex);
+                            res.sizeMult = sizeof(Color2Vertex);
                             res.drawDataType = DrawDataType::COLOR2_VERTEX;
                         } else {
                             res.sizeMult = sizeof(TexturedColorVertex);
@@ -110,6 +115,11 @@ namespace directgraph {
                                 _curZ
                         );
                         break;
+                    case QueueItem::RECTANGLE:
+                        curVertMem = _primCreator.genDegenerate(
+                                curVertMem, startCrds, endCrds, _curZ
+                        );
+                        break;
                     case QueueItem::BAR:
                         curVertMem = _primCreator.genDegenerate(
                                 curVertMem, startCrds, endCrds, _curZ
@@ -124,7 +134,7 @@ namespace directgraph {
             }
         }
 
-        DrawItemProcessor::StartEndCoords DrawItemProcessor::getStartEndCoords(
+        StartEndCoords DrawItemProcessor::getStartEndCoords(
                 const QueueItem &item, const ItemState &state
         ) {
             StartEndCoords crds;
@@ -166,17 +176,32 @@ namespace directgraph {
                                 item.data.fillellipse.y - item.data.fillellipse.yradius
                         );
                     }
-
                     break;
+                case QueueItem::RECTANGLE:
+                    crds = _primCreator.getRectangleCoords(
+                            genCoords(item.data.rectangle.left, item.data.rectangle.top),
+                            genCoords(item.data.rectangle.right, item.data.rectangle.bottom),
+                            _stateHelper->getLastState().lineThickness
+                    );
             }
             return crds;
         }
 
         void DrawItemProcessor::processDrawItem(
                 const QueueItem &item, void *&curVertMem,
+                uint_fast32_t &,
                 const ItemState &state
         ) {
             switch(item.type){
+                case QueueItem::RECTANGLE:
+                    curVertMem = _primCreator.genRectangle(curVertMem,
+                                                          genCoords(item.data.rectangle.left, item.data.rectangle.top),
+                                                          genCoords(item.data.rectangle.right, item.data.rectangle.bottom),
+                                                          _stateHelper->getLastState().lineThickness,
+                                                          _curZ,
+                                                          _stateHelper->getLastState().drawColor
+                    );
+                    break;
                 case QueueItem::SINGLE_PIXEL:
                     curVertMem = _primCreator.genQuad(curVertMem,
                                                       genCoords(item.data.singlePixel.x, item.data.singlePixel.y),
@@ -295,26 +320,24 @@ namespace directgraph {
             }
         }
 
-        uint_fast32_t DrawItemProcessor::getNumVertices(const QueueItem &item, bool isFirst) {
-            uint_fast32_t curNumVertices;
+        DrawItemProcessor::NumVertices DrawItemProcessor::getNumVertices(const QueueItem &item, bool isFirst) {
+            NumVertices res;
+            res.degenerate = (isFirst) ? 0 : 2;
             if(item.type == QueueItem::FILLELLIPSE && !_bufPrepParams->supportsEllipse()){
-                curNumVertices = _primCreator.getNumEllipseVertices(
+                res.primitive = _primCreator.getNumEllipseVertices(
                         genUCoords(
                                 item.data.fillellipse.xradius,
                                 item.data.fillellipse.yradius
                         )
                 );
-                if(!isFirst){
-                    curNumVertices += 2;
-                }
-            } else {
-                curNumVertices =
-                        (isFirst) ?
-                        VERTICES_IN_QUAD :
-                        VERTICES_IN_QUAD + 2
-                        ;
+                return res;
             }
-            return curNumVertices;
+            if(item.type == QueueItem::RECTANGLE){
+                res.primitive = VERTICES_IN_QUAD * 4;
+                return res;
+            }
+            res.primitive = VERTICES_IN_QUAD;
+            return res;
         }
 
         bool DrawItemProcessor::canCreateMoreItems() {
