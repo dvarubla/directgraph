@@ -86,6 +86,7 @@ namespace directgraph {
             virtual void setBgColor(uint_fast32_t bgColor);
             virtual void setFillPattern(uint_fast8_t pattern, bool useTransparency);
             virtual void setLinePattern(uint_fast8_t pattern, bool useTransparency);
+            virtual void setLinePatternColor(uint_fast8_t pattern, uint_fast32_t color, bool useTransparency);
             virtual void setFillPatternBgFillColor(uint_fast8_t pattern, uint_fast32_t bgColor, uint_fast32_t fillColor);
             virtual void setFillPatternBgColor(uint_fast8_t pattern, uint_fast32_t bgColor, bool useTransparency);
             void unsetPattern(bool useTransparency);

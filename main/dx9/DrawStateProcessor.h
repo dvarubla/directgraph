@@ -26,7 +26,7 @@ namespace directgraph {
             void useFillTexture(ItemState &state, bool useBgColor, bool useFillColorIfTransp);
             void disablePixelTexture(ItemState &state);
             void disableTexture(ItemState &state);
-            void useLineStyle(ItemState &state, bool useDrawColorIfTransp);
+            void useLineStyle(ItemState &state, bool useDrawColor);
             void disableShader(ItemState &state);
         };
     }

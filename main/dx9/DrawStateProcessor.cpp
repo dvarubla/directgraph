@@ -30,13 +30,13 @@ namespace directgraph{
             }
         }
 
-        void DrawStateProcessor::useLineStyle(ItemState &state, bool useDrawColorIfTransp) {
+        void DrawStateProcessor::useLineStyle(ItemState &state, bool useDrawColor) {
             if(_stateHelper->getLastState().lineStyle == NULL_LINE || _stateHelper->getLastState().lineStyle == SOLID_LINE){
                 _propMan->setProp(state, PropertyName::TEXTURE_STATE, TextureState::NO_TEXTURE);
             } else {
                 _propMan->setProp(state, PropertyName::TEXTURE_STATE, TextureState::LINE_TEXTURE);
                 _propMan->setProp(state, PropertyName::LINE_PATTERN, _stateHelper->getLastState().lineStyle);
-                if(useDrawColorIfTransp && color_has_alpha(_stateHelper->getLastState().drawColor)){
+                if(useDrawColor){
                     _propMan->setProp(state, PropertyName::DRAW_COLOR, _stateHelper->getLastState().drawColor);
                 }
                 if(_stateHelper->getLastState().lineStyle == USERBIT_LINE){
@@ -193,6 +193,7 @@ namespace directgraph{
             if(_bufPrepParams->needRecreateTexture()){
                 if (
                         stateDiff[PropertyName::FILL_PATTERN].isSet ||
+                        stateDiff[PropertyName::USER_FILL_PATTERN].isSet ||
                         stateDiff[PropertyName::BG_COLOR].isSet ||
                         (isTransp && stateDiff[PropertyName::FILL_COLOR].isSet)
                         ){
@@ -213,26 +214,43 @@ namespace directgraph{
                     isFirst = true;
                 }
             } else {
-                if(stateDiff[PropertyName::LINE_PATTERN].isSet || stateDiff[PropertyName::USER_LINE_PATTERN].isSet){
+                if (stateDiff[PropertyName::FILL_PATTERN].isSet ||
+                    stateDiff[PropertyName::USER_FILL_PATTERN].isSet) {
                     drawOps.push_back(
-                            DrawOpCreator::create<DrawOpType::SET_LINE_PATTERN>(stateCur[PropertyName::LINE_PATTERN].val));
+                            DrawOpCreator::create<DrawOpType::SET_FILL_PATTERN>(
+                                    stateCur[PropertyName::FILL_PATTERN].val));
                     isFirst = true;
-                } else {
-                    if (stateDiff[PropertyName::FILL_PATTERN].isSet ||
-                        stateDiff[PropertyName::USER_FILL_PATTERN].isSet) {
-                        drawOps.push_back(
-                                DrawOpCreator::create<DrawOpType::SET_FILL_PATTERN>(
-                                        stateCur[PropertyName::FILL_PATTERN].val));
-                        isFirst = true;
-                    }
-                    if (stateDiff[PropertyName::BG_COLOR].isSet) {
-                        drawOps.push_back(DrawOpCreator::create<DrawOpType::SET_TEX_BG_COLOR>(
-                                stateDiff[PropertyName::BG_COLOR].val
-                        ));
-                        isFirst = true;
-                    }
+                }
+                if (stateDiff[PropertyName::BG_COLOR].isSet) {
+                    drawOps.push_back(DrawOpCreator::create<DrawOpType::SET_TEX_BG_COLOR>(
+                            stateDiff[PropertyName::BG_COLOR].val
+                    ));
+                    isFirst = true;
                 }
             }
+
+            if(
+                    stateDiff[PropertyName::LINE_PATTERN].isSet ||
+                    stateDiff[PropertyName::USER_LINE_PATTERN].isSet ||
+                    (_bufPrepParams->needRecreateTexture() && stateDiff[PropertyName::DRAW_COLOR].isSet)
+            ){
+                if(_bufPrepParams->needRecreateTexture() && stateDiff[PropertyName::DRAW_COLOR].isSet){
+                    drawOps.push_back(
+                            DrawOpCreator::create<DrawOpType::SET_LINE_PATTERN_COLOR>(
+                                    stateCur[PropertyName::LINE_PATTERN].val,
+                                    stateDiff[PropertyName::DRAW_COLOR].val
+                            )
+                    );
+                } else {
+                    drawOps.push_back(
+                            DrawOpCreator::create<DrawOpType::SET_LINE_PATTERN>(
+                                    stateCur[PropertyName::LINE_PATTERN].val
+                            )
+                     );
+                }
+                isFirst = true;
+            }
+
             if(stateDiff[PropertyName::PIXEL_CONTAINER].isSet){
                 drawOps.push_back(DrawOpCreator::create<DrawOpType::SET_PIXEL_TEXTURE>(
                         static_cast<IPixelContainer*>(stateDiff[PropertyName::PIXEL_CONTAINER].valP)

@@ -103,6 +103,13 @@ namespace directgraph{
         }
 
         template<uint_fast32_t DispMode>
+        void PatternTexturesHelper<DispMode>::setLinePatternColor(uint_fast8_t pattern, uint_fast32_t color,
+                                                                  bool useTransparency) {
+            pattern = setLinePattern(pattern, color, true);
+            setLTexture(pattern, true, useTransparency);
+        }
+
+        template<uint_fast32_t DispMode>
         void PatternTexturesHelper<DispMode>::setFillPattern(uint_fast8_t pattern, bool useTransparency) {
             pattern = setFillPattern(pattern, 0, 0, false, useTransparency);
             setFTexture(pattern, false, false, useTransparency);
@@ -224,10 +231,10 @@ namespace directgraph{
                 TextureType * pixels = (TextureType *)outRect.pBits;
                 for (uint_fast8_t i = 0; i < LPATTERN_H; i++) {
                     for (uint_fast8_t j = 0; j < LPATTERN_W; j++) {
-                        bool isTransparent = ((pattern & (1 << j)) == (1 << j));
+                        bool isTransparent = ((pattern & (1 << j)) != (1 << j));
                         pixels[j] = FrmFinder::convert(
                                 (isTransparent) ? 0xFF000000 : color,
-                                isTransparent && !needRecreate
+                                !isTransparent && !needRecreate
                         );
                     }
                     pixels += rowPitch / sizeof(TextureType);

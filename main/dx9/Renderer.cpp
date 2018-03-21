@@ -290,6 +290,14 @@ namespace directgraph {
                                 transpStarted
                         );
                         break;
+
+                    case DrawOpType::SET_LINE_PATTERN_COLOR:
+                        curPatTextHelper->setLinePatternColor(
+                                it->data.linePatternColor.linePattern,
+                                it->data.linePatternColor.color,
+                                transpStarted
+                        );
+                        break;
                     case DrawOpType::SET_FILL_PATTERN_COLOR: {
                         curPatTextHelper->setFillPatternBgColor(
                                 it->data.fillPatternColor.fillPattern,

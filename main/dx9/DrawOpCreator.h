@@ -18,6 +18,7 @@ namespace directgraph {
                 ITEMS,
                 SET_PIXEL_TEXTURE,
                 SET_LINE_PATTERN,
+                SET_LINE_PATTERN_COLOR,
                 SET_USER_LINE_PATTERN
             };
         }
@@ -44,6 +45,10 @@ namespace directgraph {
                     uint32_t fillColor;
                 } fillPatternTwoColors;
                 uint8_t fillPattern;
+                struct LinePatternColor {
+                    uint8_t linePattern;
+                    uint32_t color;
+                } linePatternColor;
                 uint8_t linePattern;
                 uint16_t userLinePattern;
                 uint32_t bgColor;

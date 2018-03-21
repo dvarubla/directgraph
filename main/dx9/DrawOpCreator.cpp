@@ -59,6 +59,17 @@ namespace directgraph{
         }
 
         template<>
+        DrawOp DrawOpCreator::create<DrawOpType::SET_LINE_PATTERN_COLOR>(
+                uint_fast32_t linePattern, uint_fast32_t color
+        ) {
+            DrawOp op;
+            op.type = DrawOpType::SET_LINE_PATTERN_COLOR;
+            op.data.linePatternColor.linePattern = static_cast<uint8_t>(linePattern);
+            op.data.linePatternColor.color = color;
+            return op;
+        }
+
+        template<>
         DrawOp DrawOpCreator::create<DrawOpType::SET_FILL_PATTERN_TWO_COLORS>(
                 uint_fast32_t fillPattern, uint_fast32_t bgColor, uint_fast32_t fillColor
         ) {
