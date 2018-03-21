@@ -43,7 +43,8 @@ namespace directgraph {
             bool _haveUserFPattern;
             uint16_t _userLPattern;
             bool _haveUserLPattern;
-            bool _needCreateUserPattern;
+            bool _needCreateUserFPattern;
+            bool _needCreateUserLPattern;
 
             void createFPattern(
                     uint_fast8_t index,
@@ -81,6 +82,7 @@ namespace directgraph {
             PatternTexturesHelper(IDirect3DDevice9 *device, D3DFORMAT textureFormat, bool haveConstantSupport);
             ~PatternTexturesHelper();
             void setUserFillPattern(const char *pattern);
+            void setUserLinePattern(uint_fast16_t pattern);
             virtual void setBgColor(uint_fast32_t bgColor);
             virtual void setFillPattern(uint_fast8_t pattern, bool useTransparency);
             virtual void setLinePattern(uint_fast8_t pattern, bool useTransparency);

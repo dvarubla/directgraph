@@ -7,6 +7,7 @@
 #include "Exception.h"
 #include "PatternTexturesHelper.h"
 #include "BufferPreparer.h"
+#include "DrawOpCreator.h"
 #include <algorithm>
 
 #undef max
@@ -308,6 +309,9 @@ namespace directgraph {
                     case DrawOpType::SET_USER_FILL_PATTERN: {
                         curPatTextHelper->setUserFillPattern(it->data.userFillPattern);
                     }
+                        break;
+                    case DrawOpType::SET_USER_LINE_PATTERN:
+                        curPatTextHelper->setUserLinePattern(it->data.userLinePattern);
                         break;
                     case DrawOpType::SET_TEX_BG_COLOR: {
                         curPatTextHelper->setBgColor(it->data.bgColor);

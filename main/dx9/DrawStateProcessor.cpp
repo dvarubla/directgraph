@@ -39,6 +39,13 @@ namespace directgraph{
                 if(useDrawColorIfTransp && color_has_alpha(_stateHelper->getLastState().drawColor)){
                     _propMan->setProp(state, PropertyName::DRAW_COLOR, _stateHelper->getLastState().drawColor);
                 }
+                if(_stateHelper->getLastState().lineStyle == USERBIT_LINE){
+                    _propMan->setProp(
+                            state,
+                            PropertyName::USER_LINE_PATTERN,
+                            _stateHelper->getLastState().userLinePattern
+                    );
+                }
             }
         }
 
@@ -176,6 +183,13 @@ namespace directgraph{
                 ));
                 isFirst = true;
             }
+
+            if(stateDiff[PropertyName::USER_LINE_PATTERN].isSet){
+                drawOps.push_back(DrawOpCreator::create<DrawOpType::SET_USER_LINE_PATTERN>(
+                        stateCur[PropertyName::USER_LINE_PATTERN].val
+                ));
+            }
+
             if(_bufPrepParams->needRecreateTexture()){
                 if (
                         stateDiff[PropertyName::FILL_PATTERN].isSet ||
@@ -199,7 +213,7 @@ namespace directgraph{
                     isFirst = true;
                 }
             } else {
-                if(stateDiff[PropertyName::LINE_PATTERN].isSet){
+                if(stateDiff[PropertyName::LINE_PATTERN].isSet || stateDiff[PropertyName::USER_LINE_PATTERN].isSet){
                     drawOps.push_back(
                             DrawOpCreator::create<DrawOpType::SET_LINE_PATTERN>(stateCur[PropertyName::LINE_PATTERN].val));
                     isFirst = true;

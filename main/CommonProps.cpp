@@ -11,7 +11,7 @@ namespace directgraph{
         props.lineStyle = SOLID_LINE;
         props.drawColor = 0x000000;
         props.lineThickness = 1;
-        props.linePattern = 0;
+        props.userLinePattern = 0;
         return props;
     }
 }

@@ -143,7 +143,7 @@ namespace directgraph{
                         case QueueItem::SETLINESTYLE:
                             _stateHelper.getLastState().lineStyle = item.data.setlinestyle.linestyle;
                             _stateHelper.getLastState().lineThickness = item.data.setlinestyle.thickness;
-                            _stateHelper.getLastState().linePattern = item.data.setlinestyle.pattern;
+                            _stateHelper.getLastState().userLinePattern = item.data.setlinestyle.pattern;
                             break;
                         case QueueItem::COLOR:
                             _stateHelper.getLastState().drawColor = item.data.color;

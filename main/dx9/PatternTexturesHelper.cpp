@@ -41,11 +41,11 @@ namespace directgraph{
                     createFPattern(
                             USER_FPATTERN_INDEX, bgColor, fillColor,
                             reinterpret_cast<const char *>(_userFPattern),
-                            _needCreateUserPattern,
+                            _needCreateUserFPattern,
                             needRecreate,
                             useTransparency
                     );
-                    _needCreateUserPattern = false;
+                    _needCreateUserFPattern = false;
                 }
             }
             if(setStandardPattern){
@@ -66,14 +66,32 @@ namespace directgraph{
         template<uint_fast32_t DispMode>
         uint_fast8_t PatternTexturesHelper<DispMode>::setLinePattern(
                 uint_fast8_t pattern, uint_fast32_t color, bool needRecreate) {
-            pattern -= FIRST_LPATTERN;
-            if(needRecreate) {
-                createLPattern(
-                        pattern, color,
-                        linePatterns[pattern],
-                        false,
-                        true
-                );
+            bool setStandardPattern = true;
+            if(pattern == USERBIT_LINE){
+                if(!_haveUserLPattern){
+                    pattern = DASHED_LINE;
+                } else {
+                    setStandardPattern = false;
+                    pattern = USER_LPATTERN_INDEX;
+                    createLPattern(
+                            USER_LPATTERN_INDEX, color,
+                            _userLPattern,
+                            _needCreateUserLPattern,
+                            needRecreate
+                    );
+                    _needCreateUserLPattern = false;
+                }
+            }
+            if(setStandardPattern) {
+                pattern -= FIRST_LPATTERN;
+                if (needRecreate) {
+                    createLPattern(
+                            pattern, color,
+                            linePatterns[pattern],
+                            false,
+                            true
+                    );
+                }
             }
             return pattern;
         }
@@ -119,7 +137,14 @@ namespace directgraph{
         void PatternTexturesHelper<DispMode>::setUserFillPattern(const char *pattern) {
             std::copy(pattern, pattern + FPATTERN_SIZE, _userFPattern);
             _haveUserFPattern = true;
-            _needCreateUserPattern = true;
+            _needCreateUserFPattern = true;
+        }
+
+        template<uint_fast32_t DispMode>
+        void PatternTexturesHelper<DispMode>::setUserLinePattern(uint_fast16_t pattern) {
+            _userLPattern = pattern;
+            _haveUserLPattern = true;
+            _needCreateUserLPattern = true;
         }
 
         template<uint_fast32_t DispMode>

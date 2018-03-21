@@ -17,7 +17,8 @@ namespace directgraph {
                 SET_TEX_BG_COLOR,
                 ITEMS,
                 SET_PIXEL_TEXTURE,
-                SET_LINE_PATTERN
+                SET_LINE_PATTERN,
+                SET_USER_LINE_PATTERN
             };
         }
         namespace DrawDataType {
@@ -44,6 +45,7 @@ namespace directgraph {
                 } fillPatternTwoColors;
                 uint8_t fillPattern;
                 uint8_t linePattern;
+                uint16_t userLinePattern;
                 uint32_t bgColor;
                 char *userFillPattern;
                 struct Items{

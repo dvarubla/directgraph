@@ -10,7 +10,7 @@ namespace directgraph {
         uint_fast32_t bgColor;
         uint_fast32_t drawColor;
         uint_fast32_t lineThickness;
-        uint_fast32_t linePattern;
+        uint_fast16_t userLinePattern;
         char *userFillPattern;
     };
 

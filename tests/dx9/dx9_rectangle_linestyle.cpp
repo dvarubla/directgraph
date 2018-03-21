@@ -112,3 +112,47 @@ IMG_TEST_F(DX9RectangleLinestyleTest, 3RectanglesDifferentStyleThenSolid){
     _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
     return afterTestSimple(win, &_readerStub);
 }
+
+IMG_TEST_F(DX9RectangleLinestyleTest, 10pxRectangleUserLine){
+    QueueItem items[] = {
+            QueueItemCreator::create<QueueItem::CLEAR>(),
+            QueueItemCreator::create<QueueItem::SETLINESTYLE>(USERBIT_LINE, 1, 10),
+            QueueItemCreator::create<QueueItem::COLOR>(0x0000FF),
+            QueueItemCreator::create<QueueItem::RECTANGLE>(6, 6, 40, 60)
+    };
+    _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
+    return afterTestSimple(win, &_readerStub);
+}
+
+IMG_TEST_F(DX9RectangleLinestyleTest, 10pxRectangle3UserLine){
+    QueueItem items[] = {
+            QueueItemCreator::create<QueueItem::CLEAR>(),
+            QueueItemCreator::create<QueueItem::SETLINESTYLE>(USERBIT_LINE, 2, 10),
+            QueueItemCreator::create<QueueItem::COLOR>(0x0000FF),
+            QueueItemCreator::create<QueueItem::RECTANGLE>(6, 6, 40, 60),
+            QueueItemCreator::create<QueueItem::SETLINESTYLE>(USERBIT_LINE, 1, 10),
+            QueueItemCreator::create<QueueItem::COLOR>(0x00FF00),
+            QueueItemCreator::create<QueueItem::RECTANGLE>(6, 6, 40, 60),
+            QueueItemCreator::create<QueueItem::SETLINESTYLE>(USERBIT_LINE, 4, 10),
+            QueueItemCreator::create<QueueItem::COLOR>(0xFF0000),
+            QueueItemCreator::create<QueueItem::RECTANGLE>(6, 6, 40, 60)
+    };
+    _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
+    return afterTestSimple(win, &_readerStub);
+}
+
+IMG_TEST_F(DX9RectangleLinestyleTest, RectanglesDifferentStylesAndUser){
+    QueueItem items[] = {
+            QueueItemCreator::create<QueueItem::CLEAR>(),
+            QueueItemCreator::create<QueueItem::SETLINESTYLE>(USERBIT_LINE, 5, 10),
+            QueueItemCreator::create<QueueItem::COLOR>(0x0000FF),
+            QueueItemCreator::create<QueueItem::RECTANGLE>(6, 6, 40, 60),
+            QueueItemCreator::create<QueueItem::SETLINESTYLE>(SOLID_LINE, 0, 2),
+            QueueItemCreator::create<QueueItem::COLOR>(0x00FF00),
+            QueueItemCreator::create<QueueItem::RECTANGLE>(2, 10, 5, 20),
+            QueueItemCreator::create<QueueItem::SETLINESTYLE>(CENTER_LINE, 0, 1),
+            QueueItemCreator::create<QueueItem::RECTANGLE>(10, 15, 30, 100)
+    };
+    _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
+    return afterTestSimple(win, &_readerStub);
+}
