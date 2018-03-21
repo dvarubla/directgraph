@@ -32,6 +32,10 @@ namespace directgraph {
             return state[PropertyName::TEXTURE_STATE].val == TextureState::FILL_TEXTURE;
         }
 
+        bool StateHelper::lineTextureUsed(const ItemState &state) {
+            return state[PropertyName::TEXTURE_STATE].val == TextureState::LINE_TEXTURE;
+        }
+
         void StateHelper::resetState() {
             _curItemState = _propMan->getInitialItemState();
         }

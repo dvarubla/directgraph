@@ -34,6 +34,8 @@ namespace directgraph {
             void resetState();
 
             bool fillTextureUsed(const ItemState &state);
+
+            bool lineTextureUsed(const ItemState &state);
         };
     }
 }

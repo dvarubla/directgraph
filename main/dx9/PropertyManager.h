@@ -17,9 +17,9 @@ namespace directgraph {
             enum Name {
                 FILL_PATTERN = 0,
                 USER_FILL_PATTERN,
-                LINE_STYLE,
                 LINE_PATTERN,
                 FILL_COLOR,
+                DRAW_COLOR,
                 BG_COLOR,
                 SHADER_TYPE,
                 TEXTURE_STATE,

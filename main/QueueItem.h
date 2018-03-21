@@ -31,7 +31,7 @@ namespace directgraph{
             } setfillpattern;
             struct LineStyleItem{
                 uint8_t linestyle;
-                uint32_t pattern;
+                uint16_t pattern;
                 uint32_t thickness;
             } setlinestyle;
             struct BarItem{

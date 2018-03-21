@@ -29,10 +29,11 @@ namespace directgraph{
 
     typedef Vect<int_fast32_t> Coords;
     typedef Vect<uint_fast32_t> UCoords;
-
+    typedef Vect<float> FCoords;
 
     UCoords genUCoords(uint_fast32_t x, uint_fast32_t y);
     Coords genCoords(int_fast32_t x, int_fast32_t y);
+    FCoords genFCoords(float x, float y);
     Coords genCoords(const UCoords &ucrds);
 
     template <typename T>

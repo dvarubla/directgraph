@@ -9,32 +9,38 @@ namespace directgraph{
                 IDirect3DDevice9 *device, D3DFORMAT textureFormat, bool haveConstantSupport
         ): _device(device), _textureFormat(textureFormat),
            _haveConstantSupport(haveConstantSupport),
-           _userPattern(new uint8_t[FPATTERN_SIZE]), _haveUserPattern(false) {
+           _userFPattern(new uint8_t[FPATTERN_SIZE]), _haveUserFPattern(false), _haveUserLPattern(false) {
             for(uint_fast8_t i = 0; i < NUM_TOTAL_FPATTERNS; i++){
-                _textures[i].texture = NULL;
+                _fTextures[i].texture = NULL;
+            }
+            for(uint_fast8_t i = 0; i < NUM_TOTAL_LPATTERNS; i++){
+                _lTextures[i].texture = NULL;
             }
             if(haveConstantSupport) {
                 for(uint_fast8_t i = 0; i < NUM_STANDARD_FPATTERNS; i++) {
                     createFPattern(i, 0, 0, reinterpret_cast<const char *>(fillPatterns[i]), false, true, false);
                 }
+                for(uint_fast8_t i = 0; i < NUM_STANDARD_LPATTERNS; i++) {
+                    createLPattern(i, 0, linePatterns[i], false, false);
+                }
             }
         }
 
         template<uint_fast32_t DispMode>
-        void PatternTexturesHelper<DispMode>::setFillPattern(
+        uint_fast8_t PatternTexturesHelper<DispMode>::setFillPattern(
                 uint_fast8_t pattern, uint_fast32_t bgColor, uint_fast32_t fillColor,
                 bool needRecreate, bool useTransparency
         ) {
             bool setStandardPattern = true;
             if(pattern == USER_FILL){
-                if(!_haveUserPattern){
+                if(!_haveUserFPattern){
                     pattern = CLOSE_DOT_FILL;
                 } else {
                     setStandardPattern = false;
-                    pattern = USER_PATTERN_INDEX;
+                    pattern = USER_FPATTERN_INDEX;
                     createFPattern(
-                            USER_PATTERN_INDEX, bgColor, fillColor,
-                            reinterpret_cast<const char *>(_userPattern),
+                            USER_FPATTERN_INDEX, bgColor, fillColor,
+                            reinterpret_cast<const char *>(_userFPattern),
                             _needCreateUserPattern,
                             needRecreate,
                             useTransparency
@@ -54,25 +60,49 @@ namespace directgraph{
                     );
                 }
             }
-            setTexture(pattern, useTransparency);
+            return pattern;
+        }
+
+        template<uint_fast32_t DispMode>
+        uint_fast8_t PatternTexturesHelper<DispMode>::setLinePattern(
+                uint_fast8_t pattern, uint_fast32_t color, bool needRecreate) {
+            pattern -= FIRST_LPATTERN;
+            if(needRecreate) {
+                createLPattern(
+                        pattern, color,
+                        linePatterns[pattern],
+                        false,
+                        true
+                );
+            }
+            return pattern;
+        }
+
+        template<uint_fast32_t DispMode>
+        void PatternTexturesHelper<DispMode>::setLinePattern(uint_fast8_t pattern, bool useTransparency) {
+            pattern = setLinePattern(pattern, 0, false);
+            setLTexture(pattern, false, useTransparency);
         }
 
         template<uint_fast32_t DispMode>
         void PatternTexturesHelper<DispMode>::setFillPattern(uint_fast8_t pattern, bool useTransparency) {
-            setFillPattern(pattern, 0, 0, false, useTransparency);
+            pattern = setFillPattern(pattern, 0, 0, false, useTransparency);
+            setFTexture(pattern, false, false, useTransparency);
         }
 
         template<uint_fast32_t DispMode>
         void PatternTexturesHelper<DispMode>::setFillPatternBgColor(
                 uint_fast8_t pattern, uint_fast32_t bgColor, bool useTransparency
         ) {
-            setFillPattern(pattern, bgColor, bgColor, true, useTransparency);
+            pattern = setFillPattern(pattern, bgColor, bgColor, true, useTransparency);
+            setFTexture(pattern, true, false, useTransparency);
         }
 
         template<uint_fast32_t DispMode>
         void PatternTexturesHelper<DispMode>::setFillPatternBgFillColor(
                 uint_fast8_t pattern, uint_fast32_t bgColor, uint_fast32_t fillColor) {
-            setFillPattern(pattern, bgColor, fillColor, true, true);
+            pattern = setFillPattern(pattern, bgColor, fillColor, true, true);
+            setFTexture(pattern, true, true, true);
         }
 
         template<uint_fast32_t DispMode>
@@ -87,8 +117,8 @@ namespace directgraph{
 
         template<uint_fast32_t DispMode>
         void PatternTexturesHelper<DispMode>::setUserFillPattern(const char *pattern) {
-            std::copy(pattern, pattern + FPATTERN_SIZE, _userPattern);
-            _haveUserPattern = true;
+            std::copy(pattern, pattern + FPATTERN_SIZE, _userFPattern);
+            _haveUserFPattern = true;
             _needCreateUserPattern = true;
         }
 
@@ -109,22 +139,22 @@ namespace directgraph{
                 bool forceCreate, bool needRecreate, bool useTransparency
         ) {
             bool needCreate = false;
-            if(_textures[index].texture == NULL) {
+            if(_fTextures[index].texture == NULL) {
                 needCreate = true;
                 if (_device->CreateTexture(
                         FPATTERN_W, FPATTERN_H, 1, 0,
-                        _textureFormat, D3DPOOL_MANAGED, &_textures[index].texture, NULL
+                        _textureFormat, D3DPOOL_MANAGED, &_fTextures[index].texture, NULL
                 ) != D3D_OK) {
                     THROW_EXC_CODE(Exception, DX9_CANT_CREATE_TEXTURE, std::wstring(L"Can't create pattern texture"));
                 };
             }
             if(
                     needCreate || forceCreate ||
-                    (needRecreate && _textures[index].bgColor != bgColor) ||
-                    (needRecreate && useTransparency && _textures[index].fillColor != fillColor)
+                    (needRecreate && _fTextures[index].bgColor != bgColor) ||
+                    (needRecreate && useTransparency && _fTextures[index].fillColor != fillColor)
             ) {
                 D3DLOCKED_RECT outRect;
-                _textures[index].texture->LockRect(0, &outRect, NULL, 0);
+                _fTextures[index].texture->LockRect(0, &outRect, NULL, 0);
                 int rowPitch = outRect.Pitch;
                 TextureType * pixels = (TextureType *)outRect.pBits;
                 for (uint_fast8_t i = 0; i < FPATTERN_H; i++) {
@@ -138,29 +168,69 @@ namespace directgraph{
                     }
                     pixels += rowPitch / sizeof(TextureType);
                 }
-                _textures[index].texture->UnlockRect(0);
-                _textures[index].bgColor = bgColor;
-                _textures[index].fillColor = fillColor;
+                _fTextures[index].texture->UnlockRect(0);
+                _fTextures[index].bgColor = bgColor;
+                _fTextures[index].fillColor = fillColor;
             }
         }
 
         template<uint_fast32_t DispMode>
-        void PatternTexturesHelper<DispMode>::setTexture(uint_fast8_t index, bool useTransparency) {
+        void PatternTexturesHelper<DispMode>::createLPattern(
+                uint_fast8_t index, uint_fast32_t color, uint_fast16_t pattern,
+                bool forceCreate, bool needRecreate
+        ) {
+            bool needCreate = false;
+            if(_lTextures[index].texture == NULL) {
+                needCreate = true;
+                if (_device->CreateTexture(
+                        LPATTERN_W, LPATTERN_H, 1, 0,
+                        _textureFormat, D3DPOOL_MANAGED, &_lTextures[index].texture, NULL
+                ) != D3D_OK) {
+                    THROW_EXC_CODE(Exception, DX9_CANT_CREATE_TEXTURE, std::wstring(L"Can't create pattern texture"));
+                };
+            }
+            if(
+                    needCreate || forceCreate ||
+                    (needRecreate && _lTextures[index].color != color)
+            ) {
+                D3DLOCKED_RECT outRect;
+                _lTextures[index].texture->LockRect(0, &outRect, NULL, 0);
+                int rowPitch = outRect.Pitch;
+                TextureType * pixels = (TextureType *)outRect.pBits;
+                for (uint_fast8_t i = 0; i < LPATTERN_H; i++) {
+                    for (uint_fast8_t j = 0; j < LPATTERN_W; j++) {
+                        bool isTransparent = ((pattern & (1 << j)) == (1 << j));
+                        pixels[j] = FrmFinder::convert(
+                                (isTransparent) ? 0xFF000000 : color,
+                                isTransparent && !needRecreate
+                        );
+                    }
+                    pixels += rowPitch / sizeof(TextureType);
+                }
+                _lTextures[index].texture->UnlockRect(0);
+                _lTextures[index].color = color;
+            }
+        }
+
+        template<uint_fast32_t DispMode>
+        void PatternTexturesHelper<DispMode>::setFTexture(
+                uint_fast8_t index, bool useBgColor, bool useFgColor, bool useTransparency
+        ) {
             if(index >= NUM_TOTAL_FPATTERNS){
                 THROW_EXC_CODE(WException, UNREACHABLE_CODE, std::wstring(L"Bad pattern index"));
             }
-            _device->SetTexture(0, _textures[index].texture);
+            _device->SetTexture(0, _fTextures[index].texture);
             _device->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
             _device->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
             _device->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
-            if(useTransparency && !_haveConstantSupport){
+            if(useFgColor){
                 _device->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
                 _device->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
             } else {
-                if (_haveConstantSupport) {
-                    _device->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_CONSTANT);
-                } else {
+                if (useBgColor) {
                     _device->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+                } else if(_haveConstantSupport){
+                    _device->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_CONSTANT);
                 }
                 _device->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_BLENDTEXTUREALPHA);
                 if (_haveConstantSupport && useTransparency) {
@@ -169,18 +239,41 @@ namespace directgraph{
                     _device->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_BLENDTEXTUREALPHA);
                 }
             }
+        }
 
+        template<uint_fast32_t DispMode>
+        void PatternTexturesHelper<DispMode>::setLTexture(uint_fast8_t index, bool useColor, bool useTransparency) {
+            _device->SetTexture(0, _lTextures[index].texture);
+            _device->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
+            _device->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
+            if(useColor){
+                _device->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+                _device->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+            } else {
+                _device->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
+                _device->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+                if(useTransparency){
+                    _device->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE);
+                    _device->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_TEXTURE);
+                    _device->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SUBTRACT);
+                }
+            }
         }
 
         template<uint_fast32_t DispMode>
         PatternTexturesHelper<DispMode>::~PatternTexturesHelper() {
             _device->SetTexture(0, NULL);
             for(uint_fast8_t i = 0; i < NUM_TOTAL_FPATTERNS; i++){
-                if(_textures[i].texture != NULL){
-                    _textures[i].texture->Release();
+                if(_fTextures[i].texture != NULL){
+                    _fTextures[i].texture->Release();
                 }
             }
-            delete [] _userPattern;
+            delete [] _userFPattern;
+            for(uint_fast8_t i = 0; i < NUM_TOTAL_LPATTERNS; i++){
+                if(_lTextures[i].texture != NULL){
+                    _lTextures[i].texture->Release();
+                }
+            }
         }
 
         template class PatternTexturesHelper<ColorFormat::A8R8G8B8>;

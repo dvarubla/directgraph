@@ -8,6 +8,10 @@ namespace directgraph {
             Coords start;
             Coords end;
         };
+        struct TextureCoords{
+            FCoords start;
+            FCoords end;
+        };
     }
 }
 

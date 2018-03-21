@@ -7,11 +7,13 @@
 #include "patterns.h"
 #include "RectangleHelper.h"
 #include "SimplePrimHelper.h"
+#include "TextureCoordsCalc.h"
 
 namespace directgraph {
     namespace dx9 {
         class PrimitiveCreator {
         private:
+            TextureCoordsCalc _texCrdCalc;
             EllipseHelper _ellipseHelper;
             SimplePrimHelper _simplePrimHelper;
             RectangleHelper _rectangleHelper;
@@ -124,7 +126,8 @@ namespace directgraph {
                     const Coords &endCrds,
                     uint_fast32_t thickness,
                     float z,
-                    uint_fast32_t color
+                    uint_fast32_t color,
+                    bool textured
             );
 
             StartEndCoords getRectangleCoords(

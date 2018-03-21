@@ -160,46 +160,8 @@ namespace directgraph{
                 float z,
                 uint_fast32_t color
         ) {
-            TexturedColorVertex *vertices = static_cast<TexturedColorVertex*>(verticesVoid);
-            float textureRight = 1.0f * (endCrds.x - startCrds.x) / FPATTERN_SIZE;
-            float textureBottom = 1.0f * (endCrds.y - startCrds.y) / FPATTERN_SIZE;
-            *vertices = VertexCreator::create<TexturedColorVertex>(
-                    static_cast<float>(startCrds.x) - 0.5f,
-                    static_cast<float>(startCrds.y) - 0.5f,
-                    z, 1.0f,
-                    swap_color_transp(color),
-                    0.0f,
-                    0.0f
-            );
-            vertices++;
-            *vertices = VertexCreator::create<TexturedColorVertex>(
-                    static_cast<float>(endCrds.x) - 0.5f,
-                    static_cast<float>(startCrds.y) - 0.5f,
-                    z, 1.0f,
-                    swap_color_transp(color),
-                    textureRight,
-                    0.0f
-            );
-            vertices++;
-            *vertices = VertexCreator::create<TexturedColorVertex>(
-                    static_cast<float>(startCrds.x) - 0.5f,
-                    static_cast<float>(endCrds.y) - 0.5f,
-                    z, 1.0f,
-                    swap_color_transp(color),
-                    0.0f,
-                    textureBottom
-            );
-            vertices++;
-            *vertices = VertexCreator::create<TexturedColorVertex>(
-                    static_cast<float>(endCrds.x) - 0.5f,
-                    static_cast<float>(endCrds.y) - 0.5f,
-                    z, 1.0f,
-                    swap_color_transp(color),
-                    textureRight,
-                    textureBottom
-            );
-            vertices++;
-            return vertices;
+            TextureCoords barCoords = _texCrdCalc.calcBarCoords(startCrds, endCrds);
+            return _simplePrimHelper.genTexColorQuad(verticesVoid, startCrds, endCrds, z, color, barCoords, false);
         }
 
         void * PrimitiveCreator::genTexQuad(
@@ -233,7 +195,7 @@ namespace directgraph{
             return vertices;
         }
 
-        PrimitiveCreator::PrimitiveCreator() : _rectangleHelper(&_simplePrimHelper) {
+        PrimitiveCreator::PrimitiveCreator() : _rectangleHelper(&_simplePrimHelper, &_texCrdCalc) {
         }
 
         void * PrimitiveCreator::genEllipseDegenerate(
@@ -389,9 +351,10 @@ namespace directgraph{
                                        const Coords &startCrds, const Coords &endCrds,
                                        uint_fast32_t thickness,
                                        float z,
-                                       uint_fast32_t color
+                                       uint_fast32_t color,
+                                       bool textured
         ) {
-            return _rectangleHelper.genRectangle(verticesVoid, startCrds, endCrds, thickness, z, color);
+            return _rectangleHelper.genRectangle(verticesVoid, startCrds, endCrds, thickness, z, color, textured);
         }
 
         StartEndCoords PrimitiveCreator::getRectangleCoords(

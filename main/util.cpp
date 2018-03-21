@@ -31,4 +31,9 @@ namespace directgraph{
     bool color_has_alpha(uint_fast32_t color) {
         return (color & 0xFF000000) != 0;
     }
+
+    FCoords genFCoords(float x, float y) {
+        FCoords res = {x, y};
+        return res;
+    }
 }

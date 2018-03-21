@@ -8,8 +8,13 @@ namespace directgraph {
             TypeSize res;
             switch(item.type){
                 case QueueItem::RECTANGLE:
-                    res.sizeMult = sizeof(ColorVertex);
-                    res.drawDataType = DrawDataType::COLOR_VERTEX;
+                    if(_stateHelper->lineTextureUsed(state)) {
+                        res.sizeMult = sizeof(TexturedColorVertex);
+                        res.drawDataType = DrawDataType::TEXTURED_COLOR_VERTEX;
+                    } else {
+                        res.sizeMult = sizeof(ColorVertex);
+                        res.drawDataType = DrawDataType::COLOR_VERTEX;
+                    }
                     break;
                 case QueueItem::PIXEL_CONTAINER:
                     res.sizeMult = sizeof(TexturedVertex);
@@ -92,6 +97,14 @@ namespace directgraph {
                         break;
                     default:
                         break;
+                }
+            } else if(_stateHelper->lineTextureUsed(state)){
+                switch(item.type) {
+                    case QueueItem::RECTANGLE:
+                        curVertMem = _primCreator.genFillDegenerate(
+                                curVertMem, startCrds, endCrds, _curZ
+                        );
+                    break;
                 }
             } else {
                 switch(item.type){
@@ -199,7 +212,8 @@ namespace directgraph {
                                                           genCoords(item.data.rectangle.right, item.data.rectangle.bottom),
                                                           _stateHelper->getLastState().lineThickness,
                                                           _curZ,
-                                                          _stateHelper->getLastState().drawColor
+                                                          _stateHelper->getLastState().drawColor,
+                                                          _stateHelper->lineTextureUsed(state)
                     );
                     break;
                 case QueueItem::SINGLE_PIXEL:

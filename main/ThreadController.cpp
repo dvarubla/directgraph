@@ -68,7 +68,7 @@ namespace directgraph{
         writeItemHelper(item);
     }
 
-    void ThreadController::setlinestyle(uint_fast8_t linestyle, uint_fast32_t pattern, uint_fast32_t thickness) {
+    void ThreadController::setlinestyle(uint_fast8_t linestyle, uint_fast16_t pattern, uint_fast32_t thickness) {
         QueueItem item = QueueItemCreator::create<QueueItem::SETLINESTYLE>(linestyle, pattern, thickness);
         writeItemHelper(item);
     }

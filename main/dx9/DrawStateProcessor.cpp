@@ -23,16 +23,22 @@ namespace directgraph{
                                     color_has_alpha(_stateHelper->getLastState().fillColor) ||
                                     color_has_alpha(_stateHelper->getLastState().bgColor)
                             )
-                            ){
+                    ){
                         _propMan->setProp(state, PropertyName::FILL_COLOR, _stateHelper->getLastState().fillColor);
                     }
                 }
             }
         }
 
-        void DrawStateProcessor::useLineStyle(ItemState &state) {
+        void DrawStateProcessor::useLineStyle(ItemState &state, bool useDrawColorIfTransp) {
             if(_stateHelper->getLastState().lineStyle == NULL_LINE || _stateHelper->getLastState().lineStyle == SOLID_LINE){
                 _propMan->setProp(state, PropertyName::TEXTURE_STATE, TextureState::NO_TEXTURE);
+            } else {
+                _propMan->setProp(state, PropertyName::TEXTURE_STATE, TextureState::LINE_TEXTURE);
+                _propMan->setProp(state, PropertyName::LINE_PATTERN, _stateHelper->getLastState().lineStyle);
+                if(useDrawColorIfTransp && color_has_alpha(_stateHelper->getLastState().drawColor)){
+                    _propMan->setProp(state, PropertyName::DRAW_COLOR, _stateHelper->getLastState().drawColor);
+                }
             }
         }
 
@@ -66,7 +72,7 @@ namespace directgraph{
                 case QueueItem::RECTANGLE:
                     disablePixelTexture(state);
                     disableShader(state);
-                    useLineStyle(state);
+                    useLineStyle(state, _bufPrepParams->needRecreateTexture());
                     break;
                 case QueueItem::SINGLE_PIXEL:
                     disablePixelTexture(state);
@@ -128,7 +134,11 @@ namespace directgraph{
                 return true;
             }
             if(
-                item.type == QueueItem::RECTANGLE && color_has_alpha(_stateHelper->getLastState().drawColor)
+                item.type == QueueItem::RECTANGLE &&
+                        (
+                                color_has_alpha(_stateHelper->getLastState().drawColor) ||
+                                _stateHelper->lineTextureUsed(state)
+                        )
             ){
                 return true;
             }
@@ -189,16 +199,24 @@ namespace directgraph{
                     isFirst = true;
                 }
             } else {
-                if (stateDiff[PropertyName::FILL_PATTERN].isSet || stateDiff[PropertyName::USER_FILL_PATTERN].isSet) {
+                if(stateDiff[PropertyName::LINE_PATTERN].isSet){
                     drawOps.push_back(
-                            DrawOpCreator::create<DrawOpType::SET_FILL_PATTERN>(stateCur[PropertyName::FILL_PATTERN].val));
+                            DrawOpCreator::create<DrawOpType::SET_LINE_PATTERN>(stateCur[PropertyName::LINE_PATTERN].val));
                     isFirst = true;
-                }
-                if (stateDiff[PropertyName::BG_COLOR].isSet) {
-                    drawOps.push_back(DrawOpCreator::create<DrawOpType::SET_TEX_BG_COLOR>(
-                            stateDiff[PropertyName::BG_COLOR].val
-                    ));
-                    isFirst = true;
+                } else {
+                    if (stateDiff[PropertyName::FILL_PATTERN].isSet ||
+                        stateDiff[PropertyName::USER_FILL_PATTERN].isSet) {
+                        drawOps.push_back(
+                                DrawOpCreator::create<DrawOpType::SET_FILL_PATTERN>(
+                                        stateCur[PropertyName::FILL_PATTERN].val));
+                        isFirst = true;
+                    }
+                    if (stateDiff[PropertyName::BG_COLOR].isSet) {
+                        drawOps.push_back(DrawOpCreator::create<DrawOpType::SET_TEX_BG_COLOR>(
+                                stateDiff[PropertyName::BG_COLOR].val
+                        ));
+                        isFirst = true;
+                    }
                 }
             }
             if(stateDiff[PropertyName::PIXEL_CONTAINER].isSet){

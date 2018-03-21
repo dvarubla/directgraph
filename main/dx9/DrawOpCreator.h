@@ -17,7 +17,7 @@ namespace directgraph {
                 SET_TEX_BG_COLOR,
                 ITEMS,
                 SET_PIXEL_TEXTURE,
-                SET_LINE_STYLE
+                SET_LINE_PATTERN
             };
         }
         namespace DrawDataType {
@@ -43,6 +43,7 @@ namespace directgraph {
                     uint32_t fillColor;
                 } fillPatternTwoColors;
                 uint8_t fillPattern;
+                uint8_t linePattern;
                 uint32_t bgColor;
                 char *userFillPattern;
                 struct Items{
@@ -50,7 +51,6 @@ namespace directgraph {
                     uint32_t numItems;
                     DrawDataType::Type type;
                 } items;
-                uint8_t lineStyle;
                 IPixelContainer *pixelContainer;
             } data;
         };
