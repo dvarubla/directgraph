@@ -79,6 +79,23 @@ IMG_TEST_F(DX9TransparencyTest, TwoEllipsesHatchFill){
     return afterTestSimple(win, &_readerStub);
 }
 
+IMG_TEST_F(DX9TransparencyTest, EllipsesRectanglesLinestyle){
+    QueueItem items[] = {
+            QueueItemCreator::create<QueueItem::CLEAR>(),
+            QueueItemCreator::create<QueueItem::SETLINESTYLE>(NULL_LINE, 0, 0),
+            QueueItemCreator::create<QueueItem::SETFILLSTYLE>(SOLID_FILL, 0x0000FF),
+            QueueItemCreator::create<QueueItem::FILLELLIPSE>(WIDTH/2, HEIGHT/2, static_cast<uint32_t>(WIDTH/4), static_cast<uint32_t>(HEIGHT/4)),
+            QueueItemCreator::create<QueueItem::COLOR>(0x7FFF0000),
+            QueueItemCreator::create<QueueItem::SETLINESTYLE>(DOTTED_LINE, 0, 5),
+            QueueItemCreator::create<QueueItem::RECTANGLE>(WIDTH/2, HEIGHT/2, WIDTH, HEIGHT),
+            QueueItemCreator::create<QueueItem::SETLINESTYLE>(USERBIT_LINE, 0x1111, 5),
+            QueueItemCreator::create<QueueItem::COLOR>(0x7F00FF00),
+            QueueItemCreator::create<QueueItem::RECTANGLE>(WIDTH/2, HEIGHT/2, WIDTH, HEIGHT)
+    };
+    _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
+    return afterTestSimple(win, &_readerStub);
+}
+
 IMG_TEST_F(DX9TransparencyTest, MultipleItems){
     QueueItem items[] = {
             QueueItemCreator::create<QueueItem::CLEAR>(),
