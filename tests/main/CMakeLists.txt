@@ -6,7 +6,7 @@ function(main_test name src)
             ${name}
             PROPERTIES
             COMPILE_FLAGS "${COMMON_COMPILE_FLAGS}"
-            LINK_FLAGS "/ENTRY:wmainCRTStartup /subsystem:console ${EXTRA_LINK_FLAGS}"
+            LINK_FLAGS "${TESTS_LINK_FLAGS} ${EXTRA_LINK_FLAGS}"
     )
     target_link_libraries(${name} PUBLIC directgraph_common directgraph_testlib)
     add_test(NAME ${name} COMMAND $<TARGET_FILE:${name}> .)

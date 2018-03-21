@@ -10,7 +10,7 @@ namespace directgraph {
             A8,
             A4R4G4B4
         };
-    };
+    }
 
     template <uint_fast32_t DispMode>
     class FormatFinder{

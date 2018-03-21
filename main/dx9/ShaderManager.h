@@ -9,12 +9,12 @@ namespace directgraph {
             IDirect3DDevice9 *_device;
             IDirect3DVertexShader9 *_centerBarV11Shader;
             IDirect3DPixelShader9 *_ellipseP14Shader;
+            IDirect3DVertexDeclaration9 *_centerBarV11Decl;
             IDirect3DVertexShader9 *_texturedBarV11Shader;
             IDirect3DPixelShader9 *_texturedBarP14Shader;
+            IDirect3DVertexDeclaration9 *_texturedBarV11Decl;
             IDirect3DVertexShader9 *_texturedCenterBarV11Shader;
             IDirect3DPixelShader9 *_texturedEllipseP14Shader;
-            IDirect3DVertexDeclaration9 *_centerBarV11Decl;
-            IDirect3DVertexDeclaration9 *_texturedBarV11Decl;
             IDirect3DVertexDeclaration9 *_texturedCenterBarV11Decl;
             void createVertexShader(uint_fast32_t name, uint_fast32_t type, IDirect3DVertexShader9 *&shader);
             void createPixelShader(uint_fast32_t name, uint_fast32_t type, IDirect3DPixelShader9 *&shader);

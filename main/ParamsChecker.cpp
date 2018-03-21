@@ -22,7 +22,7 @@ namespace directgraph{
     }
 
     void ParamsChecker::checkFillStyle(uint_fast8_t fillstyle) {
-        if(fillstyle < EMPTY_FILL || fillstyle > USER_FILL){
+        if(fillstyle > USER_FILL){
             THROW_EXC_CODE(WException, WRONG_DRAW_PARAM, L"Wrong fillstyle param: " + to_wstring(fillstyle));
         }
     }

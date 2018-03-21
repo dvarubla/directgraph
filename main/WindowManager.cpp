@@ -3,6 +3,7 @@
 #include "WException.h"
 #include "WinManException.h"
 #include "error_handler.h"
+#include <limits>
 
 #undef max
 
@@ -193,4 +194,4 @@ namespace directgraph{
                 break;
         }
     }
-};
+}

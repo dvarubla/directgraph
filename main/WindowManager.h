@@ -25,7 +25,7 @@ namespace directgraph {
             IController *ctrl;
             IMyWindow *win;
             DirectgraphRendererType renderer;
-            void *winIndexMem;
+            DirectgraphWinIndex *winIndexMem;
             DWORD threadId;
         };
         typedef std::map<DirectgraphWinIndex, WindowData> WinManMap;

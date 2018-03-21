@@ -15,8 +15,8 @@
 namespace directgraph {
     namespace dx9 {
         Renderer::Renderer(Common *common, uint32_t width, uint32_t height, const CommonProps &props)
-                : _swapChain(NULL), _vertBuffer(NULL), _pixelTexture(NULL), _patTextHelper(NULL), _bufPreparer(NULL), 
-                  _shaderMan(NULL), _bufPrepParams(NULL), _props(props)
+                : _swapChain(NULL), _bufPreparer(NULL), _shaderMan(NULL), _bufPrepParams(NULL), _props(props),
+                  _vertBuffer(NULL), _pixelTexture(NULL),  _patTextHelper(NULL)
         {
             _width = width;
             _height = height;
@@ -217,7 +217,7 @@ namespace directgraph {
             for(DrawOpVector::iterator it = _bufPreparer->drawOpsBegin(); it != _bufPreparer->drawOpsEnd(); ++it){
                 switch(it->type){
                     case DrawOpType::ITEMS: {
-                        UINT stride;
+                        UINT stride = 0;
                         DWORD fvf;
                         bool setFVF;
                         setFVF = false;

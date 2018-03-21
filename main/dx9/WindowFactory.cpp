@@ -32,12 +32,6 @@ namespace directgraph{
 
         IMyWindow *
         WindowFactory::createWindow(const wchar_t *name, uint32_t width, uint32_t height, const CommonProps &props) {
-            if (width < 0 || height < 0) {
-                THROW_EXC_CODE(
-                        WException, CANT_CREATE_WINDOW,
-                        std::wstring(L"Window width and height must be positive")
-                );
-            }
             Renderer *renderer = NULL;
             MyWindow *window = NULL;
             try {

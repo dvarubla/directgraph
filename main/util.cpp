@@ -15,7 +15,7 @@ namespace directgraph{
         return res;
     }
 
-    Coords directgraph::genCoords(const UCoords &ucrds) {
+    Coords genCoords(const UCoords &ucrds) {
         Coords res = {static_cast<int_fast32_t>(ucrds.x), static_cast<int_fast32_t>(ucrds.y)};
         return res;
     }

@@ -185,13 +185,13 @@ namespace directgraph{
         delete [] _currentProps.userFillPattern;
     }
 
-    void ThreadController::init() {
-        clear();
-        CreateThread(NULL, 0, repaintFunc, (LPVOID)this, 0, &_drawThreadId);
-    }
-
     DWORD WINAPI repaintFunc(LPVOID ctrl){
         ((ThreadController*)ctrl)->repaintThread();
         return 0;
     }
-};
+
+    void ThreadController::init() {
+        clear();
+        CreateThread(NULL, 0, repaintFunc, (LPVOID)this, 0, &_drawThreadId);
+    }
+}

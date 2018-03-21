@@ -9,10 +9,10 @@ namespace directgraph {
     namespace dx9 {
         ShaderManager::ShaderManager(IFeatures *features, IDirect3DDevice9 *device):
                 _device(device),
-                _supportsEllipse(false), _supportsTexturedBar(false), _supportsTexturedEllipse(false),
                 _centerBarV11Shader(NULL), _ellipseP14Shader(NULL), _centerBarV11Decl(NULL),
                 _texturedBarV11Shader(NULL), _texturedBarP14Shader(NULL), _texturedBarV11Decl(NULL),
-                _texturedCenterBarV11Shader(NULL), _texturedEllipseP14Shader(NULL), _texturedCenterBarV11Decl(NULL)
+                _texturedCenterBarV11Shader(NULL), _texturedEllipseP14Shader(NULL), _texturedCenterBarV11Decl(NULL),
+                _supportsEllipse(false), _supportsTexturedBar(false), _supportsTexturedEllipse(false)
         {
             try {
                 IFeatures::ShaderVersion vertexVer = features->getVertexShaderVer();

@@ -91,7 +91,7 @@ WPARAM DIRECTGRAPH_EXPORT directgraph_mainloop() {
         } else if(msg.message == DIRECTGRAPH_WND_DESTROY){
             try {
                 directgraph_destroy_window(static_cast<DirectgraphWinIndex>(msg.lParam));
-                PostThreadMessage(static_cast<DWORD>(msg.wParam), DIRECTGRAPH_REPLY, NULL, false);
+                PostThreadMessage(static_cast<DWORD>(msg.wParam), DIRECTGRAPH_REPLY, 0, false);
             } catch(const std::exception &){
                 std::exception_ptr *ptrMem = new std::exception_ptr;
                 *ptrMem = std::current_exception();

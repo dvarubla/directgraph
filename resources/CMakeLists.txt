@@ -48,16 +48,16 @@ get_filename_component(RC_FILE_PATH ${SHADER_RC} ABSOLUTE)
 get_filename_component(RESOURCES_PATH "." ABSOLUTE)
 get_filename_component(SHADER_RC_NAME_WE ${SHADER_RC} NAME_WE)
 
-set(OUTPUT_RES "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${SHADER_RC_NAME_WE}.res" CACHE INTERNAL "")
+set(OUTPUT_RES "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${SHADER_RC_NAME_WE}.o" CACHE INTERNAL "")
+
+rc_compiler_cmd(RC_COMPILER_CMD)
 
 add_custom_command(
         OUTPUT "${OUTPUT_RES}"
         WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}"
         VERBATIM
         COMMAND
-            ${CMAKE_RC_COMPILER}
-            /i${RESOURCES_PATH} /i${CMAKE_BINARY_DIR}/${PROJECT_NAME}
-            /fo${OUTPUT_RES} "${RC_FILE_PATH}"
+        ${RC_COMPILER_CMD}
         DEPENDS
         ${compiled_shaders} ${SHADER_RC} ${INCLUDE_FILE}
 )

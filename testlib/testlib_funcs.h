@@ -10,14 +10,19 @@
 #define IMAGE_TEST_NAME(test_fixture, test_name)\
     test_fixture##_##test_name##_image_test
 
+#define IMAGE_TEST_NAME_WRAP_CLASS(test_fixture, test_name)\
+    test_fixture##_##test_name##_image_test_wrap
+
 #define IMAGE_TEST_NAME_WRAP(test_fixture, test_name)\
     test_fixture##_##test_name##_image_test_wrap_obj
 
 #define IMAGE_TEST_VARNAME(test_fixture, test_name)\
     test_fixture##_##test_name##_var
 
+#define LSTR(x) L ## x
+
 #define IMAGE_TEST_FNAME(test_fixture, test_name)\
-    L#test_fixture L"_" L#test_name
+    LSTR(#test_fixture) L"_" LSTR(#test_name)
 
 #define IMG_TEST_F(test_fixture, test_name)\
     class IMAGE_TEST_NAME(test_fixture, test_name): public test_fixture{\
@@ -25,7 +30,7 @@
         BitmapWrap* imageTestRun();\
         virtual ~IMAGE_TEST_NAME(test_fixture, test_name)(){}\
     };\
-    class IMAGE_TEST_NAME(test_fixture, test_name)_wrap: public ImageTestWrap{\
+    class IMAGE_TEST_NAME_WRAP_CLASS(test_fixture, test_name): public ImageTestWrap{\
     public:\
         ImageTest* getObj(){\
             return new IMAGE_TEST_NAME(test_fixture, test_name);\

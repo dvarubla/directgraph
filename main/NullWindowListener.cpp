@@ -1,7 +1,7 @@
 #include "NullWindowListener.h"
 
 namespace directgraph{
-    void NullWindowListener::onClose(void *param) {
+    void NullWindowListener::onClose(void *) {
 
     }
 }

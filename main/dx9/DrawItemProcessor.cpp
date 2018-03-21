@@ -105,6 +105,8 @@ namespace directgraph {
                                 curVertMem, startCrds, endCrds, _curZ
                         );
                     break;
+                    default:
+                        break;
                 }
             } else {
                 switch(item.type){
@@ -143,6 +145,8 @@ namespace directgraph {
                                 curVertMem, startCrds, endCrds, _curZ
                         );
                         break;
+                    default:
+                        break;
                 }
             }
         }
@@ -172,8 +176,8 @@ namespace directgraph {
                     break;
                 case QueueItem::FILLELLIPSE:
                     if(
-                            _stateHelper->fillTextureUsed(state) && _bufPrepParams->supportsTexturedEllipse() ||
-                            !_stateHelper->fillTextureUsed(state) && _bufPrepParams->supportsEllipse()
+                            (_stateHelper->fillTextureUsed(state) && _bufPrepParams->supportsTexturedEllipse()) ||
+                            (!_stateHelper->fillTextureUsed(state) && _bufPrepParams->supportsEllipse())
                             ){
                         crds.start = genCoords(
                                 item.data.fillellipse.x - item.data.fillellipse.xradius,
@@ -196,6 +200,8 @@ namespace directgraph {
                             genCoords(item.data.rectangle.right, item.data.rectangle.bottom),
                             _stateHelper->getLastState().lineThickness
                     );
+                default:
+                    break;
             }
             return crds;
         }

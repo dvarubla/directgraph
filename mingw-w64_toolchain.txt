@@ -1,0 +1,31 @@
+set(COMMON_COMPILE_FLAGS "-W -Wall -Wextra -pedantic -Werror -municode")
+set(EXTRA_LINK_FLAGS "-mwindows -municode -static")
+
+set(DEBUG_COMPILE_FLAGS "")
+set(RELEASE_COMPILE_FLAGS "-flto -O3")
+set(DEBUG_LINK_FLAGS "")
+set(RELEASE_LINK_FLAGS "-s -flto")
+
+set(IA32COMPAT_COMPILE_FLAGS "")
+set(XPCOMPAT_COMPILE_FLAGS "")
+set(XP64COMPAT_COMPILE_FLAGS "")
+
+set(COMMON_DEFS "")
+
+set(TESTS_LINK_FLAGS "-mconsole")
+
+macro(start_hook)
+    SET(CMAKE_AR "gcc-ar")
+    SET(CMAKE_RANLIB "gcc-ranlib")
+    SET(CMAKE_CXX_ARCHIVE_CREATE "<CMAKE_AR> qcs <TARGET> <LINK_FLAGS> <OBJECTS>")
+    SET(CMAKE_CXX_ARCHIVE_FINISH "<CMAKE_RANLIB> <TARGET>")
+endmacro()
+
+macro(rc_compiler_cmd var)
+      set(${var} "${CMAKE_RC_COMPILER}"
+             -I${RESOURCES_PATH} -I${CMAKE_BINARY_DIR}/${PROJECT_NAME}
+             --preprocessor="${CMAKE_CXX_COMPILER}"
+             --preprocessor-arg=-E --preprocessor-arg=-xc-header
+            "${RC_FILE_PATH}" ${OUTPUT_RES}
+      )
+endmacro()

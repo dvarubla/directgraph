@@ -62,8 +62,8 @@ namespace directgraph{
                 swap = true;
             }
             uint_fast32_t numVertices = getNumEllipseVertices(radiusCrds.x, radiusCrds.y);
-            ColorVertex *memoryCol;
-            TexturedColorVertex *memoryTextured;
+            ColorVertex *memoryCol = NULL;
+            TexturedColorVertex *memoryTextured = NULL;
             if(textured){
                 memoryTextured = static_cast<TexturedColorVertex *>(memoryVoid);
             } else {
