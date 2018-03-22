@@ -13,6 +13,9 @@ set(SHADER_SRCS
         shaders/vs_1_1/textured_bar.hlsl
         shaders/vs_1_1/textured_center_bar.hlsl
 )
+
+set(COMMON_SRCS shaders/common/common_vs.hlsl shaders/common/common_ps.hlsl)
+
 set(INCLUDE_FILE common_res.h)
 set(SHADER_RC shaders/shaders.rc)
 
@@ -38,8 +41,8 @@ foreach(shader_src ${SHADER_SRCS})
             WORKING_DIRECTORY "${output_dir}"
             VERBATIM
             COMMAND
-            ${FXC_BIN} /LD /T${shader_profile} /Fo${output} ${shader_path}
-            DEPENDS "${shader_src}"
+            ${FXC_BIN} /I${CMAKE_CURRENT_SOURCE_DIR}/shaders/common /LD /T${shader_profile} /Fo${output} ${shader_path}
+            DEPENDS "${shader_src}" "${COMMON_SRCS}"
     )
     list(APPEND compiled_shaders ${output})
 endforeach()

@@ -1,3 +1,5 @@
+#include <common_ps.hlsl>
+
 sampler texSampler;
 
 void main(
@@ -6,5 +8,5 @@ void main(
         in float4 colorIn1 : COLOR1,
         out float4 colorOut : COLOR
 ){
-    colorOut = lerp(colorIn0, colorIn1, tex2D(texSampler, tex0).a);
+    colorOut = sampleFillPattern(colorIn0, colorIn1, texSampler, tex0);
 }

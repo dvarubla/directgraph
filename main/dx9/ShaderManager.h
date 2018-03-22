@@ -40,6 +40,7 @@ namespace directgraph {
             bool supportsEllipse();
             bool supportsTexturedBar();
             bool supportsTexturedEllipse();
+            bool supportsShaders();
             void setEllipse();
             void setTexturedBar();
             void setTexturedEllipse();

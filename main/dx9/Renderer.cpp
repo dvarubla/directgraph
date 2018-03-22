@@ -172,6 +172,14 @@ namespace directgraph {
             _common->lock();
             _device->SetRenderTarget(0, _backBuffer);
             _device->SetDepthStencilSurface(_depthStencil);
+            if(_shaderMan->supportsShaders()) {
+                float maxParams[REGISTER_SIZE] = {
+                        static_cast<float>(_width),
+                        static_cast<float>(_height),
+                        0, 0
+                };
+                _device->SetVertexShaderConstantF(0, maxParams, 1);
+            }
             _device->BeginScene();
             if(_bufPreparer->isFull()){
                 _bufPreparer->genOpsAndMemBlocks();
@@ -247,7 +255,7 @@ namespace directgraph {
                                 setFVF = false;
                                 break;
                             case DrawDataType::TEXTURED_ELLIPSE_VERTEX:
-                                stride = sizeof(TexturedColor2Vertex);
+                                stride = sizeof(Color2Vertex);
                                 setFVF = false;
                                 break;
                         }

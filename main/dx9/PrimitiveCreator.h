@@ -17,8 +17,6 @@ namespace directgraph {
             EllipseHelper _ellipseHelper;
             SimplePrimHelper _simplePrimHelper;
             RectangleHelper _rectangleHelper;
-            float coordToPositionX(int_fast32_t coord, uint_fast32_t width);
-            float coordToPositionY(int_fast32_t coord, uint_fast32_t height);
         public:
             PrimitiveCreator();
 
@@ -56,7 +54,6 @@ namespace directgraph {
                     void *verticesVoid,
                     const Coords &startCrds,
                     const Coords &endCrds,
-                    const UCoords &maxCrds,
                     float z
             );
 
@@ -65,8 +62,7 @@ namespace directgraph {
                     const Coords &startCrds,
                     const Coords &endCrds,
                     float z,
-                    uint_fast32_t color1, uint_fast32_t color2,
-                    const UCoords &maxCrds
+                    uint_fast32_t color1, uint_fast32_t color2
             );
 
             void * genTexQuad(
@@ -81,7 +77,6 @@ namespace directgraph {
                     void *verticesVoid,
                     const Coords &startCrds,
                     const Coords &endCrds,
-                    const UCoords &maxCrds,
                     float z
             );
 
@@ -89,22 +84,19 @@ namespace directgraph {
                     void *verticesVoid,
                     const Coords &centerCrds,
                     const UCoords &radiusCrds,
-                    const UCoords &maxCrds,
                     float z,
                     uint_fast32_t color
             );
 
             void * genTexEllipseDegenerate(
                     void *verticesVoid, const Coords &startCrds, const Coords &endCrds,
-                    float z,
-                    const UCoords &maxCrds
+                    float z
             );
 
             void * genTexEllipseQuad(
                     void *verticesVoid, const Coords &centerCrds, const UCoords &radiusCrds,
                     float z,
-                    uint_fast32_t color1, uint_fast32_t color2,
-                    const UCoords &maxCrds
+                    uint_fast32_t color1, uint_fast32_t color2
             );
 
             void * genEllipse(

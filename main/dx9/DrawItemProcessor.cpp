@@ -41,7 +41,7 @@ namespace directgraph {
                 case QueueItem::FILLELLIPSE:
                     if (_stateHelper->fillTextureUsed(state)) {
                         if(_bufPrepParams->supportsTexturedEllipse()){
-                            res.sizeMult = sizeof(TexturedColor2Vertex);
+                            res.sizeMult = sizeof(Color2Vertex);
                             res.drawDataType = DrawDataType::TEXTURED_ELLIPSE_VERTEX;
                         } else {
                             res.sizeMult = sizeof(TexturedColorVertex);
@@ -72,7 +72,6 @@ namespace directgraph {
                         if(_bufPrepParams->supportsTexturedBar()){
                             curVertMem = _primCreator.genFillCol2Degenerate(
                                     curVertMem, startCrds, endCrds,
-                                    _bufPrepParams->getMaxCoords(),
                                     _curZ
                             );
                         } else {
@@ -85,8 +84,7 @@ namespace directgraph {
                     case QueueItem::FILLELLIPSE: {
                         if(_bufPrepParams->supportsTexturedEllipse()){
                             curVertMem = _primCreator.genTexEllipseDegenerate(
-                                    curVertMem, startCrds, endCrds, _curZ,
-                                    _bufPrepParams->getMaxCoords()
+                                    curVertMem, startCrds, endCrds, _curZ
                             );
                         } else {
                             curVertMem = _primCreator.genFillDegenerate(
@@ -114,7 +112,6 @@ namespace directgraph {
                         if (_bufPrepParams->supportsEllipse()) {
                             curVertMem = _primCreator.genEllipseDegenerate(
                                     curVertMem, startCrds, endCrds,
-                                    _bufPrepParams->getMaxCoords(),
                                     _curZ
                             );
                         } else {
@@ -249,8 +246,7 @@ namespace directgraph {
                                                                         ),
                                                                         _curZ,
                                                                         _stateHelper->getLastState().fillColor,
-                                                                        _stateHelper->getLastState().bgColor,
-                                                                        _bufPrepParams->getMaxCoords()
+                                                                        _stateHelper->getLastState().bgColor
                             );
                         } else {
                             curVertMem = _primCreator.genEllipse(curVertMem,
@@ -275,7 +271,6 @@ namespace directgraph {
                                                                              item.data.fillellipse.xradius,
                                                                              item.data.fillellipse.yradius
                                                                      ),
-                                                                     _bufPrepParams->getMaxCoords(),
                                                                      _curZ,
                                                                      _stateHelper->getFillColor()
                             );
@@ -304,8 +299,7 @@ namespace directgraph {
                                                                       genCoords(item.data.bar.right, item.data.bar.bottom),
                                                                       _curZ,
                                                                       _stateHelper->getLastState().fillColor,
-                                                                      _stateHelper->getLastState().bgColor,
-                                                                      _bufPrepParams->getMaxCoords()
+                                                                      _stateHelper->getLastState().bgColor
 
                             );
                         } else {

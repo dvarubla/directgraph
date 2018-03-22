@@ -31,13 +31,6 @@ namespace directgraph {
             DWORD color;
             float tu, tv;
         };
-        
-        struct TexturedColor2Vertex {
-            float x, y, z;
-            DWORD color1;
-            DWORD color2;
-            float tu, tv, t3, t4;
-        };
 
         class VertexCreator {
         public:
@@ -61,9 +54,6 @@ namespace directgraph {
 
             template<typename T>
             static T create(float x, float y, float z, float rhw, DWORD color, float tu, float tv);
-
-            template<typename T>
-            static T create(float x, float y, float z, DWORD color1, DWORD color2, float tu, float tv, float t3, float t4);
         };
     }
 }

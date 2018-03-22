@@ -68,17 +68,12 @@ namespace directgraph{
 
         void * PrimitiveCreator::genFillCol2Degenerate(void *verticesVoid, const Coords &startCrds,
                                                 const Coords &endCrds,
-                                                const UCoords &maxCrds,
                                                 float z
         ) {
-            float startXTrans = coordToPositionX(startCrds.x, maxCrds.x);
-            float endXTrans = coordToPositionX(endCrds.x, maxCrds.x);
-            float startYTrans = coordToPositionY(startCrds.y, maxCrds.y);
-            float endYTrans = coordToPositionY(endCrds.y, maxCrds.y);
             Color2Vertex *vertices = static_cast<Color2Vertex*>(verticesVoid);
             (*vertices) = VertexCreator::create<Color2Vertex>(
-                    startXTrans,
-                    startYTrans,
+                    static_cast<float>(startCrds.x),
+                    static_cast<float>(startCrds.y),
                     z,
                     D3DCOLOR_ARGB(0, 0, 0, 0),
                     D3DCOLOR_ARGB(0, 0, 0, 0),
@@ -86,8 +81,8 @@ namespace directgraph{
             );
             vertices++;
             *vertices = VertexCreator::create<Color2Vertex>(
-                    endXTrans,
-                    endYTrans,
+                    static_cast<float>(endCrds.x),
+                    static_cast<float>(endCrds.y),
                     z,
                     D3DCOLOR_ARGB(0, 0, 0, 0),
                     D3DCOLOR_ARGB(0, 0, 0, 0),
@@ -100,19 +95,14 @@ namespace directgraph{
         void * PrimitiveCreator::genFillCol2Quad(void *verticesVoid,
                                           const Coords &startCrds, const Coords &endCrds,
                                           float z,
-                                          uint_fast32_t color1, uint_fast32_t color2,
-                                          const UCoords &maxCrds
+                                          uint_fast32_t color1, uint_fast32_t color2
         ) {
             Color2Vertex *vertices = static_cast<Color2Vertex*>(verticesVoid);
             float textureRight = 1.0f * (endCrds.x - startCrds.x) / FPATTERN_SIZE;
             float textureBottom = 1.0f * (endCrds.y - startCrds.y) / FPATTERN_SIZE;
-            float startXTrans = coordToPositionX(startCrds.x, maxCrds.x);
-            float endXTrans = coordToPositionX(endCrds.x, maxCrds.x);
-            float startYTrans = coordToPositionY(startCrds.y, maxCrds.y);
-            float endYTrans = coordToPositionY(endCrds.y, maxCrds.y);
             *vertices = VertexCreator::create<Color2Vertex>(
-                    startXTrans,
-                    startYTrans,
+                    static_cast<float>(startCrds.x),
+                    static_cast<float>(startCrds.y),
                     z,
                     static_cast<DWORD>(swap_color_transp(color1)),
                     static_cast<DWORD>(swap_color_transp(color2)),
@@ -121,8 +111,8 @@ namespace directgraph{
             );
             vertices++;
             *vertices = VertexCreator::create<Color2Vertex>(
-                    endXTrans,
-                    startYTrans,
+                    static_cast<float>(endCrds.x),
+                    static_cast<float>(startCrds.y),
                     z,
                     static_cast<DWORD>(swap_color_transp(color1)),
                     static_cast<DWORD>(swap_color_transp(color2)),
@@ -131,8 +121,8 @@ namespace directgraph{
             );
             vertices++;
             *vertices = VertexCreator::create<Color2Vertex>(
-                    startXTrans,
-                    endYTrans,
+                    static_cast<float>(startCrds.x),
+                    static_cast<float>(endCrds.y),
                     z,
                     static_cast<DWORD>(swap_color_transp(color1)),
                     static_cast<DWORD>(swap_color_transp(color2)),
@@ -141,8 +131,8 @@ namespace directgraph{
             );
             vertices++;
             *vertices = VertexCreator::create<Color2Vertex>(
-                    endXTrans,
-                    endYTrans,
+                    static_cast<float>(endCrds.x),
+                    static_cast<float>(endCrds.y),
                     z,
                     static_cast<DWORD>(swap_color_transp(color1)),
                     static_cast<DWORD>(swap_color_transp(color2)),
@@ -201,21 +191,20 @@ namespace directgraph{
         void * PrimitiveCreator::genEllipseDegenerate(
                 void *verticesVoid, const Coords &startCrds,
                 const Coords &endCrds,
-                const UCoords &maxCrds,
                 float z
         ) {
             TexturedColorVertexNoRHW *vertices = static_cast<TexturedColorVertexNoRHW*>(verticesVoid);
             (*vertices) = VertexCreator::create<TexturedColorVertexNoRHW>(
-                    coordToPositionX(startCrds.x, maxCrds.x),
-                    coordToPositionY(startCrds.y, maxCrds.y),
+                    static_cast<float>(startCrds.x),
+                    static_cast<float>(startCrds.y),
                     z,
                     D3DCOLOR_ARGB(0, 0, 0, 0),
                     0.0f, 0.0f
             );
             vertices++;
             *vertices = VertexCreator::create<TexturedColorVertexNoRHW>(
-                    coordToPositionX(endCrds.x, maxCrds.x),
-                    coordToPositionY(endCrds.y, maxCrds.y),
+                    static_cast<float>(endCrds.x),
+                    static_cast<float>(endCrds.y),
                     z,
                     D3DCOLOR_ARGB(0, 0, 0, 0),
                     0.0f, 0.0f
@@ -228,29 +217,28 @@ namespace directgraph{
                 void *verticesVoid,
                 const Coords &centerCrds,
                 const UCoords &radiusCrds,
-                const UCoords &maxCrds,
                 float z,
                 uint_fast32_t color
         ) {
-            float centerXTrans = coordToPositionX(centerCrds.x, maxCrds.x);
-            float radiusXTrans = static_cast<float>(1.0 * radiusCrds.x / maxCrds.x);
-            float centerYTrans = coordToPositionY(centerCrds.y, maxCrds.y);
-            float radiusYTrans = static_cast<float>(1.0 * radiusCrds.y / maxCrds.y);
             TexturedColorVertexNoRHW *vertices = static_cast<TexturedColorVertexNoRHW*>(verticesVoid);
             *vertices = VertexCreator::create<TexturedColorVertexNoRHW>(
-                    centerXTrans, centerYTrans, z, static_cast<DWORD>(swap_color_transp(color)), -radiusXTrans, -radiusYTrans
+                    static_cast<float>(centerCrds.x), static_cast<float>(centerCrds.y), z, static_cast<DWORD>(swap_color_transp(color)),
+                    -static_cast<float>(radiusCrds.x), -static_cast<float>(radiusCrds.y)
             );
             vertices++;
             *vertices = VertexCreator::create<TexturedColorVertexNoRHW>(
-                    centerXTrans, centerYTrans, z, static_cast<DWORD>(swap_color_transp(color)), radiusXTrans, -radiusYTrans
+                    static_cast<float>(centerCrds.x), static_cast<float>(centerCrds.y), z, static_cast<DWORD>(swap_color_transp(color)),
+                    static_cast<float>(radiusCrds.x), -static_cast<float>(radiusCrds.y)
             );
             vertices++;
             *vertices = VertexCreator::create<TexturedColorVertexNoRHW>(
-                    centerXTrans, centerYTrans, z, static_cast<DWORD>(swap_color_transp(color)), -radiusXTrans, radiusYTrans
+                    static_cast<float>(centerCrds.x), static_cast<float>(centerCrds.y), z, static_cast<DWORD>(swap_color_transp(color)),
+                    -static_cast<float>(radiusCrds.x), static_cast<float>(radiusCrds.y)
             );
             vertices++;
             *vertices = VertexCreator::create<TexturedColorVertexNoRHW>(
-                    centerXTrans, centerYTrans, z, static_cast<DWORD>(swap_color_transp(color)), radiusXTrans, radiusYTrans
+                    static_cast<float>(centerCrds.x), static_cast<float>(centerCrds.y), z, static_cast<DWORD>(swap_color_transp(color)),
+                    static_cast<float>(radiusCrds.x), static_cast<float>(radiusCrds.y)
             );
             vertices++;
             return vertices;
@@ -258,25 +246,24 @@ namespace directgraph{
 
         void * PrimitiveCreator::genTexEllipseDegenerate(void *verticesVoid, 
                                                   const Coords &startCrds, const Coords &endCrds,
-                                                  float z,
-                                                  const UCoords &maxCrds) {
-            TexturedColor2Vertex *vertices = static_cast<TexturedColor2Vertex*>(verticesVoid);
-            (*vertices) = VertexCreator::create<TexturedColor2Vertex>(
-                    coordToPositionX(startCrds.x, maxCrds.x),
-                    coordToPositionY(startCrds.y, maxCrds.y),
+                                                  float z) {
+            Color2Vertex *vertices = static_cast<Color2Vertex*>(verticesVoid);
+            (*vertices) = VertexCreator::create<Color2Vertex>(
+                    static_cast<float>(startCrds.x),
+                    static_cast<float>(startCrds.y),
                     z,
                     D3DCOLOR_ARGB(0, 0, 0, 0),
                     D3DCOLOR_ARGB(0, 0, 0, 0),
-                    0.0f, 0.0f, 0.0f, 0.0f
+                    0.0f, 0.0f
             );
             vertices++;
-            *vertices = VertexCreator::create<TexturedColor2Vertex>(
-                    coordToPositionX(endCrds.x, maxCrds.x),
-                    coordToPositionY(endCrds.y, maxCrds.y),
+            *vertices = VertexCreator::create<Color2Vertex>(
+                    static_cast<float>(endCrds.x),
+                    static_cast<float>(endCrds.y),
                     z,
                     D3DCOLOR_ARGB(0, 0, 0, 0),
                     D3DCOLOR_ARGB(0, 0, 0, 0),
-                    0.0f, 0.0f, 0.0f, 0.0f
+                    0.0f, 0.0f
             );
             vertices++;
             return vertices;
@@ -285,41 +272,30 @@ namespace directgraph{
         void * PrimitiveCreator::genTexEllipseQuad(void *verticesVoid, 
                                             const Coords &centerCrds, const UCoords &radiusCrds,
                                             float z,
-                                            uint_fast32_t color1, uint_fast32_t color2,
-                                            const UCoords &maxCrds) {
-            float centerXTrans = coordToPositionX(centerCrds.x, maxCrds.x);
-            float radiusXTrans = static_cast<float>(1.0 * radiusCrds.x / maxCrds.x);
-            float centerYTrans = coordToPositionY(centerCrds.y, maxCrds.y);
-            float radiusYTrans = static_cast<float>(1.0 * radiusCrds.y / maxCrds.y);
-            float textureRight = (2.0f * radiusCrds.x) / FPATTERN_SIZE;
-            float textureBottom = (2.0f * radiusCrds.y) / FPATTERN_SIZE;
-            TexturedColor2Vertex *vertices = static_cast<TexturedColor2Vertex*>(verticesVoid);
-            *vertices = VertexCreator::create<TexturedColor2Vertex>(
-                    centerXTrans, centerYTrans, z,
-                    swap_color_transp(color1), swap_color_transp(color2),
-                    0.0f, 0.0f,
-                    -radiusXTrans, -radiusYTrans
+                                            uint_fast32_t color1, uint_fast32_t color2) {
+            Color2Vertex *vertices = static_cast<Color2Vertex*>(verticesVoid);
+            *vertices = VertexCreator::create<Color2Vertex>(
+                    static_cast<float>(centerCrds.x), static_cast<float>(centerCrds.y), z,
+                    static_cast<DWORD>(swap_color_transp(color1)), static_cast<DWORD>(swap_color_transp(color2)),
+                    -static_cast<float>(radiusCrds.x), -static_cast<float>(radiusCrds.y)
             );
             vertices++;
-            *vertices = VertexCreator::create<TexturedColor2Vertex>(
-                    centerXTrans, centerYTrans, z,
-                    swap_color_transp(color1), swap_color_transp(color2),
-                    textureRight, 0.0f,
-                    radiusXTrans, -radiusYTrans
+            *vertices = VertexCreator::create<Color2Vertex>(
+                    static_cast<float>(centerCrds.x), static_cast<float>(centerCrds.y), z,
+                    static_cast<DWORD>(swap_color_transp(color1)), static_cast<DWORD>(swap_color_transp(color2)),
+                    static_cast<float>(radiusCrds.x), -static_cast<float>(radiusCrds.y)
             );
             vertices++;
-            *vertices = VertexCreator::create<TexturedColor2Vertex>(
-                    centerXTrans, centerYTrans, z,
-                    swap_color_transp(color1), swap_color_transp(color2),
-                    0.0f, textureBottom,
-                    -radiusXTrans, radiusYTrans
+            *vertices = VertexCreator::create<Color2Vertex>(
+                    static_cast<float>(centerCrds.x), static_cast<float>(centerCrds.y), z,
+                    static_cast<DWORD>(swap_color_transp(color1)), static_cast<DWORD>(swap_color_transp(color2)),
+                    -static_cast<float>(radiusCrds.x), static_cast<float>(radiusCrds.y)
             );
             vertices++;
-            *vertices = VertexCreator::create<TexturedColor2Vertex>(
-                    centerXTrans, centerYTrans, z,
-                    swap_color_transp(color1), swap_color_transp(color2),
-                    textureRight, textureBottom,
-                    radiusXTrans, radiusYTrans
+            *vertices = VertexCreator::create<Color2Vertex>(
+                    static_cast<float>(centerCrds.x), static_cast<float>(centerCrds.y), z,
+                    static_cast<DWORD>(swap_color_transp(color1)), static_cast<DWORD>(swap_color_transp(color2)),
+                    static_cast<float>(radiusCrds.x), static_cast<float>(radiusCrds.y)
             );
             vertices++;
             return vertices;
@@ -336,14 +312,6 @@ namespace directgraph{
 
         uint_fast32_t PrimitiveCreator::getNumEllipseVertices(const UCoords &radiusCrds) {
             return _ellipseHelper.getNumEllipseVertices(radiusCrds.x, radiusCrds.y);
-        }
-
-        float PrimitiveCreator::coordToPositionX(int_fast32_t coord, uint_fast32_t width) {
-            return static_cast<float>(2.0 * (coord - 0.5) / width - 1);
-        }
-
-        float PrimitiveCreator::coordToPositionY(int_fast32_t coord, uint_fast32_t height) {
-            return static_cast<float>(1 - 2.0 * (coord - 0.5) / height);
         }
 
         void *

@@ -114,6 +114,10 @@ namespace directgraph {
             return _supportsTexturedEllipse;
         }
 
+        bool ShaderManager::supportsShaders() {
+            return _supportsEllipse | _supportsTexturedBar | _supportsTexturedEllipse;
+        }
+
         void ShaderManager::setTexturedBar() {
             _device->SetVertexDeclaration(_texturedBarV11Decl);
             _device->SetVertexShader(_texturedBarV11Shader);
