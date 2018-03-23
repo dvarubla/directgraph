@@ -331,5 +331,61 @@ namespace directgraph{
         ) {
             return _rectangleHelper.getCoords(startCrds, endCrds, thickness);
         }
+
+
+        void *
+        PrimitiveCreator::genTexRectangleDegenerate(
+                void *verticesVoid, const Coords &startCrds, const Coords &endCrds,
+                float z
+        ) {
+            TexturedColorVertex *vertices = static_cast<TexturedColorVertex*>(verticesVoid);
+            *vertices = VertexCreator::create<TexturedColorVertex>(
+                    static_cast<float>(startCrds.x), static_cast<float>(startCrds.y),
+                    z, 0.f, 0, 0, 0
+            );
+            vertices++;
+            *vertices = VertexCreator::create<TexturedColorVertex>(
+                    static_cast<float>(endCrds.x), static_cast<float>(endCrds.y),
+                    z, 0.f, 0, 0, 0
+            );
+            vertices++;
+            return vertices;
+        }
+
+        void *PrimitiveCreator::genTexRectangle(
+                void *verticesVoid, const Coords &startCrds, const Coords &endCrds,
+                uint_fast32_t thickness, float z, uint_fast32_t color
+        ) {
+            TexturedColorVertex *vertices = static_cast<TexturedColorVertex*>(verticesVoid);
+            *vertices = VertexCreator::create<TexturedColorVertex>(
+                    static_cast<float>(startCrds.x), static_cast<float>(startCrds.y),
+                    z, static_cast<float>(thickness), static_cast<DWORD>(swap_color_transp(color)),
+                    static_cast<float>(-(endCrds.x - startCrds.x)),
+                    static_cast<float>(-(endCrds.y - startCrds.y))
+            );
+            vertices++;
+            *vertices = VertexCreator::create<TexturedColorVertex>(
+                    static_cast<float>(endCrds.x), static_cast<float>(startCrds.y),
+                    z, static_cast<float>(thickness), static_cast<DWORD>(swap_color_transp(color)),
+                    static_cast<float>(endCrds.x - startCrds.x),
+                    static_cast<float>(-(endCrds.y - startCrds.y))
+            );
+            vertices++;
+            *vertices = VertexCreator::create<TexturedColorVertex>(
+                    static_cast<float>(startCrds.x), static_cast<float>(endCrds.y),
+                    z, static_cast<float>(thickness), static_cast<DWORD>(swap_color_transp(color)),
+                    static_cast<float>(-(endCrds.x - startCrds.x)),
+                    static_cast<float>(endCrds.y - startCrds.y)
+            );
+            vertices++;
+            *vertices = VertexCreator::create<TexturedColorVertex>(
+                    static_cast<float>(endCrds.x), static_cast<float>(endCrds.y),
+                    z, static_cast<float>(thickness), static_cast<DWORD>(swap_color_transp(color)),
+                    static_cast<float>(endCrds.x - startCrds.x),
+                    static_cast<float>(endCrds.y - startCrds.y)
+            );
+            vertices++;
+            return vertices;
+        }
     }
 }

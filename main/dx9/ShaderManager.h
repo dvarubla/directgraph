@@ -16,11 +16,15 @@ namespace directgraph {
             IDirect3DVertexShader9 *_texturedCenterBarV11Shader;
             IDirect3DPixelShader9 *_texturedEllipseP14Shader;
             IDirect3DVertexDeclaration9 *_texturedCenterBarV11Decl;
+            IDirect3DVertexShader9 *_texturedCenterRectangleV11Shader;
+            IDirect3DPixelShader9 *_texturedRectangleP20Shader;
+            IDirect3DVertexDeclaration9 *_texturedCenterRectangleV11Decl;
             void createVertexShader(uint_fast32_t name, uint_fast32_t type, IDirect3DVertexShader9 *&shader);
             void createPixelShader(uint_fast32_t name, uint_fast32_t type, IDirect3DPixelShader9 *&shader);
             bool _supportsEllipse;
             bool _supportsTexturedBar;
             bool _supportsTexturedEllipse;
+            bool _supportsTexturedRectangle;
             void tryDeleteRes();
             void createEllipseShaders(
                     const IFeatures::ShaderVersion &vertexVer,
@@ -34,16 +38,22 @@ namespace directgraph {
                     const IFeatures::ShaderVersion &vertexVer,
                     const IFeatures::ShaderVersion &pixelVer
             );
+            void createTexturedRectangleShaders(
+                    const IFeatures::ShaderVersion &vertexVer,
+                    const IFeatures::ShaderVersion &pixelVer
+            );
         public:
             ShaderManager(IFeatures *features, IDirect3DDevice9 *device);
             ~ShaderManager();
             bool supportsEllipse();
             bool supportsTexturedBar();
             bool supportsTexturedEllipse();
+            bool supportsTexturedRectangle();
             bool supportsShaders();
             void setEllipse();
             void setTexturedBar();
             void setTexturedEllipse();
+            void setTexturedRectangle();
             void removeShaders();
         };
     }

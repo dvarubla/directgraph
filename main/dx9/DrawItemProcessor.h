@@ -32,7 +32,7 @@ namespace directgraph {
             bool canCreateMoreItems();
             void nextItem();
             void resetItemCount();
-            NumVertices getNumVertices(const QueueItem &item, bool isFirst);
+            NumVertices getNumVertices(const QueueItem &item, const ItemState &state, bool isFirst);
             TypeSize getTypeSize(const QueueItem &item, const ItemState &state);
             void processDrawItem(
                     const QueueItem &item, void *&curVertMem,

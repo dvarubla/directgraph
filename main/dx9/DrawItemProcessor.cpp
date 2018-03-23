@@ -9,8 +9,13 @@ namespace directgraph {
             switch(item.type){
                 case QueueItem::RECTANGLE:
                     if(_stateHelper->lineTextureUsed(state)) {
-                        res.sizeMult = sizeof(TexturedColorVertex);
-                        res.drawDataType = DrawDataType::TEXTURED_COLOR_VERTEX;
+                        if(_bufPrepParams->supportsTexturedRectangle()){
+                            res.sizeMult = sizeof(TexturedColorVertex);
+                            res.drawDataType = DrawDataType::TEXTURED_RECTANGLE_VERTEX;
+                        } else {
+                            res.sizeMult = sizeof(TexturedColorVertex);
+                            res.drawDataType = DrawDataType::TEXTURED_COLOR_VERTEX;
+                        }
                     } else {
                         res.sizeMult = sizeof(ColorVertex);
                         res.drawDataType = DrawDataType::COLOR_VERTEX;
@@ -99,9 +104,15 @@ namespace directgraph {
             } else if(_stateHelper->lineTextureUsed(state)){
                 switch(item.type) {
                     case QueueItem::RECTANGLE:
-                        curVertMem = _primCreator.genFillDegenerate(
-                                curVertMem, startCrds, endCrds, _curZ
-                        );
+                        if(_bufPrepParams->supportsTexturedRectangle()) {
+                            curVertMem = _primCreator.genTexRectangleDegenerate(
+                                    curVertMem, startCrds, endCrds, _curZ
+                            );
+                        } else {
+                            curVertMem = _primCreator.genFillDegenerate(
+                                    curVertMem, startCrds, endCrds, _curZ
+                            );
+                        }
                     break;
                     default:
                         break;
@@ -192,11 +203,19 @@ namespace directgraph {
                     }
                     break;
                 case QueueItem::RECTANGLE:
-                    crds = _primCreator.getRectangleCoords(
-                            genCoords(item.data.rectangle.left, item.data.rectangle.top),
-                            genCoords(item.data.rectangle.right, item.data.rectangle.bottom),
-                            _stateHelper->getLastState().lineThickness
-                    );
+                    if(
+                            (_stateHelper->lineTextureUsed(state) && _bufPrepParams->supportsTexturedRectangle())
+                    ){
+                        int_fast32_t thickness = _stateHelper->getLastState().lineThickness / 2;
+                        crds.start = genCoords(item.data.rectangle.left - thickness, item.data.rectangle.top - thickness);
+                        crds.end = genCoords(item.data.rectangle.right + thickness, item.data.rectangle.bottom + thickness);
+                    } else {
+                        crds = _primCreator.getRectangleCoords(
+                                genCoords(item.data.rectangle.left, item.data.rectangle.top),
+                                genCoords(item.data.rectangle.right, item.data.rectangle.bottom),
+                                _stateHelper->getLastState().lineThickness
+                        );
+                    }
                 default:
                     break;
             }
@@ -210,14 +229,32 @@ namespace directgraph {
         ) {
             switch(item.type){
                 case QueueItem::RECTANGLE:
-                    curVertMem = _primCreator.genRectangle(curVertMem,
-                                                          genCoords(item.data.rectangle.left, item.data.rectangle.top),
-                                                          genCoords(item.data.rectangle.right, item.data.rectangle.bottom),
-                                                          _stateHelper->getLastState().lineThickness,
-                                                          _curZ,
-                                                          _stateHelper->getLastState().drawColor,
-                                                          _stateHelper->lineTextureUsed(state)
-                    );
+                    if(
+                            (_stateHelper->lineTextureUsed(state) && _bufPrepParams->supportsTexturedRectangle())
+                    ){
+                        if(_stateHelper->lineTextureUsed(state)){
+                            curVertMem = _primCreator.genTexRectangle(curVertMem,
+                                                                   genCoords(item.data.rectangle.left,
+                                                                             item.data.rectangle.top),
+                                                                   genCoords(item.data.rectangle.right,
+                                                                             item.data.rectangle.bottom),
+                                                                   _stateHelper->getLastState().lineThickness,
+                                                                   _curZ,
+                                                                   _stateHelper->getLastState().drawColor
+                            );
+                        }
+                    } else {
+                        curVertMem = _primCreator.genRectangle(curVertMem,
+                                                               genCoords(item.data.rectangle.left,
+                                                                         item.data.rectangle.top),
+                                                               genCoords(item.data.rectangle.right,
+                                                                         item.data.rectangle.bottom),
+                                                               _stateHelper->getLastState().lineThickness,
+                                                               _curZ,
+                                                               _stateHelper->getLastState().drawColor,
+                                                               _stateHelper->lineTextureUsed(state)
+                        );
+                    }
                     break;
                 case QueueItem::SINGLE_PIXEL:
                     curVertMem = _primCreator.genQuad(curVertMem,
@@ -334,10 +371,15 @@ namespace directgraph {
             }
         }
 
-        DrawItemProcessor::NumVertices DrawItemProcessor::getNumVertices(const QueueItem &item, bool isFirst) {
+        DrawItemProcessor::NumVertices DrawItemProcessor::getNumVertices(const QueueItem &item, const ItemState &state, bool isFirst) {
             NumVertices res;
             res.degenerate = (isFirst) ? 0 : 2;
-            if(item.type == QueueItem::FILLELLIPSE && !_bufPrepParams->supportsEllipse()){
+            if(item.type == QueueItem::FILLELLIPSE &&
+                    (
+                        (_stateHelper->fillTextureUsed(state) && !_bufPrepParams->supportsTexturedEllipse()) ||
+                        (!_stateHelper->fillTextureUsed(state) && !_bufPrepParams->supportsEllipse())
+                    )
+            ){
                 res.primitive = _primCreator.getNumEllipseVertices(
                         genUCoords(
                                 item.data.fillellipse.xradius,
@@ -346,7 +388,13 @@ namespace directgraph {
                 );
                 return res;
             }
-            if(item.type == QueueItem::RECTANGLE){
+            if(
+                    item.type == QueueItem::RECTANGLE &&
+                        (
+                            (_stateHelper->lineTextureUsed(state) && !_bufPrepParams->supportsTexturedRectangle()) ||
+                            (!_stateHelper->lineTextureUsed(state))
+                        )
+            ){
                 res.primitive = VERTICES_IN_QUAD * 4;
                 return res;
             }

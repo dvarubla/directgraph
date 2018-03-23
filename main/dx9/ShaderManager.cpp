@@ -12,7 +12,11 @@ namespace directgraph {
                 _centerBarV11Shader(NULL), _ellipseP14Shader(NULL), _centerBarV11Decl(NULL),
                 _texturedBarV11Shader(NULL), _texturedBarP14Shader(NULL), _texturedBarV11Decl(NULL),
                 _texturedCenterBarV11Shader(NULL), _texturedEllipseP14Shader(NULL), _texturedCenterBarV11Decl(NULL),
-                _supportsEllipse(false), _supportsTexturedBar(false), _supportsTexturedEllipse(false)
+                _texturedCenterRectangleV11Shader(NULL),
+                _texturedRectangleP20Shader(NULL),
+                _texturedCenterRectangleV11Decl(NULL),
+                _supportsEllipse(false), _supportsTexturedBar(false), _supportsTexturedEllipse(false),
+                _supportsTexturedRectangle(false)
         {
             try {
                 IFeatures::ShaderVersion vertexVer = features->getVertexShaderVer();
@@ -20,6 +24,7 @@ namespace directgraph {
                 createEllipseShaders(vertexVer, pixelVer);
                 createTexturedBarShaders(vertexVer, pixelVer);
                 createTexturedEllipseShaders(vertexVer, pixelVer);
+                createTexturedRectangleShaders(vertexVer, pixelVer);
             } catch(const WException &){
                 tryDeleteRes();
                 throw;
@@ -79,9 +84,9 @@ namespace directgraph {
 
         void ShaderManager::createTexturedEllipseShaders(const IFeatures::ShaderVersion &vertexVer,
                                                          const IFeatures::ShaderVersion &pixelVer) {
-            IFeatures::ShaderVersion texturedBarVertexVer = {1, 1};
-            IFeatures::ShaderVersion texturedBarPixelVer = {1, 4};
-            if (texturedBarVertexVer <= vertexVer && texturedBarPixelVer <= pixelVer) {
+            IFeatures::ShaderVersion texturedEllipseVertexVer = {1, 1};
+            IFeatures::ShaderVersion texturedEllipsePixelVer = {1, 4};
+            if (texturedEllipseVertexVer <= vertexVer && texturedEllipsePixelVer <= pixelVer) {
                 _supportsTexturedEllipse = true;
                 createVertexShader(TEXTURED_CENTER_BAR_V1_1, IDR_VERTEX_SHADER, _texturedCenterBarV11Shader);
                 createPixelShader(TEXTURED_ELLIPSE_P1_4, IDR_PIXEL_SHADER, _texturedEllipseP14Shader);
@@ -102,6 +107,30 @@ namespace directgraph {
             }
         }
 
+        void ShaderManager::createTexturedRectangleShaders(const IFeatures::ShaderVersion &vertexVer,
+                                                           const IFeatures::ShaderVersion &pixelVer) {
+            IFeatures::ShaderVersion texturedRectangleVertexVer = {1, 1};
+            IFeatures::ShaderVersion texturedRectanglePixelVer = {2, 0};
+            if (texturedRectangleVertexVer <= vertexVer && texturedRectanglePixelVer <= pixelVer) {
+                _supportsTexturedRectangle = true;
+                createVertexShader(TEXTURED_CENTER_RECTANGLE_V1_1, IDR_VERTEX_SHADER, _texturedCenterRectangleV11Shader);
+                createPixelShader(TEXTURED_RECTANGLE_P2_0, IDR_PIXEL_SHADER, _texturedRectangleP20Shader);
+                D3DVERTEXELEMENT9 decl[] = {
+                        { 0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
+                        { 0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0 },
+                        { 0, 20, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 },
+                        D3DDECL_END()
+                };
+                if (_device->CreateVertexDeclaration(decl, &_texturedCenterRectangleV11Decl) != D3D_OK) {
+                    THROW_EXC_CODE(
+                            Exception,
+                            DX9_CANT_CREATE_VDECL,
+                            L"Can't create textured rectangle vertex declaration"
+                    );
+                }
+            }
+        }
+
         bool ShaderManager::supportsEllipse() {
             return _supportsEllipse;
         }
@@ -114,8 +143,12 @@ namespace directgraph {
             return _supportsTexturedEllipse;
         }
 
+        bool ShaderManager::supportsTexturedRectangle() {
+            return _supportsTexturedRectangle;
+        }
+
         bool ShaderManager::supportsShaders() {
-            return _supportsEllipse | _supportsTexturedBar | _supportsTexturedEllipse;
+            return _supportsEllipse | _supportsTexturedBar | _supportsTexturedEllipse | _supportsTexturedRectangle;
         }
 
         void ShaderManager::setTexturedBar() {
@@ -134,6 +167,12 @@ namespace directgraph {
             _device->SetVertexDeclaration(_texturedCenterBarV11Decl);
             _device->SetVertexShader(_texturedCenterBarV11Shader);
             _device->SetPixelShader(_texturedEllipseP14Shader);
+        }
+
+        void ShaderManager::setTexturedRectangle() {
+            _device->SetVertexDeclaration(_texturedCenterRectangleV11Decl);
+            _device->SetVertexShader(_texturedCenterRectangleV11Shader);
+            _device->SetPixelShader(_texturedRectangleP20Shader);
         }
 
         void ShaderManager::removeShaders() {
@@ -210,7 +249,11 @@ namespace directgraph {
 
                     _texturedCenterBarV11Decl,
                     _texturedCenterBarV11Shader,
-                    _texturedEllipseP14Shader
+                    _texturedEllipseP14Shader,
+
+                    _texturedCenterRectangleV11Decl,
+                    _texturedCenterRectangleV11Shader,
+                    _texturedRectangleP20Shader
             };
             for(uint_fast32_t i = 0; i < sizeof(delArr) / sizeof(IUnknown*); i++){
                 if(delArr[i] != NULL){

@@ -88,6 +88,22 @@ namespace directgraph {
                     uint_fast32_t color
             );
 
+            void * genTexRectangleDegenerate(
+                    void *verticesVoid,
+                    const Coords &startCrds,
+                    const Coords &endCrds,
+                    float z
+            );
+
+            void * genTexRectangle(
+                    void *verticesVoid,
+                    const Coords &startCrds,
+                    const Coords &endCrds,
+                    uint_fast32_t thickness,
+                    float z,
+                    uint_fast32_t color
+            );
+
             void * genTexEllipseDegenerate(
                     void *verticesVoid, const Coords &startCrds, const Coords &endCrds,
                     float z

@@ -78,8 +78,12 @@ namespace directgraph{
                     break;
                 case QueueItem::RECTANGLE:
                     disablePixelTexture(state);
-                    disableShader(state);
-                    useLineStyle(state, _bufPrepParams->needRecreateTexture());
+                    useLineStyle(state, _bufPrepParams->needRecreateTexture() && !_bufPrepParams->supportsTexturedRectangle());
+                    if(_bufPrepParams->supportsTexturedRectangle() && _stateHelper->lineTextureUsed(state)){
+                        _propMan->setProp(state, PropertyName::SHADER_TYPE, ShaderType::TEXTURED_RECTANGLE_SHADER);
+                    } else {
+                        disableShader(state);
+                    }
                     break;
                 case QueueItem::SINGLE_PIXEL:
                     disablePixelTexture(state);
@@ -144,7 +148,7 @@ namespace directgraph{
                 item.type == QueueItem::RECTANGLE &&
                         (
                                 color_has_alpha(_stateHelper->getLastState().drawColor) ||
-                                _stateHelper->lineTextureUsed(state)
+                                (_stateHelper->lineTextureUsed(state) && !_bufPrepParams->supportsTexturedRectangle())
                         )
             ){
                 return true;

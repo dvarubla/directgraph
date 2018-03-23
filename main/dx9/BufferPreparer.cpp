@@ -44,7 +44,7 @@ namespace directgraph{
                         _isFirst = (_drawBuffers.find(lastState) == _drawBuffers.end());
                     }
                     DrawItemProcessor::TypeSize ts = _drawItemProc.getTypeSize(item, lastState);
-                    DrawItemProcessor::NumVertices curNumVertices = _drawItemProc.getNumVertices(item, _isFirst);
+                    DrawItemProcessor::NumVertices curNumVertices = _drawItemProc.getNumVertices(item, lastState, _isFirst);
                     uint_fast32_t totalVertices = (curNumVertices.primitive + curNumVertices.degenerate);
                     uint_fast32_t newUsedSize = _curUsedSize + totalVertices * ts.sizeMult;
                     if (newUsedSize > maxSize) {
