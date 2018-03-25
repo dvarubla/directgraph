@@ -25,6 +25,8 @@ endfunction()
 
 set(DX9_RECTANGLE_SRC dx9_rectangle.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp ../stubs/FeaturesStub.h)
 dx9_test(dx9_rectangle "${DX9_RECTANGLE_SRC}")
+set(DX9_RECTANGLE_NO_SHADER_SRC dx9_rectangle_no_shader.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp ../stubs/FeaturesStub.h)
+dx9_test(dx9_rectangle_no_shader "${DX9_RECTANGLE_NO_SHADER_SRC}")
 set(DX9_RECTANGLE_LINESTYLE_SRC dx9_rectangle_linestyle.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp ../stubs/FeaturesStub.h)
 dx9_test(dx9_rectangle_linestyle "${DX9_RECTANGLE_LINESTYLE_SRC}")
 set(DX9_RECTANGLE_LINESTYLE_NO_SHADER_SRC dx9_rectangle_linestyle_no_shader.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp ../stubs/FeaturesStub.h)

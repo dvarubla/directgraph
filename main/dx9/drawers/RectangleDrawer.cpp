@@ -5,8 +5,14 @@ namespace directgraph {
     namespace dx9 {
         void RectangleDrawer::getItemState(ItemState &state) {
             _drawStateHelper->useLineStyle(state, _bufPrepParams->needRecreateTexture() && !_bufPrepParams->supportsTexturedRectangle());
-            if(_bufPrepParams->supportsTexturedRectangle() && _stateHelper->lineTextureUsed(state)){
-                _propMan->setProp(state, PropertyName::SHADER_TYPE, ShaderType::TEXTURED_RECTANGLE_SHADER);
+            if(_stateHelper->lineTextureUsed(state)){
+                if(_bufPrepParams->supportsTexturedRectangle()){
+                    _propMan->setProp(state, PropertyName::SHADER_TYPE, ShaderType::TEXTURED_RECTANGLE_SHADER);
+                }
+            } else {
+                if(_bufPrepParams->supportsRectangle()){
+                    _propMan->setProp(state, PropertyName::SHADER_TYPE, ShaderType::RECTANGLE_SHADER);
+                }
             }
         }
 
@@ -15,7 +21,7 @@ namespace directgraph {
             res.degenerate = (isFirst) ? 0 : 2;
             if(
                     (_stateHelper->lineTextureUsed(_curState) && !_bufPrepParams->supportsTexturedRectangle()) || 
-                    (!_stateHelper->lineTextureUsed(_curState))
+                    (!_stateHelper->lineTextureUsed(_curState) && !_bufPrepParams->supportsRectangle())
             ){
                 res.primitive = VERTICES_IN_QUAD * 4;
             } else {
@@ -34,27 +40,31 @@ namespace directgraph {
                     res.drawDataType = DrawDataType::TEXTURED_COLOR_VERTEX;
                 }
             } else {
-                res.sizeMult = sizeof(ColorVertex);
-                res.drawDataType = DrawDataType::COLOR_VERTEX;
+                if(_bufPrepParams->supportsRectangle()) {
+                    res.sizeMult = sizeof(TexturedColorVertex);
+                    res.drawDataType = DrawDataType::RECTANGLE_VERTEX;
+                } else {
+                    res.sizeMult = sizeof(ColorVertex);
+                    res.drawDataType = DrawDataType::COLOR_VERTEX;
+                }
             }
             return res;
         }
 
         void RectangleDrawer::processDrawItem(void *&curVertMem, uint_fast32_t &, float curZ) {
             if(
-                    (_stateHelper->lineTextureUsed(_curState) && _bufPrepParams->supportsTexturedRectangle())
+                    (_stateHelper->lineTextureUsed(_curState) && _bufPrepParams->supportsTexturedRectangle()) ||
+                    (!_stateHelper->lineTextureUsed(_curState) && _bufPrepParams->supportsRectangle())
             ){
-                if(_stateHelper->lineTextureUsed(_curState)){
-                    curVertMem = _simplePrimHelper->genTexRectangle(curVertMem,
-                                                              genCoords(_curItem.data.rectangle.left,
-                                                                        _curItem.data.rectangle.top),
-                                                              genCoords(_curItem.data.rectangle.right,
-                                                                        _curItem.data.rectangle.bottom),
-                                                              _stateHelper->getLastState().lineThickness,
-                                                              curZ,
-                                                              _stateHelper->getLastState().drawColor
-                    );
-                }
+                curVertMem = _simplePrimHelper->genTexRectangle(curVertMem,
+                                                          genCoords(_curItem.data.rectangle.left,
+                                                                    _curItem.data.rectangle.top),
+                                                          genCoords(_curItem.data.rectangle.right,
+                                                                    _curItem.data.rectangle.bottom),
+                                                          _stateHelper->getLastState().lineThickness,
+                                                          curZ,
+                                                          _stateHelper->getLastState().drawColor
+                );
             } else {
                 curVertMem = _rectangleHelper->genRectangle(curVertMem,
                                                        genCoords(_curItem.data.rectangle.left,
@@ -72,7 +82,8 @@ namespace directgraph {
         StartEndCoords RectangleDrawer::getStartEndCoords() {
             StartEndCoords res;
             if(
-                    (_stateHelper->lineTextureUsed(_curState) && _bufPrepParams->supportsTexturedRectangle())
+                    (_stateHelper->lineTextureUsed(_curState) && _bufPrepParams->supportsTexturedRectangle()) ||
+                    (!_stateHelper->lineTextureUsed(_curState) && _bufPrepParams->supportsRectangle())
                     ){
                 int_fast32_t thickness = _stateHelper->getLastState().lineThickness / 2;
                 res.start = genCoords(_curItem.data.rectangle.left - thickness, _curItem.data.rectangle.top - thickness);
@@ -90,7 +101,7 @@ namespace directgraph {
         void RectangleDrawer::genDegenerates(void *&curVertMem, const Coords &startCrds, const Coords &endCrds, float curZ) {
             if(_stateHelper->lineTextureUsed(_curState)) {
                 if (_bufPrepParams->supportsTexturedRectangle()) {
-                    curVertMem = _degenerateHelper->genTexRectangleDegenerate(
+                    curVertMem = _degenerateHelper->genShaderRectangleDegenerate(
                             curVertMem, startCrds, endCrds, curZ
                     );
                 } else {
@@ -99,9 +110,15 @@ namespace directgraph {
                     );
                 }
             } else {
-                curVertMem = _degenerateHelper->genDegenerate(
-                        curVertMem, startCrds, endCrds, curZ
-                );
+                if (_bufPrepParams->supportsRectangle()) {
+                    curVertMem = _degenerateHelper->genShaderRectangleDegenerate(
+                            curVertMem, startCrds, endCrds, curZ
+                    );
+                } else {
+                    curVertMem = _degenerateHelper->genDegenerate(
+                            curVertMem, startCrds, endCrds, curZ
+                    );
+                }
             }
         }
 

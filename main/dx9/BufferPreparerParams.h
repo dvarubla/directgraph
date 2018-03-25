@@ -17,6 +17,7 @@ namespace directgraph {
             bool supportsTexturedBar();
             bool supportsTexturedEllipse();
             bool supportsTexturedRectangle();
+            bool supportsRectangle();
             bool needRecreateTexture();
             UCoords getMaxCoords();
             UCoords getPxTextureCoords();

@@ -15,8 +15,9 @@ namespace directgraph {
                 _texturedCenterRectangleV11Shader(NULL),
                 _texturedRectangleP20Shader(NULL),
                 _texturedCenterRectangleV11Decl(NULL),
+                _centerRectangleV11Shader(NULL), _rectangleP14Shader(NULL), _centerRectangleV11Decl(NULL),
                 _supportsEllipse(false), _supportsTexturedBar(false), _supportsTexturedEllipse(false),
-                _supportsTexturedRectangle(false)
+                _supportsTexturedRectangle(false), _supportsRectangle(false)
         {
             try {
                 IFeatures::ShaderVersion vertexVer = features->getVertexShaderVer();
@@ -25,6 +26,7 @@ namespace directgraph {
                 createTexturedBarShaders(vertexVer, pixelVer);
                 createTexturedEllipseShaders(vertexVer, pixelVer);
                 createTexturedRectangleShaders(vertexVer, pixelVer);
+                createRectangleShaders(vertexVer, pixelVer);
             } catch(const WException &){
                 tryDeleteRes();
                 throw;
@@ -131,6 +133,30 @@ namespace directgraph {
             }
         }
 
+        void ShaderManager::createRectangleShaders(const IFeatures::ShaderVersion &vertexVer,
+                                                   const IFeatures::ShaderVersion &pixelVer) {
+            IFeatures::ShaderVersion texturedRectangleVertexVer = {1, 1};
+            IFeatures::ShaderVersion texturedRectanglePixelVer = {1, 4};
+            if (texturedRectangleVertexVer <= vertexVer && texturedRectanglePixelVer <= pixelVer) {
+                _supportsRectangle = true;
+                createVertexShader(CENTER_RECTANGLE_V1_1, IDR_VERTEX_SHADER, _centerRectangleV11Shader);
+                createPixelShader(RECTANGLE_P1_4, IDR_PIXEL_SHADER, _rectangleP14Shader);
+                D3DVERTEXELEMENT9 decl[] = {
+                        { 0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
+                        { 0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0 },
+                        { 0, 20, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 },
+                        D3DDECL_END()
+                };
+                if (_device->CreateVertexDeclaration(decl, &_centerRectangleV11Decl) != D3D_OK) {
+                    THROW_EXC_CODE(
+                            Exception,
+                            DX9_CANT_CREATE_VDECL,
+                            L"Can't create rectangle vertex declaration"
+                    );
+                }
+            }
+        }
+
         bool ShaderManager::supportsEllipse() {
             return _supportsEllipse;
         }
@@ -147,8 +173,16 @@ namespace directgraph {
             return _supportsTexturedRectangle;
         }
 
+        bool ShaderManager::supportsRectangle() {
+            return _supportsRectangle;
+        }
+
         bool ShaderManager::supportsShaders() {
-            return _supportsEllipse | _supportsTexturedBar | _supportsTexturedEllipse | _supportsTexturedRectangle;
+            return _supportsEllipse |
+                   _supportsTexturedBar |
+                   _supportsTexturedEllipse |
+                   _supportsTexturedRectangle |
+                   _supportsRectangle;
         }
 
         void ShaderManager::setTexturedBar() {
@@ -173,6 +207,12 @@ namespace directgraph {
             _device->SetVertexDeclaration(_texturedCenterRectangleV11Decl);
             _device->SetVertexShader(_texturedCenterRectangleV11Shader);
             _device->SetPixelShader(_texturedRectangleP20Shader);
+        }
+
+        void ShaderManager::setRectangle() {
+            _device->SetVertexDeclaration(_centerRectangleV11Decl);
+            _device->SetVertexShader(_centerRectangleV11Shader);
+            _device->SetPixelShader(_rectangleP14Shader);
         }
 
         void ShaderManager::removeShaders() {
@@ -253,7 +293,11 @@ namespace directgraph {
 
                     _texturedCenterRectangleV11Decl,
                     _texturedCenterRectangleV11Shader,
-                    _texturedRectangleP20Shader
+                    _texturedRectangleP20Shader,
+
+                    _centerRectangleV11Decl,
+                    _centerRectangleV11Shader,
+                    _rectangleP14Shader
             };
             for(uint_fast32_t i = 0; i < sizeof(delArr) / sizeof(IUnknown*); i++){
                 if(delArr[i] != NULL){

@@ -19,6 +19,10 @@ namespace directgraph{
             return _shaderMan->supportsTexturedRectangle();
         }
 
+        bool BufferPreparerParams::supportsRectangle() {
+            return _shaderMan->supportsRectangle();
+        }
+        
         bool BufferPreparerParams::needRecreateTexture() {
             return _needRecreateTexture;
         }

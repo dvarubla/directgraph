@@ -30,6 +30,7 @@ namespace directgraph {
                 COLOR2_VERTEX,
                 ELLIPSE_VERTEX,
                 TEXTURED_ELLIPSE_VERTEX,
+                RECTANGLE_VERTEX,
                 TEXTURED_RECTANGLE_VERTEX
             };
         }

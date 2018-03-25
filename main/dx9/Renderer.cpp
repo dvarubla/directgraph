@@ -248,19 +248,18 @@ namespace directgraph {
                                 break;
                             case DrawDataType::ELLIPSE_VERTEX:
                                 stride = sizeof(TexturedColorVertexNoRHW);
-                                setFVF = false;
                                 break;
                             case DrawDataType::COLOR2_VERTEX:
                                 stride = sizeof(Color2Vertex);
-                                setFVF = false;
                                 break;
                             case DrawDataType::TEXTURED_ELLIPSE_VERTEX:
                                 stride = sizeof(Color2Vertex);
-                                setFVF = false;
                                 break;
                             case DrawDataType::TEXTURED_RECTANGLE_VERTEX:
                                 stride = sizeof(TexturedColorVertex);
-                                setFVF = false;
+                                break;
+                            case DrawDataType::RECTANGLE_VERTEX:
+                                stride = sizeof(TexturedColorVertex);
                                 break;
                         }
                         _device->SetStreamSource(
@@ -284,6 +283,9 @@ namespace directgraph {
                                     break;
                                 case DrawDataType::TEXTURED_RECTANGLE_VERTEX:
                                     _shaderMan->setTexturedRectangle();
+                                    break;
+                                case DrawDataType::RECTANGLE_VERTEX:
+                                    _shaderMan->setRectangle();
                                     break;
                                 default: break;
                             }

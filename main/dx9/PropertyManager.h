@@ -34,7 +34,8 @@ namespace directgraph {
                 ELLIPSE_SHADER,
                 TEXTURED_ELLIPSE_SHADER,
                 TEXTURED_BAR_SHADER,
-                TEXTURED_RECTANGLE_SHADER
+                TEXTURED_RECTANGLE_SHADER,
+                RECTANGLE_SHADER
             };
         }
 

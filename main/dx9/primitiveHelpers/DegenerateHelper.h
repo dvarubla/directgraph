@@ -27,7 +27,7 @@ namespace directgraph {
                     float z
             );
 
-            void * genTexRectangleDegenerate(
+            void * genShaderRectangleDegenerate(
                     void *verticesVoid,
                     const Coords &startCrds,
                     const Coords &endCrds,

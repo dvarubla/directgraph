@@ -74,7 +74,7 @@ namespace directgraph {
         }
 
         void *
-        DegenerateHelper::genTexRectangleDegenerate(
+        DegenerateHelper::genShaderRectangleDegenerate(
                 void *verticesVoid, const Coords &startCrds, const Coords &endCrds,
                 float z
         ) {
