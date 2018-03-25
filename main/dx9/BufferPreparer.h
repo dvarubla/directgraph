@@ -5,14 +5,13 @@
 #include <vector>
 #include <unordered_map>
 #include <main/CommonProps.h>
-#include "PrimitiveCreator.h"
 #include "ShaderManager.h"
 #include "BufferPreparerParams.h"
 #include "StateHelper.h"
 #include "PropertyManager.h"
 #include "DrawOpCreator.h"
 #include "DrawItemProcessor.h"
-#include "DrawStateProcessor.h"
+#include "DrawerManager.h"
 
 namespace directgraph {
     namespace dx9 {
@@ -53,8 +52,8 @@ namespace directgraph {
             CharPVector _patterns;
             StateHelper _stateHelper;
             PropertyManager _propMan;
+            DrawerManager _drawerManager;
             DrawItemProcessor _drawItemProc;
-            DrawStateProcessor _drawStateProc;
             bool _isFirst;
             uint_fast32_t _curUsedSize;
             uint_fast32_t _lastOffset;

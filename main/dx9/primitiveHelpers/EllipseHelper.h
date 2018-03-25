@@ -19,8 +19,7 @@ namespace directgraph {
         public:
             EllipseHelper();
             uint_fast32_t getNumEllipseVertices(
-                    uint_fast32_t rx,
-                    uint_fast32_t ry
+                    const UCoords & radiusCrds
             );
             void* genEllipse(
                     void *memoryVoid,

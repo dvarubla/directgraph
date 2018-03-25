@@ -1,8 +1,7 @@
 #include <algorithm>
 #include <main/patterns.h>
 #include "RectangleHelper.h"
-#include "VertexCreator.h"
-#include "misc.h"
+#include <VertexCreator.h>
 
 #undef min
 #undef max

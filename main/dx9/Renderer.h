@@ -6,7 +6,6 @@
 #include <util.h>
 #include <vector>
 #include "IPatternTexturesHelper.h"
-#include "PrimitiveCreator.h"
 #include "BufferPreparer.h"
 #include "ShaderManager.h"
 

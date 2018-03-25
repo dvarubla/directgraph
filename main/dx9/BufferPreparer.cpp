@@ -3,7 +3,6 @@
 #include <main/QueueItem.h>
 #include "Exception.h"
 #include "BufferPreparer.h"
-#include "PrimitiveCreator.h"
 
 namespace directgraph{
     namespace dx9{
@@ -12,7 +11,8 @@ namespace directgraph{
                 const CommonProps &props,
                 BufferPreparerParams *bufPrepParams
         ): _bufPrepParams(bufPrepParams), _memSize(memSize), _stateHelper(&_propMan, props),
-           _drawItemProc(&_stateHelper, _bufPrepParams), _drawStateProc(&_stateHelper, _bufPrepParams, &_propMan),
+           _drawerManager(&_stateHelper, bufPrepParams, &_propMan),
+           _drawItemProc(&_stateHelper, bufPrepParams, &_drawerManager, &_propMan),
            _isFirst(true), _curUsedSize(0), _lastOffset(0), _canReadMore(true)
         {
         }
@@ -33,18 +33,22 @@ namespace directgraph{
                         item.type == QueueItem::FILLELLIPSE ||
                         item.type == QueueItem::RECTANGLE
                 ) {
-                    ItemState lastState = _drawStateProc.createItemState(item);
-                    bool isTransparent = _drawStateProc.isStateTransparent(item, lastState);
-                    if(isTransparent){
+                    _drawerManager.setActiveDrawerType(item);
+                    IDrawer *curDrawer = _drawerManager.getActiveDrawer();
+                    curDrawer->setItem(item);
+                    ItemState lastState = _drawItemProc.createItemState();
+                    curDrawer->setItemState(lastState);
+                    bool isSemiTransparent = curDrawer->isSemiTransparent();
+                    if(isSemiTransparent){
                         _isFirst =
-                                _drawStateProc.processStateDiff(_stateHelper.getCurItemState(), lastState, _transpBuffer.drawOps, true)
+                                _drawItemProc.processStateDiff(_stateHelper.getCurItemState(), lastState, _transpBuffer.drawOps, true)
                                 || _transpBuffer.vect.empty();
                         _stateHelper.getCurItemState() = lastState;
                     } else {
                         _isFirst = (_drawBuffers.find(lastState) == _drawBuffers.end());
                     }
-                    DrawItemProcessor::TypeSize ts = _drawItemProc.getTypeSize(item, lastState);
-                    DrawItemProcessor::NumVertices curNumVertices = _drawItemProc.getNumVertices(item, lastState, _isFirst);
+                    TypeSize ts = curDrawer->getTypeSize();
+                    NumVertices curNumVertices = curDrawer->getNumVertices(_isFirst);
                     uint_fast32_t totalVertices = (curNumVertices.primitive + curNumVertices.degenerate);
                     uint_fast32_t newUsedSize = _curUsedSize + totalVertices * ts.sizeMult;
                     if (newUsedSize > maxSize) {
@@ -53,7 +57,7 @@ namespace directgraph{
                     }
                     uint_fast32_t realNumPrimVertices = curNumVertices.primitive;
                     uint_fast32_t numDiff;
-                    if (isTransparent) {
+                    if (isSemiTransparent) {
                         void *curMem;
                         if(_transpBuffer.vect.empty()){
                             _transpBuffer.numItems = totalVertices;
@@ -65,11 +69,11 @@ namespace directgraph{
                             _transpBuffer.vect.resize(_transpBuffer.vect.size() + totalVertices * ts.sizeMult);
                             curMem = reinterpret_cast<void *>(&_transpBuffer.vect[0] + prevSize);
                         }
-                        StartEndCoords crds = _drawItemProc.getStartEndCoords(item, lastState);
+                        StartEndCoords crds =  curDrawer->getStartEndCoords();
                         if (!_isFirst) {
-                            _drawItemProc.genDegenerates(item, curMem, _transpBuffer.prevCrds, crds.start, lastState);
+                            curDrawer->genDegenerates(curMem, _transpBuffer.prevCrds, crds.start, _drawItemProc.getCurZ());
                         }
-                        _drawItemProc.processDrawItem(item, curMem, realNumPrimVertices, lastState);
+                        curDrawer->processDrawItem(curMem, realNumPrimVertices, _drawItemProc.getCurZ());
                         _transpBuffer.prevCrds = crds.end;
 
                         numDiff = curNumVertices.primitive - realNumPrimVertices;
@@ -104,10 +108,10 @@ namespace directgraph{
                             curMem = reinterpret_cast<void *>(&buffer.vect[0] + prevSize);
                             buffer.offsets.push_back(prevSize);
                         }
-                        StartEndCoords crds = _drawItemProc.getStartEndCoords(item, lastState);
-                        _drawItemProc.processDrawItem(item, curMem, realNumPrimVertices, lastState);
+                        StartEndCoords crds = curDrawer->getStartEndCoords();
+                        curDrawer->processDrawItem(curMem, realNumPrimVertices, _drawItemProc.getCurZ());
                         if (!_isFirst) {
-                            _drawItemProc.genDegenerates(item, curMem, crds.end, buffer.prevCrds, lastState);
+                            curDrawer->genDegenerates(curMem, crds.end, buffer.prevCrds, _drawItemProc.getCurZ());
                         }
                         buffer.prevCrds = crds.start;
 
@@ -173,7 +177,7 @@ namespace directgraph{
                         break;
                     }
                 }
-                _drawStateProc.processStateDiff(_stateHelper.getCurItemState(), lastState, _drawOps, false);
+                _drawItemProc.processStateDiff(_stateHelper.getCurItemState(), lastState, _drawOps, false);
                 _stateHelper.getCurItemState() = lastState;
                 _drawOps.push_back(DrawOpCreator::create<DrawOpType::ITEMS>(
                         static_cast<uint_fast32_t>(it->second.vect.size()),

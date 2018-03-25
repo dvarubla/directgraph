@@ -61,7 +61,7 @@ namespace directgraph{
                 minR = radiusCrds.y;
                 swap = true;
             }
-            uint_fast32_t numVertices = getNumEllipseVertices(radiusCrds.x, radiusCrds.y);
+            uint_fast32_t numVertices = getNumEllipseVertices(radiusCrds);
             ColorVertex *memoryCol = NULL;
             TexturedColorVertex *memoryTextured = NULL;
             if(textured){
@@ -145,9 +145,9 @@ namespace directgraph{
         }
 
         uint_fast32_t EllipseHelper::getNumEllipseVertices(
-                uint_fast32_t rx, uint_fast32_t ry
+                const UCoords & radiusCrds
         ) {
-            uint_fast32_t numPoints = std::min(rx, ry);
+            uint_fast32_t numPoints = std::min(radiusCrds.x, radiusCrds.y);
             return (numPoints * 4 - 1) / 2 * 4 + 3;
         }
         ColorVertex EllipseHelper::createVertex(

@@ -4,402 +4,113 @@
 
 namespace directgraph {
     namespace dx9 {
-        DrawItemProcessor::TypeSize DrawItemProcessor::getTypeSize(const QueueItem &item, const ItemState &state) {
-            TypeSize res;
-            switch(item.type){
-                case QueueItem::RECTANGLE:
-                    if(_stateHelper->lineTextureUsed(state)) {
-                        if(_bufPrepParams->supportsTexturedRectangle()){
-                            res.sizeMult = sizeof(TexturedColorVertex);
-                            res.drawDataType = DrawDataType::TEXTURED_RECTANGLE_VERTEX;
-                        } else {
-                            res.sizeMult = sizeof(TexturedColorVertex);
-                            res.drawDataType = DrawDataType::TEXTURED_COLOR_VERTEX;
-                        }
-                    } else {
-                        res.sizeMult = sizeof(ColorVertex);
-                        res.drawDataType = DrawDataType::COLOR_VERTEX;
-                    }
-                    break;
-                case QueueItem::PIXEL_CONTAINER:
-                    res.sizeMult = sizeof(TexturedVertex);
-                    res.drawDataType = DrawDataType::TEXTURED_VERTEX;
-                    break;
-                case QueueItem::BAR:
-                    if (_stateHelper->fillTextureUsed(state)) {
-                        if(_bufPrepParams->supportsTexturedBar()){
-                            res.sizeMult = sizeof(Color2Vertex);
-                            res.drawDataType = DrawDataType::COLOR2_VERTEX;
-                        } else {
-                            res.sizeMult = sizeof(TexturedColorVertex);
-                            res.drawDataType = DrawDataType::TEXTURED_COLOR_VERTEX;
-                        }
-                    } else {
-                        res.sizeMult = sizeof(ColorVertex);
-                        res.drawDataType = DrawDataType::COLOR_VERTEX;
-                    }
-                    break;
-                case QueueItem::SINGLE_PIXEL: case QueueItem::CLEAR:
-                    res.sizeMult = sizeof(ColorVertex);
-                    res.drawDataType = DrawDataType::COLOR_VERTEX;
-                    break;
-                case QueueItem::FILLELLIPSE:
-                    if (_stateHelper->fillTextureUsed(state)) {
-                        if(_bufPrepParams->supportsTexturedEllipse()){
-                            res.sizeMult = sizeof(Color2Vertex);
-                            res.drawDataType = DrawDataType::TEXTURED_ELLIPSE_VERTEX;
-                        } else {
-                            res.sizeMult = sizeof(TexturedColorVertex);
-                            res.drawDataType = DrawDataType::TEXTURED_COLOR_VERTEX;
-                        }
-                    } else {
-                        if (_bufPrepParams->supportsEllipse()) {
-                            res.sizeMult = sizeof(TexturedColorVertexNoRHW);
-                            res.drawDataType = DrawDataType::ELLIPSE_VERTEX;
-                        } else {
-                            res.sizeMult = sizeof(ColorVertex);
-                            res.drawDataType = DrawDataType::COLOR_VERTEX;
-                        }
-                    }
-                    break;
-                default: break;
-            }
-            return res;
-        }
-
-        void DrawItemProcessor::genDegenerates(
-                const QueueItem &item, void *&curVertMem, const Coords &startCrds, const Coords &endCrds,
-                const ItemState &state
-        ){
-            if (_stateHelper->fillTextureUsed(state)) {
-                switch(item.type) {
-                    case QueueItem::BAR: {
-                        if(_bufPrepParams->supportsTexturedBar()){
-                            curVertMem = _primCreator.genFillCol2Degenerate(
-                                    curVertMem, startCrds, endCrds,
-                                    _curZ
-                            );
-                        } else {
-                            curVertMem = _primCreator.genFillDegenerate(
-                                    curVertMem, startCrds, endCrds, _curZ
-                            );
-                        }
-                    }
-                        break;
-                    case QueueItem::FILLELLIPSE: {
-                        if(_bufPrepParams->supportsTexturedEllipse()){
-                            curVertMem = _primCreator.genTexEllipseDegenerate(
-                                    curVertMem, startCrds, endCrds, _curZ
-                            );
-                        } else {
-                            curVertMem = _primCreator.genFillDegenerate(
-                                    curVertMem, startCrds, endCrds, _curZ
-                            );
-                        }
-                    }
-                        break;
-                    default:
-                        break;
-                }
-            } else if(_stateHelper->lineTextureUsed(state)){
-                switch(item.type) {
-                    case QueueItem::RECTANGLE:
-                        if(_bufPrepParams->supportsTexturedRectangle()) {
-                            curVertMem = _primCreator.genTexRectangleDegenerate(
-                                    curVertMem, startCrds, endCrds, _curZ
-                            );
-                        } else {
-                            curVertMem = _primCreator.genFillDegenerate(
-                                    curVertMem, startCrds, endCrds, _curZ
-                            );
-                        }
-                    break;
-                    default:
-                        break;
-                }
-            } else {
-                switch(item.type){
-                    case QueueItem::FILLELLIPSE: {
-                        if (_bufPrepParams->supportsEllipse()) {
-                            curVertMem = _primCreator.genEllipseDegenerate(
-                                    curVertMem, startCrds, endCrds,
-                                    _curZ
-                            );
-                        } else {
-                            curVertMem = _primCreator.genDegenerate(
-                                    curVertMem, startCrds, endCrds, _curZ
-                            );
-                        }
-                    }
-                        break;
-                    case QueueItem::SINGLE_PIXEL:
-                        curVertMem = _primCreator.genDegenerate(
-                                curVertMem, startCrds, endCrds,
-                                _curZ
-                        );
-                        break;
-                    case QueueItem::RECTANGLE:
-                        curVertMem = _primCreator.genDegenerate(
-                                curVertMem, startCrds, endCrds, _curZ
-                        );
-                        break;
-                    case QueueItem::BAR:
-                        curVertMem = _primCreator.genDegenerate(
-                                curVertMem, startCrds, endCrds, _curZ
-                        );
-                        break;
-                    case QueueItem::CLEAR:
-                        curVertMem = _primCreator.genDegenerate(
-                                curVertMem, startCrds, endCrds, _curZ
-                        );
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-
-        StartEndCoords DrawItemProcessor::getStartEndCoords(
-                const QueueItem &item, const ItemState &state
+        bool DrawItemProcessor::processStateDiff(
+                const ItemState &statePrev, const ItemState &stateCur,
+                DrawOpVector &drawOps, bool isTransp
         ) {
-            StartEndCoords crds;
-            switch(item.type){
-                case QueueItem::SINGLE_PIXEL:
-                    crds.start = genCoords(item.data.singlePixel.x, item.data.singlePixel.y);
-                    crds.end = genCoords(item.data.singlePixel.x + 1, item.data.singlePixel.y + 1);
-                    break;
-                case QueueItem::CLEAR:
-                    crds.start = genCoords(0, 0);
-                    crds.end = genCoords(_bufPrepParams->getPxTextureCoords());
-                    break;
-                case QueueItem::BAR:
-                    crds.start = genCoords(item.data.bar.left, item.data.bar.top);
-                    crds.end = genCoords(item.data.bar.right, item.data.bar.bottom);
-                    break;
-                case QueueItem::PIXEL_CONTAINER: {
-                    Rectangle coords = item.data.pixelContainer->getCoords();
-                    crds.start = genCoords(coords.left, coords.top);
-                    crds.end = genCoords(coords.right, coords.bottom);
-                }
-                    break;
-                case QueueItem::FILLELLIPSE:
-                    if(
-                            (_stateHelper->fillTextureUsed(state) && _bufPrepParams->supportsTexturedEllipse()) ||
-                            (!_stateHelper->fillTextureUsed(state) && _bufPrepParams->supportsEllipse())
-                            ){
-                        crds.start = genCoords(
-                                item.data.fillellipse.x - item.data.fillellipse.xradius,
-                                item.data.fillellipse.y - item.data.fillellipse.yradius
-                        );
-                        crds.end = genCoords(
-                                item.data.fillellipse.x + item.data.fillellipse.xradius,
-                                item.data.fillellipse.y + item.data.fillellipse.yradius
-                        );
-                    } else {
-                        crds.start = crds.end = genCoords(
-                                item.data.fillellipse.x,
-                                item.data.fillellipse.y - item.data.fillellipse.yradius
-                        );
-                    }
-                    break;
-                case QueueItem::RECTANGLE:
-                    if(
-                            (_stateHelper->lineTextureUsed(state) && _bufPrepParams->supportsTexturedRectangle())
-                    ){
-                        int_fast32_t thickness = _stateHelper->getLastState().lineThickness / 2;
-                        crds.start = genCoords(item.data.rectangle.left - thickness, item.data.rectangle.top - thickness);
-                        crds.end = genCoords(item.data.rectangle.right + thickness, item.data.rectangle.bottom + thickness);
-                    } else {
-                        crds = _primCreator.getRectangleCoords(
-                                genCoords(item.data.rectangle.left, item.data.rectangle.top),
-                                genCoords(item.data.rectangle.right, item.data.rectangle.bottom),
-                                _stateHelper->getLastState().lineThickness
-                        );
-                    }
-                default:
-                    break;
-            }
-            return crds;
-        }
-
-        void DrawItemProcessor::processDrawItem(
-                const QueueItem &item, void *&curVertMem,
-                uint_fast32_t &,
-                const ItemState &state
-        ) {
-            switch(item.type){
-                case QueueItem::RECTANGLE:
-                    if(
-                            (_stateHelper->lineTextureUsed(state) && _bufPrepParams->supportsTexturedRectangle())
-                    ){
-                        if(_stateHelper->lineTextureUsed(state)){
-                            curVertMem = _primCreator.genTexRectangle(curVertMem,
-                                                                   genCoords(item.data.rectangle.left,
-                                                                             item.data.rectangle.top),
-                                                                   genCoords(item.data.rectangle.right,
-                                                                             item.data.rectangle.bottom),
-                                                                   _stateHelper->getLastState().lineThickness,
-                                                                   _curZ,
-                                                                   _stateHelper->getLastState().drawColor
-                            );
-                        }
-                    } else {
-                        curVertMem = _primCreator.genRectangle(curVertMem,
-                                                               genCoords(item.data.rectangle.left,
-                                                                         item.data.rectangle.top),
-                                                               genCoords(item.data.rectangle.right,
-                                                                         item.data.rectangle.bottom),
-                                                               _stateHelper->getLastState().lineThickness,
-                                                               _curZ,
-                                                               _stateHelper->getLastState().drawColor,
-                                                               _stateHelper->lineTextureUsed(state)
-                        );
-                    }
-                    break;
-                case QueueItem::SINGLE_PIXEL:
-                    curVertMem = _primCreator.genQuad(curVertMem,
-                                                      genCoords(item.data.singlePixel.x, item.data.singlePixel.y),
-                                                      genCoords(item.data.singlePixel.x + 1, item.data.singlePixel.y + 1),
-                                                      _curZ,
-                                                      item.data.singlePixel.color
-                    );
-                    break;
-                case QueueItem::CLEAR:
-                    curVertMem = _primCreator.genQuad(curVertMem,
-                                                      genCoords(0, 0),
-                                                      genCoords(_bufPrepParams->getMaxCoords()),
-                                                      _curZ,
-                                                      0xFFFFFF
-                    );
-                    break;
-                case QueueItem::FILLELLIPSE:
-                    if (_stateHelper->fillTextureUsed(state)) {
-                        if (_bufPrepParams->supportsTexturedEllipse()) {
-                            curVertMem = _primCreator.genTexEllipseQuad(curVertMem,
-                                                                        genCoords(item.data.fillellipse.x, item.data.fillellipse.y),
-                                                                        genUCoords(
-                                                                                item.data.fillellipse.xradius,
-                                                                                item.data.fillellipse.yradius
-                                                                        ),
-                                                                        _curZ,
-                                                                        _stateHelper->getLastState().fillColor,
-                                                                        _stateHelper->getLastState().bgColor
-                            );
-                        } else {
-                            curVertMem = _primCreator.genEllipse(curVertMem,
-                                                                 genCoords(
-                                                                         item.data.fillellipse.x,
-                                                                         item.data.fillellipse.y
-                                                                 ),
-                                                                 genUCoords(
-                                                                         item.data.fillellipse.xradius,
-                                                                         item.data.fillellipse.yradius
-                                                                 ),
-                                                                 _curZ,
-                                                                 _stateHelper->getLastState().fillColor,
-                                                                 true
-                            );
-                        }
-                    } else {
-                        if (_bufPrepParams->supportsEllipse()) {
-                            curVertMem = _primCreator.genEllipseQuad(curVertMem,
-                                                                     genCoords(item.data.fillellipse.x, item.data.fillellipse.y),
-                                                                     genUCoords(
-                                                                             item.data.fillellipse.xradius,
-                                                                             item.data.fillellipse.yradius
-                                                                     ),
-                                                                     _curZ,
-                                                                     _stateHelper->getFillColor()
-                            );
-                        } else {
-                            curVertMem = _primCreator.genEllipse(curVertMem,
-                                                                 genCoords(
-                                                                         item.data.fillellipse.x,
-                                                                         item.data.fillellipse.y
-                                                                 ),
-                                                                 genUCoords(
-                                                                         item.data.fillellipse.xradius,
-                                                                         item.data.fillellipse.yradius
-                                                                 ),
-                                                                 _curZ,
-                                                                 _stateHelper->getFillColor(),
-                                                                 false
-                            );
-                        }
-                    }
-                    break;
-                case QueueItem::BAR:
-                    if (_stateHelper->fillTextureUsed(state)) {
-                        if(_bufPrepParams->supportsTexturedBar()){
-                            curVertMem = _primCreator.genFillCol2Quad(curVertMem,
-                                                                      genCoords(item.data.bar.left, item.data.bar.top),
-                                                                      genCoords(item.data.bar.right, item.data.bar.bottom),
-                                                                      _curZ,
-                                                                      _stateHelper->getLastState().fillColor,
-                                                                      _stateHelper->getLastState().bgColor
-
-                            );
-                        } else {
-                            curVertMem = _primCreator.genFillQuad(curVertMem,
-                                                                  genCoords(item.data.bar.left, item.data.bar.top),
-                                                                  genCoords(item.data.bar.right, item.data.bar.bottom),
-                                                                  _curZ,
-                                                                  _stateHelper->getLastState().fillColor
-                            );
-                        }
-                    } else {
-                        curVertMem = _primCreator.genQuad(curVertMem,
-                                                          genCoords(item.data.bar.left, item.data.bar.top),
-                                                          genCoords(item.data.bar.right, item.data.bar.bottom),
-                                                          _curZ,
-                                                          _stateHelper->getFillColor()
-
-                        );
-                    }
-                    break;
-                case QueueItem::PIXEL_CONTAINER: {
-                    Rectangle coords = item.data.pixelContainer->getCoords();
-                    curVertMem = _primCreator.genTexQuad(
-                            curVertMem,
-                            genCoords(coords.left, coords.top), genCoords(coords.right, coords.bottom),
-                            _bufPrepParams->getPxTextureCoords(),
-                            _curZ
-                    );
-                }
-                    break;
-                default:break;
-            }
-        }
-
-        DrawItemProcessor::NumVertices DrawItemProcessor::getNumVertices(const QueueItem &item, const ItemState &state, bool isFirst) {
-            NumVertices res;
-            res.degenerate = (isFirst) ? 0 : 2;
-            if(item.type == QueueItem::FILLELLIPSE &&
-                    (
-                        (_stateHelper->fillTextureUsed(state) && !_bufPrepParams->supportsTexturedEllipse()) ||
-                        (!_stateHelper->fillTextureUsed(state) && !_bufPrepParams->supportsEllipse())
-                    )
-            ){
-                res.primitive = _primCreator.getNumEllipseVertices(
-                        genUCoords(
-                                item.data.fillellipse.xradius,
-                                item.data.fillellipse.yradius
-                        )
-                );
-                return res;
+            ItemState stateDiff = _propMan->itemStateDiff(statePrev, stateCur);
+            bool isFirst = false;
+            if(stateDiff[PropertyName::SHADER_TYPE].isSet){
+                isFirst = true;
             }
             if(
-                    item.type == QueueItem::RECTANGLE &&
-                        (
-                            (_stateHelper->lineTextureUsed(state) && !_bufPrepParams->supportsTexturedRectangle()) ||
-                            (!_stateHelper->lineTextureUsed(state))
-                        )
-            ){
-                res.primitive = VERTICES_IN_QUAD * 4;
-                return res;
+                    stateDiff[PropertyName::TEXTURE_STATE].isSet &&
+                    stateDiff[PropertyName::TEXTURE_STATE].val == TextureState::NO_TEXTURE
+                    ){
+                drawOps.push_back(DrawOpCreator::create<DrawOpType::REMOVE_PATTERN_TEXTURE>());
+                isFirst = true;
             }
-            res.primitive = VERTICES_IN_QUAD;
-            return res;
+
+            if(
+                    stateDiff[PropertyName::PIXEL_TEXTURE_STATE].isSet &&
+                    stateDiff[PropertyName::PIXEL_TEXTURE_STATE].val == PixelTextureState::NO_TEXTURE
+                    ){
+                drawOps.push_back(DrawOpCreator::create<DrawOpType::REMOVE_PIXEL_TEXTURE>());
+                isFirst = true;
+            }
+
+            if(stateDiff[PropertyName::USER_FILL_PATTERN].isSet){
+                drawOps.push_back(DrawOpCreator::create<DrawOpType::SET_USER_FILL_PATTERN>(
+                        static_cast<char*>(stateCur[PropertyName::USER_FILL_PATTERN].valP)
+                ));
+                isFirst = true;
+            }
+
+            if(stateDiff[PropertyName::USER_LINE_PATTERN].isSet){
+                drawOps.push_back(DrawOpCreator::create<DrawOpType::SET_USER_LINE_PATTERN>(
+                        stateCur[PropertyName::USER_LINE_PATTERN].val
+                ));
+            }
+
+            if(_bufPrepParams->needRecreateTexture()){
+                if (
+                        stateDiff[PropertyName::FILL_PATTERN].isSet ||
+                        stateDiff[PropertyName::USER_FILL_PATTERN].isSet ||
+                        stateDiff[PropertyName::BG_COLOR].isSet ||
+                        (isTransp && stateDiff[PropertyName::FILL_COLOR].isSet)
+                        ){
+                    if(isTransp){
+                        drawOps.push_back(
+                                DrawOpCreator::create<DrawOpType::SET_FILL_PATTERN_TWO_COLORS>(
+                                        stateCur[PropertyName::FILL_PATTERN].val,
+                                        stateCur[PropertyName::BG_COLOR].val,
+                                        stateCur[PropertyName::FILL_COLOR].val
+                                ));
+                    } else {
+                        drawOps.push_back(
+                                DrawOpCreator::create<DrawOpType::SET_FILL_PATTERN_COLOR>(
+                                        stateCur[PropertyName::FILL_PATTERN].val,
+                                        stateCur[PropertyName::BG_COLOR].val
+                                ));
+                    }
+                    isFirst = true;
+                }
+            } else {
+                if (stateDiff[PropertyName::FILL_PATTERN].isSet ||
+                    stateDiff[PropertyName::USER_FILL_PATTERN].isSet) {
+                    drawOps.push_back(
+                            DrawOpCreator::create<DrawOpType::SET_FILL_PATTERN>(
+                                    stateCur[PropertyName::FILL_PATTERN].val));
+                    isFirst = true;
+                }
+                if (stateDiff[PropertyName::BG_COLOR].isSet) {
+                    drawOps.push_back(DrawOpCreator::create<DrawOpType::SET_TEX_BG_COLOR>(
+                            stateDiff[PropertyName::BG_COLOR].val
+                    ));
+                    isFirst = true;
+                }
+            }
+
+            if(
+                    stateDiff[PropertyName::LINE_PATTERN].isSet ||
+                    stateDiff[PropertyName::USER_LINE_PATTERN].isSet ||
+                    (_bufPrepParams->needRecreateTexture() && stateDiff[PropertyName::DRAW_COLOR].isSet)
+                    ){
+                if(_bufPrepParams->needRecreateTexture() && stateDiff[PropertyName::DRAW_COLOR].isSet){
+                    drawOps.push_back(
+                            DrawOpCreator::create<DrawOpType::SET_LINE_PATTERN_COLOR>(
+                                    stateCur[PropertyName::LINE_PATTERN].val,
+                                    stateDiff[PropertyName::DRAW_COLOR].val
+                            )
+                    );
+                } else {
+                    drawOps.push_back(
+                            DrawOpCreator::create<DrawOpType::SET_LINE_PATTERN>(
+                                    stateCur[PropertyName::LINE_PATTERN].val
+                            )
+                    );
+                }
+                isFirst = true;
+            }
+
+            if(stateDiff[PropertyName::PIXEL_CONTAINER].isSet){
+                drawOps.push_back(DrawOpCreator::create<DrawOpType::SET_PIXEL_TEXTURE>(
+                        static_cast<IPixelContainer*>(stateDiff[PropertyName::PIXEL_CONTAINER].valP)
+                ));
+                isFirst = true;
+            }
+
+            return isFirst;
         }
 
         bool DrawItemProcessor::canCreateMoreItems() {
@@ -421,9 +132,24 @@ namespace directgraph {
         }
 
         DrawItemProcessor::DrawItemProcessor(
-                StateHelper *stateHelper, BufferPreparerParams *bufPrepParams
-        ): _stateHelper(stateHelper), _bufPrepParams(bufPrepParams) {
+                StateHelper *stateHelper,
+                BufferPreparerParams *bufPrepParams,
+                DrawerManager *drawerManager,
+                PropertyManager *propMan
+        ): _stateHelper(stateHelper), _bufPrepParams(bufPrepParams),
+           _drawerManager(drawerManager), _propMan(propMan)
+        {
             resetItemCount();
+        }
+
+        float DrawItemProcessor::getCurZ() {
+            return _curZ;
+        }
+
+        ItemState DrawItemProcessor::createItemState() {
+            ItemState state = _propMan->getNullState();
+            _drawerManager->getActiveDrawer()->getItemState(state);
+            return state;
         }
     }
 }

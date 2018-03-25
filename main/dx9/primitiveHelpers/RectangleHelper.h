@@ -2,8 +2,8 @@
 
 #include <main/util.h>
 #include "SimplePrimHelper.h"
-#include "misc.h"
-#include "TextureCoordsCalc.h"
+#include <misc.h>
+#include <TextureCoordsCalc.h>
 
 namespace directgraph {
     namespace dx9{
