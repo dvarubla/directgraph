@@ -4,12 +4,9 @@
 namespace directgraph {
     namespace dx9 {
         void RectangleDrawer::getItemState(ItemState &state) {
-            _drawStateHelper->disablePixelTexture(state);
             _drawStateHelper->useLineStyle(state, _bufPrepParams->needRecreateTexture() && !_bufPrepParams->supportsTexturedRectangle());
             if(_bufPrepParams->supportsTexturedRectangle() && _stateHelper->lineTextureUsed(state)){
                 _propMan->setProp(state, PropertyName::SHADER_TYPE, ShaderType::TEXTURED_RECTANGLE_SHADER);
-            } else {
-                _drawStateHelper->disableShader(state);
             }
         }
 

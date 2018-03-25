@@ -4,15 +4,12 @@
 namespace directgraph{
     namespace dx9{
         void BarDrawer::getItemState(ItemState &state) {
-            _drawStateHelper->disablePixelTexture(state);
             _drawStateHelper->useFillTexture(
                     state,
                     !_bufPrepParams->supportsTexturedBar(), _bufPrepParams->needRecreateTexture()
             );
             if(_bufPrepParams->supportsTexturedBar() && _stateHelper->fillTextureUsed(state)){
                 _propMan->setProp(state, PropertyName::SHADER_TYPE, ShaderType::TEXTURED_BAR_SHADER);
-            } else {
-                _drawStateHelper->disableShader(state);
             }
         }
 

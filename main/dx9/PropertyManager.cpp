@@ -6,24 +6,23 @@ namespace directgraph {
         PropertyManager::PropertyManager() {
         }
 
-        ItemState PropertyManager::itemStateDiff(const ItemState &statePrev, const ItemState &stateCurr) {
-            ItemState res;
+        ItemStateDiff PropertyManager::getItemStateDiff(const ItemState &statePrev, const ItemState &stateCurr) {
+            ItemStateDiff res;
             for(uint_fast8_t i = 0; i < PropertyName::TOTAL_PROP_COUNT; i++){
-                if(stateCurr[i].isSet &&
-                        (
-                                !statePrev[i].isSet ||
-                                (i == PropertyName::USER_FILL_PATTERN && stateCurr[i].valP != statePrev[i].valP) ||
-                                (i != PropertyName::USER_FILL_PATTERN && stateCurr[i].val != statePrev[i].val)
-                        )
-                ){
-                    res[i].isSet = true;
-                    if(i == PropertyName::USER_FILL_PATTERN){
-                        res[i].valP = stateCurr[i].valP;
+                res[i].added = false;
+                res[i].changed = false;
+                res[i].removed = false;
+                if(stateCurr[i].isSet){
+                    if(statePrev[i].isSet){
+                        if((i == PropertyName::USER_FILL_PATTERN && stateCurr[i].valP != statePrev[i].valP) ||
+                           (i != PropertyName::USER_FILL_PATTERN && stateCurr[i].val != statePrev[i].val)){
+                            res[i].changed = true;
+                        }
                     } else {
-                        res[i].val = stateCurr[i].val;
+                        res[i].added = true;
                     }
-                } else {
-                    res[i].isSet = false;
+                } else if(statePrev[i].isSet){
+                    res[i].removed = true;
                 }
             }
             return res;
@@ -31,12 +30,6 @@ namespace directgraph {
 
         ItemState PropertyManager::getInitialItemState() {
             ItemState res = getNullState();
-            res[PropertyName::TEXTURE_STATE].val = TextureState::NO_TEXTURE;
-            res[PropertyName::TEXTURE_STATE].isSet = true;
-            res[PropertyName::PIXEL_TEXTURE_STATE].val = PixelTextureState::NO_TEXTURE;
-            res[PropertyName::PIXEL_TEXTURE_STATE].isSet = true;
-            res[PropertyName::SHADER_TYPE].val = ShaderType::NO_SHADER;
-            res[PropertyName::SHADER_TYPE].isSet = true;
             return res;
         }
 

@@ -4,9 +4,6 @@
 namespace directgraph{
     namespace dx9{
         void PixelContainerDrawer::getItemState(ItemState &state) {
-            _drawStateHelper->disableShader(state);
-            _drawStateHelper->disableTexture(state);
-            _propMan->setProp(state, PropertyName::PIXEL_TEXTURE_STATE, PixelTextureState::PIXEL_TEXTURE);
             _propMan->setPropP(state, PropertyName::PIXEL_CONTAINER, _curItem.data.pixelContainer);
         }
 
@@ -47,10 +44,9 @@ namespace directgraph{
         }
 
         PixelContainerDrawer::PixelContainerDrawer(
-                DrawStateHelper *drawStateHelper,
                 BufferPreparerParams *bufPrepParams, PropertyManager *propMan,
                 SimplePrimHelper *simplePrimHelper
-        ) : _drawStateHelper(drawStateHelper), _bufPrepParams(bufPrepParams),
+        ) :  _bufPrepParams(bufPrepParams),
             _propMan(propMan), _simplePrimHelper(simplePrimHelper){
 
         }

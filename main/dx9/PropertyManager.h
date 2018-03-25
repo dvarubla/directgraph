@@ -24,7 +24,6 @@ namespace directgraph {
                 BG_COLOR,
                 SHADER_TYPE,
                 TEXTURE_STATE,
-                PIXEL_TEXTURE_STATE,
                 PIXEL_CONTAINER,
                 TOTAL_PROP_COUNT
             };
@@ -32,7 +31,6 @@ namespace directgraph {
 
         namespace ShaderType {
             enum Type {
-                NO_SHADER,
                 ELLIPSE_SHADER,
                 TEXTURED_ELLIPSE_SHADER,
                 TEXTURED_BAR_SHADER,
@@ -42,16 +40,8 @@ namespace directgraph {
 
         namespace TextureState {
             enum State {
-                NO_TEXTURE,
                 FILL_TEXTURE,
                 LINE_TEXTURE
-            };
-        }
-
-        namespace PixelTextureState{
-            enum State{
-                NO_TEXTURE,
-                PIXEL_TEXTURE
             };
         }
 
@@ -63,10 +53,18 @@ namespace directgraph {
 
         bool operator==(const ItemState &l, const ItemState &r);
 
+        struct ItemStateDiffPart{
+            bool added;
+            bool changed;
+            bool removed;
+        };
+
+        typedef std::array<ItemStateDiffPart, PropertyName::TOTAL_PROP_COUNT> ItemStateDiff;
+
         class PropertyManager {
         public:
             PropertyManager();
-            ItemState itemStateDiff(const ItemState &statePrev, const ItemState &stateCurr);
+            ItemStateDiff getItemStateDiff(const ItemState &statePrev, const ItemState &stateCurr);
             ItemState getInitialItemState();
             ItemState getNullState();
             void setProp(ItemState &state, PropertyName::Name name, uint_fast32_t val);

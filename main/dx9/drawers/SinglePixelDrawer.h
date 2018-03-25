@@ -10,7 +10,6 @@ namespace directgraph {
     namespace dx9 {
         class SinglePixelDrawer: public NullDrawer{
         private:
-            DrawStateHelper *_drawStateHelper;
             BufferPreparerParams *_bufPrepParams;
             PropertyManager *_propMan;
             SimplePrimHelper *_simplePrimHelper;
@@ -18,7 +17,6 @@ namespace directgraph {
             QueueItem _curItem;
         public:
             SinglePixelDrawer(
-                    DrawStateHelper *drawStateHelper,
                     BufferPreparerParams *bufPrepParams,
                     PropertyManager *propMan,
                     SimplePrimHelper *simplePrimHelper,

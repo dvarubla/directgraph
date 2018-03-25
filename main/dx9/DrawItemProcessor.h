@@ -21,6 +21,7 @@ namespace directgraph {
             uint_fast32_t _itemNum;
 
             void setCurZ();
+            bool addedOrChanged(const ItemStateDiffPart &diffPart);
         public:
             DrawItemProcessor(
                     StateHelper *stateHelper,

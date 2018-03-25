@@ -3,7 +3,6 @@
 namespace directgraph{
     namespace dx9{
         void EllipseDrawer::getItemState(ItemState &_curState) {
-            _drawStateHelper->disablePixelTexture(_curState);
             _drawStateHelper->useFillTexture(
                     _curState,
                     !_bufPrepParams->supportsTexturedEllipse(),
@@ -13,14 +12,10 @@ namespace directgraph{
                 if(_stateHelper->fillTextureUsed(_curState)){
                     if(_bufPrepParams->supportsTexturedEllipse()){
                         _propMan->setProp(_curState, PropertyName::SHADER_TYPE, ShaderType::TEXTURED_ELLIPSE_SHADER);
-                    } else {
-                        _drawStateHelper->disableShader(_curState);
                     }
                 } else {
                     if (_bufPrepParams->supportsEllipse()) {
                         _propMan->setProp(_curState, PropertyName::SHADER_TYPE, ShaderType::ELLIPSE_SHADER);
-                    } else {
-                        _drawStateHelper->disableShader(_curState);
                     }
                 }
             }

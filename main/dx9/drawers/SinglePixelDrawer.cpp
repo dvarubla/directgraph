@@ -3,10 +3,7 @@
 
 namespace directgraph{
     namespace dx9{
-        void SinglePixelDrawer::getItemState(ItemState &state) {
-            _drawStateHelper->disablePixelTexture(state);
-            _drawStateHelper->disableShader(state);
-            _drawStateHelper->disableTexture(state);
+        void SinglePixelDrawer::getItemState(ItemState &) {
         }
 
         NumVertices SinglePixelDrawer::getNumVertices(bool isFirst) {
@@ -51,10 +48,10 @@ namespace directgraph{
             _curItem = item;
         }
 
-        SinglePixelDrawer::SinglePixelDrawer(DrawStateHelper *drawStateHelper, BufferPreparerParams *bufPrepParams,
+        SinglePixelDrawer::SinglePixelDrawer(BufferPreparerParams *bufPrepParams,
                                              PropertyManager *propMan, SimplePrimHelper *simplePrimHelper,
                                              DegenerateHelper *degenerateHelper
-        ): _drawStateHelper(drawStateHelper), _bufPrepParams(bufPrepParams),
+        ): _bufPrepParams(bufPrepParams),
            _propMan(propMan), _simplePrimHelper(simplePrimHelper), _degenerateHelper(degenerateHelper){
         }
     }

@@ -3,10 +3,7 @@
 
 namespace directgraph{
     namespace dx9{
-        void Clearer::getItemState(ItemState &state) {
-            _drawStateHelper->disablePixelTexture(state);
-            _drawStateHelper->disableShader(state);
-            _drawStateHelper->disableTexture(state);
+        void Clearer::getItemState(ItemState &) {
         }
 
         NumVertices Clearer::getNumVertices(bool isFirst) {
@@ -47,10 +44,10 @@ namespace directgraph{
         }
 
         Clearer::Clearer(
-                DrawStateHelper *drawStateHelper, BufferPreparerParams *bufPrepParams,
+                BufferPreparerParams *bufPrepParams,
                 PropertyManager *propMan, SimplePrimHelper *simplePrimHelper,
                 DegenerateHelper *degenerateHelper
-        ) : _drawStateHelper(drawStateHelper), _bufPrepParams(bufPrepParams), _propMan(propMan),
+        ) : _bufPrepParams(bufPrepParams), _propMan(propMan),
             _simplePrimHelper(simplePrimHelper), _degenerateHelper(degenerateHelper){
         }
     }

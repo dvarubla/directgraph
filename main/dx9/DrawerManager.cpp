@@ -14,8 +14,7 @@ namespace directgraph{
                 PropertyManager *propMan
         ) : _drawStateHelper(stateHelper, propMan), _rectangleHelper(&_simplePrimHelper, &_texCrdsCalc){
             _drawers[CLEARER] = new Clearer(
-                    &_drawStateHelper, bufPrepParams, propMan,
-                    &_simplePrimHelper, &_degenerateHelper
+                    bufPrepParams, propMan, &_simplePrimHelper, &_degenerateHelper
             );
             _drawers[BAR_DRAWER] = new BarDrawer(
                 &_drawStateHelper, stateHelper, bufPrepParams, propMan,
@@ -30,11 +29,10 @@ namespace directgraph{
                     &_simplePrimHelper, &_ellipseHelper, &_degenerateHelper
             );
             _drawers[PIXEL_CONTAINER_DRAWER] = new PixelContainerDrawer(
-                    &_drawStateHelper, bufPrepParams, propMan,
-                    &_simplePrimHelper
+                    bufPrepParams, propMan, &_simplePrimHelper
             );
             _drawers[SINGLE_PIXEL_DRAWER] = new SinglePixelDrawer(
-                    &_drawStateHelper, bufPrepParams, propMan,
+                    bufPrepParams, propMan,
                     &_simplePrimHelper, &_degenerateHelper
             );
         }

@@ -29,11 +29,13 @@ namespace directgraph {
         }
 
         bool StateHelper::fillTextureUsed(const ItemState &state) {
-            return state[PropertyName::TEXTURE_STATE].val == TextureState::FILL_TEXTURE;
+            return state[PropertyName::TEXTURE_STATE].isSet &&
+                    state[PropertyName::TEXTURE_STATE].val == TextureState::FILL_TEXTURE;
         }
 
         bool StateHelper::lineTextureUsed(const ItemState &state) {
-            return state[PropertyName::TEXTURE_STATE].val == TextureState::LINE_TEXTURE;
+            return state[PropertyName::TEXTURE_STATE].isSet &&
+                    state[PropertyName::TEXTURE_STATE].val == TextureState::LINE_TEXTURE;
         }
 
         void StateHelper::resetState() {

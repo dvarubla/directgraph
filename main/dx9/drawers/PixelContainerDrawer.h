@@ -9,14 +9,12 @@ namespace directgraph {
     namespace dx9 {
         class PixelContainerDrawer: public NullDrawer {
         private:
-            DrawStateHelper *_drawStateHelper;
             BufferPreparerParams *_bufPrepParams;
             PropertyManager *_propMan;
             SimplePrimHelper *_simplePrimHelper;
             QueueItem _curItem;
         public:
             PixelContainerDrawer(
-                    DrawStateHelper *drawStateHelper,
                     BufferPreparerParams *bufPrepParams,
                     PropertyManager *propMan,
                     SimplePrimHelper *simplePrimHelper

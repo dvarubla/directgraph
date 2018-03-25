@@ -11,14 +11,12 @@ namespace directgraph {
     namespace dx9 {
         class Clearer: public NullDrawer {
         private:
-            DrawStateHelper *_drawStateHelper;
             BufferPreparerParams *_bufPrepParams;
             PropertyManager *_propMan;
             SimplePrimHelper *_simplePrimHelper;
             DegenerateHelper *_degenerateHelper;
         public:
             Clearer(
-                    DrawStateHelper *drawStateHelper,
                     BufferPreparerParams *bufPrepParams,
                     PropertyManager *propMan,
                     SimplePrimHelper *simplePrimHelper,

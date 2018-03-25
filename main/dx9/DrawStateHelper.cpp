@@ -5,9 +5,7 @@
 namespace directgraph{
     namespace dx9{
         void DrawStateHelper::useFillTexture(ItemState &state, bool useBgColor, bool useFillColorIfTransp) {
-            if (_stateHelper->getLastState().fillPattern == SOLID_FILL || _stateHelper->getLastState().fillPattern == EMPTY_FILL){
-                _propMan->setProp(state, PropertyName::TEXTURE_STATE, TextureState::NO_TEXTURE);
-            } else {
+            if (_stateHelper->getLastState().fillPattern != SOLID_FILL && _stateHelper->getLastState().fillPattern != EMPTY_FILL){
                 _propMan->setProp(state, PropertyName::FILL_PATTERN, _stateHelper->getLastState().fillPattern);
                 _propMan->setProp(state, PropertyName::TEXTURE_STATE, TextureState::FILL_TEXTURE);
                 if(_stateHelper->getLastState().fillPattern == USER_FILL){
@@ -33,9 +31,7 @@ namespace directgraph{
         }
 
         void DrawStateHelper::useLineStyle(ItemState &state, bool useDrawColor) {
-            if(_stateHelper->getLastState().lineStyle == NULL_LINE || _stateHelper->getLastState().lineStyle == SOLID_LINE){
-                _propMan->setProp(state, PropertyName::TEXTURE_STATE, TextureState::NO_TEXTURE);
-            } else {
+            if(_stateHelper->getLastState().lineStyle != NULL_LINE && _stateHelper->getLastState().lineStyle != SOLID_LINE){
                 _propMan->setProp(state, PropertyName::TEXTURE_STATE, TextureState::LINE_TEXTURE);
                 _propMan->setProp(state, PropertyName::LINE_PATTERN, _stateHelper->getLastState().lineStyle);
                 if(useDrawColor){
@@ -49,18 +45,6 @@ namespace directgraph{
                     );
                 }
             }
-        }
-
-        void DrawStateHelper::disableTexture(ItemState &state) {
-            _propMan->setProp(state, PropertyName::TEXTURE_STATE, TextureState::NO_TEXTURE);
-        }
-
-        void DrawStateHelper::disablePixelTexture(ItemState &state) {
-            _propMan->setProp(state, PropertyName::PIXEL_TEXTURE_STATE, PixelTextureState::NO_TEXTURE);
-        }
-
-        void DrawStateHelper::disableShader(ItemState &state) {
-            _propMan->setProp(state, PropertyName::SHADER_TYPE, ShaderType::NO_SHADER);
         }
 
         DrawStateHelper::DrawStateHelper(StateHelper *stateHelper, PropertyManager *propMan)
