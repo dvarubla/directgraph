@@ -74,6 +74,11 @@ namespace directgraph{
     }
 
     void ThreadController::bar(int_fast32_t left, int_fast32_t top, int_fast32_t right, int_fast32_t bottom) {
+        if(
+                !_paramsChecker.checkBar(left, top, right, bottom)
+        ){
+            return;
+        }
         QueueItem item = QueueItemCreator::create<QueueItem::BAR>(left, top, right, bottom);
         writeItemHelper(item);
     }
@@ -89,8 +94,23 @@ namespace directgraph{
         writeItemHelper(item);
     }
 
+    void ThreadController::setcolor(uint_fast32_t color) {
+        QueueItem item = QueueItemCreator::create<QueueItem::COLOR>(color);
+        writeItemHelper(item);
+    }
+
     void ThreadController::setfillpattern(const char *fillpattern, uint_fast32_t color) {
         QueueItem item = QueueItemCreator::create<QueueItem::SETFILLPATTERN>(fillpattern, color);
+        writeItemHelper(item);
+    }
+
+    void ThreadController::rectangle(int_fast32_t left, int_fast32_t top, int_fast32_t right, int_fast32_t bottom){
+        if(
+                !_paramsChecker.checkRectangle(left, top, right, bottom)
+        ){
+            return;
+        }
+        QueueItem item = QueueItemCreator::create<QueueItem::RECTANGLE>(left, top, right, bottom);
         writeItemHelper(item);
     }
 

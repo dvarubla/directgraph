@@ -1,6 +1,7 @@
 #include "ParamsChecker.h"
 #include "WException.h"
 #include "util.h"
+#include <algorithm>
 
 namespace directgraph{
     bool ParamsChecker::checkEllipse(int32_t , int32_t , uint32_t rx, uint32_t ry) {
@@ -25,5 +26,31 @@ namespace directgraph{
         if(fillstyle > USER_FILL){
             THROW_EXC_CODE(WException, WRONG_DRAW_PARAM, L"Wrong fillstyle param: " + to_wstring(fillstyle));
         }
+    }
+
+    bool ParamsChecker::checkRectangle(int_fast32_t &left, int_fast32_t &top, int_fast32_t &right, int_fast32_t &bottom) {
+        if(right == left || top == bottom){
+            return false;
+        }
+        if(left > right){
+            std::swap(left, right);
+        }
+        if(top > bottom){
+            std::swap(top, bottom);
+        }
+        return true;
+    }
+
+    bool ParamsChecker::checkBar(int_fast32_t &left, int_fast32_t &top, int_fast32_t &right, int_fast32_t &bottom) {
+        if(right == left || top == bottom){
+            return false;
+        }
+        if(left > right){
+            std::swap(left, right);
+        }
+        if(top > bottom){
+            std::swap(top, bottom);
+        }
+        return true;
     }
 }
