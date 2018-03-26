@@ -1,55 +1,54 @@
 #pragma once
 
+#include <resources/common_res.h>
+#include <array>
 #include "IFeatures.h"
 
 namespace directgraph {
     namespace dx9 {
         class ShaderManager {
         private:
+            enum VertexShaderId{
+                CENTER_BAR_V1_1_SHADER,
+                TEXTURED_BAR_V1_1_SHADER,
+                TEXTURED_CENTER_BAR_V1_1_SHADER,
+                TEXTURED_CENTER_RECTANGLE_V1_1_SHADER,
+                CENTER_RECTANGLE_V1_1_SHADER,
+                TOTAL_SHADERS
+            };
+            const static int FIRST_VERTEX_SHADER = CENTER_BAR_V1_1;
+            enum PixelShaderId{
+                ELLIPSE_P1_4_SHADER,
+                TEXTURED_BAR_P1_4_SHADER,
+                TEXTURED_ELLIPSE_P1_4_SHADER,
+                TEXTURED_RECTANGLE_P2_0_SHADER,
+                RECTANGLE_P1_4_SHADER
+            };
+            const static int FIRST_PIXEL_SHADER = ELLIPSE_P1_4;
+            struct ShaderInfo{
+                IDirect3DVertexShader9 *vertexShader;
+                IDirect3DPixelShader9 *pixelShader;
+                IDirect3DVertexDeclaration9 *vertexDecl;
+                uint_fast32_t vertexShaderId;
+                uint_fast32_t pixelShaderId;
+                IFeatures::ShaderVersion vertexShaderVer;
+                IFeatures::ShaderVersion pixelShaderVer;
+                bool haveSupport;
+            };
+            std::array<ShaderInfo, TOTAL_SHADERS> _shaders;
             IDirect3DDevice9 *_device;
-            IDirect3DVertexShader9 *_centerBarV11Shader;
-            IDirect3DPixelShader9 *_ellipseP14Shader;
-            IDirect3DVertexDeclaration9 *_centerBarV11Decl;
-            IDirect3DVertexShader9 *_texturedBarV11Shader;
-            IDirect3DPixelShader9 *_texturedBarP14Shader;
-            IDirect3DVertexDeclaration9 *_texturedBarV11Decl;
-            IDirect3DVertexShader9 *_texturedCenterBarV11Shader;
-            IDirect3DPixelShader9 *_texturedEllipseP14Shader;
-            IDirect3DVertexDeclaration9 *_texturedCenterBarV11Decl;
-            IDirect3DVertexShader9 *_texturedCenterRectangleV11Shader;
-            IDirect3DPixelShader9 *_texturedRectangleP20Shader;
-            IDirect3DVertexDeclaration9 *_texturedCenterRectangleV11Decl;
-            IDirect3DVertexShader9 *_centerRectangleV11Shader;
-            IDirect3DPixelShader9 *_rectangleP14Shader;
-            IDirect3DVertexDeclaration9 *_centerRectangleV11Decl;
+            bool _haveShaderSupport;
             void createVertexShader(uint_fast32_t name, uint_fast32_t type, IDirect3DVertexShader9 *&shader);
             void createPixelShader(uint_fast32_t name, uint_fast32_t type, IDirect3DPixelShader9 *&shader);
-            bool _supportsEllipse;
-            bool _supportsTexturedBar;
-            bool _supportsTexturedEllipse;
-            bool _supportsTexturedRectangle;
-            bool _supportsRectangle;
+
+            void setShader(ShaderManager::PixelShaderId id);
             void tryDeleteRes();
-            void createEllipseShaders(
+            void createShader(
+                    PixelShaderId id,
                     const IFeatures::ShaderVersion &vertexVer,
                     const IFeatures::ShaderVersion &pixelVer
             );
-            void createTexturedBarShaders(
-                    const IFeatures::ShaderVersion &vertexVer,
-                    const IFeatures::ShaderVersion &pixelVer
-            );
-            void createTexturedEllipseShaders(
-                    const IFeatures::ShaderVersion &vertexVer,
-                    const IFeatures::ShaderVersion &pixelVer
-            );
-            void createTexturedRectangleShaders(
-                    const IFeatures::ShaderVersion &vertexVer,
-                    const IFeatures::ShaderVersion &pixelVer
-            );
-            void createRectangleShaders(
-                    const IFeatures::ShaderVersion &vertexVer,
-                    const IFeatures::ShaderVersion &pixelVer
-            );
+            bool checkSupport(uint_fast16_t id);
         public:
             ShaderManager(IFeatures *features, IDirect3DDevice9 *device);
             ~ShaderManager();
