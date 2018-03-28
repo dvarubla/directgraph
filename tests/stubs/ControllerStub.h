@@ -17,6 +17,11 @@ namespace directgraph{
         MOCK_METHOD1(setcolor, void(uint_fast32_t color));
         MOCK_METHOD3(putpixel, void (int_fast32_t x, int_fast32_t y, uint_fast32_t color));
         MOCK_METHOD0(repaint, void ());
+        MOCK_METHOD0(getcolor, uint_fast32_t());
+        MOCK_METHOD0(getbgcolor, uint_fast32_t());
+        MOCK_METHOD1(getlinesettings, void(linesettingstype *lineinfo));
+        MOCK_METHOD1(getfillsettings, void(fillsettingstype *fillinfo));
+        MOCK_METHOD1(getfillpattern, void(char *pattern));
     };
 }
 

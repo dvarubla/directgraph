@@ -14,6 +14,8 @@ endfunction()
 
 set(THREADS_SIMPLE_SRC threads_simple.cpp ../stubs/MyWindowStub.cpp ../stubs/MyWindowStub.h ../stubs/RendererStub.cpp ../stubs/RendererStub.h ../stubs/QueueItemUtils.cpp ../stubs/QueueItemUtils.h)
 main_test(threads_simple "${THREADS_SIMPLE_SRC}")
+set(THREADS_GETPROPS_SRC threads_getprops.cpp ../stubs/MyWindowStub.cpp ../stubs/MyWindowStub.h ../stubs/RendererStub.cpp ../stubs/RendererStub.h ../stubs/QueueItemUtils.cpp ../stubs/QueueItemUtils.h)
+main_test(threads_get_props "${THREADS_GETPROPS_SRC}")
 set(THREADS_LAST_SRC threads_last.cpp ../stubs/MyWindowStub.cpp ../stubs/MyWindowStub.h ../stubs/RendererStub.cpp ../stubs/RendererStub.h ../stubs/QueueItemUtils.cpp ../stubs/QueueItemUtils.h)
 main_test(threads_last "${THREADS_LAST_SRC}")
 set(WINDOW_MANAGER_SRC window_manager.cpp window_manager.cpp ../stubs/WindowFactoryStub.cpp ../stubs/WindowFactoryStub.h ../stubs/MyWindowStub.cpp ../stubs/MyWindowStub.h ../stubs/RendererStub.cpp ../stubs/RendererStub.h ../stubs/ControllerFactoryStub.cpp ../stubs/ControllerFactoryStub.h ../stubs/ControllerStub.cpp ../stubs/ControllerStub.h)

@@ -78,4 +78,15 @@ typedef void (*DirectgraphErrorHandler)(
         const wchar_t *str
 );
 
+typedef struct linesettingstype {
+    int linestyle;
+    unsigned upattern;
+    int thickness;
+} linesettingstype;
+
+typedef struct fillsettingstype {
+    int pattern;
+    int color;
+} fillsettingstype;
+
 #endif //DIRECTGRAPH_GRAPHICS_CONST_H

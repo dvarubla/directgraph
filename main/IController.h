@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <directgraph/directgraph_constants.h>
 
 namespace directgraph{
     class IController{
@@ -15,6 +16,11 @@ namespace directgraph{
         virtual void setcolor(uint_fast32_t color) = 0;
         virtual void setbgcolor(uint_fast32_t color) = 0;
         virtual void setfillpattern(const char *fillpattern, uint_fast32_t color) = 0;
+        virtual uint_fast32_t getcolor() = 0;
+        virtual uint_fast32_t getbgcolor() = 0;
+        virtual void getlinesettings (linesettingstype *lineinfo) = 0;
+        virtual void getfillsettings(fillsettingstype *fillinfo) = 0;
+        virtual void getfillpattern(char *pattern) = 0;
         virtual void putpixel(int_fast32_t x, int_fast32_t y, uint_fast32_t color) = 0;
         virtual void repaint() = 0;
         virtual ~IController(){};

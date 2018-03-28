@@ -2,6 +2,7 @@
 #include "Queue.h"
 #include "QueueItem.h"
 #include "WException.h"
+#include "patterns.h"
 
 namespace directgraph{
 
@@ -11,6 +12,11 @@ namespace directgraph{
         _currentProps = props;
         InitializeCriticalSection(&_addCS);
         InitializeCriticalSection(&_queueCS);
+        InitializeCriticalSection(&_propsCS);
+
+        if(_currentProps.userFillPattern == NULL){
+            _currentProps.userFillPattern = reinterpret_cast<char *>(new uint8_t[FPATTERN_SIZE]);
+        }
     }
 
     void ThreadController::checkGrow() {
@@ -85,21 +91,36 @@ namespace directgraph{
 
     void ThreadController::setfillstyle(uint_fast8_t fillStyle, uint_fast32_t color) {
         _paramsChecker.checkFillStyle(fillStyle);
+        EnterCriticalSection(&_propsCS);
+        _currentProps.fillStyle = fillStyle;
+        _currentProps.fillColor = color;
+        LeaveCriticalSection(&_propsCS);
         QueueItem item = QueueItemCreator::create<QueueItem::SETFILLSTYLE>(fillStyle, color);
         writeItemHelper(item);
     }
 
     void ThreadController::setbgcolor(uint_fast32_t color) {
+        EnterCriticalSection(&_propsCS);
+        _currentProps.bgColor = color;
+        LeaveCriticalSection(&_propsCS);
         QueueItem item = QueueItemCreator::create<QueueItem::BGCOLOR>(color);
         writeItemHelper(item);
     }
 
     void ThreadController::setcolor(uint_fast32_t color) {
+        EnterCriticalSection(&_propsCS);
+        _currentProps.drawColor = color;
+        LeaveCriticalSection(&_propsCS);
         QueueItem item = QueueItemCreator::create<QueueItem::COLOR>(color);
         writeItemHelper(item);
     }
 
     void ThreadController::setfillpattern(const char *fillpattern, uint_fast32_t color) {
+        EnterCriticalSection(&_propsCS);
+        std::copy(fillpattern, fillpattern + FPATTERN_SIZE, _currentProps.userFillPattern);
+        _currentProps.fillStyle = USER_FILL;
+        _currentProps.fillColor = color;
+        LeaveCriticalSection(&_propsCS);
         QueueItem item = QueueItemCreator::create<QueueItem::SETFILLPATTERN>(fillpattern, color);
         writeItemHelper(item);
     }
@@ -204,6 +225,7 @@ namespace directgraph{
         stopRepaintThread();
         DeleteCriticalSection(&_addCS);
         DeleteCriticalSection(&_queueCS);
+        DeleteCriticalSection(&_propsCS);
         delete [] _currentProps.userFillPattern;
     }
 
@@ -215,5 +237,42 @@ namespace directgraph{
     void ThreadController::init() {
         clear();
         _drawThread = CreateThread(NULL, 0, repaintFunc, (LPVOID)this, 0, &_drawThreadId);
+    }
+
+    uint_fast32_t ThreadController::getcolor() {
+        uint_fast32_t color;
+        EnterCriticalSection(&_propsCS);
+        color = _currentProps.drawColor;
+        LeaveCriticalSection(&_propsCS);
+        return color;
+    }
+
+    uint_fast32_t ThreadController::getbgcolor() {
+        uint_fast32_t color;
+        EnterCriticalSection(&_propsCS);
+        color = _currentProps.bgColor;
+        LeaveCriticalSection(&_propsCS);
+        return color;
+    }
+
+    void ThreadController::getlinesettings(linesettingstype *lineinfo) {
+        EnterCriticalSection(&_propsCS);
+        lineinfo->thickness = _currentProps.lineThickness;
+        lineinfo->linestyle = _currentProps.lineStyle;
+        lineinfo->upattern = _currentProps.userLinePattern;
+        LeaveCriticalSection(&_propsCS);
+    }
+
+    void ThreadController::getfillsettings(fillsettingstype *fillinfo) {
+        EnterCriticalSection(&_propsCS);
+        fillinfo->color = _currentProps.fillColor;
+        fillinfo->pattern = _currentProps.fillStyle;
+        LeaveCriticalSection(&_propsCS);
+    }
+
+    void ThreadController::getfillpattern(char *pattern) {
+        EnterCriticalSection(&_propsCS);
+        std::copy(_currentProps.userFillPattern, _currentProps.userFillPattern + FPATTERN_SIZE, pattern);
+        LeaveCriticalSection(&_propsCS);
     }
 }

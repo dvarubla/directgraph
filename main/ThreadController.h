@@ -24,6 +24,7 @@ namespace directgraph {
         LONG volatile _numDrawMsgs;
 
         CRITICAL_SECTION _addCS;
+        CRITICAL_SECTION _propsCS;
         CRITICAL_SECTION _queueCS;
 
         DWORD _drawThreadId;
@@ -50,6 +51,12 @@ namespace directgraph {
         void setfillpattern(const char *fillpattern, uint_fast32_t color);
         void setcolor(uint_fast32_t color);
         void setbgcolor(uint_fast32_t color);
+        uint_fast32_t getcolor();
+        uint_fast32_t getbgcolor();
+        void getlinesettings (linesettingstype *lineinfo);
+        void getfillsettings(fillsettingstype *fillinfo);
+        void getfillpattern(char *pattern);
+
         void putpixel(int_fast32_t x, int_fast32_t y, uint_fast32_t color);
         void repaint();
 
