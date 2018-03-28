@@ -3,6 +3,7 @@
 
 #if	defined(__BORLANDC__) && __BORLANDC__ < 0x621
 typedef unsigned int uint32_t;
+typedef int int32_t;
 #else
 #include <stdint.h>
 #endif

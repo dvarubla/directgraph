@@ -222,6 +222,13 @@ void DIRECTGRAPH_EXPORT bar(int32_t left, int32_t top, int32_t right, int32_t bo
     )
 }
 
+void DIRECTGRAPH_EXPORT rectangle(int32_t left, int32_t top, int32_t right, int32_t bottom){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager());
+            lock.data.controller->rectangle(left, top, right, bottom);
+    )
+}
+
 void DIRECTGRAPH_EXPORT putpixel(int32_t x, int32_t y, uint32_t color){
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager());
@@ -233,6 +240,13 @@ void DIRECTGRAPH_EXPORT fillellipse(int32_t x, int32_t y, uint32_t xradius, uint
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager());
             lock.data.controller->fillellipse(x, y, xradius, yradius);
+    )
+}
+
+void DIRECTGRAPH_EXPORT setcolor(uint32_t color){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager());
+            lock.data.controller->setcolor(color);
     )
 }
 
@@ -262,6 +276,43 @@ void DIRECTGRAPH_EXPORT setbgcolor(uint32_t color){
             WindowManagerScopedLock lock(getWindowManager());
             lock.data.controller->setbgcolor(color);
     )
+}
+
+uint32_t DIRECTGRAPH_EXPORT getcolor(){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager());
+            return lock.data.controller->getcolor();
+    );
+    return 0;
+}
+
+uint32_t DIRECTGRAPH_EXPORT getbgcolor(){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager());
+            return lock.data.controller->getbgcolor();
+    );
+    return 0;
+}
+
+void DIRECTGRAPH_EXPORT getlinesettings(linesettingstype *lineinfo){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager());
+            lock.data.controller->getlinesettings(lineinfo);
+    );
+}
+
+void DIRECTGRAPH_EXPORT getfillsettings(fillsettingstype *fillinfo){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager());
+            lock.data.controller->getfillsettings(fillinfo);
+    );
+}
+
+void DIRECTGRAPH_EXPORT getfillpattern(char *pattern){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager());
+            lock.data.controller->getfillpattern(pattern);
+    );
 }
 
 void DIRECTGRAPH_EXPORT delay(uint32_t msec){
@@ -297,10 +348,24 @@ void DIRECTGRAPH_EXPORT barw(DirectgraphWinIndex index, int32_t left, int32_t to
     )
 }
 
+void DIRECTGRAPH_EXPORT rectanglew(DirectgraphWinIndex index, int32_t left, int32_t top, int32_t right, int32_t bottom){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager(), index);
+            lock.data.controller->rectangle(left, top, right, bottom);
+    )
+}
+
 void DIRECTGRAPH_EXPORT putpixelw(DirectgraphWinIndex index, int32_t x, int32_t y, uint32_t color){
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager(), index);
             lock.data.controller->putpixel(x, y, color);
+    )
+}
+
+void DIRECTGRAPH_EXPORT setcolorw(DirectgraphWinIndex index, uint32_t color){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager(), index);
+            lock.data.controller->setcolor(color);
     )
 }
 
@@ -329,5 +394,42 @@ void DIRECTGRAPH_EXPORT directgraph_repaintw(DirectgraphWinIndex index){
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager(), index);
             lock.data.controller->repaint();
+    )
+}
+
+uint32_t DIRECTGRAPH_EXPORT getcolorw(DirectgraphWinIndex index){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager(), index);
+            return lock.data.controller->getcolor();
+    )
+    return 0;
+}
+
+uint32_t DIRECTGRAPH_EXPORT getbgcolorw(DirectgraphWinIndex index){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager(), index);
+            return lock.data.controller->getbgcolor();
+    )
+    return 0;
+}
+
+void DIRECTGRAPH_EXPORT getlinesettingsw(DirectgraphWinIndex index, linesettingstype *lineinfo){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager(), index);
+            lock.data.controller->getlinesettings(lineinfo);
+    )
+}
+
+void DIRECTGRAPH_EXPORT getfillsettingsw(DirectgraphWinIndex index, fillsettingstype *fillinfo){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager(), index);
+            lock.data.controller->getfillsettings(fillinfo);
+    )
+}
+
+void DIRECTGRAPH_EXPORT getfillpatternw(DirectgraphWinIndex index, char *pattern){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager(), index);
+            lock.data.controller->getfillpattern(pattern);
     )
 }

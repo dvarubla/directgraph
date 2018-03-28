@@ -20,7 +20,11 @@ void DIRECTGRAPH_EXPORT setlinestyle(line_styles linestyle, uint32_t pattern, ui
 
 void DIRECTGRAPH_EXPORT bar(int32_t left, int32_t top, int32_t right, int32_t bottom);
 
+void DIRECTGRAPH_EXPORT rectangle(int32_t left, int32_t top, int32_t right, int32_t bottom);
+
 void DIRECTGRAPH_EXPORT putpixel(int32_t x, int32_t y, uint32_t color);
+
+void DIRECTGRAPH_EXPORT setcolor(uint32_t color);
 
 void DIRECTGRAPH_EXPORT setfillstyle(fill_patterns pattern, uint32_t color);
 
@@ -30,6 +34,16 @@ void DIRECTGRAPH_EXPORT setbgcolor(uint32_t color);
 
 void DIRECTGRAPH_EXPORT directgraph_repaint();
 
+uint32_t DIRECTGRAPH_EXPORT getcolor();
+
+uint32_t DIRECTGRAPH_EXPORT getbgcolor();
+
+void DIRECTGRAPH_EXPORT getlinesettings(linesettingstype *lineinfo);
+
+void DIRECTGRAPH_EXPORT getfillsettings(fillsettingstype *fillinfo);
+
+void DIRECTGRAPH_EXPORT getfillpattern(char *pattern);
+
 
 void DIRECTGRAPH_EXPORT fillellipsew(DirectgraphWinIndex index, int32_t x, int32_t y, uint32_t xradius, uint32_t yradius);
 
@@ -37,7 +51,11 @@ void DIRECTGRAPH_EXPORT setlinestylew(DirectgraphWinIndex index, line_styles lin
 
 void DIRECTGRAPH_EXPORT barw(DirectgraphWinIndex index, int32_t left, int32_t top, int32_t right, int32_t bottom);
 
+void DIRECTGRAPH_EXPORT rectanglew(DirectgraphWinIndex index, int32_t left, int32_t top, int32_t right, int32_t bottom);
+
 void DIRECTGRAPH_EXPORT putpixelw(DirectgraphWinIndex index, int32_t x, int32_t y, uint32_t color);
+
+void DIRECTGRAPH_EXPORT setcolorw(DirectgraphWinIndex index, uint32_t color);
 
 void DIRECTGRAPH_EXPORT setfillstylew(DirectgraphWinIndex index, fill_patterns pattern, uint32_t color);
 
@@ -46,6 +64,16 @@ void DIRECTGRAPH_EXPORT setfillpatternw(DirectgraphWinIndex index, const char *f
 void DIRECTGRAPH_EXPORT setbgcolorw(DirectgraphWinIndex index, uint32_t color);
 
 void DIRECTGRAPH_EXPORT directgraph_repaintw(DirectgraphWinIndex index);
+
+uint32_t DIRECTGRAPH_EXPORT getcolorw(DirectgraphWinIndex index);
+
+uint32_t DIRECTGRAPH_EXPORT getbgcolorw(DirectgraphWinIndex index);
+
+void DIRECTGRAPH_EXPORT getlinesettingsw(DirectgraphWinIndex index, linesettingstype *lineinfo);
+
+void DIRECTGRAPH_EXPORT getfillsettingsw(DirectgraphWinIndex index, fillsettingstype *fillinfo);
+
+void DIRECTGRAPH_EXPORT getfillpatternw(DirectgraphWinIndex index, char *pattern);
 
 
 WPARAM DIRECTGRAPH_EXPORT directgraph_mainloop();
