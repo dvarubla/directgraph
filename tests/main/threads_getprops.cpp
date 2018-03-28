@@ -5,6 +5,7 @@
 #include <tests/stubs/QueueItemUtils.h>
 #include <tests/stubs/MyWindowStub.h>
 #include <patterns.h>
+#include <QueueItem.h>
 
 using namespace directgraph;
 using testing::Return;
@@ -64,6 +65,8 @@ TEST_F(ThreadsGetpropsTest, OneThreadFillPattern){
     tc.getfillsettings(&fsett);
     EXPECT_EQ(fsett.pattern, USER_FILL);
     EXPECT_EQ(fsett.color, 0xFF0000);
+    tc.repaint();
+    delete [] ren->getData()[1].data.setfillpattern.fillPattern;
 }
 
 struct RepParam{

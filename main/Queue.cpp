@@ -1,4 +1,5 @@
 #include "Queue.h"
+#include "QueueItem.h"
 
 namespace directgraph{
     Queue::Queue():_getIndex(0),_putIndex(0),_size(SIZE_INCREMENT) {
@@ -59,6 +60,13 @@ namespace directgraph{
     }
 
     Queue::~Queue() {
+        uint_fast32_t size = getReadSize();
+        for(uint_fast32_t i = 0; i < size; i++){
+            QueueItem &item = getItemAt(transformIndex(i + _getIndex));
+            if(item.type == QueueItem::SETFILLPATTERN){
+                delete [] item.data.setfillpattern.fillPattern;
+            }
+        }
         free(_items);
     }
 }
