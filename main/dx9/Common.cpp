@@ -107,6 +107,7 @@ namespace directgraph {
             _device->Release();
             _d3d->Release();
             delete _features;
+            DeleteCriticalSection(&_mainCS);
         }
 
         IFeatures *Common::getFeatures() {

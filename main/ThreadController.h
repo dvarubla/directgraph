@@ -27,6 +27,7 @@ namespace directgraph {
         CRITICAL_SECTION _queueCS;
 
         DWORD _drawThreadId;
+        HANDLE _drawThread;
         CommonProps _currentProps;
 
         PixelContainerCreator *_pixContFactory;

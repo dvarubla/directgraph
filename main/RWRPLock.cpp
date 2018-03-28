@@ -10,6 +10,7 @@ namespace directgraph{
     RWRPLock::~RWRPLock() {
         DeleteCriticalSection(&_counterCS);
         DeleteCriticalSection(&_writerCS);
+        CloseHandle(_noReaders);
     }
 
     void RWRPLock::startRead() {

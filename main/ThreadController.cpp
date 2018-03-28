@@ -196,6 +196,8 @@ namespace directgraph{
         MSG msg;
         PostThreadMessage(_drawThreadId, STOP, GetCurrentThreadId(), 0);
         GetMessage(&msg, NULL, REPLY, REPLY);
+        WaitForSingleObject(_drawThread, INFINITE);
+        CloseHandle(_drawThread);
     }
 
     ThreadController::~ThreadController() {
@@ -212,6 +214,6 @@ namespace directgraph{
 
     void ThreadController::init() {
         clear();
-        CreateThread(NULL, 0, repaintFunc, (LPVOID)this, 0, &_drawThreadId);
+        _drawThread = CreateThread(NULL, 0, repaintFunc, (LPVOID)this, 0, &_drawThreadId);
     }
 }
