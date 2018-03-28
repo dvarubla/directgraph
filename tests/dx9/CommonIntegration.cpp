@@ -3,7 +3,7 @@
 
 WindowManager *CommonIntegration::wman = NULL;
 WindowFactory *CommonIntegration::wf = NULL;
-
+WindowFactoryStub *CommonIntegration::wfstub = NULL;
 using testing::NiceMock;
 using testing::Invoke;
 using testing::_;
@@ -41,5 +41,6 @@ BitmapWrap *CommonIntegration::afterTestSimple(DirectgraphWinIndex index) {
 }
 
 CommonIntegration::~CommonIntegration() {
-    delete wfstub;
+    delete wman;
+    wman = NULL;
 }

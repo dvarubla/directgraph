@@ -21,6 +21,22 @@ public:
         p.controller = DIRECTGRAPH_MULT_THREAD_CTRL;
         _curIndex = wman->createWindow(p);
     }
+
+    void drawGrid(IController *ctrl){
+        ctrl->setfillstyle(SOLID_FILL, 0x994444);
+        ctrl->bar(0, 0, WIDTH, HEIGHT);
+        ctrl->setfillstyle(SOLID_FILL, 0xFFFFFF);
+        for(uint_fast32_t i = 0; i < HEIGHT/10; i++){
+            for(uint_fast32_t j = 0; j < WIDTH/10; j++){
+                ctrl->bar(
+                        static_cast<int_fast32_t>(j * 10 + 1.0f),
+                        static_cast<int_fast32_t>(i * 10 + 1.0f),
+                        static_cast<int_fast32_t>((j + 1) * 10.0f),
+                        static_cast<int_fast32_t>((i + 1) * 10.0f)
+                );
+            }
+        }
+    }
 };
 
 uint32_t DX9Int1Test::WIDTH = 561;
@@ -28,20 +44,8 @@ uint32_t DX9Int1Test::HEIGHT = 401;
 
 IMG_TEST_F(DX9Int1Test, Vehicle){
     IController *ctrl = wman->getCurrentWindowAndLock().controller;
+    drawGrid(ctrl);
     ctrl->setlinestyle(NULL_LINE, 0, 0);
-    ctrl->setfillstyle(SOLID_FILL, 0x994444);
-    ctrl->bar(0, 0, WIDTH, HEIGHT);
-    ctrl->setfillstyle(SOLID_FILL, 0xFFFFFF);
-    for(uint_fast32_t i = 0; i < HEIGHT/10; i++){
-        for(uint_fast32_t j = 0; j < WIDTH/10; j++){
-            ctrl->bar(
-                    static_cast<int_fast32_t>(j * 10 + 1.0f),
-                    static_cast<int_fast32_t>(i * 10 + 1.0f),
-                    static_cast<int_fast32_t>((j + 1) * 10.0f),
-                    static_cast<int_fast32_t>((i + 1) * 10.0f)
-            );
-        }
-    }
     ctrl->setbgcolor(0xAAAAAA);
     ctrl->setfillstyle(SLASH_FILL, 0x444444);
     ctrl->bar(50, 190, 70, 210);
@@ -91,6 +95,62 @@ IMG_TEST_F(DX9Int1Test, Vehicle){
     for(uint_fast32_t i = 245; i < 256; i++){
         ctrl->putpixel(410, i, 0);
     }
+
+    ctrl->repaint();
+    wman->releaseCurrentWindowLock();
+    return afterTestSimple(_curIndex);
+}
+
+IMG_TEST_F(DX9Int1Test, Tractor){
+    IController *ctrl = wman->getCurrentWindowAndLock().controller;
+    drawGrid(ctrl);
+
+    //First block
+    ctrl->setlinestyle(SOLID_LINE, 0, 10);
+    ctrl->setcolor(0);
+    ctrl->rectangle(325, 235, 135, 165);
+
+    ctrl->setbgcolor(0x0044AA);
+    ctrl->setfillstyle(LINE_FILL, 0x00FFFF);
+    ctrl->bar(140, 170, 320, 230);
+
+    ctrl->setfillstyle(SOLID_FILL, 0x0);
+    ctrl->bar(170, 100, 190, 160);
+
+    //Second block
+    ctrl->setlinestyle(NULL_LINE, 0, 0);
+    ctrl->setbgcolor(0x0044AA);
+    ctrl->setfillstyle(LTBKSLASH_FILL, 0xFF0000);
+    ctrl->fillellipse(200, 280, 40, 40);
+
+    ctrl->setbgcolor(0x0044AA);
+    ctrl->setfillstyle(LTSLASH_FILL, 0xFF0000);
+    ctrl->fillellipse(420, 240, 80, 80);
+
+    ctrl->setbgcolor(0x0077FF);
+    ctrl->setfillstyle(EMPTY_FILL, 0);
+    ctrl->bar(330, 30, 490, 190);
+
+    ctrl->setbgcolor(0x550044AA);
+    ctrl->setfillstyle(LTSLASH_FILL, 0x55FF0000);
+    ctrl->fillellipse(420, 240, 80, 80);
+
+    //Window
+    ctrl->setbgcolor(0xAAFFFF);
+    ctrl->setfillstyle(HATCH_FILL, 0);
+    ctrl->bar(380, 50, 440, 110);
+
+    ctrl->setlinestyle(SOLID_LINE, 0, 5);
+    ctrl->setcolor(0x7FFF0000);
+    ctrl->rectangle(382, 52, 438, 108);
+
+    //Back
+    ctrl->setfillstyle(SOLID_FILL, 0xAAAAAA);
+    ctrl->bar(490, 60, 510, 160);
+
+    ctrl->setlinestyle(DASHED_LINE, 0, 5);
+    ctrl->setcolor(0xFF0000);
+    ctrl->rectangle(492, 62, 508, 158);
 
     ctrl->repaint();
     wman->releaseCurrentWindowLock();

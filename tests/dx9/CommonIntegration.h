@@ -13,7 +13,7 @@ class CommonIntegration {
 public:
     static WindowManager *wman;
     static WindowFactory *wf;
-    WindowFactoryStub *wfstub;
+    static WindowFactoryStub *wfstub;
     IMyWindow *_curWindow;
     void initWindowManager();
     IMyWindow * createWindow(const wchar_t *name, uint32_t width, uint32_t height, const CommonProps &props);
