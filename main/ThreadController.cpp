@@ -126,11 +126,14 @@ namespace directgraph{
     }
 
     void ThreadController::rectangle(int_fast32_t left, int_fast32_t top, int_fast32_t right, int_fast32_t bottom){
+        EnterCriticalSection(&_propsCS);
         if(
-                !_paramsChecker.checkRectangle(left, top, right, bottom)
+                !_paramsChecker.checkRectangle(left, top, right, bottom, _currentProps.lineStyle)
         ){
+            LeaveCriticalSection(&_propsCS);
             return;
         }
+        LeaveCriticalSection(&_propsCS);
         QueueItem item = QueueItemCreator::create<QueueItem::RECTANGLE>(left, top, right, bottom);
         writeItemHelper(item);
     }
