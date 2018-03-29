@@ -1,4 +1,5 @@
 #include <directgraph/directgraph_constants.h>
+#include <stdlib.h>
 #include "CommonProps.h"
 
 namespace directgraph{
