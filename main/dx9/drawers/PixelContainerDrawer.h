@@ -30,7 +30,7 @@ namespace directgraph {
 
             StartEndCoords getStartEndCoords();
 
-            void genDegenerates(void *&curVertMem, const Coords &startCrds, const Coords &endCrds, float curZ);
+            void genDegenerates(void *&curVertMem, const FCoords &startCrds, const FCoords &endCrds, float curZ);
 
             void setItem(const QueueItem &item);
 

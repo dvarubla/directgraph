@@ -21,7 +21,8 @@ namespace directgraph{
             Rectangle coords = _curItem.data.pixelContainer->getCoords();
             curVertMem = _simplePrimHelper->genTexQuad(
                     curVertMem,
-                    genCoords(coords.left, coords.top), genCoords(coords.right, coords.bottom),
+                    genFCoords(coords.left, coords.top),
+                    genFCoords(coords.right, coords.bottom),
                     _bufPrepParams->getPxTextureCoords(),
                     curZ
             );
@@ -29,11 +30,14 @@ namespace directgraph{
 
         StartEndCoords PixelContainerDrawer::getStartEndCoords() {
             Rectangle coords = _curItem.data.pixelContainer->getCoords();
-            StartEndCoords res = {genCoords(coords.left, coords.top), genCoords(coords.right, coords.bottom)};
+            StartEndCoords res = {
+                    subtHalfPixel(genFCoords(coords.left, coords.top)),
+                    subtHalfPixel(genFCoords(coords.right, coords.bottom))
+            };
             return res;
         }
 
-        void PixelContainerDrawer::genDegenerates(void *&, const Coords &, const Coords &, float ) {
+        void PixelContainerDrawer::genDegenerates(void *&, const FCoords &, const FCoords &, float ) {
         }
 
         PixelContainerDrawer::~PixelContainerDrawer() {

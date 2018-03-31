@@ -32,8 +32,8 @@ namespace directgraph{
         return (color & 0xFF000000) != 0;
     }
 
-    FCoords genFCoords(float x, float y) {
-        FCoords res = {x, y};
+    Coords genCoords(const FCoords &fcrds) {
+        Coords res = {static_cast<int_fast32_t>(round(fcrds.x)), static_cast<int_fast32_t>(round(fcrds.y))};
         return res;
     }
 }

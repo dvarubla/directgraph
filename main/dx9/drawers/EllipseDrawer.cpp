@@ -68,10 +68,10 @@ namespace directgraph{
                 if(_stateHelper->fillTextureUsed(_curState)){
                     curVertMem = _simplePrimHelper->genTexEllipseQuad(
                             curVertMem,
-                            genCoords(_curItem.data.fillellipse.x, _curItem.data.fillellipse.y),
-                            genUCoords(
-                                    _curItem.data.fillellipse.xradius,
-                                    _curItem.data.fillellipse.yradius
+                            genFCoords(_curItem.data.fillellipse.x, _curItem.data.fillellipse.y),
+                            genFCoords(
+                                    _curItem.data.fillellipse.xradius - CORR_OFFSET,
+                                    _curItem.data.fillellipse.yradius - CORR_OFFSET
                             ),
                             curZ,
                             _stateHelper->getLastState().fillColor,
@@ -80,10 +80,10 @@ namespace directgraph{
                 } else {
                     curVertMem = _simplePrimHelper->genEllipseQuad(
                             curVertMem,
-                            genCoords(_curItem.data.fillellipse.x, _curItem.data.fillellipse.y),
-                            genUCoords(
-                                    _curItem.data.fillellipse.xradius,
-                                    _curItem.data.fillellipse.yradius
+                            genFCoords(_curItem.data.fillellipse.x, _curItem.data.fillellipse.y),
+                            genFCoords(
+                                    _curItem.data.fillellipse.xradius - CORR_OFFSET,
+                                    _curItem.data.fillellipse.yradius - CORR_OFFSET
                             ),
                             curZ,
                             _stateHelper->getFillColor()
@@ -113,24 +113,24 @@ namespace directgraph{
                     (_stateHelper->fillTextureUsed(_curState) && _bufPrepParams->supportsTexturedEllipse()) ||
                     (!_stateHelper->fillTextureUsed(_curState) && _bufPrepParams->supportsEllipse())
                     ){
-                res.start = genCoords(
-                        _curItem.data.fillellipse.x - _curItem.data.fillellipse.xradius,
-                        _curItem.data.fillellipse.y - _curItem.data.fillellipse.yradius
+                res.start = genFCoords(
+                        _curItem.data.fillellipse.x - _curItem.data.fillellipse.xradius + CORR_OFFSET,
+                        _curItem.data.fillellipse.y - _curItem.data.fillellipse.yradius + CORR_OFFSET
                 );
-                res.end = genCoords(
-                        _curItem.data.fillellipse.x + _curItem.data.fillellipse.xradius,
-                        _curItem.data.fillellipse.y + _curItem.data.fillellipse.yradius
+                res.end = genFCoords(
+                        _curItem.data.fillellipse.x + _curItem.data.fillellipse.xradius - CORR_OFFSET,
+                        _curItem.data.fillellipse.y + _curItem.data.fillellipse.yradius - CORR_OFFSET
                 );
             } else {
-                res.start = res.end = genCoords(
+                res.start = res.end = genFCoords(
                         _curItem.data.fillellipse.x,
-                        _curItem.data.fillellipse.y - _curItem.data.fillellipse.yradius
+                        _curItem.data.fillellipse.y - _curItem.data.fillellipse.yradius + CORR_OFFSET
                 );
             }
             return res;
         }
 
-        void EllipseDrawer::genDegenerates(void *&curVertMem, const Coords &startCrds, const Coords &endCrds, float curZ) {
+        void EllipseDrawer::genDegenerates(void *&curVertMem, const FCoords &startCrds, const FCoords &endCrds, float curZ) {
             if(_stateHelper->fillTextureUsed(_curState)){
                 if(_bufPrepParams->supportsTexturedEllipse()){
                     curVertMem = _degenerateHelper->genTexEllipseDegenerate(

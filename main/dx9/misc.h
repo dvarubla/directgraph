@@ -1,14 +1,15 @@
 #pragma once
 
 #include "DrawOpCreator.h"
+#include <array>
 
 namespace directgraph {
     namespace dx9 {
         const int TRIANGLES_IN_QUAD = 2;
         const int VERTICES_IN_QUAD = 4;
         struct StartEndCoords {
-            Coords start;
-            Coords end;
+            FCoords start;
+            FCoords end;
         };
         struct TextureCoords{
             FCoords start;
@@ -22,6 +23,10 @@ namespace directgraph {
             uint_fast32_t degenerate;
             uint_fast32_t primitive;
         };
+
+        typedef std::array<FCoords, VERTICES_IN_QUAD> QuadPointsArr;
+
+        extern const float CORR_OFFSET;
     }
 }
 

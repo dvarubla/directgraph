@@ -2,6 +2,7 @@
 #include <main/patterns.h>
 #include "RectangleHelper.h"
 #include <VertexCreator.h>
+#include <util.h>
 
 #undef min
 #undef max
@@ -38,8 +39,8 @@ namespace directgraph {
                 );
                 verticesVoid = _simplePrimHelper->genTexColorQuad(
                         verticesVoid,
-                        genCoords(outlineStartCoords.x, leftSepCrd),
-                        genCoords(topSepCrd, outlineStartCoords.y),
+                        subtHalfPixel(genFCoords(outlineStartCoords.x, leftSepCrd)),
+                        subtHalfPixel(genFCoords(topSepCrd, outlineStartCoords.y)),
                         z, color, texCrds, false
                 );
 
@@ -50,8 +51,8 @@ namespace directgraph {
                 );
                 verticesVoid = _simplePrimHelper->genTexColorQuad(
                         verticesVoid,
-                        genCoords(topSepCrd, outlineStartCoords.y),
-                        genCoords(outlineEndCoords.x, rightSepCrd),
+                        subtHalfPixel(genFCoords(topSepCrd, outlineStartCoords.y)),
+                        subtHalfPixel(genFCoords(outlineEndCoords.x, rightSepCrd)),
                         z, color, texCrds, true
                 );
 
@@ -62,8 +63,8 @@ namespace directgraph {
                 );
                 verticesVoid = _simplePrimHelper->genTexColorQuad(
                         verticesVoid,
-                        genCoords(outlineEndCoords.x, rightSepCrd),
-                        genCoords(bottomSepCrd, outlineEndCoords.y),
+                        subtHalfPixel(genFCoords(outlineEndCoords.x, rightSepCrd)),
+                        subtHalfPixel(genFCoords(bottomSepCrd, outlineEndCoords.y)),
                         z, color, texCrds, false
                 );
 
@@ -74,33 +75,33 @@ namespace directgraph {
                 );
                 verticesVoid = _simplePrimHelper->genTexColorQuad(
                         verticesVoid,
-                        genCoords(bottomSepCrd, outlineEndCoords.y),
-                        genCoords(outlineStartCoords.x, leftSepCrd),
+                        subtHalfPixel(genFCoords(bottomSepCrd, outlineEndCoords.y)),
+                        subtHalfPixel(genFCoords(outlineStartCoords.x, leftSepCrd)),
                         z, color, texCrds, true
                 );
             } else {
                 verticesVoid = _simplePrimHelper->genQuad(
                         verticesVoid,
-                        genCoords(outlineStartCoords.x, leftSepCrd),
-                        genCoords(topSepCrd, outlineStartCoords.y),
+                        subtHalfPixel(genFCoords(outlineStartCoords.x, leftSepCrd)),
+                        subtHalfPixel(genFCoords(topSepCrd, outlineStartCoords.y)),
                         z, color
                 );
                 verticesVoid = _simplePrimHelper->genQuad(
                         verticesVoid,
-                        genCoords(topSepCrd, outlineStartCoords.y),
-                        genCoords(outlineEndCoords.x, rightSepCrd),
+                        subtHalfPixel(genFCoords(topSepCrd, outlineStartCoords.y)),
+                        subtHalfPixel(genFCoords(outlineEndCoords.x, rightSepCrd)),
                         z, color
                 );
                 verticesVoid = _simplePrimHelper->genQuad(
                         verticesVoid,
-                        genCoords(outlineEndCoords.x, rightSepCrd),
-                        genCoords(bottomSepCrd, outlineEndCoords.y),
+                        subtHalfPixel(genFCoords(outlineEndCoords.x, rightSepCrd)),
+                        subtHalfPixel(genFCoords(bottomSepCrd, outlineEndCoords.y)),
                         z, color
                 );
                 verticesVoid = _simplePrimHelper->genQuad(
                         verticesVoid,
-                        genCoords(bottomSepCrd, outlineEndCoords.y),
-                        genCoords(outlineStartCoords.x, leftSepCrd),
+                        subtHalfPixel(genFCoords(bottomSepCrd, outlineEndCoords.y)),
+                        subtHalfPixel(genFCoords(outlineStartCoords.x, leftSepCrd)),
                         z, color
                 );
             }
@@ -113,8 +114,8 @@ namespace directgraph {
                     startCrds.y + (thickness / 2 + thickness % 2)
             );
             StartEndCoords res;
-            res.start = genCoords(startCrds.x  - thickness / 2, leftSepCrd);
-            res.end = genCoords(startCrds.x - thickness / 2, leftSepCrd);
+            res.start = subtHalfPixel(genFCoords(startCrds.x  - thickness / 2, leftSepCrd));
+            res.end = subtHalfPixel(genFCoords(startCrds.x - thickness / 2, leftSepCrd));
             return res;
         }
 

@@ -41,7 +41,7 @@ namespace directgraph {
             StartEndCoords getStartEndCoords();
 
             void
-            genDegenerates(void *&curVertMem, const Coords &startCrds, const Coords &endCrds, float curZ);
+            genDegenerates(void *&curVertMem, const FCoords &startCrds, const FCoords &endCrds, float curZ);
 
             bool isSemiTransparent();
 

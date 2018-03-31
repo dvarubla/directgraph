@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <main/patterns.h>
+#include <misc.h>
 #include "EllipseHelper.h"
 #include "util.h"
 
@@ -7,8 +8,6 @@
 
 namespace directgraph{
     namespace dx9{
-        const float EllipseHelper::EXTRA_OFFSET = 0.005f;
-
         EllipseHelper::EllipseHelper() {
 
         }
@@ -85,53 +84,53 @@ namespace directgraph{
                         if(textured){
                             memoryTextured[j] = createTexturedVertex(
                                     centerCrds.x + first,
-                                    centerCrds.y - second 
+                                    centerCrds.y - second + CORR_OFFSET
                             );
                         } else {
                             memoryCol[j] = createVertex(
-                                    centerCrds.x + first ,
-                                    centerCrds.y - second 
+                                    centerCrds.x + first,
+                                    centerCrds.y - second + CORR_OFFSET
                             );
                         }
                     }
                     if(textured){
                         memoryTextured[numVertices - 1] = createTexturedVertex(
                                 centerCrds.x + first,
-                                centerCrds.y - second 
+                                centerCrds.y - second + CORR_OFFSET
                         );
                     } else {
                         memoryCol[numVertices - 1] = createVertex(
                                 centerCrds.x + first,
-                                centerCrds.y - second 
+                                centerCrds.y - second + CORR_OFFSET
                         );
                     }
                     uint_fast32_t oppIndex = 2 * minR;
-                    createVertices(memoryVoid, centerCrds.x + first, centerCrds.y + second, oppIndex, textured);
+                    createVertices(memoryVoid, centerCrds.x + first, centerCrds.y + second - CORR_OFFSET, oppIndex, textured);
                 } else if (i == minR) {
                     uint_fast32_t curIndex = minR;
                     uint_fast32_t oppIndex = 3 * minR;
-                    createVertices(memoryVoid, centerCrds.x + first + EXTRA_OFFSET, centerCrds.y - second, curIndex, textured);
-                    createVertices(memoryVoid, centerCrds.x - first, centerCrds.y + second, oppIndex, textured);
+                    createVertices(memoryVoid, centerCrds.x + first - CORR_OFFSET, centerCrds.y - second, curIndex, textured);
+                    createVertices(memoryVoid, centerCrds.x - first + CORR_OFFSET, centerCrds.y + second, oppIndex, textured);
                 } else {
                     for (uint_fast32_t j = 0; j < 4; j++) {
                         uint_fast32_t index;
                         double x, y;
                         if (j == 0) {
                             index = i;
-                            x = centerCrds.x + first + EXTRA_OFFSET;
-                            y = centerCrds.y - second;
+                            x = centerCrds.x + first - CORR_OFFSET;
+                            y = centerCrds.y - second + CORR_OFFSET;
                         } else if (j == 1) {
                             index = 2 * minR - i;
-                            x = centerCrds.x + first + EXTRA_OFFSET;
-                            y = centerCrds.y + second;
+                            x = centerCrds.x + first - CORR_OFFSET;
+                            y = centerCrds.y + second - CORR_OFFSET;
                         } else if (j == 2) {
                             index = 2 * minR + i;
-                            x = centerCrds.x - first;
-                            y = centerCrds.y + second;
+                            x = centerCrds.x - first + CORR_OFFSET;
+                            y = centerCrds.y + second - CORR_OFFSET;
                         } else {
                             index = 4 * minR - i;
-                            x = centerCrds.x - first;
-                            y = centerCrds.y - second;
+                            x = centerCrds.x - first + CORR_OFFSET;
+                            y = centerCrds.y - second + CORR_OFFSET;
                         }
                         createVertices(memoryVoid, x, y, index, textured);
                     }
@@ -154,15 +153,15 @@ namespace directgraph{
                 double x, double y
         ) {
             return VertexCreator::create<ColorVertex>(
-                    static_cast<float>(x - 0.5), static_cast<float>(y - 0.5), _z, 1.0f, _color
+                    static_cast<float>(x), static_cast<float>(y), _z, 1.0f, _color
             );
         }
 
         TexturedColorVertex EllipseHelper::createTexturedVertex(double x, double y) {
             return VertexCreator::create<TexturedColorVertex>(
-                    static_cast<float>(x - 0.5), static_cast<float>(y - 0.5), _z, 1.0f, _color,
-                    static_cast<float>((x - _minX) / FPATTERN_SIZE),
-                    static_cast<float>((y - _minY) / FPATTERN_SIZE)
+                    static_cast<float>(x), static_cast<float>(y), _z, 1.0f, _color,
+                    static_cast<float>((x - _minX + 0.5f) / FPATTERN_SIZE),
+                    static_cast<float>((y - _minY + 0.5f) / FPATTERN_SIZE)
             );
         }
     }

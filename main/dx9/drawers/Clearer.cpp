@@ -20,19 +20,17 @@ namespace directgraph{
                                       float curZ) {
 
             curVertMem = _simplePrimHelper->genQuad(curVertMem,
-                                              genCoords(0, 0),
-                                              genCoords(_bufPrepParams->getMaxCoords()),
-                                              curZ,
+                                              _coords[0], _coords[1], curZ,
                                               0xFFFFFF
             );
         }
 
         StartEndCoords Clearer::getStartEndCoords() {
-            StartEndCoords res = {genCoords(0, 0), genCoords(_bufPrepParams->getMaxCoords())};
+            StartEndCoords res = {_coords[0], _coords[1]};
             return res;
         }
 
-        void Clearer::genDegenerates(void *&curVertMem, const Coords &startCrds, const Coords &endCrds,
+        void Clearer::genDegenerates(void *&curVertMem, const FCoords &startCrds, const FCoords &endCrds,
                                      float curZ) {
             curVertMem = _degenerateHelper->genDegenerate(
                     curVertMem, startCrds, endCrds, curZ
@@ -49,6 +47,15 @@ namespace directgraph{
                 DegenerateHelper *degenerateHelper
         ) : _bufPrepParams(bufPrepParams), _propMan(propMan),
             _simplePrimHelper(simplePrimHelper), _degenerateHelper(degenerateHelper){
+        }
+
+        void Clearer::genCoords() {
+            _coords[0] = subtHalfPixel(genFCoords(0, 0)),
+            _coords[1] = subtHalfPixel(genFCoords(_bufPrepParams->getMaxCoords().x, _bufPrepParams->getMaxCoords().y));
+        }
+
+        void Clearer::setItemState(const ItemState &) {
+            genCoords();
         }
     }
 }

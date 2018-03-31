@@ -57,9 +57,9 @@ namespace directgraph {
                     (!_stateHelper->lineTextureUsed(_curState) && _bufPrepParams->supportsRectangle())
             ){
                 curVertMem = _simplePrimHelper->genTexRectangle(curVertMem,
-                                                          genCoords(_curItem.data.rectangle.left,
+                                                          genFCoords(_curItem.data.rectangle.left,
                                                                     _curItem.data.rectangle.top),
-                                                          genCoords(_curItem.data.rectangle.right,
+                                                          genFCoords(_curItem.data.rectangle.right,
                                                                     _curItem.data.rectangle.bottom),
                                                           _stateHelper->getLastState().lineThickness,
                                                           curZ,
@@ -86,8 +86,8 @@ namespace directgraph {
                     (!_stateHelper->lineTextureUsed(_curState) && _bufPrepParams->supportsRectangle())
                     ){
                 int_fast32_t thickness = _stateHelper->getLastState().lineThickness / 2;
-                res.start = genCoords(_curItem.data.rectangle.left - thickness, _curItem.data.rectangle.top - thickness);
-                res.end = genCoords(_curItem.data.rectangle.right + thickness, _curItem.data.rectangle.bottom + thickness);
+                res.start = genFCoords(_curItem.data.rectangle.left - thickness, _curItem.data.rectangle.top - thickness);
+                res.end = genFCoords(_curItem.data.rectangle.right + thickness, _curItem.data.rectangle.bottom + thickness);
             } else {
                 res = _rectangleHelper->getCoords(
                         genCoords(_curItem.data.rectangle.left, _curItem.data.rectangle.top),
@@ -98,7 +98,7 @@ namespace directgraph {
             return res;
         }
 
-        void RectangleDrawer::genDegenerates(void *&curVertMem, const Coords &startCrds, const Coords &endCrds, float curZ) {
+        void RectangleDrawer::genDegenerates(void *&curVertMem, const FCoords &startCrds, const FCoords &endCrds, float curZ) {
             if(_stateHelper->lineTextureUsed(_curState)) {
                 if (_bufPrepParams->supportsTexturedRectangle()) {
                     curVertMem = _degenerateHelper->genShaderRectangleDegenerate(

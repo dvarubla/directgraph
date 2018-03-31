@@ -1,35 +1,36 @@
+#include <util.h>
 #include "SimplePrimHelper.h"
 #include "VertexCreator.h"
 
 namespace directgraph {
     namespace dx9 {
-        void *SimplePrimHelper::genQuad(void *verticesVoid, const Coords &startCrds, const Coords &endCrds, float z,
+        void *SimplePrimHelper::genQuad(void *verticesVoid, const FCoords &startCrds, const FCoords &endCrds, float z,
                                         uint_fast32_t color) {
             ColorVertex *vertices = static_cast<ColorVertex*>(verticesVoid);
             *vertices = VertexCreator::create<ColorVertex>(
-                    static_cast<float>(startCrds.x) - 0.5f,
-                    static_cast<float>(startCrds.y) - 0.5f,
+                    startCrds.x,
+                    startCrds.y,
                     z, 1.0f,
                     swap_color_transp(color)
             );
             vertices++;
             *vertices = VertexCreator::create<ColorVertex>(
-                    static_cast<float>(endCrds.x) - 0.5f,
-                    static_cast<float>(startCrds.y) - 0.5f,
+                    endCrds.x,
+                    startCrds.y,
                     z, 1.0f,
                     swap_color_transp(color)
             );
             vertices++;
             *vertices = VertexCreator::create<ColorVertex>(
-                    static_cast<float>(startCrds.x) - 0.5f,
-                    static_cast<float>(endCrds.y) - 0.5f,
+                    startCrds.x,
+                    endCrds.y,
                     z, 1.0f,
                     swap_color_transp(color)
             );
             vertices++;
             *vertices = VertexCreator::create<ColorVertex>(
-                    static_cast<float>(endCrds.x) - 0.5f,
-                    static_cast<float>(endCrds.y) - 0.5f,
+                    endCrds.x,
+                    endCrds.y,
                     z, 1.0f,
                     swap_color_transp(color)
             );
@@ -39,13 +40,13 @@ namespace directgraph {
 
         void *
         SimplePrimHelper::genTexColorQuad(
-                void *verticesVoid, const Coords &startCrds, const Coords &endCrds, float z,
+                void *verticesVoid, const FCoords &startCrds, const FCoords &endCrds, float z,
                 uint_fast32_t color, const TextureCoords &textureCoords, bool rotate
         ) {
             TexturedColorVertex *vertices = static_cast<TexturedColorVertex*>(verticesVoid);
             *vertices = VertexCreator::create<TexturedColorVertex>(
-                    static_cast<float>(startCrds.x) - 0.5f,
-                    static_cast<float>(startCrds.y) - 0.5f,
+                    startCrds.x,
+                    startCrds.y,
                     z, 1.0f,
                     swap_color_transp(color),
                     textureCoords.start.x,
@@ -53,8 +54,8 @@ namespace directgraph {
             );
             vertices++;
             *vertices = VertexCreator::create<TexturedColorVertex>(
-                    static_cast<float>(endCrds.x) - 0.5f,
-                    static_cast<float>(startCrds.y) - 0.5f,
+                    endCrds.x,
+                    startCrds.y,
                     z, 1.0f,
                     swap_color_transp(color),
                     (rotate) ? textureCoords.start.x : textureCoords.end.x,
@@ -62,8 +63,8 @@ namespace directgraph {
             );
             vertices++;
             *vertices = VertexCreator::create<TexturedColorVertex>(
-                    static_cast<float>(startCrds.x) - 0.5f,
-                    static_cast<float>(endCrds.y) - 0.5f,
+                    startCrds.x,
+                    endCrds.y,
                     z, 1.0f,
                     swap_color_transp(color),
                     (rotate) ? textureCoords.end.x : textureCoords.start.x,
@@ -71,8 +72,8 @@ namespace directgraph {
             );
             vertices++;
             *vertices = VertexCreator::create<TexturedColorVertex>(
-                    static_cast<float>(endCrds.x) - 0.5f,
-                    static_cast<float>(endCrds.y) - 0.5f,
+                    endCrds.x,
+                    endCrds.y,
                     z, 1.0f,
                     swap_color_transp(color),
                     textureCoords.end.x,
@@ -84,14 +85,14 @@ namespace directgraph {
 
         void *
         SimplePrimHelper::genFillCol2Quad(
-                void *verticesVoid, const Coords &startCrds, const Coords &endCrds, float z,
+                void *verticesVoid, const FCoords &startCrds, const FCoords &endCrds, float z,
                 uint_fast32_t color1, uint_fast32_t color2,
                 const TextureCoords &textureCoords
         ) {
             Color2Vertex *vertices = static_cast<Color2Vertex*>(verticesVoid);
             *vertices = VertexCreator::create<Color2Vertex>(
-                    static_cast<float>(startCrds.x),
-                    static_cast<float>(startCrds.y),
+                    startCrds.x,
+                    startCrds.y,
                     z,
                     static_cast<DWORD>(swap_color_transp(color1)),
                     static_cast<DWORD>(swap_color_transp(color2)),
@@ -100,8 +101,8 @@ namespace directgraph {
             );
             vertices++;
             *vertices = VertexCreator::create<Color2Vertex>(
-                    static_cast<float>(endCrds.x),
-                    static_cast<float>(startCrds.y),
+                    endCrds.x,
+                    startCrds.y,
                     z,
                     static_cast<DWORD>(swap_color_transp(color1)),
                     static_cast<DWORD>(swap_color_transp(color2)),
@@ -110,8 +111,8 @@ namespace directgraph {
             );
             vertices++;
             *vertices = VertexCreator::create<Color2Vertex>(
-                    static_cast<float>(startCrds.x),
-                    static_cast<float>(endCrds.y),
+                    startCrds.x,
+                    endCrds.y,
                     z,
                     static_cast<DWORD>(swap_color_transp(color1)),
                     static_cast<DWORD>(swap_color_transp(color2)),
@@ -120,8 +121,8 @@ namespace directgraph {
             );
             vertices++;
             *vertices = VertexCreator::create<Color2Vertex>(
-                    static_cast<float>(endCrds.x),
-                    static_cast<float>(endCrds.y),
+                    endCrds.x,
+                    endCrds.y,
                     z,
                     static_cast<DWORD>(swap_color_transp(color1)),
                     static_cast<DWORD>(swap_color_transp(color2)),
@@ -133,121 +134,154 @@ namespace directgraph {
         }
 
         void *SimplePrimHelper::genTexRectangle(
-                void *verticesVoid, const Coords &startCrds, const Coords &endCrds,
+                void *verticesVoid, const FCoords &startCrds, const FCoords &endCrds,
                 uint_fast32_t thickness, float z, uint_fast32_t color
         ) {
             TexturedColorVertex *vertices = static_cast<TexturedColorVertex*>(verticesVoid);
             *vertices = VertexCreator::create<TexturedColorVertex>(
-                    static_cast<float>(startCrds.x), static_cast<float>(startCrds.y),
+                    startCrds.x, startCrds.y,
                     z, static_cast<float>(thickness), static_cast<DWORD>(swap_color_transp(color)),
-                    static_cast<float>(-(endCrds.x - startCrds.x)),
-                    static_cast<float>(-(endCrds.y - startCrds.y))
+                    -(endCrds.x - startCrds.x),
+                    -(endCrds.y - startCrds.y)
             );
             vertices++;
             *vertices = VertexCreator::create<TexturedColorVertex>(
-                    static_cast<float>(endCrds.x), static_cast<float>(startCrds.y),
+                    endCrds.x, startCrds.y,
                     z, static_cast<float>(thickness), static_cast<DWORD>(swap_color_transp(color)),
-                    static_cast<float>(endCrds.x - startCrds.x),
-                    static_cast<float>(-(endCrds.y - startCrds.y))
+                    endCrds.x - startCrds.x,
+                    -(endCrds.y - startCrds.y)
             );
             vertices++;
             *vertices = VertexCreator::create<TexturedColorVertex>(
-                    static_cast<float>(startCrds.x), static_cast<float>(endCrds.y),
+                    startCrds.x, endCrds.y,
                     z, static_cast<float>(thickness), static_cast<DWORD>(swap_color_transp(color)),
-                    static_cast<float>(-(endCrds.x - startCrds.x)),
-                    static_cast<float>(endCrds.y - startCrds.y)
+                    -(endCrds.x - startCrds.x),
+                    endCrds.y - startCrds.y
             );
             vertices++;
             *vertices = VertexCreator::create<TexturedColorVertex>(
-                    static_cast<float>(endCrds.x), static_cast<float>(endCrds.y),
+                    endCrds.x, endCrds.y,
                     z, static_cast<float>(thickness), static_cast<DWORD>(swap_color_transp(color)),
-                    static_cast<float>(endCrds.x - startCrds.x),
-                    static_cast<float>(endCrds.y - startCrds.y)
+                    endCrds.x - startCrds.x,
+                    endCrds.y - startCrds.y
             );
             vertices++;
             return vertices;
         }
 
-        void *SimplePrimHelper::genEllipseQuad(void *verticesVoid, const Coords &centerCrds, const UCoords &radiusCrds,
+        void *SimplePrimHelper::genEllipseQuad(void *verticesVoid, const FCoords &centerCrds, const FCoords &radiusCrds,
                                                float z, uint_fast32_t color) {
             TexturedColorVertexNoRHW *vertices = static_cast<TexturedColorVertexNoRHW*>(verticesVoid);
             *vertices = VertexCreator::create<TexturedColorVertexNoRHW>(
-                    static_cast<float>(centerCrds.x), static_cast<float>(centerCrds.y), z, static_cast<DWORD>(swap_color_transp(color)),
-                    -static_cast<float>(radiusCrds.x), -static_cast<float>(radiusCrds.y)
+                    centerCrds.x, centerCrds.y, z, static_cast<DWORD>(swap_color_transp(color)),
+                    -radiusCrds.x, -radiusCrds.y
             );
             vertices++;
             *vertices = VertexCreator::create<TexturedColorVertexNoRHW>(
-                    static_cast<float>(centerCrds.x), static_cast<float>(centerCrds.y), z, static_cast<DWORD>(swap_color_transp(color)),
-                    static_cast<float>(radiusCrds.x), -static_cast<float>(radiusCrds.y)
+                    centerCrds.x, centerCrds.y, z, static_cast<DWORD>(swap_color_transp(color)),
+                    radiusCrds.x, -radiusCrds.y
             );
             vertices++;
             *vertices = VertexCreator::create<TexturedColorVertexNoRHW>(
-                    static_cast<float>(centerCrds.x), static_cast<float>(centerCrds.y), z, static_cast<DWORD>(swap_color_transp(color)),
-                    -static_cast<float>(radiusCrds.x), static_cast<float>(radiusCrds.y)
+                    centerCrds.x, centerCrds.y, z, static_cast<DWORD>(swap_color_transp(color)),
+                    -radiusCrds.x, radiusCrds.y
             );
             vertices++;
             *vertices = VertexCreator::create<TexturedColorVertexNoRHW>(
-                    static_cast<float>(centerCrds.x), static_cast<float>(centerCrds.y), z, static_cast<DWORD>(swap_color_transp(color)),
-                    static_cast<float>(radiusCrds.x), static_cast<float>(radiusCrds.y)
+                    centerCrds.x, centerCrds.y, z, static_cast<DWORD>(swap_color_transp(color)),
+                    radiusCrds.x, radiusCrds.y
             );
             vertices++;
             return vertices;
         }
 
         void *
-        SimplePrimHelper::genTexEllipseQuad(void *verticesVoid, const Coords &centerCrds, const UCoords &radiusCrds,
+        SimplePrimHelper::genTexEllipseQuad(void *verticesVoid, const FCoords &centerCrds, const FCoords &radiusCrds,
                                             float z, uint_fast32_t color1, uint_fast32_t color2) {
             Color2Vertex *vertices = static_cast<Color2Vertex*>(verticesVoid);
             *vertices = VertexCreator::create<Color2Vertex>(
-                    static_cast<float>(centerCrds.x), static_cast<float>(centerCrds.y), z,
+                    centerCrds.x, centerCrds.y, z,
                     static_cast<DWORD>(swap_color_transp(color1)), static_cast<DWORD>(swap_color_transp(color2)),
-                    -static_cast<float>(radiusCrds.x), -static_cast<float>(radiusCrds.y)
+                    -radiusCrds.x, -radiusCrds.y
             );
             vertices++;
             *vertices = VertexCreator::create<Color2Vertex>(
-                    static_cast<float>(centerCrds.x), static_cast<float>(centerCrds.y), z,
+                    centerCrds.x, centerCrds.y, z,
                     static_cast<DWORD>(swap_color_transp(color1)), static_cast<DWORD>(swap_color_transp(color2)),
-                    static_cast<float>(radiusCrds.x), -static_cast<float>(radiusCrds.y)
+                    radiusCrds.x, -radiusCrds.y
             );
             vertices++;
             *vertices = VertexCreator::create<Color2Vertex>(
-                    static_cast<float>(centerCrds.x), static_cast<float>(centerCrds.y), z,
+                    centerCrds.x, centerCrds.y, z,
                     static_cast<DWORD>(swap_color_transp(color1)), static_cast<DWORD>(swap_color_transp(color2)),
-                    -static_cast<float>(radiusCrds.x), static_cast<float>(radiusCrds.y)
+                    -radiusCrds.x, radiusCrds.y
             );
             vertices++;
             *vertices = VertexCreator::create<Color2Vertex>(
-                    static_cast<float>(centerCrds.x), static_cast<float>(centerCrds.y), z,
+                    centerCrds.x, centerCrds.y, z,
                     static_cast<DWORD>(swap_color_transp(color1)), static_cast<DWORD>(swap_color_transp(color2)),
-                    static_cast<float>(radiusCrds.x), static_cast<float>(radiusCrds.y)
+                    radiusCrds.x, radiusCrds.y
             );
             vertices++;
             return vertices;
         }
 
         void *SimplePrimHelper::genTexQuad(
-                void *verticesVoid, const Coords &startCrds, const Coords &endCrds,
+                void *verticesVoid, const FCoords &startCrds, const FCoords &endCrds,
                 const UCoords &maxCrds, float z
         ) {
             TexturedVertex *vertices = static_cast<TexturedVertex*>(verticesVoid);
             *vertices = VertexCreator::create<TexturedVertex>(
                     startCrds.x - 0.5f, startCrds.y - 0.5f, z, 1.0f,
-                    static_cast<float>(startCrds.x) / maxCrds.x, static_cast<float>(startCrds.y) / maxCrds.y
+                    startCrds.x / maxCrds.x, startCrds.y / maxCrds.y
             );
             vertices++;
             *vertices = VertexCreator::create<TexturedVertex>(
                     endCrds.x - 0.5f, startCrds.y - 0.5f, z, 1.0f,
-                    static_cast<float>(endCrds.x) / maxCrds.x, static_cast<float>(startCrds.y) / maxCrds.y
+                    endCrds.x / maxCrds.x, startCrds.y / maxCrds.y
             );
             vertices++;
             *vertices = VertexCreator::create<TexturedVertex>(
                     startCrds.x - 0.5f, endCrds.y - 0.5f, z, 1.0f,
-                    static_cast<float>(startCrds.x) / maxCrds.x, static_cast<float>(endCrds.y) / maxCrds.y
+                    startCrds.x / maxCrds.x, endCrds.y / maxCrds.y
             );
             vertices++;
             *vertices = VertexCreator::create<TexturedVertex>(
                     endCrds.x - 0.5f, endCrds.y - 0.5f, z, 1.0f,
-                    static_cast<float>(endCrds.x) / maxCrds.x, static_cast<float>(endCrds.y) / maxCrds.y
+                    endCrds.x / maxCrds.x, endCrds.y / maxCrds.y
+            );
+            vertices++;
+            return vertices;
+        }
+
+        void *SimplePrimHelper::genQuad(void *verticesVoid, const QuadPointsArr &points, float z, uint_fast32_t color) {
+            ColorVertex *vertices = static_cast<ColorVertex*>(verticesVoid);
+            *vertices = VertexCreator::create<ColorVertex>(
+                    points[0].x,
+                    points[0].y,
+                    z, 1.0f,
+                    swap_color_transp(color)
+            );
+            vertices++;
+            *vertices = VertexCreator::create<ColorVertex>(
+                    points[1].x,
+                    points[1].y,
+                    z, 1.0f,
+                    swap_color_transp(color)
+            );
+            vertices++;
+            *vertices = VertexCreator::create<ColorVertex>(
+                    points[2].x,
+                    points[2].y,
+                    z, 1.0f,
+                    swap_color_transp(color)
+            );
+            vertices++;
+            *vertices = VertexCreator::create<ColorVertex>(
+                    points[3].x,
+                    points[3].y,
+                    z, 1.0f,
+                    swap_color_transp(color)
             );
             vertices++;
             return vertices;

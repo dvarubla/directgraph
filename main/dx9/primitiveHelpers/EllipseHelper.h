@@ -8,7 +8,6 @@ namespace directgraph {
     namespace dx9 {
         class EllipseHelper {
         private:
-            const static float EXTRA_OFFSET;
             uint_fast32_t _color;
             float _z;
             double _minX;

@@ -8,38 +8,38 @@ namespace directgraph {
         public:
             void * genDegenerate(
                     void *verticesVoid,
-                    const Coords &startCrds,
-                    const Coords &endCrds,
+                    const FCoords &startCrds,
+                    const FCoords &endCrds,
                     float z
             );
 
             void * genTexDegenerate(
                     void *verticesVoid,
-                    const Coords &startCrds,
-                    const Coords &endCrds,
+                    const FCoords &startCrds,
+                    const FCoords &endCrds,
                     float z
             );
 
             void * genTexCol2Degenerate(
                     void *verticesVoid,
-                    const Coords &startCrds,
-                    const Coords &endCrds,
+                    const FCoords &startCrds,
+                    const FCoords &endCrds,
                     float z
             );
 
             void * genShaderRectangleDegenerate(
                     void *verticesVoid,
-                    const Coords &startCrds,
-                    const Coords &endCrds,
+                    const FCoords &startCrds,
+                    const FCoords &endCrds,
                     float z
             );
 
             void * genEllipseDegenerate(
-                    void *verticesVoid, const Coords &startCrds, const Coords &endCrds, float z
+                    void *verticesVoid, const FCoords &startCrds, const FCoords &endCrds, float z
             );
 
             void * genTexEllipseDegenerate(
-                    void *verticesVoid, const Coords &startCrds, const Coords &endCrds, float z
+                    void *verticesVoid, const FCoords &startCrds, const FCoords &endCrds, float z
             );
         };
     }

@@ -15,7 +15,11 @@ namespace directgraph {
             PropertyManager *_propMan;
             SimplePrimHelper *_simplePrimHelper;
             DegenerateHelper *_degenerateHelper;
+            FCoords _coords[2];
+            void genCoords();
         public:
+            void setItemState(const ItemState &state) override;
+
             Clearer(
                     BufferPreparerParams *bufPrepParams,
                     PropertyManager *propMan,
@@ -34,7 +38,7 @@ namespace directgraph {
             StartEndCoords getStartEndCoords();
 
             void
-            genDegenerates(void *&curVertMem, const Coords &startCrds, const Coords &endCrds,
+            genDegenerates(void *&curVertMem, const FCoords &startCrds, const FCoords &endCrds,
                            float curZ);
 
             ~Clearer();

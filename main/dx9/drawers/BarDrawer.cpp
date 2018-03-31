@@ -45,8 +45,7 @@ namespace directgraph{
                 );
                 if(_bufPrepParams->supportsTexturedBar()){
                     curVertMem = _simplePrimHelper->genFillCol2Quad(curVertMem,
-                                                              genCoords(_curItem.data.bar.left, _curItem.data.bar.top),
-                                                              genCoords(_curItem.data.bar.right, _curItem.data.bar.bottom),
+                                                              _coords[0], _coords[1],
                                                               curZ,
                                                               _stateHelper->getLastState().fillColor,
                                                               _stateHelper->getLastState().bgColor,
@@ -54,8 +53,7 @@ namespace directgraph{
                     );
                 } else {
                     curVertMem = _simplePrimHelper->genTexColorQuad(curVertMem,
-                        genCoords(_curItem.data.bar.left, _curItem.data.bar.top),
-                        genCoords(_curItem.data.bar.right, _curItem.data.bar.bottom),
+                        _coords[0], _coords[1],
                         curZ,
                         _stateHelper->getLastState().fillColor,
                         barCoords, false
@@ -63,8 +61,7 @@ namespace directgraph{
                 }
             } else {
                 curVertMem = _simplePrimHelper->genQuad(curVertMem,
-                                                  genCoords(_curItem.data.bar.left, _curItem.data.bar.top),
-                                                  genCoords(_curItem.data.bar.right, _curItem.data.bar.bottom),
+                                                  _coords[0], _coords[1],
                                                   curZ,
                                                   _stateHelper->getFillColor()
 
@@ -73,15 +70,12 @@ namespace directgraph{
         }
 
         StartEndCoords BarDrawer::getStartEndCoords() {
-            StartEndCoords res = {
-                    genCoords(_curItem.data.bar.left, _curItem.data.bar.top),
-                    genCoords(_curItem.data.bar.right, _curItem.data.bar.bottom)
-            };
+            StartEndCoords res = {_coords[0], _coords[1]};
             return res;
         }
 
         void BarDrawer::genDegenerates(
-                void *&curVertMem, const Coords &startCrds, const Coords &endCrds, float curZ
+                void *&curVertMem, const FCoords &startCrds, const FCoords &endCrds, float curZ
         ) {
             if (_stateHelper->fillTextureUsed(_curState)) {
                 if (_bufPrepParams->supportsTexturedBar()) {
@@ -123,10 +117,16 @@ namespace directgraph{
 
         void BarDrawer::setItemState(const ItemState &state) {
             _curState = state;
+            genBarCoords();
         }
 
         void BarDrawer::setItem(const QueueItem &item) {
             _curItem = item;
+        }
+
+        void BarDrawer::genBarCoords() {
+            _coords[0] = subtHalfPixel(genFCoords(_curItem.data.bar.left, _curItem.data.bar.top));
+            _coords[1] = subtHalfPixel(genFCoords(_curItem.data.bar.right, _curItem.data.bar.bottom));
         }
     }
 }

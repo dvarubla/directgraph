@@ -20,7 +20,7 @@ namespace directgraph {
             ) = 0;
             virtual void genDegenerates(
                     void *&curVertMem,
-                    const Coords &startCrds, const Coords &endCrds,
+                    const FCoords &startCrds, const FCoords &endCrds,
                     float curZ
             ) = 0;
             virtual bool isSemiTransparent() = 0;

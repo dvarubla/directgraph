@@ -14,7 +14,7 @@ void main(
     float halfThickness = floor(thickness / 2);
 
     positionOut = transformPosition(
-        positionIn.xyz +
+        subtOffset(positionIn.xyz) +
             sign(float3(rectDimens.x, rectDimens.y, 0)) * float3(halfThickness, halfThickness, 0),
         maxDimens
     );

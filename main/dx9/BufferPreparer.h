@@ -30,7 +30,7 @@ namespace directgraph {
                 OffsetVector offsets;
                 uint32_t numItems;
                 DrawDataType::Type type;
-                Coords prevCrds;
+                FCoords prevCrds;
             };
 
             const static int VERTICES_TRIANGLES_DIFF = 2;
@@ -41,7 +41,7 @@ namespace directgraph {
 
                 uint32_t numItems;
                 DrawOpVector drawOps;
-                Coords prevCrds;
+                FCoords prevCrds;
             } _transpBuffer;
 
             BufferPreparerParams *_bufPrepParams;

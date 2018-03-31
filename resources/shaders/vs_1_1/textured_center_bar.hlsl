@@ -16,5 +16,5 @@ void main(
     colorOut0 = colorIn0;
     colorOut1 = colorIn1;
     pxShaderPos = float4(sign(texIn0.x), sign(texIn0.y), 0.0f, 1.0f);
-    texOut0 = (abs(texIn0.xy) + texIn0.xy) / 8.0f ;
+    texOut0 = (abs(texIn0.xy) + texIn0.xy + 0.5f) / 8.0f ;
 }

@@ -9,16 +9,16 @@ namespace directgraph {
         public:
             void * genQuad(
                     void *verticesVoid,
-                    const Coords &startCrds,
-                    const Coords &endCrds,
+                    const FCoords &startCrds,
+                    const FCoords &endCrds,
                     float z,
                     uint_fast32_t color
             );
 
             void * genTexColorQuad(
                     void *verticesVoid,
-                    const Coords &startCrds,
-                    const Coords &endCrds,
+                    const FCoords &startCrds,
+                    const FCoords &endCrds,
                     float z,
                     uint_fast32_t color,
                     const TextureCoords &textureCoords,
@@ -27,8 +27,8 @@ namespace directgraph {
 
             void *genFillCol2Quad(
                     void *verticesVoid,
-                    const Coords &startCrds,
-                    const Coords &endCrds,
+                    const FCoords &startCrds,
+                    const FCoords &endCrds,
                     float z,
                     uint_fast32_t color1, uint_fast32_t color2,
                     const TextureCoords &textureCoords
@@ -36,8 +36,8 @@ namespace directgraph {
 
             void * genTexRectangle(
                     void *verticesVoid,
-                    const Coords &startCrds,
-                    const Coords &endCrds,
+                    const FCoords &startCrds,
+                    const FCoords &endCrds,
                     uint_fast32_t thickness,
                     float z,
                     uint_fast32_t color
@@ -45,26 +45,28 @@ namespace directgraph {
 
             void * genEllipseQuad(
                     void *verticesVoid,
-                    const Coords &centerCrds,
-                    const UCoords &radiusCrds,
+                    const FCoords &centerCrds,
+                    const FCoords &radiusCrds,
                     float z,
                     uint_fast32_t color
             );
 
             void * genTexEllipseQuad(
                     void *verticesVoid,
-                    const Coords &centerCrds, const UCoords &radiusCrds,
+                    const FCoords &centerCrds, const FCoords &radiusCrds,
                     float z,
                     uint_fast32_t color1, uint_fast32_t color2
             );
 
             void * genTexQuad(
                     void *verticesVoid,
-                    const Coords &startCrds,
-                    const Coords &endCrds,
+                    const FCoords &startCrds,
+                    const FCoords &endCrds,
                     const UCoords &maxCrds,
                     float z
             );
+
+            void *genQuad(void *verticesVoid, const QuadPointsArr &points, float z, uint_fast32_t color);
         };
     }
 }

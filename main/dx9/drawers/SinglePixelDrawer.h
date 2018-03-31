@@ -15,6 +15,8 @@ namespace directgraph {
             SimplePrimHelper *_simplePrimHelper;
             DegenerateHelper *_degenerateHelper;
             QueueItem _curItem;
+            FCoords _coords[2];
+            void genPixelCoords();
         public:
             SinglePixelDrawer(
                     BufferPreparerParams *bufPrepParams,
@@ -33,7 +35,7 @@ namespace directgraph {
 
             StartEndCoords getStartEndCoords();
 
-            void genDegenerates(void *&curVertMem, const Coords &startCrds, const Coords &endCrds, float curZ);
+            void genDegenerates(void *&curVertMem, const FCoords &startCrds, const FCoords &endCrds, float curZ);
 
             ~SinglePixelDrawer();
 

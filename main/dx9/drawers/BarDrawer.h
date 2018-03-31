@@ -20,6 +20,8 @@ namespace directgraph {
             TextureCoordsCalc *_texCrdCalc;
             QueueItem _curItem;
             ItemState _curState;
+            FCoords _coords[2];
+            void genBarCoords();
         public:
             BarDrawer(
                     DrawStateHelper *drawStateHelper,
@@ -45,7 +47,7 @@ namespace directgraph {
 
             void genDegenerates(
                     void *&curVertMem,
-                    const Coords &startCrds, const Coords &endCrds,
+                    const FCoords &startCrds, const FCoords &endCrds,
                     float curZ
             );
 

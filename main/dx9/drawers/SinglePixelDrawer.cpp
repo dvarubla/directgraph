@@ -17,22 +17,19 @@ namespace directgraph{
         }
 
         void SinglePixelDrawer::processDrawItem(void *&curVertMem, uint_fast32_t &, float curZ) {
-            curVertMem = _simplePrimHelper->genQuad(curVertMem,
-                                              genCoords(_curItem.data.singlePixel.x, _curItem.data.singlePixel.y),
-                                              genCoords(_curItem.data.singlePixel.x + 1, _curItem.data.singlePixel.y + 1),
+            curVertMem = _simplePrimHelper->genQuad(curVertMem, _coords[0], _coords[1],
                                               curZ, _curItem.data.singlePixel.color
             );
         }
 
         StartEndCoords SinglePixelDrawer::getStartEndCoords() {
             StartEndCoords res = {
-                    genCoords(_curItem.data.singlePixel.x, _curItem.data.singlePixel.y),
-                    genCoords(_curItem.data.singlePixel.x + 1, _curItem.data.singlePixel.y + 1)
+                    _coords[0], _coords[1]
             };
             return res;
         }
 
-        void SinglePixelDrawer::genDegenerates(void *&curVertMem, const Coords &startCrds, const Coords &endCrds,
+        void SinglePixelDrawer::genDegenerates(void *&curVertMem, const FCoords &startCrds, const FCoords &endCrds,
                                                float curZ) {
             curVertMem = _degenerateHelper->genDegenerate(
                     curVertMem, startCrds, endCrds,
@@ -46,6 +43,7 @@ namespace directgraph{
 
         void SinglePixelDrawer::setItem(const QueueItem &item) {
             _curItem = item;
+            genPixelCoords();
         }
 
         SinglePixelDrawer::SinglePixelDrawer(BufferPreparerParams *bufPrepParams,
@@ -53,6 +51,11 @@ namespace directgraph{
                                              DegenerateHelper *degenerateHelper
         ): _bufPrepParams(bufPrepParams),
            _propMan(propMan), _simplePrimHelper(simplePrimHelper), _degenerateHelper(degenerateHelper){
+        }
+
+        void SinglePixelDrawer::genPixelCoords() {
+            _coords[0] = subtHalfPixel(genFCoords(_curItem.data.singlePixel.x, _curItem.data.singlePixel.y));
+            _coords[1] = subtHalfPixel(genFCoords(_curItem.data.singlePixel.x + 1, _curItem.data.singlePixel.y + 1));
         }
     }
 }

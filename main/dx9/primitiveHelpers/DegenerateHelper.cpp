@@ -5,20 +5,20 @@ namespace directgraph {
     namespace dx9 {
         void * DegenerateHelper::genDegenerate(
                 void *verticesVoid,
-                const Coords &startCrds,
-                const Coords &endCrds,
+                const FCoords &startCrds,
+                const FCoords &endCrds,
                 float z
         ) {
             ColorVertex *vertices = static_cast<ColorVertex*>(verticesVoid);
             (*vertices) = VertexCreator::create<ColorVertex>(
-                    static_cast<float>(startCrds.x) - 0.5f,
-                    static_cast<float>(startCrds.y) - 0.5f,
+                    startCrds.x,
+                    startCrds.y,
                     z, 1.0f, 0
             );
             vertices++;
             *vertices = VertexCreator::create<ColorVertex>(
-                    static_cast<float>(endCrds.x) - 0.5f,
-                    static_cast<float>(endCrds.y) - 0.5f,
+                    endCrds.x,
+                    endCrds.y,
                     z, 1.0f, 0
             );
             vertices++;
@@ -27,22 +27,22 @@ namespace directgraph {
 
         void * DegenerateHelper::genTexDegenerate(
                 void *verticesVoid,
-                const Coords &startCrds,
-                const Coords &endCrds,
+                const FCoords &startCrds,
+                const FCoords &endCrds,
                 float z
         ) {
             TexturedColorVertex *vertices = static_cast<TexturedColorVertex*>(verticesVoid);
             (*vertices) = VertexCreator::create<TexturedColorVertex>(
-                    static_cast<float>(startCrds.x) - 0.5f,
-                    static_cast<float>(startCrds.y) - 0.5f,
+                    startCrds.x,
+                    startCrds.y,
                     z, 1.0f, 0,
                     0.0f,
                     0.0f
             );
             vertices++;
             *vertices = VertexCreator::create<TexturedColorVertex>(
-                    static_cast<float>(endCrds.x) - 0.5f,
-                    static_cast<float>(endCrds.y) - 0.5f,
+                    endCrds.x,
+                    endCrds.y,
                     z, 1.0f, 0,
                     0.0f,
                     0.0f
@@ -52,20 +52,20 @@ namespace directgraph {
         }
 
         void *DegenerateHelper::genTexCol2Degenerate(
-                void *verticesVoid, const Coords &startCrds, const Coords &endCrds,
+                void *verticesVoid, const FCoords &startCrds, const FCoords &endCrds,
                 float z
         ) {
             Color2Vertex *vertices = static_cast<Color2Vertex*>(verticesVoid);
             (*vertices) = VertexCreator::create<Color2Vertex>(
-                    static_cast<float>(startCrds.x),
-                    static_cast<float>(startCrds.y),
+                    startCrds.x,
+                    startCrds.y,
                     z, 0ul, 0ul,
                     0.0f, 0.0f
             );
             vertices++;
             *vertices = VertexCreator::create<Color2Vertex>(
-                    static_cast<float>(endCrds.x),
-                    static_cast<float>(endCrds.y),
+                    endCrds.x,
+                    endCrds.y,
                     z, 0ul, 0ul,
                     0.0f, 0.0f
             );
@@ -75,35 +75,35 @@ namespace directgraph {
 
         void *
         DegenerateHelper::genShaderRectangleDegenerate(
-                void *verticesVoid, const Coords &startCrds, const Coords &endCrds,
+                void *verticesVoid, const FCoords &startCrds, const FCoords &endCrds,
                 float z
         ) {
             TexturedColorVertex *vertices = static_cast<TexturedColorVertex*>(verticesVoid);
             *vertices = VertexCreator::create<TexturedColorVertex>(
-                    static_cast<float>(startCrds.x), static_cast<float>(startCrds.y),
+                    startCrds.x, startCrds.y,
                     z, 0.f, 0, 0, 0
             );
             vertices++;
             *vertices = VertexCreator::create<TexturedColorVertex>(
-                    static_cast<float>(endCrds.x), static_cast<float>(endCrds.y),
+                    endCrds.x, endCrds.y,
                     z, 0.f, 0, 0, 0
             );
             vertices++;
             return vertices;
         }
 
-        void *DegenerateHelper::genEllipseDegenerate(void *verticesVoid, const Coords &startCrds, const Coords &endCrds,
+        void *DegenerateHelper::genEllipseDegenerate(void *verticesVoid, const FCoords &startCrds, const FCoords &endCrds,
                                                      float z) {
             TexturedColorVertexNoRHW *vertices = static_cast<TexturedColorVertexNoRHW*>(verticesVoid);
             (*vertices) = VertexCreator::create<TexturedColorVertexNoRHW>(
-                    static_cast<float>(startCrds.x),
-                    static_cast<float>(startCrds.y),
+                    startCrds.x,
+                    startCrds.y,
                     z, 0ul, 0.0f, 0.0f
             );
             vertices++;
             *vertices = VertexCreator::create<TexturedColorVertexNoRHW>(
-                    static_cast<float>(endCrds.x),
-                    static_cast<float>(endCrds.y),
+                    endCrds.x,
+                    endCrds.y,
                     z, 0ul, 0.0f, 0.0f
             );
             vertices++;
@@ -111,19 +111,19 @@ namespace directgraph {
         }
 
         void *
-        DegenerateHelper::genTexEllipseDegenerate(void *verticesVoid, const Coords &startCrds, const Coords &endCrds,
+        DegenerateHelper::genTexEllipseDegenerate(void *verticesVoid, const FCoords &startCrds, const FCoords &endCrds,
                                                   float z) {
             Color2Vertex *vertices = static_cast<Color2Vertex*>(verticesVoid);
             (*vertices) = VertexCreator::create<Color2Vertex>(
-                    static_cast<float>(startCrds.x),
-                    static_cast<float>(startCrds.y),
+                    startCrds.x,
+                    startCrds.y,
                     z, 0ul, 0ul,
                     0.0f, 0.0f
             );
             vertices++;
             *vertices = VertexCreator::create<Color2Vertex>(
-                    static_cast<float>(endCrds.x),
-                    static_cast<float>(endCrds.y),
+                    endCrds.x,
+                    endCrds.y,
                     z, 0ul, 0ul, 0.0f, 0.0f
             );
             vertices++;
