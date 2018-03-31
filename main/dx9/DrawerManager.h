@@ -7,6 +7,7 @@
 #include "primitiveHelpers/SimplePrimHelper.h"
 #include "primitiveHelpers/RectangleHelper.h"
 #include "primitiveHelpers/EllipseHelper.h"
+#include "primitiveHelpers/LineHelper.h"
 #include <array>
 
 namespace directgraph {
@@ -20,6 +21,7 @@ namespace directgraph {
                 ELLIPSE_DRAWER,
                 PIXEL_CONTAINER_DRAWER,
                 SINGLE_PIXEL_DRAWER,
+                LINE_DRAWER,
                 NUM_DRAWERS
             };
             SimplePrimHelper _simplePrimHelper;
@@ -29,6 +31,7 @@ namespace directgraph {
             DrawStateHelper _drawStateHelper;
             RectangleHelper _rectangleHelper;
             EllipseHelper _ellipseHelper;
+            LineHelper _lineHelper;
 
             std::array<IDrawer*, NUM_DRAWERS> _drawers;
             DrawerType _activeDrawer;

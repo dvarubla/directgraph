@@ -16,7 +16,8 @@ namespace directgraph{
             PIXEL_CONTAINER,
             SETFILLPATTERN,
             SETLINESTYLE,
-            FILLELLIPSE
+            FILLELLIPSE,
+            LINE
         } type;
         union{
             uint32_t color;
@@ -37,6 +38,9 @@ namespace directgraph{
             struct BarItem{
                 int32_t left, top, right, bottom;
             } bar;
+            struct LineItem{
+                int32_t left, top, right, bottom;
+            } line;
             struct RectangleItem{
                 int32_t left, top, right, bottom;
             } rectangle;

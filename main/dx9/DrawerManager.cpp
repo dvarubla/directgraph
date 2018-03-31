@@ -4,6 +4,7 @@
 #include <drawers/EllipseDrawer.h>
 #include <drawers/PixelContainerDrawer.h>
 #include <drawers/SinglePixelDrawer.h>
+#include <drawers/LineDrawer.h>
 #include "DrawerManager.h"
 
 namespace directgraph{
@@ -35,6 +36,10 @@ namespace directgraph{
                     bufPrepParams, propMan,
                     &_simplePrimHelper, &_degenerateHelper
             );
+            _drawers[LINE_DRAWER] = new LineDrawer(
+                    &_drawStateHelper, stateHelper, bufPrepParams, propMan,
+                    &_simplePrimHelper, &_degenerateHelper, &_texCrdCalc, &_lineHelper
+            );
         }
 
         void DrawerManager::setActiveDrawerType(const QueueItem &item) {
@@ -56,6 +61,9 @@ namespace directgraph{
                     break;
                 case QueueItem::SINGLE_PIXEL:
                     _activeDrawer = SINGLE_PIXEL_DRAWER;
+                    break;
+                case QueueItem::LINE:
+                    _activeDrawer = LINE_DRAWER;
                     break;
                 default: break;
             }

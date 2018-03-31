@@ -28,13 +28,24 @@ namespace directgraph{
     QueueItem QueueItemCreator::create<QueueItem::RECTANGLE>(int_fast32_t left, int_fast32_t top, int_fast32_t right, int_fast32_t bottom) {
         QueueItem item;
         item.type = QueueItem::RECTANGLE;
-        item.data.bar.left = left;
-        item.data.bar.top = top;
-        item.data.bar.right = right;
-        item.data.bar.bottom = bottom;
+        item.data.rectangle.left = left;
+        item.data.rectangle.top = top;
+        item.data.rectangle.right = right;
+        item.data.rectangle.bottom = bottom;
         return item;
     }
 
+    template<>
+    QueueItem QueueItemCreator::create<QueueItem::LINE>(int_fast32_t left, int_fast32_t top, int_fast32_t right, int_fast32_t bottom) {
+        QueueItem item;
+        item.type = QueueItem::LINE;
+        item.data.line.left = left;
+        item.data.line.top = top;
+        item.data.line.right = right;
+        item.data.line.bottom = bottom;
+        return item;
+    }
+    
     template<>
     QueueItem QueueItemCreator::create<QueueItem::FILLELLIPSE>(int_fast32_t x, int_fast32_t y, uint_fast32_t xradius, uint_fast32_t yradius) {
         QueueItem item;
