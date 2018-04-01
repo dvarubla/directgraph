@@ -286,5 +286,48 @@ namespace directgraph {
             vertices++;
             return vertices;
         }
+
+        void *
+        SimplePrimHelper::genTexColorQuad(void *verticesVoid, const QuadPointsArr &points, float z, uint_fast32_t color,
+                                          const TextureCoords &textureCoords, bool rotate) {
+            TexturedColorVertex *vertices = static_cast<TexturedColorVertex*>(verticesVoid);
+            *vertices = VertexCreator::create<TexturedColorVertex>(
+                    points[0].x,
+                    points[0].y,
+                    z, 1.0f,
+                    swap_color_transp(color),
+                    textureCoords.start.x,
+                    textureCoords.start.y
+            );
+            vertices++;
+            *vertices = VertexCreator::create<TexturedColorVertex>(
+                    points[1].x,
+                    points[1].y,
+                    z, 1.0f,
+                    swap_color_transp(color),
+                    (rotate) ? textureCoords.start.x : textureCoords.end.x,
+                    (rotate) ? textureCoords.end.y : textureCoords.start.y
+            );
+            vertices++;
+            *vertices = VertexCreator::create<TexturedColorVertex>(
+                    points[2].x,
+                    points[2].y,
+                    z, 1.0f,
+                    swap_color_transp(color),
+                    (rotate) ? textureCoords.end.x : textureCoords.start.x,
+                    (rotate) ? textureCoords.start.y : textureCoords.end.y
+            );
+            vertices++;
+            *vertices = VertexCreator::create<TexturedColorVertex>(
+                    points[3].x,
+                    points[3].y,
+                    z, 1.0f,
+                    swap_color_transp(color),
+                    textureCoords.end.x,
+                    textureCoords.end.y
+            );
+            vertices++;
+            return vertices;
+        }
     }
 }

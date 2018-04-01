@@ -67,6 +67,9 @@ namespace directgraph {
             );
 
             void *genQuad(void *verticesVoid, const QuadPointsArr &points, float z, uint_fast32_t color);
+
+            void *genTexColorQuad(void *verticesVoid, const QuadPointsArr &points, float z, uint_fast32_t color,
+                          const TextureCoords &textureCoords, bool rotate);
         };
     }
 }

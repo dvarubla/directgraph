@@ -20,6 +20,8 @@ namespace directgraph{
         TypeSize LineDrawer::getTypeSize() {
             TypeSize res;
             if (_stateHelper->lineTextureUsed(_curState)) {
+                res.sizeMult = sizeof(TexturedColorVertex);
+                res.drawDataType = DrawDataType::TEXTURED_COLOR_VERTEX;
             } else {
                 res.sizeMult = sizeof(ColorVertex);
                 res.drawDataType = DrawDataType::COLOR_VERTEX;
@@ -31,6 +33,19 @@ namespace directgraph{
                 void *&curVertMem, uint_fast32_t &, float curZ
         ) {
             if (_stateHelper->lineTextureUsed(_curState)) {
+                TextureCoords texCrds = _texCrdCalc->addHalfPixel(
+                        _texCrdCalc->calcLineCoords(
+                                genFCoords(0, 0),
+                                genFCoords(_lineHelper->getLen(), 0)
+                        )
+                );
+                curVertMem = _simplePrimHelper->genTexColorQuad(curVertMem,
+                                                        _lineHelper->getPoints(),
+                                                        curZ,
+                                                        _stateHelper->getLastState().drawColor,
+                                                        texCrds,
+                                                        false
+                );
             } else {
                 curVertMem = _simplePrimHelper->genQuad(curVertMem,
                                                         _lineHelper->getPoints(),
@@ -53,6 +68,9 @@ namespace directgraph{
                 void *&curVertMem, const FCoords &startCrds, const FCoords &endCrds, float curZ
         ) {
             if (_stateHelper->lineTextureUsed(_curState)) {
+                curVertMem = _degenerateHelper->genTexDegenerate(
+                        curVertMem, startCrds, endCrds, curZ
+                );
             } else {
                 curVertMem = _degenerateHelper->genDegenerate(
                         curVertMem, startCrds, endCrds, curZ
@@ -61,7 +79,7 @@ namespace directgraph{
         }
 
         bool LineDrawer::isSemiTransparent() {
-            return color_has_alpha(_stateHelper->getLastState().drawColor) && _stateHelper->lineTextureUsed(_curState);
+            return color_has_alpha(_stateHelper->getLastState().drawColor) || _stateHelper->lineTextureUsed(_curState);
         }
 
         LineDrawer::~LineDrawer() {

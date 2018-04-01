@@ -34,8 +34,8 @@ namespace directgraph {
             if (textured) {
                 TextureCoords texCrds = _texCrdCalc->calcLineCoords(
                         genFCoords(0, 0),
-                        genCoords(topSepCrd, outlineStartCoords.y),
-                        genCoords(outlineStartCoords.x, leftSepCrd)
+                        genFCoords(topSepCrd, outlineStartCoords.y),
+                        genFCoords(outlineStartCoords.x, leftSepCrd)
                 );
                 verticesVoid = _simplePrimHelper->genTexColorQuad(
                         verticesVoid,
@@ -46,8 +46,8 @@ namespace directgraph {
 
                 texCrds = _texCrdCalc->calcLineCoords(
                         texCrds.end,
-                        genCoords(outlineStartCoords.y, topSepCrd),
-                        genCoords(rightSepCrd, outlineEndCoords.x)
+                        genFCoords(outlineStartCoords.y, topSepCrd),
+                        genFCoords(rightSepCrd, outlineEndCoords.x)
                 );
                 verticesVoid = _simplePrimHelper->genTexColorQuad(
                         verticesVoid,
@@ -58,8 +58,8 @@ namespace directgraph {
 
                 texCrds = _texCrdCalc->calcLineCoords(
                         texCrds.end,
-                        genCoords(outlineEndCoords.x, rightSepCrd),
-                        genCoords(bottomSepCrd, outlineEndCoords.y)
+                        genFCoords(outlineEndCoords.x, rightSepCrd),
+                        genFCoords(bottomSepCrd, outlineEndCoords.y)
                 );
                 verticesVoid = _simplePrimHelper->genTexColorQuad(
                         verticesVoid,
@@ -70,8 +70,8 @@ namespace directgraph {
 
                 texCrds = _texCrdCalc->calcLineCoords(
                         texCrds.end,
-                        genCoords(leftSepCrd, outlineStartCoords.x),
-                        genCoords(outlineEndCoords.y, bottomSepCrd)
+                        genFCoords(leftSepCrd, outlineStartCoords.x),
+                        genFCoords(outlineEndCoords.y, bottomSepCrd)
                 );
                 verticesVoid = _simplePrimHelper->genTexColorQuad(
                         verticesVoid,

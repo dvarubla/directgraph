@@ -9,15 +9,15 @@ namespace directgraph {
                     y1d = y1, y2d = y2
             ;
             double halfT = thickness / 2.0;
-            double extraOffset = (thickness% 2 == 0) ? CORR_OFFSET : 0;
+            double extraOffset = (thickness% 2 == 0) ? -CORR_OFFSET : 0;
             double dx = x2d - x1d, dy = y2d - y1d;
             double len = std::sqrt(dx * dx + dy * dy);
             dx /= len;
             dy /= len;
-            x1d -= halfT * dx;
-            y1d -= halfT * dy;
-            x2d += halfT * dx;
-            y2d += halfT * dy;
+            x1d -= (halfT - extraOffset) * dx;
+            y1d -= (halfT - extraOffset) * dy;
+            x2d += (halfT - extraOffset) * dx;
+            y2d += (halfT - extraOffset) * dy;
             dx *= -1;
             std::swap(dx, dy);
 
@@ -32,10 +32,18 @@ namespace directgraph {
 
             _points[3].x = static_cast<float>(x2d - halfT * dx + extraOffset);
             _points[3].y = static_cast<float>(y2d - halfT * dy + extraOffset);
+            _len = std::max(
+                    std::abs(x2 - x1),
+                    std::abs(y2 - y1)
+            ) + static_cast<int_fast32_t>(thickness) - extraOffset * 2;
         }
 
         QuadPointsArr &LineHelper::getPoints() {
             return _points;
+        }
+
+        double LineHelper::getLen() {
+            return _len;
         }
     }
 }
