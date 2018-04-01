@@ -10,12 +10,14 @@ set(SHADER_SRCS
         shaders/ps_1_4/textured_ellipse.hlsl
         shaders/ps_2_0/textured_rectangle.hlsl
         shaders/ps_1_4/rectangle.hlsl
+        shaders/ps_1_4/textured_line.hlsl
 
         shaders/vs_1_1/center_bar.hlsl
         shaders/vs_1_1/textured_bar.hlsl
         shaders/vs_1_1/textured_center_bar.hlsl
         shaders/vs_1_1/textured_center_rectangle.hlsl
         shaders/vs_1_1/center_rectangle.hlsl
+        shaders/vs_1_1/textured_line.hlsl
 )
 
 set(COMMON_SRCS shaders/common/common_vs.hlsl shaders/common/common_ps.hlsl)

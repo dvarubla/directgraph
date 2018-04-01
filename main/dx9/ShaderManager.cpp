@@ -40,7 +40,8 @@ namespace directgraph {
                 case ELLIPSE_P1_4_SHADER:
                 case TEXTURED_BAR_P1_4_SHADER:
                 case TEXTURED_ELLIPSE_P1_4_SHADER:
-                case RECTANGLE_P1_4_SHADER: {
+                case RECTANGLE_P1_4_SHADER:
+                case TEXTURED_LINE_P1_4_SHADER: {
                     IFeatures::ShaderVersion tVertexVer = {1, 1};
                     IFeatures::ShaderVersion tPixelVer = {1, 4};
                     _shaders[id].vertexShaderVer = tVertexVer;
@@ -142,6 +143,22 @@ namespace directgraph {
                         }
                         break;
                     }
+
+                    case TEXTURED_LINE_P1_4_SHADER: {
+                        D3DVERTEXELEMENT9 decl[] = {
+                                {0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+                                {0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0},
+                                D3DDECL_END()
+                        };
+                        if (_device->CreateVertexDeclaration(decl, &_shaders[id].vertexDecl) != D3D_OK) {
+                            THROW_EXC_CODE(
+                                    Exception,
+                                    DX9_CANT_CREATE_VDECL,
+                                    L"Can't create rectangle vertex declaration"
+                            );
+                        }
+                        break;
+                    }
                 }
             }
         }
@@ -164,6 +181,10 @@ namespace directgraph {
 
         bool ShaderManager::supportsRectangle() {
             return checkSupport(RECTANGLE_P1_4_SHADER);
+        }
+
+        bool ShaderManager::supportsTexturedLine() {
+            return checkSupport(TEXTURED_LINE_P1_4_SHADER);
         }
 
         bool ShaderManager::checkSupport(uint_fast16_t id) {
@@ -198,6 +219,10 @@ namespace directgraph {
 
         void ShaderManager::setRectangle() {
             setShader(RECTANGLE_P1_4_SHADER);
+        }
+
+        void ShaderManager::setTexturedLine() {
+            setShader(TEXTURED_LINE_P1_4_SHADER);
         }
 
         void ShaderManager::removeShaders() {

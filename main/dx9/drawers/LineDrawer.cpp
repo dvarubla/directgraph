@@ -6,10 +6,12 @@
 namespace directgraph{
     namespace dx9{
         void LineDrawer::getItemState(ItemState &state) {
-            _drawStateHelper->useLineStyle(
-                    state,
-                    _bufPrepParams->needRecreateTexture()
-            );
+            _drawStateHelper->useLineStyle(state, _bufPrepParams->needRecreateTexture() && !_bufPrepParams->supportsTexturedLine());
+            if(_stateHelper->lineTextureUsed(state)){
+                if(_bufPrepParams->supportsTexturedLine()){
+                    _propMan->setProp(state, PropertyName::SHADER_TYPE, ShaderType::TEXTURED_LINE_SHADER);
+                }
+            }
         }
 
         NumVertices LineDrawer::getNumVertices(bool isFirst) {
@@ -20,8 +22,13 @@ namespace directgraph{
         TypeSize LineDrawer::getTypeSize() {
             TypeSize res;
             if (_stateHelper->lineTextureUsed(_curState)) {
-                res.sizeMult = sizeof(TexturedColorVertex);
-                res.drawDataType = DrawDataType::TEXTURED_COLOR_VERTEX;
+                if(_bufPrepParams->supportsTexturedLine()) {
+                    res.sizeMult = sizeof(ColorVertex);
+                    res.drawDataType = DrawDataType::TEXTURED_LINE_VERTEX;
+                } else {
+                    res.sizeMult = sizeof(TexturedColorVertex);
+                    res.drawDataType = DrawDataType::TEXTURED_COLOR_VERTEX;
+                }
             } else {
                 res.sizeMult = sizeof(ColorVertex);
                 res.drawDataType = DrawDataType::COLOR_VERTEX;
@@ -39,13 +46,23 @@ namespace directgraph{
                                 genFCoords(_lineHelper->getLen(), 0)
                         )
                 );
-                curVertMem = _simplePrimHelper->genTexColorQuad(curVertMem,
-                                                        _lineHelper->getPoints(),
-                                                        curZ,
-                                                        _stateHelper->getLastState().drawColor,
-                                                        texCrds,
-                                                        false
-                );
+                if(_bufPrepParams->supportsTexturedLine()) {
+                    float ws[4] = {texCrds.start.x, texCrds.end.x, texCrds.start.x, texCrds.end.x};
+                    curVertMem = _simplePrimHelper->genQuadExtra(curVertMem,
+                                                                    _lineHelper->getPoints(),
+                                                                    ws,
+                                                                    curZ,
+                                                                    _stateHelper->getLastState().drawColor
+                    );
+                } else {
+                    curVertMem = _simplePrimHelper->genTexColorQuad(curVertMem,
+                                                                    _lineHelper->getPoints(),
+                                                                    curZ,
+                                                                    _stateHelper->getLastState().drawColor,
+                                                                    texCrds,
+                                                                    false
+                    );
+                }
             } else {
                 curVertMem = _simplePrimHelper->genQuad(curVertMem,
                                                         _lineHelper->getPoints(),
@@ -68,9 +85,15 @@ namespace directgraph{
                 void *&curVertMem, const FCoords &startCrds, const FCoords &endCrds, float curZ
         ) {
             if (_stateHelper->lineTextureUsed(_curState)) {
-                curVertMem = _degenerateHelper->genTexDegenerate(
-                        curVertMem, startCrds, endCrds, curZ
-                );
+                if(_bufPrepParams->supportsTexturedLine()) {
+                    curVertMem = _degenerateHelper->genDegenerate(
+                            curVertMem, startCrds, endCrds, curZ
+                    );
+                } else {
+                    curVertMem = _degenerateHelper->genTexDegenerate(
+                            curVertMem, startCrds, endCrds, curZ
+                    );
+                }
             } else {
                 curVertMem = _degenerateHelper->genDegenerate(
                         curVertMem, startCrds, endCrds, curZ
@@ -79,7 +102,8 @@ namespace directgraph{
         }
 
         bool LineDrawer::isSemiTransparent() {
-            return color_has_alpha(_stateHelper->getLastState().drawColor) || _stateHelper->lineTextureUsed(_curState);
+            return color_has_alpha(_stateHelper->getLastState().drawColor) ||
+                   (_stateHelper->lineTextureUsed(_curState) && !_bufPrepParams->supportsTexturedLine());
         }
 
         LineDrawer::~LineDrawer() {

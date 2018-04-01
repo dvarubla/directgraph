@@ -78,7 +78,7 @@ namespace directgraph{
                             _stateHelper->getLastState().bgColor
                     );
                 } else {
-                    curVertMem = _simplePrimHelper->genEllipseQuad(
+                    curVertMem = _simplePrimHelper->genTexColorNoRHWQuad(
                             curVertMem,
                             genFCoords(_curItem.data.fillellipse.x, _curItem.data.fillellipse.y),
                             genFCoords(
@@ -143,7 +143,7 @@ namespace directgraph{
                 }
             } else {
                 if(_bufPrepParams->supportsEllipse()) {
-                    curVertMem = _degenerateHelper->genEllipseDegenerate(
+                    curVertMem = _degenerateHelper->genTexColorNoRHWDegenerate(
                             curVertMem, startCrds, endCrds,
                             curZ
                     );

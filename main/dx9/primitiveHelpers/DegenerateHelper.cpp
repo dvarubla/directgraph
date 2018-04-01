@@ -92,8 +92,9 @@ namespace directgraph {
             return vertices;
         }
 
-        void *DegenerateHelper::genEllipseDegenerate(void *verticesVoid, const FCoords &startCrds, const FCoords &endCrds,
-                                                     float z) {
+        void *DegenerateHelper::genTexColorNoRHWDegenerate(void *verticesVoid, const FCoords &startCrds,
+                                                           const FCoords &endCrds,
+                                                           float z) {
             TexturedColorVertexNoRHW *vertices = static_cast<TexturedColorVertexNoRHW*>(verticesVoid);
             (*vertices) = VertexCreator::create<TexturedColorVertexNoRHW>(
                     startCrds.x,

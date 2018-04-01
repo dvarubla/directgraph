@@ -34,7 +34,7 @@ namespace directgraph {
                     float z
             );
 
-            void * genEllipseDegenerate(
+            void * genTexColorNoRHWDegenerate(
                     void *verticesVoid, const FCoords &startCrds, const FCoords &endCrds, float z
             );
 

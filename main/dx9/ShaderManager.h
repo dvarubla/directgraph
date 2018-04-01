@@ -14,6 +14,7 @@ namespace directgraph {
                 TEXTURED_CENTER_BAR_V1_1_SHADER,
                 TEXTURED_CENTER_RECTANGLE_V1_1_SHADER,
                 CENTER_RECTANGLE_V1_1_SHADER,
+                TEXTURED_LINE_V1_1_SHADER,
                 TOTAL_SHADERS
             };
             const static int FIRST_VERTEX_SHADER = CENTER_BAR_V1_1;
@@ -22,7 +23,8 @@ namespace directgraph {
                 TEXTURED_BAR_P1_4_SHADER,
                 TEXTURED_ELLIPSE_P1_4_SHADER,
                 TEXTURED_RECTANGLE_P2_0_SHADER,
-                RECTANGLE_P1_4_SHADER
+                RECTANGLE_P1_4_SHADER,
+                TEXTURED_LINE_P1_4_SHADER
             };
             const static int FIRST_PIXEL_SHADER = ELLIPSE_P1_4;
             struct ShaderInfo{
@@ -57,12 +59,14 @@ namespace directgraph {
             bool supportsTexturedEllipse();
             bool supportsTexturedRectangle();
             bool supportsRectangle();
+            bool supportsTexturedLine();
             bool supportsShaders();
             void setEllipse();
             void setTexturedBar();
             void setTexturedEllipse();
             void setTexturedRectangle();
             void setRectangle();
+            void setTexturedLine();
             void removeShaders();
         };
     }

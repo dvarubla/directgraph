@@ -22,7 +22,11 @@ namespace directgraph{
         bool BufferPreparerParams::supportsRectangle() {
             return _shaderMan->supportsRectangle();
         }
-        
+
+        bool BufferPreparerParams::supportsTexturedLine() {
+            return _shaderMan->supportsTexturedLine();
+        }
+
         bool BufferPreparerParams::needRecreateTexture() {
             return _needRecreateTexture;
         }

@@ -14,3 +14,6 @@ TEXTURED_RECTANGLE_P2_0 IDR_PIXEL_SHADER "shaders/ps_2_0/textured_rectangle.obj"
 
 CENTER_RECTANGLE_V1_1 IDR_VERTEX_SHADER "shaders/vs_1_1/center_rectangle.obj"
 RECTANGLE_P1_4 IDR_PIXEL_SHADER "shaders/ps_1_4/rectangle.obj"
+
+TEXTURED_LINE_V1_1 IDR_VERTEX_SHADER "shaders/vs_1_1/textured_line.obj"
+TEXTURED_LINE_P1_4 IDR_PIXEL_SHADER "shaders/ps_1_4/textured_line.obj"

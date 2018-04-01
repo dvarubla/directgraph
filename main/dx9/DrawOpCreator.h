@@ -31,7 +31,8 @@ namespace directgraph {
                 ELLIPSE_VERTEX,
                 TEXTURED_ELLIPSE_VERTEX,
                 RECTANGLE_VERTEX,
-                TEXTURED_RECTANGLE_VERTEX
+                TEXTURED_RECTANGLE_VERTEX,
+                TEXTURED_LINE_VERTEX
             };
         }
         struct DrawOp{

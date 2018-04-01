@@ -261,6 +261,9 @@ namespace directgraph {
                             case DrawDataType::RECTANGLE_VERTEX:
                                 stride = sizeof(TexturedColorVertex);
                                 break;
+                            case DrawDataType::TEXTURED_LINE_VERTEX:
+                                stride = sizeof(ColorVertex);
+                                break;
                         }
                         _device->SetStreamSource(
                                 0, _vertBuffer,
@@ -286,6 +289,9 @@ namespace directgraph {
                                     break;
                                 case DrawDataType::RECTANGLE_VERTEX:
                                     _shaderMan->setRectangle();
+                                    break;
+                                case DrawDataType::TEXTURED_LINE_VERTEX:
+                                    _shaderMan->setTexturedLine();
                                     break;
                                 default: break;
                             }
