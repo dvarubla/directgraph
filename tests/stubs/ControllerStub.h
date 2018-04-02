@@ -22,6 +22,13 @@ namespace directgraph{
         MOCK_METHOD1(getlinesettings, void(linesettingstype *lineinfo));
         MOCK_METHOD1(getfillsettings, void(fillsettingstype *fillinfo));
         MOCK_METHOD1(getfillpattern, void(char *pattern));
+        MOCK_METHOD4(line, void(int_fast32_t startx, int_fast32_t starty, int_fast32_t endx, int_fast32_t endy));
+        MOCK_METHOD2(lineto, void(int_fast32_t x, int_fast32_t y));
+        MOCK_METHOD2(linerel, void(int_fast32_t x, int_fast32_t y));
+        MOCK_METHOD2(moveto, void(int_fast32_t x, int_fast32_t y));
+        MOCK_METHOD2(moverel, void(int_fast32_t x, int_fast32_t y));
+        MOCK_METHOD0(getx, int_fast32_t());
+        MOCK_METHOD0(gety, int_fast32_t());
     };
 }
 

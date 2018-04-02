@@ -22,6 +22,13 @@ namespace directgraph{
         virtual void getfillsettings(fillsettingstype *fillinfo) = 0;
         virtual void getfillpattern(char *pattern) = 0;
         virtual void putpixel(int_fast32_t x, int_fast32_t y, uint_fast32_t color) = 0;
+        virtual void line(int_fast32_t startx, int_fast32_t starty, int_fast32_t endx, int_fast32_t endy) = 0;
+        virtual void lineto(int_fast32_t x, int_fast32_t y) = 0;
+        virtual void linerel(int_fast32_t x, int_fast32_t y) = 0;
+        virtual void moveto(int_fast32_t x, int_fast32_t y) = 0;
+        virtual void moverel(int_fast32_t x, int_fast32_t y) = 0;
+        virtual int_fast32_t getx() = 0;
+        virtual int_fast32_t gety() = 0;
         virtual void repaint() = 0;
         virtual ~IController(){};
     };

@@ -13,6 +13,8 @@ namespace directgraph{
         props.drawColor = 0x000000;
         props.lineThickness = 1;
         props.userLinePattern = 0;
+        props.curPos.x = 0;
+        props.curPos.y = 0;
         return props;
     }
 }

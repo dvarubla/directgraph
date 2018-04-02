@@ -278,4 +278,59 @@ namespace directgraph{
         std::copy(_currentProps.userFillPattern, _currentProps.userFillPattern + FPATTERN_SIZE, pattern);
         LeaveCriticalSection(&_propsCS);
     }
+
+    void ThreadController::line(int_fast32_t startx, int_fast32_t starty, int_fast32_t endx, int_fast32_t endy) {
+        QueueItem item = QueueItemCreator::create<QueueItem::LINE>(startx, starty, endx, endy);
+        writeItemHelper(item);
+    }
+
+    void ThreadController::lineto(int_fast32_t x, int_fast32_t y) {
+        EnterCriticalSection(&_propsCS);
+        int_fast32_t lastx = _currentProps.curPos.x;
+        int_fast32_t lasty = _currentProps.curPos.y;
+        _currentProps.curPos.x = x;
+        _currentProps.curPos.y = y;
+        LeaveCriticalSection(&_propsCS);
+        QueueItem item = QueueItemCreator::create<QueueItem::LINE>(lastx, lasty, x, y);
+        writeItemHelper(item);
+    }
+
+    void ThreadController::linerel(int_fast32_t x, int_fast32_t y) {
+        EnterCriticalSection(&_propsCS);
+        int_fast32_t lastx = _currentProps.curPos.x;
+        int_fast32_t lasty = _currentProps.curPos.y;
+        _currentProps.curPos.x += x;
+        _currentProps.curPos.y += y;
+        LeaveCriticalSection(&_propsCS);
+        QueueItem item = QueueItemCreator::create<QueueItem::LINE>(lastx, lasty, lastx + x, lasty + y);
+        writeItemHelper(item);
+    }
+
+    void ThreadController::moveto(int_fast32_t x, int_fast32_t y) {
+        EnterCriticalSection(&_propsCS);
+        _currentProps.curPos.x = x;
+        _currentProps.curPos.y = y;
+        LeaveCriticalSection(&_propsCS);
+    }
+
+    void ThreadController::moverel(int_fast32_t x, int_fast32_t y) {
+        EnterCriticalSection(&_propsCS);
+        _currentProps.curPos.x += x;
+        _currentProps.curPos.y += y;
+        LeaveCriticalSection(&_propsCS);
+    }
+
+    int_fast32_t ThreadController::getx() {
+        EnterCriticalSection(&_propsCS);
+        int_fast32_t x = _currentProps.curPos.x;
+        LeaveCriticalSection(&_propsCS);
+        return x;
+    }
+
+    int_fast32_t ThreadController::gety() {
+        EnterCriticalSection(&_propsCS);
+        int_fast32_t y = _currentProps.curPos.y;
+        LeaveCriticalSection(&_propsCS);
+        return y;
+    }
 }

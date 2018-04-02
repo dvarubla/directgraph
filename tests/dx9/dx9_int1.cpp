@@ -156,3 +156,19 @@ IMG_TEST_F(DX9Int1Test, Tractor){
     wman->releaseCurrentWindowLock();
     return afterTestSimple(_curIndex);
 }
+
+IMG_TEST_F(DX9Int1Test, Star) {
+    IController *ctrl = wman->getCurrentWindowAndLock().controller;
+    drawGrid(ctrl);
+    ctrl->setlinestyle(DASHED_LINE, 0, 4);
+    ctrl->moveto(200,200);
+    ctrl->linerel(20, 50);
+
+    ctrl->lineto(170, 220);
+    ctrl->linerel(60, 0);
+    ctrl->linerel(-50, 30);
+    ctrl->linerel(20, -50);
+    ctrl->repaint();
+    wman->releaseCurrentWindowLock();
+    return afterTestSimple(_curIndex);
+}

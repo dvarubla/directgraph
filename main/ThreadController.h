@@ -56,6 +56,13 @@ namespace directgraph {
         void getlinesettings (linesettingstype *lineinfo);
         void getfillsettings(fillsettingstype *fillinfo);
         void getfillpattern(char *pattern);
+        void line(int_fast32_t startx, int_fast32_t starty, int_fast32_t endx, int_fast32_t endy);
+        void lineto(int_fast32_t x, int_fast32_t y);
+        void linerel(int_fast32_t x, int_fast32_t y);
+        void moveto(int_fast32_t x, int_fast32_t y);
+        void moverel(int_fast32_t x, int_fast32_t y);
+        int_fast32_t getx();
+        int_fast32_t gety();
 
         void putpixel(int_fast32_t x, int_fast32_t y, uint_fast32_t color);
         void repaint();
