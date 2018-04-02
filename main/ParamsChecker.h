@@ -12,6 +12,7 @@ namespace directgraph {
         bool checkRectangle(int_fast32_t &left, int_fast32_t &top, int_fast32_t &right, int_fast32_t &bottom, uint_fast8_t linestyle);
         bool checkBar(int_fast32_t &left, int_fast32_t &top, int_fast32_t &right, int_fast32_t &bottom);
         void checkFillStyle(uint_fast8_t fillstyle);
+        void checkLineStyle(uint_fast8_t linestyle);
     };
 }
 

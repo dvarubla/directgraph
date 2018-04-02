@@ -75,6 +75,12 @@ namespace directgraph{
     }
 
     void ThreadController::setlinestyle(uint_fast8_t linestyle, uint_fast16_t pattern, uint_fast32_t thickness) {
+        _paramsChecker.checkLineStyle(linestyle);
+        EnterCriticalSection(&_propsCS);
+        _currentProps.lineStyle = linestyle;
+        _currentProps.userLinePattern = pattern;
+        _currentProps.lineThickness = thickness;
+        LeaveCriticalSection(&_propsCS);
         QueueItem item = QueueItemCreator::create<QueueItem::SETLINESTYLE>(linestyle, pattern, thickness);
         writeItemHelper(item);
     }

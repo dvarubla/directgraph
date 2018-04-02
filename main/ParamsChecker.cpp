@@ -28,6 +28,12 @@ namespace directgraph{
         }
     }
 
+    void ParamsChecker::checkLineStyle(uint_fast8_t linestyle) {
+        if(linestyle > NULL_LINE){
+            THROW_EXC_CODE(WException, WRONG_DRAW_PARAM, L"Wrong linestyle param: " + to_wstring(linestyle));
+        }
+    }
+
     bool ParamsChecker::checkRectangle(int_fast32_t &left, int_fast32_t &top, int_fast32_t &right, int_fast32_t &bottom, uint_fast8_t linestyle) {
         if(linestyle == NULL_LINE){
             return false;
