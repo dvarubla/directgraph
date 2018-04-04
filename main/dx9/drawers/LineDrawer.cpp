@@ -131,6 +131,7 @@ namespace directgraph{
                     _curItem.data.line.bottom,
                     _stateHelper->getLastState().lineThickness
             );
+            _lineHelper->addOffsetToEnds();
         }
 
         void LineDrawer::setItem(const QueueItem &item) {
