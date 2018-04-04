@@ -2,6 +2,7 @@
 
 #include "DrawOpCreator.h"
 #include <array>
+#include <main/Vect.h>
 
 namespace directgraph {
     namespace dx9 {

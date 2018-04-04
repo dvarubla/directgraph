@@ -22,27 +22,6 @@ namespace directgraph{
     };
 
     template <typename T>
-    struct Vect{
-        T x;
-        T y;
-    };
-
-    typedef Vect<int_fast32_t> Coords;
-    typedef Vect<uint_fast32_t> UCoords;
-    typedef Vect<float> FCoords;
-
-    UCoords genUCoords(uint_fast32_t x, uint_fast32_t y);
-    Coords genCoords(int_fast32_t x, int_fast32_t y);
-    Coords genCoords(const FCoords &fcrds);
-
-    template <typename T1, typename T2>
-    FCoords genFCoords(T1 x,  T2 y){
-        FCoords res = {static_cast<float>(x), static_cast<float>(y)};
-        return res;
-    }
-    Coords genCoords(const UCoords &ucrds);
-
-    template <typename T>
     T round(T val){
 #if _MSC_VER > 1800
         return std::round(val);

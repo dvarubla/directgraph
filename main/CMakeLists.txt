@@ -15,7 +15,7 @@ set(COMMON_FILES
     resource.h
         WindowManager.cpp WindowManager.h IController.h IWindowListener.h
         WException.cpp WException.h IWindowFactory.h
-        Queue.cpp Queue.h ThreadController.cpp ThreadController.h QueueReader.cpp QueueReader.h CommonProps.cpp CommonProps.h ../include/directgraph/directgraph_constants.h IPixelContainer.h PixelContainer.cpp PixelContainer.h NullWindowListener.cpp NullWindowListener.h RWRPLock.cpp RWRPLock.h ControllerFactory.cpp ControllerFactory.h IControllerFactory.h QueueItem.cpp WinManException.cpp WinManException.h error_handler.cpp error_handler.h FormatFinder.h patterns.h patterns.cpp ParamsChecker.cpp ParamsChecker.h)
+        Queue.cpp Queue.h ThreadController.cpp ThreadController.h QueueReader.cpp QueueReader.h CommonProps.cpp CommonProps.h ../include/directgraph/directgraph_constants.h IPixelContainer.h PixelContainer.cpp PixelContainer.h NullWindowListener.cpp NullWindowListener.h RWRPLock.cpp RWRPLock.h ControllerFactory.cpp ControllerFactory.h IControllerFactory.h QueueItem.cpp WinManException.cpp WinManException.h error_handler.cpp error_handler.h FormatFinder.h patterns.h patterns.cpp ParamsChecker.cpp ParamsChecker.h Vect.cpp Vect.h)
 
 set(INCLUDE_FILES
     ${CMAKE_SOURCE_DIR}/include/directgraph/directgraph_api.h

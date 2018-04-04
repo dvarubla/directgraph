@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdint.h>
-#include "util.h"
+#include "Vect.h"
 
 namespace directgraph {
     struct CommonProps {
