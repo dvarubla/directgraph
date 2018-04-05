@@ -27,6 +27,8 @@ namespace directgraph {
 
         typedef std::array<FCoords, VERTICES_IN_QUAD> QuadPointsArr;
 
+        typedef std::vector<FCoords> CoordVect;
+
         extern const float CORR_OFFSET;
     }
 }

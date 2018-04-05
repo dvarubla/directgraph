@@ -73,6 +73,8 @@ namespace directgraph {
 
             void *genQuadExtra(void *verticesVoid, const QuadPointsArr &points, const float (&extraVal)[4], float z, uint_fast32_t color);
 
+            void *genTriangles(void *verticesVoid, const CoordVect &points, float z, uint_fast32_t color);
+
         };
     }
 }

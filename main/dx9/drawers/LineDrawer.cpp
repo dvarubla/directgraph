@@ -43,20 +43,20 @@ namespace directgraph{
                 TextureCoords texCrds = _texCrdCalc->addHalfPixel(
                         _texCrdCalc->calcLineCoords(
                                 genFCoords(0, 0),
-                                genFCoords(_lineHelper->getLen(), 0)
+                                genFCoords(_pointsLen.len, 0)
                         )
                 );
                 if(_bufPrepParams->supportsTexturedLine()) {
                     float ws[4] = {texCrds.start.x, texCrds.end.x, texCrds.start.x, texCrds.end.x};
                     curVertMem = _simplePrimHelper->genQuadExtra(curVertMem,
-                                                                    _lineHelper->getPoints(),
+                                                                    _pointsLen.points,
                                                                     ws,
                                                                     curZ,
                                                                     _stateHelper->getLastState().drawColor
                     );
                 } else {
                     curVertMem = _simplePrimHelper->genTexColorQuad(curVertMem,
-                                                                    _lineHelper->getPoints(),
+                                                                    _pointsLen.points,
                                                                     curZ,
                                                                     _stateHelper->getLastState().drawColor,
                                                                     texCrds,
@@ -65,7 +65,7 @@ namespace directgraph{
                 }
             } else {
                 curVertMem = _simplePrimHelper->genQuad(curVertMem,
-                                                        _lineHelper->getPoints(),
+                                                        _pointsLen.points,
                                                         curZ,
                                                         _stateHelper->getLastState().drawColor
 
@@ -75,8 +75,8 @@ namespace directgraph{
 
         StartEndCoords LineDrawer::getStartEndCoords() {
             StartEndCoords res = {
-                    _lineHelper->getPoints()[0],
-                    _lineHelper->getPoints()[3]
+                    _pointsLen.points[0],
+                    _pointsLen.points[3]
             };
             return res;
         }
@@ -124,14 +124,13 @@ namespace directgraph{
 
         void LineDrawer::setItemState(const ItemState &state) {
             _curState = state;
-            _lineHelper->calcPoints(
+            _pointsLen = _lineHelper->getPointsLen(
                     _curItem.data.line.left, 
                     _curItem.data.line.top, 
                     _curItem.data.line.right, 
                     _curItem.data.line.bottom,
                     _stateHelper->getLastState().lineThickness
             );
-            _lineHelper->addOffsetToEnds();
         }
 
         void LineDrawer::setItem(const QueueItem &item) {

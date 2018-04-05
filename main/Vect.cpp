@@ -22,4 +22,14 @@ namespace directgraph{
         Coords res = {static_cast<int_fast32_t>(round(fcrds.x)), static_cast<int_fast32_t>(round(fcrds.y))};
         return res;
     }
+
+    DCoords genDCoords(const FCoords &fCoords) {
+        DCoords res = {fCoords.x, fCoords.y};
+        return res;
+    }
+
+    FCoords genFCoords(const DCoords &dCoords) {
+        FCoords res = {static_cast<float>(dCoords.x), static_cast<float>(dCoords.y)};
+        return res;
+    }
 }

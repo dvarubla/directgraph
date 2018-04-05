@@ -17,7 +17,8 @@ namespace directgraph{
             SETFILLPATTERN,
             SETLINESTYLE,
             FILLELLIPSE,
-            LINE
+            LINE,
+            DRAWPOLY
         } type;
         union{
             uint32_t color;
@@ -52,6 +53,10 @@ namespace directgraph{
                 uint32_t x, y;
                 uint32_t color;
             } singlePixel;
+            struct DrawPolyItem{
+                uint32_t numPoints;
+                int32_t *points;
+            } drawPoly;
             IPixelContainer *pixelContainer;
         } data;
     };
@@ -74,5 +79,7 @@ namespace directgraph{
         static QueueItem create(uint_fast32_t, uint_fast32_t , uint_fast32_t );
         template <QueueItem::QueueItemType T>
         static QueueItem create(IPixelContainer *pixelContainer);
+        template <QueueItem::QueueItemType T>
+        static QueueItem create(uint32_t numPoints, int32_t *points);
     };
 }

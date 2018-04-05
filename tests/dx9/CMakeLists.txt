@@ -23,6 +23,8 @@ function(dx9_test name src)
     set_tests_properties(${name} PROPERTIES LABELS "dx9")
 endfunction()
 
+set(DX9_DRAWPOLY_SRC dx9_drawpoly.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp ../stubs/FeaturesStub.h)
+dx9_test(dx9_drawpoly "${DX9_DRAWPOLY_SRC}")
 set(DX9_LINE_SRC dx9_line.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp ../stubs/FeaturesStub.h)
 dx9_test(dx9_line "${DX9_LINE_SRC}")
 set(DX9_LINE_STYLE_SRC dx9_line_style.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp ../stubs/FeaturesStub.h)

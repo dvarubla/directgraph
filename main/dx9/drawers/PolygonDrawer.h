@@ -5,12 +5,12 @@
 #include <primitiveHelpers/SimplePrimHelper.h>
 #include <primitiveHelpers/DegenerateHelper.h>
 #include <TextureCoordsCalc.h>
-#include <primitiveHelpers/LineHelper.h>
+#include <primitiveHelpers/PolygonHelper.h>
 #include "NullDrawer.h"
 
-namespace directgraph {
+namespace directgraph{
     namespace dx9 {
-        class LineDrawer : public NullDrawer {
+        class PolygonDrawer: public NullDrawer {
         private:
             DrawStateHelper *_drawStateHelper;
             StateHelper *_stateHelper;
@@ -19,12 +19,12 @@ namespace directgraph {
             SimplePrimHelper *_simplePrimHelper;
             DegenerateHelper *_degenerateHelper;
             TextureCoordsCalc *_texCrdCalc;
-            LineHelper *_lineHelper;
-            LineHelper::PointsLen _pointsLen;
+            PolygonHelper *_polygonHelper;
             QueueItem _curItem;
             ItemState _curState;
+            std::vector<FCoords> _points;
         public:
-            LineDrawer(
+            PolygonDrawer(
                     DrawStateHelper *drawStateHelper,
                     StateHelper *stateHelper,
                     BufferPreparerParams *bufPrepParams,
@@ -32,7 +32,7 @@ namespace directgraph {
                     SimplePrimHelper *simplePrimHelper,
                     DegenerateHelper *degenerateHelper,
                     TextureCoordsCalc *texCrdCalc,
-                    LineHelper *lineHelper
+                    PolygonHelper *polygonHelper
             );
             void getItemState(ItemState &state);
 
@@ -55,7 +55,7 @@ namespace directgraph {
 
             bool isSemiTransparent();
 
-            ~LineDrawer();
+            ~PolygonDrawer();
 
             void setItemState(const ItemState &state);
 

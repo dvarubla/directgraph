@@ -32,7 +32,8 @@ namespace directgraph{
                         item.type == QueueItem::PIXEL_CONTAINER ||
                         item.type == QueueItem::FILLELLIPSE ||
                         item.type == QueueItem::RECTANGLE ||
-                        item.type == QueueItem::LINE
+                        item.type == QueueItem::LINE ||
+                        item.type == QueueItem::DRAWPOLY
                 ) {
                     _drawerManager.setActiveDrawerType(item);
                     IDrawer *curDrawer = _drawerManager.getActiveDrawer();

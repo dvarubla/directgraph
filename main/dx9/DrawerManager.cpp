@@ -5,6 +5,7 @@
 #include <drawers/PixelContainerDrawer.h>
 #include <drawers/SinglePixelDrawer.h>
 #include <drawers/LineDrawer.h>
+#include <drawers/PolygonDrawer.h>
 #include "DrawerManager.h"
 
 namespace directgraph{
@@ -40,6 +41,10 @@ namespace directgraph{
                     &_drawStateHelper, stateHelper, bufPrepParams, propMan,
                     &_simplePrimHelper, &_degenerateHelper, &_texCrdCalc, &_lineHelper
             );
+            _drawers[POLYGON_DRAWER] = new PolygonDrawer(
+                    &_drawStateHelper, stateHelper, bufPrepParams, propMan,
+                    &_simplePrimHelper, &_degenerateHelper, &_texCrdCalc, &_polygonHelper
+            );
         }
 
         void DrawerManager::setActiveDrawerType(const QueueItem &item) {
@@ -64,6 +69,9 @@ namespace directgraph{
                     break;
                 case QueueItem::LINE:
                     _activeDrawer = LINE_DRAWER;
+                    break;
+                case QueueItem::DRAWPOLY:
+                    _activeDrawer = POLYGON_DRAWER;
                     break;
                 default: break;
             }

@@ -2,56 +2,57 @@
 
 namespace directgraph {
     namespace dx9 {
-        void LineHelper::calcPoints(int_fast32_t x1, int_fast32_t y1, int_fast32_t x2, int_fast32_t y2,
+        LineHelper::LineData LineHelper::calcPoints(double x1d, double y1d, double x2d, double y2d,
                                     uint_fast32_t thickness) {
-            double
-                    x1d = x1, x2d = x2,
-                    y1d = y1, y2d = y2
-            ;
-            _halfT = thickness / 2.0;
-            _extraOffset = (thickness% 2 == 0) ? -CORR_OFFSET : 0;
+            LineData res;
+            res.halfT = thickness / 2.0;
+            res.extraOffset = (thickness% 2 == 0) ? -CORR_OFFSET : 0;
             double dx = x2d - x1d, dy = y2d - y1d;
             double len = std::sqrt(dx * dx + dy * dy);
             dx /= len;
             dy /= len;
-            _dir.x = static_cast<float>(dx);
-            _dir.y = static_cast<float>(dy);
+            res.dir.x = static_cast<float>(dx);
+            res.dir.y = static_cast<float>(dy);
             dx *= -1;
             std::swap(dx, dy);
 
-            _points[0].x = static_cast<float>(x1d + _halfT * dx + _extraOffset);
-            _points[0].y = static_cast<float>(y1d + _halfT * dy + _extraOffset);
+            res.points[0].x = static_cast<float>(x1d + res.halfT * dx + res.extraOffset);
+            res.points[0].y = static_cast<float>(y1d + res.halfT * dy + res.extraOffset);
 
-            _points[1].x = static_cast<float>(x2d + _halfT * dx + _extraOffset);
-            _points[1].y = static_cast<float>(y2d + _halfT * dy + _extraOffset);
+            res.points[1].x = static_cast<float>(x2d + res.halfT * dx + res.extraOffset);
+            res.points[1].y = static_cast<float>(y2d + res.halfT * dy + res.extraOffset);
 
-            _points[2].x = static_cast<float>(x1d - _halfT * dx + _extraOffset);
-            _points[2].y = static_cast<float>(y1d - _halfT * dy + _extraOffset);
+            res.points[2].x = static_cast<float>(x1d - res.halfT * dx + res.extraOffset);
+            res.points[2].y = static_cast<float>(y1d - res.halfT * dy + res.extraOffset);
 
-            _points[3].x = static_cast<float>(x2d - _halfT * dx + _extraOffset);
-            _points[3].y = static_cast<float>(y2d - _halfT * dy + _extraOffset);
-            _len = std::max(
-                    std::abs(x2 - x1),
-                    std::abs(y2 - y1)
-            ) + static_cast<int_fast32_t>(thickness) - _extraOffset * 2;
-            _normal.x = static_cast<float>(dx);
-            _normal.y = static_cast<float>(dy);
+            res.points[3].x = static_cast<float>(x2d - res.halfT * dx + res.extraOffset);
+            res.points[3].y = static_cast<float>(y2d - res.halfT * dy + res.extraOffset);
+            res.len = std::max(
+                    std::abs(x2d - x1d),
+                    std::abs(y2d - y1d)
+            );
+            res.normal.x = static_cast<float>(dx);
+            res.normal.y = static_cast<float>(dy);
+            return res;
         }
 
-        QuadPointsArr &LineHelper::getPoints() {
-            return _points;
+        LineHelper::PointsLen
+        LineHelper::getPointsLen(double x1d, double y1d, double x2d, double y2d, uint_fast32_t thickness) {
+            LineData lData = calcPoints(x1d, y1d, x2d, y2d, thickness);
+            FCoords offset = genFCoords(calcOffset(lData));
+            lData.points[0] -= offset;
+            lData.points[2] -= offset;
+            lData.points[1] += offset;
+            lData.points[3] += offset;
+            lData.len += static_cast<int_fast32_t>(thickness) - lData.extraOffset * 2;
+            PointsLen res;
+            res.points = lData.points;
+            res.len = lData.len;
+            return res;
         }
 
-        double LineHelper::getLen() {
-            return _len;
-        }
-
-        void LineHelper::addOffsetToEnds() {
-            FCoords offset = _dir * (_halfT - _extraOffset);
-            _points[0] -= offset;
-            _points[2] -= offset;
-            _points[1] += offset;
-            _points[3] += offset;
+        DCoords LineHelper::calcOffset(const LineHelper::LineData &lineData) {
+            return lineData.dir * (lineData.halfT - lineData.extraOffset);
         }
     }
 }

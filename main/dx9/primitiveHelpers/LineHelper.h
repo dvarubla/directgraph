@@ -5,18 +5,23 @@
 namespace directgraph {
     namespace dx9 {
         class LineHelper {
-        private:
-            QuadPointsArr _points;
-            FCoords _normal;
-            FCoords _dir;
-            double _len;
-            double _halfT;
-            double _extraOffset;
         public:
-            QuadPointsArr &getPoints();
-            double getLen();
-            void calcPoints(int_fast32_t x1, int_fast32_t y1, int_fast32_t x2, int_fast32_t y2, uint_fast32_t thickness);
-            void addOffsetToEnds();
+            struct LineData{
+                QuadPointsArr points;
+                DCoords normal;
+                DCoords dir;
+                double len;
+                double halfT;
+                double extraOffset;
+            };
+            struct PointsLen{
+                QuadPointsArr points;
+                double len;
+            };
+        public:
+            LineData calcPoints(double x1d, double y1d, double x2d, double y2d, uint_fast32_t thickness);
+            PointsLen getPointsLen(double x1d, double y1d, double x2d, double y2d, uint_fast32_t thickness);
+            DCoords calcOffset(const LineData &lineData);
         };
     }
 }

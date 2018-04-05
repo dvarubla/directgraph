@@ -96,16 +96,27 @@ namespace directgraph{
     typedef Vect<int_fast32_t> Coords;
     typedef Vect<uint_fast32_t> UCoords;
     typedef Vect<float> FCoords;
+    typedef Vect<double> DCoords;
 
     UCoords genUCoords(uint_fast32_t x, uint_fast32_t y);
     Coords genCoords(int_fast32_t x, int_fast32_t y);
     Coords genCoords(const FCoords &fcrds);
+    Coords genCoords(const UCoords &ucrds);
 
     template <typename T1, typename T2>
     FCoords genFCoords(T1 x,  T2 y){
         FCoords res = {static_cast<float>(x), static_cast<float>(y)};
         return res;
     }
-    Coords genCoords(const UCoords &ucrds);
+
+    FCoords genFCoords(const DCoords &dCoords);
+
+    template <typename T1, typename T2>
+    DCoords genDCoords(T1 x,  T2 y){
+        DCoords res = {static_cast<float>(x), static_cast<float>(y)};
+        return res;
+    }
+
+    DCoords genDCoords(const FCoords &fCoords);
 }
 

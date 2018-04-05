@@ -363,5 +363,20 @@ namespace directgraph {
             vertices++;
             return vertices;
         }
+
+        void *SimplePrimHelper::genTriangles(void *verticesVoid, const CoordVect &points, float z,
+                                             uint_fast32_t color) {
+            ColorVertex *vertices = static_cast<ColorVertex*>(verticesVoid);
+            for(CoordVect::const_iterator it = points.begin(); it != points.end(); ++it){
+                *vertices = VertexCreator::create<ColorVertex>(
+                        it->x,
+                        it->y,
+                        z, 1.0f,
+                        swap_color_transp(color)
+                );
+                vertices++;
+            }
+            return vertices;
+        }
     }
 }

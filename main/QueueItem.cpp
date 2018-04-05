@@ -117,4 +117,14 @@ namespace directgraph{
         item.data.setfillpattern.color = color;
         return item;
     }
+
+    template<>
+    QueueItem QueueItemCreator::create<QueueItem::DRAWPOLY>(uint32_t numPoints, int32_t *points) {
+        QueueItem item;
+        item.type = QueueItem::DRAWPOLY;
+        item.data.drawPoly.numPoints = numPoints;
+        item.data.drawPoly.points = new int32_t[numPoints * 2];
+        std::copy(points, points + numPoints * 2, item.data.drawPoly.points);
+        return item;
+    }
 }
