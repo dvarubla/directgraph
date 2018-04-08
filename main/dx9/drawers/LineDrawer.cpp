@@ -40,12 +40,13 @@ namespace directgraph{
                 void *&curVertMem, uint_fast32_t &, float curZ
         ) {
             if (_stateHelper->lineTextureUsed(_curState)) {
-                TextureCoords texCrds = _texCrdCalc->addHalfPixel(
+                TextureCoords texCrds =
                         _texCrdCalc->calcLineCoords(
                                 genFCoords(0, 0),
-                                genFCoords(_pointsLen.len, 0)
+                                genFCoords(_pointsLen.len, 0),
+                                true
                         )
-                );
+                ;
                 if(_bufPrepParams->supportsTexturedLine()) {
                     float ws[4] = {texCrds.start.x, texCrds.end.x, texCrds.start.x, texCrds.end.x};
                     curVertMem = _simplePrimHelper->genQuadExtra(curVertMem,

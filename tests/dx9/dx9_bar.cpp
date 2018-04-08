@@ -70,7 +70,7 @@ IMG_TEST_F(DX9BarTest, OutsideScreenFull){
 IMG_TEST_F(DX9BarTest, OnePixel){
     QueueItem items[] = {
             QueueItemCreator::create<QueueItem::CLEAR>(),
-            QueueItemCreator::create<QueueItem::SETFILLSTYLE>(SOLID_FILL, 0x000000),
+            QueueItemCreator::create<QueueItem::SETFILLSTYLE>(SOLID_FILL, 0x000000u),
             QueueItemCreator::create<QueueItem::BAR>(WIDTH/4, HEIGHT/4, WIDTH/4 + 1, HEIGHT/4 + 1)
     };
     _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));

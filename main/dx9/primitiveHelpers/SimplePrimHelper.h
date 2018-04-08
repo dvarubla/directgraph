@@ -75,6 +75,14 @@ namespace directgraph {
 
             void *genTriangles(void *verticesVoid, const CoordVect &points, float z, uint_fast32_t color);
 
+            void *genTexTriangles(
+                    void *verticesVoid, const CoordVect &points, const CoordVect &texCoords, float z, uint_fast32_t color
+            );
+
+            void *genTrianglesExtra(
+                    void *verticesVoid, const CoordVect &points, const CoordVect &extraCoords, float z, uint_fast32_t color
+            );
+
         };
     }
 }

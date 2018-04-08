@@ -4,14 +4,17 @@
 namespace directgraph{
     namespace dx9{
         TextureCoords
-        TextureCoordsCalc::calcLineCoords(const FCoords &prevEnd, const FCoords &start, const FCoords &end) {
-            float _;
+        TextureCoordsCalc::calcLineCoords(float prevEnd, const FCoords &start, const FCoords &end, bool needAddOffset) {
             FCoords texStart = {
-                    std::modf(prevEnd.x, &_), 0
+                    prevEnd, 0
             };
+
+            if(needAddOffset){
+                texStart = addOffset(texStart);
+            }
+
             FCoords texEnd = {
-                    1.0f * std::abs(end.x - start.x) / LPATTERN_SIZE + texStart.x,
-                    1.0f * std::abs(end.y - start.y) / LPATTERN_SIZE
+                    1.0f * std::abs(end.x - start.x) / LPATTERN_SIZE + texStart.x, 0.0f
             };
             TextureCoords res = {texStart, texEnd};
             return res;
@@ -24,16 +27,13 @@ namespace directgraph{
             return res;
         }
 
-        TextureCoords TextureCoordsCalc::calcLineCoords(const FCoords &start, const FCoords &end) {
-            return calcLineCoords(genFCoords(0, 0), start, end);
+        TextureCoords TextureCoordsCalc::calcLineCoords(const FCoords &start, const FCoords &end, bool needAddOffset) {
+            return calcLineCoords(0, start, end, needAddOffset);
         }
 
-        TextureCoords TextureCoordsCalc::addHalfPixel(const TextureCoords &textureCoords) {
-            TextureCoords res = textureCoords;
-            res.start.x += 0.5f;
-            res.start.y += 0.5f;
-            res.end.x += 0.5f;
-            res.end.y += 0.5f;
+        FCoords TextureCoordsCalc::addOffset(const FCoords &coords) {
+            FCoords res = coords;
+            res.x += CORR_OFFSET;
             return res;
         }
     }

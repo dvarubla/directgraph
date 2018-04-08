@@ -12,7 +12,6 @@ namespace directgraph {
                 DCoords dir;
                 double len;
                 double halfT;
-                double extraOffset;
             };
             struct PointsLen{
                 QuadPointsArr points;

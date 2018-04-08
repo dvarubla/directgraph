@@ -378,5 +378,39 @@ namespace directgraph {
             }
             return vertices;
         }
+
+        void *SimplePrimHelper::genTexTriangles(
+                void *verticesVoid, const CoordVect &points, const CoordVect &texCoords, float z, uint_fast32_t color
+        ) {
+            TexturedColorVertex *vertices = static_cast<TexturedColorVertex*>(verticesVoid);
+            for(CoordVect::const_iterator it = points.begin(); it != points.end(); ++it){
+                *vertices = VertexCreator::create<TexturedColorVertex>(
+                        it->x,
+                        it->y,
+                        z, 1.0f,
+                        swap_color_transp(color),
+                        texCoords[it - points.begin()].x,
+                        texCoords[it - points.begin()].y
+                );
+                vertices++;
+            }
+            return vertices;
+        }
+
+        void *
+        SimplePrimHelper::genTrianglesExtra(void *verticesVoid, const CoordVect &points, const CoordVect &extraCoords,
+                                            float z, uint_fast32_t color) {
+            ColorVertex *vertices = static_cast<ColorVertex*>(verticesVoid);
+            for(CoordVect::const_iterator it = points.begin(); it != points.end(); ++it){
+                *vertices = VertexCreator::create<ColorVertex>(
+                        it->x,
+                        it->y,
+                        z, extraCoords[it - points.begin()].x,
+                        swap_color_transp(color)
+                );
+                vertices++;
+            }
+            return vertices;
+        }
     }
 }

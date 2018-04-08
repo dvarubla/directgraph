@@ -127,3 +127,14 @@ IMG_TEST_F(DX9LineStyleTest, MultipleLines){
     _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
     return afterTestSimple(win, &_readerStub);
 }
+
+IMG_TEST_F(DX9LineStyleTest, ThickLine){
+    QueueItem items[] = {
+            QueueItemCreator::create<QueueItem::CLEAR>(),
+            QueueItemCreator::create<QueueItem::SETLINESTYLE>(DOTTED_LINE, 0, 25),
+            QueueItemCreator::create<QueueItem::COLOR>(0x0000FF),
+            QueueItemCreator::create<QueueItem::LINE>(100, 150, 100, 50)
+    };
+    _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
+    return afterTestSimple(win, &_readerStub);
+}

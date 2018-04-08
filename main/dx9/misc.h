@@ -16,6 +16,7 @@ namespace directgraph {
             FCoords start;
             FCoords end;
         };
+
         struct TypeSize{
             uint_fast32_t sizeMult;
             DrawDataType::Type drawDataType;
@@ -28,6 +29,11 @@ namespace directgraph {
         typedef std::array<FCoords, VERTICES_IN_QUAD> QuadPointsArr;
 
         typedef std::vector<FCoords> CoordVect;
+
+        struct Polyline{
+            CoordVect coords;
+            CoordVect texCoords;
+        };
 
         extern const float CORR_OFFSET;
     }
