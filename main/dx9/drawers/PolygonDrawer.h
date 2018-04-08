@@ -22,7 +22,7 @@ namespace directgraph{
             PolygonHelper *_polygonHelper;
             QueueItem _curItem;
             ItemState _curState;
-            std::vector<FCoords> _points;
+            Polyline _polyline;
         public:
             PolygonDrawer(
                     DrawStateHelper *drawStateHelper,

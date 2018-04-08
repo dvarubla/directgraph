@@ -7,6 +7,7 @@ namespace directgraph {
 
         void PolygonDrawer::getItemState(ItemState &state) {
             _drawStateHelper->useLineStyle(state, _bufPrepParams->needRecreateTexture() && !_bufPrepParams->supportsTexturedLine());
+
             if(_stateHelper->lineTextureUsed(state)){
                 if(_bufPrepParams->supportsTexturedLine()){
                     _propMan->setProp(state, PropertyName::SHADER_TYPE, ShaderType::TEXTURED_LINE_SHADER);
@@ -15,7 +16,7 @@ namespace directgraph {
         }
 
         NumVertices PolygonDrawer::getNumVertices(bool isFirst) {
-            NumVertices res = {(isFirst) ? 0u : 2u, _points.size()};
+            NumVertices res = {(isFirst) ? 0u : 2u, _polyline.coords.size()};
             return res;
         }
 
@@ -37,15 +38,29 @@ namespace directgraph {
         }
 
         void PolygonDrawer::processDrawItem(void *&curVertMem, uint_fast32_t &, float curZ) {
-            curVertMem = _simplePrimHelper->genTriangles(
-                    curVertMem, _points, curZ, _stateHelper->getLastState().drawColor
-            );
+            if (_stateHelper->lineTextureUsed(_curState)) {
+                if(_bufPrepParams->supportsTexturedLine()) {
+                    curVertMem = _simplePrimHelper->genTrianglesExtra(
+                            curVertMem, _polyline.coords, _polyline.texCoords, curZ,
+                            _stateHelper->getLastState().drawColor
+                    );
+                } else {
+                    curVertMem = _simplePrimHelper->genTexTriangles(
+                            curVertMem, _polyline.coords, _polyline.texCoords, curZ,
+                            _stateHelper->getLastState().drawColor
+                    );
+                }
+            } else {
+                curVertMem = _simplePrimHelper->genTriangles(
+                        curVertMem, _polyline.coords, curZ, _stateHelper->getLastState().drawColor
+                );
+            }
         }
 
         StartEndCoords PolygonDrawer::getStartEndCoords() {
             StartEndCoords res = {
-                    _points.front(),
-                    _points.back()
+                    _polyline.coords.front(),
+                    _polyline.coords.back()
             };
             return res;
         }
@@ -68,9 +83,9 @@ namespace directgraph {
 
         void PolygonDrawer::setItemState(const ItemState &state) {
             _curState = state;
-            _points = _polygonHelper->calcPolygonBorder(
+            _polyline = _polygonHelper->calcPolyline(
                     _curItem.data.drawPoly.numPoints, _curItem.data.drawPoly.points,
-                    _stateHelper->getLastState().lineThickness
+                    _stateHelper->getLastState().lineThickness, _stateHelper->lineTextureUsed(_curState)
             );
         }
 
