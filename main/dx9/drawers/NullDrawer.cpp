@@ -14,5 +14,17 @@ namespace directgraph{
 
         void NullDrawer::setItem(const QueueItem &) {
         }
+
+        uint_fast8_t NullDrawer::getNumStages() {
+            return 1;
+        }
+
+        void NullDrawer::setStage(uint_fast8_t) {
+        }
+
+        uint_fast32_t NullDrawer::getTotalSize() {
+            NumVertices nv = getNumVertices(false);
+            return (nv.degenerate + nv.primitive) * getTypeSize().sizeMult;
+        }
     }
 }

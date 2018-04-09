@@ -5,11 +5,11 @@
 #include <BufferPreparerParams.h>
 #include <DrawStateHelper.h>
 #include <primitiveHelpers/RectangleHelper.h>
-#include "IDrawer.h"
+#include "NullDrawer.h"
 
 namespace directgraph {
     namespace dx9 {
-        class RectangleDrawer: public IDrawer {
+        class RectangleDrawer: public NullDrawer {
         private:
             DrawStateHelper *_drawStateHelper;
             StateHelper *_stateHelper;

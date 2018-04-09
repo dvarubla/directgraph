@@ -5,11 +5,11 @@
 #include <primitiveHelpers/SimplePrimHelper.h>
 #include <primitiveHelpers/DegenerateHelper.h>
 #include <primitiveHelpers/EllipseHelper.h>
-#include "IDrawer.h"
+#include "NullDrawer.h"
 
 namespace directgraph {
     namespace dx9 {
-        class EllipseDrawer: public IDrawer{
+        class EllipseDrawer: public NullDrawer{
         private:
             DrawStateHelper *_drawStateHelper;
             StateHelper *_stateHelper;

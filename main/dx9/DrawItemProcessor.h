@@ -29,7 +29,7 @@ namespace directgraph {
                     DrawerManager *drawerManager,
                     PropertyManager *propMan
             );
-            bool canCreateMoreItems();
+            bool canCreateItems(uint_fast8_t itemsNum);
             void nextItem();
             void resetItemCount();
             float getCurZ();

@@ -12,6 +12,12 @@ namespace directgraph {
 
             void setItem(const QueueItem &item);
 
+            uint_fast8_t getNumStages();
+
+            void setStage(uint_fast8_t stage);
+
+            uint_fast32_t getTotalSize();
+
             ~NullDrawer();
         };
     }

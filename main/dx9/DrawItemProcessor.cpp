@@ -108,8 +108,8 @@ namespace directgraph {
             return isFirst;
         }
 
-        bool DrawItemProcessor::canCreateMoreItems() {
-            return _itemNum != 0;
+        bool DrawItemProcessor::canCreateItems(uint_fast8_t itemsNum) {
+            return _itemNum > itemsNum;
         }
 
         void DrawItemProcessor::nextItem() {

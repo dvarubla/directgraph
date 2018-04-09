@@ -26,6 +26,9 @@ namespace directgraph {
             virtual bool isSemiTransparent() = 0;
             virtual void setItem(const QueueItem &item) = 0;
             virtual void setItemState(const ItemState &state) = 0;
+            virtual uint_fast8_t getNumStages() = 0;
+            virtual void setStage(uint_fast8_t stage) = 0;
+            virtual uint_fast32_t getTotalSize() = 0;
             virtual ~IDrawer() {}
         };
     }
