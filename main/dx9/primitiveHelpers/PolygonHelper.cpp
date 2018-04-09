@@ -39,8 +39,8 @@ namespace directgraph{
                 const DCoords &p1, const DCoords &p2, const DCoords &p3, uint_fast32_t thickness,
                 bool useFirst, bool useLast, bool addToFirst, bool addToLast
         ) {
-            LineHelper::LineData data1 = _lineHelper.calcPoints(p1.x, p1.y, p2.x, p2.y, thickness);
-            LineHelper::LineData data2 = _lineHelper.calcPoints(p2.x, p2.y, p3.x, p3.y, thickness);
+            LineHelper::LineData data1 = _lineHelper->calcPoints(p1.x, p1.y, p2.x, p2.y, thickness);
+            LineHelper::LineData data2 = _lineHelper->calcPoints(p2.x, p2.y, p3.x, p3.y, thickness);
             DCoords arr1[VERTICES_IN_QUAD] = {
                     genDCoords(data1.points[0]), genDCoords(data1.points[1]),
                     genDCoords(data1.points[2]), genDCoords(data1.points[3])
@@ -52,8 +52,8 @@ namespace directgraph{
             DCoords intPoint1, intPoint2;
             bool int1 = getIntersection(arr1[0], arr1[1], arr2[0], arr2[1], intPoint1);
             bool int2 = getIntersection(arr1[2], arr1[3], arr2[2], arr2[3], intPoint2);
-            FCoords off1 = genFCoords(_lineHelper.calcOffset(data1));
-            FCoords off2 = genFCoords(_lineHelper.calcOffset(data2));
+            FCoords off1 = genFCoords(_lineHelper->calcOffset(data1));
+            FCoords off2 = genFCoords(_lineHelper->calcOffset(data2));
             TwoLines res;
             if(int1 ^ int2){
                 res.needConn = true;
@@ -70,8 +70,8 @@ namespace directgraph{
                 }
                 oppositePoint1 = intPoint + data1.normal * normSign * thickness;
                 oppositePoint2 = intPoint + data2.normal * normSign * thickness;
-                res.oldLineEnd = intPoint + data1.normal * normSign * thickness / 2;
-                res.newLineStart = intPoint + data2.normal * normSign * thickness / 2;
+                res.oldLineEnd = (intPoint + oppositePoint1) / 2;
+                res.newLineStart = (intPoint + oppositePoint2) / 2;
                 if(int2){
                     res.intFirst[0] = addCorrOffset(genFCoords(oppositePoint1));
                     res.intFirst[1] = addCorrOffset(genFCoords(intPoint));
@@ -221,12 +221,12 @@ namespace directgraph{
                 coords.push_back(twoLines.lineFirst[0]);
                 coords.push_back(twoLines.lineFirst[1]);
                 if(_textured) {
-                    _prevTexCrds = _texCrdCalc.addOffset(_prevTexCrds);
+                    _prevTexCrds = _texCrdCalc->addOffset(_prevTexCrds);
                     texCoords.push_back(_prevTexCrds);
                     texCoords.push_back(_prevTexCrds);
                     FCoords mid = (twoLines.lineFirst[0] + twoLines.lineFirst[1]) / 2;
 
-                    _prevTexCrds = _texCrdCalc.calcLineCoords(
+                    _prevTexCrds = _texCrdCalc->calcLineCoords(
                             _prevTexCrds.x,
                             genFCoords(0,0),
                             (useXForTextureFirst) ?
@@ -261,7 +261,7 @@ namespace directgraph{
 
                     FCoords diff1 = genFCoords(p2) - genFCoords(twoLines.oldLineEnd);
 
-                    _prevTexCrds = _texCrdCalc.calcLineCoords(
+                    _prevTexCrds = _texCrdCalc->calcLineCoords(
                             _prevTexCrds.x,
                             genFCoords(0, 0),
                             (useXForTextureFirst) ?
@@ -279,7 +279,7 @@ namespace directgraph{
 
                     FCoords diff2 = genFCoords(proj) - genFCoords(p2);
 
-                    _prevTexCrds = _texCrdCalc.calcLineCoords(
+                    _prevTexCrds = _texCrdCalc->calcLineCoords(
                             _prevTexCrds.x,
                             genFCoords(0, 0),
                             (useXForTextureFirst) ?
@@ -300,7 +300,7 @@ namespace directgraph{
 
                     diff2 = genFCoords(proj) - genFCoords(p2);
 
-                    _prevTexCrds = _texCrdCalc.calcLineCoords(
+                    _prevTexCrds = _texCrdCalc->calcLineCoords(
                             _prevTexCrds.x,
                             genFCoords(0, 0),
                             (useXForTextureSecond) ?
@@ -315,7 +315,7 @@ namespace directgraph{
 
                     diff1 = genFCoords(p2) - genFCoords(twoLines.newLineStart);
 
-                    _prevTexCrds = _texCrdCalc.calcLineCoords(
+                    _prevTexCrds = _texCrdCalc->calcLineCoords(
                             _prevTexCrds.x,
                             genFCoords(0, 0),
                             (useXForTextureSecond) ?
@@ -359,7 +359,7 @@ namespace directgraph{
                 if(_textured) {
                     FCoords mid = (twoLines.lineSecond[2] + twoLines.lineSecond[3]) / 2;
 
-                    _prevTexCrds = _texCrdCalc.calcLineCoords(
+                    _prevTexCrds = _texCrdCalc->calcLineCoords(
                             _prevTexCrds.x,
                             genFCoords(0, 0),
                             (useXForTextureSecond) ?
@@ -374,7 +374,7 @@ namespace directgraph{
             if(addLastPoints) {
                 if(_textured) {
                     FCoords mid = (_startCoords2 + _startCoords1) / 2;
-                    _prevTexCrds = _texCrdCalc.calcLineCoords(
+                    _prevTexCrds = _texCrdCalc->calcLineCoords(
                             _prevTexCrds.x,
                             genFCoords(0, 0),
                             (useXForTextureSecond) ?
@@ -392,6 +392,11 @@ namespace directgraph{
                     _polyline.coords.push_back(_startCoords2);
                 }
             }
+        }
+
+        PolygonHelper::PolygonHelper(LineHelper *lineHelper, TextureCoordsCalc *texCrdCalc)
+        :_lineHelper(lineHelper), _texCrdCalc(texCrdCalc){
+
         }
     }
 }

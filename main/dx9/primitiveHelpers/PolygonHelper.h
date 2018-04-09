@@ -17,8 +17,8 @@ namespace directgraph {
                 DCoords newLineStart;
                 DCoords oldLineEnd;
             };
-            LineHelper _lineHelper;
-            TextureCoordsCalc _texCrdCalc;
+            LineHelper *_lineHelper;
+            TextureCoordsCalc *_texCrdCalc;
 
             Polyline _polyline;
             FCoords _startCoords1;
@@ -39,6 +39,7 @@ namespace directgraph {
                     bool addFirstLine, bool rememberCoords, bool addSecondLine, bool addLastPoints
             );
         public:
+            PolygonHelper(LineHelper *lineHelper, TextureCoordsCalc *texCrdCalc);
             Polyline calcPolyline(
                     uint_fast32_t numPoints, int32_t *points, uint_fast32_t thickness,
                     bool textured
