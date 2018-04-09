@@ -17,6 +17,7 @@ namespace directgraph {
             _lastState.lineStyle = props.lineStyle;
             _lastState.lineThickness = props.lineThickness;
             _lastState.userLinePattern = props.userLinePattern;
+            _lastState.fillColor = props.fillColor;
             _curItemState = _propMan->getInitialItemState();
         }
 

@@ -54,8 +54,11 @@ namespace directgraph{
 
         bool DrawStateHelper::isFillStateTransparent(const ItemState &state) {
             return
-                    color_has_alpha(_stateHelper->getLastState().fillColor) ||
-                    (_stateHelper->fillTextureUsed(state) && color_has_alpha(_stateHelper->getLastState().bgColor))
+                    (!_stateHelper->fillTextureUsed(state) && color_has_alpha(_stateHelper->getFillColor())) ||
+                    (_stateHelper->fillTextureUsed(state) && 
+                            (color_has_alpha(_stateHelper->getLastState().bgColor) || 
+                            color_has_alpha(_stateHelper->getLastState().fillColor))
+                    )
             ;
         }
     }
