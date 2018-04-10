@@ -33,7 +33,8 @@ namespace directgraph{
                         item.type == QueueItem::FILLELLIPSE ||
                         item.type == QueueItem::RECTANGLE ||
                         item.type == QueueItem::LINE ||
-                        item.type == QueueItem::DRAWPOLY
+                        item.type == QueueItem::DRAWPOLY ||
+                        item.type == QueueItem::FILLPOLY
                 ) {
                     _drawerManager.setActiveDrawerType(item);
                     IDrawer *curDrawer = _drawerManager.getActiveDrawer();
@@ -67,7 +68,6 @@ namespace directgraph{
                         TypeSize ts = curDrawer->getTypeSize();
                         NumVertices curNumVertices = curDrawer->getNumVertices(_isFirst);
                         uint_fast32_t totalVertices = (curNumVertices.primitive + curNumVertices.degenerate);
-                        uint_fast32_t newUsedSize = _curUsedSize + totalVertices * ts.sizeMult;
                         uint_fast32_t realNumPrimVertices = curNumVertices.primitive;
                         uint_fast32_t newUsedSize = _curUsedSize + totalVertices * ts.sizeMult;
                         if (newUsedSize > maxSize) {

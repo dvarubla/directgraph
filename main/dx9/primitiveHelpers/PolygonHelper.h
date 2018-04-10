@@ -2,12 +2,15 @@
 
 #include <TextureCoordsCalc.h>
 #include "LineHelper.h"
+#include <list>
 
 namespace directgraph {
     namespace dx9 {
         class PolygonHelper {
         public:
         private:
+            const static double POLYGON_EPS;
+            typedef std::list<DCoords> CoordsList;
             struct TwoLines{
                 bool needConn;
                 QuadPointsArr intFirst;
@@ -21,9 +24,11 @@ namespace directgraph {
             TextureCoordsCalc *_texCrdCalc;
 
             Polyline _polyline;
+            Polygon _polygon;
             FCoords _startCoords1;
             FCoords _startCoords2;
-            bool _textured;
+            bool _texturedPolyline;
+            bool _texturedPolygon;
             FCoords _prevTexCrds;
             bool getIntersection(
                     const DCoords &start1, const DCoords &end1, const DCoords &start2, const DCoords &end2,
@@ -33,16 +38,23 @@ namespace directgraph {
                     const DCoords &p1, const DCoords &p2, const DCoords &p3, uint_fast32_t thickness,
                     bool useFirst, bool useLast, bool addToFirst, bool addToLast
             );
-            void addToRes(
+            void addToPolylineRes(
                     const DCoords &p1, const DCoords &p2, const DCoords &p3,
                     const PolygonHelper::TwoLines &twoLines,
                     bool addFirstLine, bool rememberCoords, bool addSecondLine, bool addLastPoints
+            );
+            bool isPointInsideTriangle(const DCoords &p1, const DCoords &p2, const DCoords &p3, const DCoords &testP);
+            PolygonHelper::CoordsList::iterator getPolygonIter(
+                    const CoordsList::iterator &it, int_fast32_t offset, CoordsList &list
             );
         public:
             PolygonHelper(LineHelper *lineHelper, TextureCoordsCalc *texCrdCalc);
             Polyline calcPolyline(
                     uint_fast32_t numPoints, int32_t *points, uint_fast32_t thickness,
                     bool textured
+            );
+            Polygon calcPolygon(
+                    uint_fast32_t numPoints, int32_t *points, bool textured
             );
         };
     }

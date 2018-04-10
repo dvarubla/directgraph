@@ -30,9 +30,14 @@ namespace directgraph {
 
         typedef std::vector<FCoords> CoordVect;
 
-        struct Polyline{
+        typedef struct{
             CoordVect coords;
             CoordVect texCoords;
+        } Polyline, Polygon;
+
+        struct PolylinePolygon{
+            Polyline polyline;
+            Polygon polygon;
         };
 
         extern const float CORR_OFFSET;

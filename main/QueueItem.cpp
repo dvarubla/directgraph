@@ -127,4 +127,14 @@ namespace directgraph{
         std::copy(points, points + numPoints * 2, item.data.drawPoly.points);
         return item;
     }
+
+    template<>
+    QueueItem QueueItemCreator::create<QueueItem::FILLPOLY>(uint32_t numPoints, int32_t *points) {
+        QueueItem item;
+        item.type = QueueItem::FILLPOLY;
+        item.data.drawPoly.numPoints = numPoints;
+        item.data.drawPoly.points = new int32_t[numPoints * 2];
+        std::copy(points, points + numPoints * 2, item.data.drawPoly.points);
+        return item;
+    }
 }

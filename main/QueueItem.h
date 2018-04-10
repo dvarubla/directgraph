@@ -18,7 +18,8 @@ namespace directgraph{
             SETLINESTYLE,
             FILLELLIPSE,
             LINE,
-            DRAWPOLY
+            DRAWPOLY,
+            FILLPOLY
         } type;
         union{
             uint32_t color;

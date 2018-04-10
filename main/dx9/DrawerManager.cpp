@@ -71,7 +71,7 @@ namespace directgraph{
                 case QueueItem::LINE:
                     _activeDrawer = LINE_DRAWER;
                     break;
-                case QueueItem::DRAWPOLY:
+                case QueueItem::DRAWPOLY: case QueueItem::FILLPOLY:
                     _activeDrawer = POLYGON_DRAWER;
                     break;
                 default: break;

@@ -25,6 +25,8 @@ endfunction()
 
 set(DX9_DRAWPOLY_SRC dx9_drawpoly.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp ../stubs/FeaturesStub.h)
 dx9_test(dx9_drawpoly "${DX9_DRAWPOLY_SRC}")
+set(DX9_FILLPOLY_SRC dx9_fillpoly.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp ../stubs/FeaturesStub.h)
+dx9_test(dx9_fillpoly "${DX9_FILLPOLY_SRC}")
 set(DX9_DRAWPOLY_STYLE_SRC dx9_drawpoly_style.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp ../stubs/FeaturesStub.h)
 dx9_test(dx9_drawpoly_style "${DX9_DRAWPOLY_STYLE_SRC}")
 set(DX9_DRAWPOLY_STYLE_OLD_SRC dx9_drawpoly_style_old.cpp ${SHADERS_RES_FILE} ../stubs/QueueReaderStub.cpp ../stubs/QueueReaderStub.h common.h common.cpp ../stubs/FeaturesStub.h)

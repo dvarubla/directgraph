@@ -22,7 +22,22 @@ namespace directgraph{
             PolygonHelper *_polygonHelper;
             QueueItem _curItem;
             ItemState _curState;
+            ItemState _outlineState;
+            ItemState _fillState;
+            TypeSize _outlineTypeSize;
+            TypeSize _fillTypeSize;
             Polyline _polyline;
+            Polygon _polygon;
+            bool _haveOutline;
+            bool _haveFill;
+            enum PolyStage{
+                OUTLINE_STAGE = 0,
+                FILL_STAGE
+            } _curStage;
+            void createOutlineState();
+            void createFillState();
+            void createOutlineTypeSize();
+            void createFillTypeSize();
         public:
             PolygonDrawer(
                     DrawStateHelper *drawStateHelper,
@@ -60,6 +75,12 @@ namespace directgraph{
             void setItemState(const ItemState &state);
 
             void setItem(const QueueItem &item);
+
+            uint_fast8_t getNumStages();
+
+            void setStage(uint_fast8_t stage);
+
+            uint_fast32_t getTotalSize();
         };
     }
 }

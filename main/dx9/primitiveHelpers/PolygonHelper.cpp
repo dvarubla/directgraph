@@ -1,4 +1,5 @@
 #include <util.h>
+#include <misc.h>
 #include "PolygonHelper.h"
 
 namespace directgraph{
@@ -164,7 +165,7 @@ namespace directgraph{
             _polyline.coords.clear();
             _polyline.texCoords.clear();
             _prevTexCrds = genFCoords(0, 0);
-            _textured = textured;
+            _texturedPolyline = textured;
             uint_fast32_t size = (num - 1) * 2;
             bool isClosed = (points[0] == points[size] && points[1] == points[size + 1]);
             DCoords prev = genDCoords(points[0], points[1]);
@@ -175,7 +176,7 @@ namespace directgraph{
                         prev, p2, p3, thickness,
                         !isClosed || i != 2, i == size - 2 && !isClosed, i == 2 && !isClosed, i == size - 2 && !isClosed
                 );
-                addToRes(
+                addToPolylineRes(
                         prev, p2, p3,
                         twoLines,
                         !isClosed || i != 2,
@@ -192,7 +193,7 @@ namespace directgraph{
                 TwoLines twoLines = calcTwoLines(
                         prev, p2, p3, thickness, true, false, false, false
                 );
-                addToRes(
+                addToPolylineRes(
                         prev, p2, p3,
                         twoLines,
                         true, false, false, true
@@ -204,7 +205,7 @@ namespace directgraph{
             return _polyline;
         }
 
-        void PolygonHelper::addToRes(
+        void PolygonHelper::addToPolylineRes(
                 const DCoords &p1, const DCoords &p2, const DCoords &p3,
                 const PolygonHelper::TwoLines &twoLines,
                 bool addFirstLine, bool rememberCoords, bool addSecondLine,
@@ -213,14 +214,14 @@ namespace directgraph{
             CoordVect &coords = _polyline.coords;
             CoordVect &texCoords = _polyline.texCoords;
             bool useXForTextureFirst = false, useXForTextureSecond = false;
-            if(_textured){
+            if(_texturedPolyline){
                 useXForTextureFirst = std::abs(p1.x - p2.x) > std::abs(p1.y - p2.y);
                 useXForTextureSecond = std::abs(p2.x - p3.x) > std::abs(p2.y - p3.y);
             }
             if(addFirstLine) {
                 coords.push_back(twoLines.lineFirst[0]);
                 coords.push_back(twoLines.lineFirst[1]);
-                if(_textured) {
+                if(_texturedPolyline) {
                     _prevTexCrds = _texCrdCalc->addOffset(_prevTexCrds);
                     texCoords.push_back(_prevTexCrds);
                     texCoords.push_back(_prevTexCrds);
@@ -255,7 +256,7 @@ namespace directgraph{
                 coords.push_back(twoLines.intSecond[2]);
                 coords.push_back(twoLines.intSecond[3]);
 
-                if(_textured) {
+                if(_texturedPolyline) {
                     texCoords.push_back(_prevTexCrds);
                     texCoords.push_back(_prevTexCrds);
 
@@ -333,7 +334,7 @@ namespace directgraph{
                     _startCoords2 = twoLines.lineFirst[3];
                 }
                 if(addFirstLine){
-                    if(_textured) {
+                    if(_texturedPolyline) {
                         texCoords.push_back(_prevTexCrds);
                         texCoords.push_back(_prevTexCrds);
                         texCoords.push_back(_prevTexCrds);
@@ -345,7 +346,7 @@ namespace directgraph{
 
                     coords.push_back(twoLines.lineSecond[0]);
                 }
-                if(_textured) {
+                if(_texturedPolyline) {
                     texCoords.push_back(_prevTexCrds);
                     texCoords.push_back(_prevTexCrds);
                 }
@@ -356,7 +357,7 @@ namespace directgraph{
             if(addSecondLine) {
                 coords.push_back(twoLines.lineSecond[2]);
                 coords.push_back(twoLines.lineSecond[3]);
-                if(_textured) {
+                if(_texturedPolyline) {
                     FCoords mid = (twoLines.lineSecond[2] + twoLines.lineSecond[3]) / 2;
 
                     _prevTexCrds = _texCrdCalc->calcLineCoords(
@@ -372,7 +373,7 @@ namespace directgraph{
                 }
             }
             if(addLastPoints) {
-                if(_textured) {
+                if(_texturedPolyline) {
                     FCoords mid = (_startCoords2 + _startCoords1) / 2;
                     _prevTexCrds = _texCrdCalc->calcLineCoords(
                             _prevTexCrds.x,
@@ -398,5 +399,130 @@ namespace directgraph{
         :_lineHelper(lineHelper), _texCrdCalc(texCrdCalc){
 
         }
+
+        Polygon PolygonHelper::calcPolygon(uint_fast32_t numPoints, int32_t *points, bool ) {
+            Polygon res;
+            uint_fast32_t numCoords = numPoints * 2;
+            CoordsList pointsList;
+            for(uint_fast32_t i = 0; i < numCoords; i += 2) {
+                DCoords point = {static_cast<double>(points[i]), static_cast<double>(points[i + 1])};
+                pointsList.push_back(point);
+            }
+            CoordsList::iterator minEl = pointsList.begin();
+            CoordsList::iterator it = pointsList.begin();
+            ++it;
+            for(; it != pointsList.end(); ++it){
+                if(minEl->x > it->x){
+                    minEl = it;
+                }
+            }
+            int_fast8_t sign;
+            if(getPolygonIter(minEl, -1, pointsList)->y < getPolygonIter(minEl, 1, pointsList)->y){
+                sign = 1;
+            } else {
+                sign = -1;
+            }
+
+            CoordsList::iterator curEl = minEl;
+
+            enum TrianglesShareEdge{
+                NO_SHARE,
+                SHARE1,
+                SHARE2
+            } trianglesShareEdge = NO_SHARE;
+            DCoords prevPnt;
+            while(true){
+                CoordsList::iterator curEl2 = getPolygonIter(curEl, 1, pointsList);
+                CoordsList::iterator curEl3 = getPolygonIter(curEl2, 1, pointsList);
+                DCoords vect1 = *curEl - *curEl2;
+                DCoords vect2 = *curEl3 - *curEl2;
+                bool nextPnt = true;
+                double orientedArea = (vect1.x * vect2.y - vect1.y * vect2.x) * sign;
+                if(pointsList.size() == 3 || orientedArea >= -POLYGON_EPS){
+                    bool pointInside = false;
+                    if(orientedArea > POLYGON_EPS) {
+                        for (it = pointsList.begin(); it != pointsList.end(); ++it) {
+                            if (it != curEl && it != curEl2 && it != curEl3 &&
+                                isPointInsideTriangle(*curEl, *curEl2, *curEl3, *it)) {
+                                pointInside = true;
+                                break;
+                            }
+                        }
+                    }
+                    if(!pointInside){
+                       int_fast8_t offset;
+                        if(trianglesShareEdge != NO_SHARE){
+                            if(trianglesShareEdge == SHARE1){
+                                res.coords.push_back(genFCoords(*curEl));
+                                prevPnt = *curEl;
+                                trianglesShareEdge = SHARE2;
+                                offset = 0;
+                            } else {
+                                res.coords.push_back(genFCoords(*curEl3));
+                                prevPnt = *curEl3;
+                                offset = -1;
+                                trianglesShareEdge = SHARE1;
+                            }
+                        } else {
+                            if(res.coords.size() != 0){
+                                res.coords.push_back(genFCoords(prevPnt));
+                                res.coords.push_back(genFCoords(*curEl2));
+                            }
+                            res.coords.push_back(genFCoords(*curEl2));
+                            res.coords.push_back(genFCoords(*curEl));
+                            res.coords.push_back(genFCoords(*curEl3));
+                            prevPnt = *curEl3;
+                            offset = -1;
+                            trianglesShareEdge = SHARE1;
+                        }
+                        if(pointsList.size() == 3){
+                            break;
+                        }
+                        pointsList.erase(curEl2);
+                        if(offset != 0) {
+                            curEl = getPolygonIter(curEl, offset, pointsList);
+                        }
+                        nextPnt = false;
+                    }
+                }
+                if(nextPnt){
+                    trianglesShareEdge = NO_SHARE;
+                    curEl = curEl2;
+                }
+            }
+            return res;
+        }
+
+        bool PolygonHelper::isPointInsideTriangle(const DCoords &p1, const DCoords &p2, const DCoords &p3,
+                                                  const DCoords &testP) {
+            double val1 = (p1.x - testP.x) * (p2.y - p1.y) - (p1.y - testP.y) * (p2.x - p1.x);
+            double val2 = (p2.x - testP.x) * (p3.y - p2.y) - (p2.y - testP.y) * (p3.x - p2.x);
+            double val3 = (p3.x - testP.x) * (p1.y - p3.y) - (p3.y - testP.y) * (p1.x - p3.x);
+            return (val1 <= POLYGON_EPS && val2 <= POLYGON_EPS && val3 <= POLYGON_EPS) ||
+                   (val1 >= -POLYGON_EPS && val2 >= -POLYGON_EPS && val3 >= -POLYGON_EPS);
+        }
+
+        PolygonHelper::CoordsList::iterator PolygonHelper::getPolygonIter(
+                const CoordsList::iterator &it, int_fast32_t offset, CoordsList &list
+        ) {
+            CoordsList::iterator res = it;
+            int_fast32_t sign = (offset > 0) ? 1 : -1;
+            for(int_fast32_t i = 0; i != offset; i += sign){
+                if(sign == 1){
+                    ++res;
+                    if(res == list.end()){
+                        res = list.begin();
+                    }
+                } else {
+                    if(res == list.begin()){
+                        res = list.end();
+                    }
+                    --res;
+                }
+            }
+            return res;
+        }
+
+        const double PolygonHelper::POLYGON_EPS = 0.0000001;
     }
 }
