@@ -19,16 +19,15 @@ namespace directgraph {
                 QuadPointsArr lineSecond;
                 DCoords newLineStart;
                 DCoords oldLineEnd;
+                bool intersectionInside;
             };
             LineHelper *_lineHelper;
             TextureCoordsCalc *_texCrdCalc;
 
             Polyline _polyline;
-            Polygon _polygon;
             FCoords _startCoords1;
             FCoords _startCoords2;
             bool _texturedPolyline;
-            bool _texturedPolygon;
             FCoords _prevTexCrds;
             bool getIntersection(
                     const DCoords &start1, const DCoords &end1, const DCoords &start2, const DCoords &end2,
@@ -47,6 +46,8 @@ namespace directgraph {
             PolygonHelper::CoordsList::iterator getPolygonIter(
                     const CoordsList::iterator &it, int_fast32_t offset, CoordsList &list
             );
+            Polygon calcPolygon(PolygonHelper::CoordsList &pointsList, int_fast8_t sign, bool textured);
+            bool getInsideDir(uint_fast32_t numPoints, int32_t *points);
         public:
             PolygonHelper(LineHelper *lineHelper, TextureCoordsCalc *texCrdCalc);
             Polyline calcPolyline(
@@ -55,6 +56,10 @@ namespace directgraph {
             );
             Polygon calcPolygon(
                     uint_fast32_t numPoints, int32_t *points, bool textured
+            );
+            PolylinePolygon calcPolylinePolygon(
+                    uint_fast32_t numPoints, int32_t *points, uint_fast32_t thickness,
+                    bool texturedPolyline, bool texturedPolygon
             );
         };
     }

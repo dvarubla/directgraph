@@ -182,7 +182,13 @@ namespace directgraph {
                 createFillTypeSize();
             }
             if(_haveFill && _haveOutline){
-
+                PolylinePolygon res = _polygonHelper->calcPolylinePolygon(
+                        _curItem.data.drawPoly.numPoints, _curItem.data.drawPoly.points,
+                        _stateHelper->getLastState().lineThickness, _stateHelper->lineTextureUsed(_outlineState),
+                        _stateHelper->fillTextureUsed(_fillState)
+                );
+                _polygon = res.polygon;
+                _polyline = res.polyline;
             } else if(_haveFill){
                 _polygon = _polygonHelper->calcPolygon(
                         _curItem.data.drawPoly.numPoints, _curItem.data.drawPoly.points,

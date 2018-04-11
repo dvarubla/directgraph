@@ -74,6 +74,7 @@ namespace directgraph{
                 res.oldLineEnd = (intPoint + oppositePoint1) / 2;
                 res.newLineStart = (intPoint + oppositePoint2) / 2;
                 if(int2){
+                    res.intersectionInside = true;
                     res.intFirst[0] = addCorrOffset(genFCoords(oppositePoint1));
                     res.intFirst[1] = addCorrOffset(genFCoords(intPoint));
                     res.intFirst[2] = addCorrOffset(genFCoords(arr1[1]));
@@ -98,6 +99,7 @@ namespace directgraph{
                         res.lineSecond[3] = genFCoords(arr2[1]);
                     }
                 } else {
+                    res.intersectionInside = false;
                     res.intFirst[0] = addCorrOffset(genFCoords(oppositePoint1));
                     res.intFirst[1] = addCorrOffset(genFCoords(intPoint));
                     res.intFirst[2] = addCorrOffset(genFCoords(arr1[3]));
@@ -136,6 +138,9 @@ namespace directgraph{
                 res.lineSecond[3] = data2.points[3];
                 useFirst = true;
                 useLast = true;
+                DCoords vect1 = p1 - p2;
+                DCoords vect2 = p3 - p2;
+                res.intersectionInside = (vect1.x * vect2.y - vect1.y * vect2.x >= -POLYGON_EPS);
             }
             if(addToFirst){
                 res.lineFirst[0] -= off1;
@@ -193,6 +198,7 @@ namespace directgraph{
                 TwoLines twoLines = calcTwoLines(
                         prev, p2, p3, thickness, true, false, false, false
                 );
+
                 addToPolylineRes(
                         prev, p2, p3,
                         twoLines,
@@ -385,12 +391,25 @@ namespace directgraph{
                     texCoords.push_back(_prevTexCrds);
                     texCoords.push_back(_prevTexCrds);
                 }
-                if (twoLines.needConn) {
-                    _polyline.coords.push_back(_startCoords2);
+
+                DCoords _;
+                if(
+                        (
+                                twoLines.needConn &&
+                                getIntersection(genDCoords(twoLines.intSecond[2]), genDCoords(_startCoords2),
+                                   genDCoords(twoLines.intSecond[3]), genDCoords(_startCoords1), _)
+                        ) ||
+                        (
+                                !twoLines.needConn &&
+                                getIntersection(genDCoords(twoLines.lineSecond[0]), genDCoords(_startCoords2),
+                                    genDCoords(twoLines.lineSecond[1]), genDCoords(_startCoords1), _)
+                        )
+                ){
                     _polyline.coords.push_back(_startCoords1);
+                    _polyline.coords.push_back(_startCoords2);
                 } else {
-                    _polyline.coords.push_back(_startCoords1);
                     _polyline.coords.push_back(_startCoords2);
+                    _polyline.coords.push_back(_startCoords1);
                 }
             }
         }
@@ -400,30 +419,10 @@ namespace directgraph{
 
         }
 
-        Polygon PolygonHelper::calcPolygon(uint_fast32_t numPoints, int32_t *points, bool ) {
+        Polygon PolygonHelper::calcPolygon(PolygonHelper::CoordsList &pointsList, int_fast8_t sign, bool) {
             Polygon res;
-            uint_fast32_t numCoords = numPoints * 2;
-            CoordsList pointsList;
-            for(uint_fast32_t i = 0; i < numCoords; i += 2) {
-                DCoords point = {static_cast<double>(points[i]), static_cast<double>(points[i + 1])};
-                pointsList.push_back(point);
-            }
-            CoordsList::iterator minEl = pointsList.begin();
-            CoordsList::iterator it = pointsList.begin();
-            ++it;
-            for(; it != pointsList.end(); ++it){
-                if(minEl->x > it->x){
-                    minEl = it;
-                }
-            }
-            int_fast8_t sign;
-            if(getPolygonIter(minEl, -1, pointsList)->y < getPolygonIter(minEl, 1, pointsList)->y){
-                sign = 1;
-            } else {
-                sign = -1;
-            }
 
-            CoordsList::iterator curEl = minEl;
+            CoordsList::iterator curEl = pointsList.begin(), it;
 
             enum TrianglesShareEdge{
                 NO_SHARE,
@@ -431,6 +430,7 @@ namespace directgraph{
                 SHARE2
             } trianglesShareEdge = NO_SHARE;
             DCoords prevPnt;
+            uint_fast32_t index = 0;
             while(true){
                 CoordsList::iterator curEl2 = getPolygonIter(curEl, 1, pointsList);
                 CoordsList::iterator curEl3 = getPolygonIter(curEl2, 1, pointsList);
@@ -450,7 +450,8 @@ namespace directgraph{
                         }
                     }
                     if(!pointInside){
-                       int_fast8_t offset;
+                        index = 0;
+                        int_fast8_t offset;
                         if(trianglesShareEdge != NO_SHARE){
                             if(trianglesShareEdge == SHARE1){
                                 res.coords.push_back(genFCoords(*curEl));
@@ -488,9 +489,139 @@ namespace directgraph{
                 if(nextPnt){
                     trianglesShareEdge = NO_SHARE;
                     curEl = curEl2;
+                    index++;
+                    if(index > pointsList.size()){
+                        break;
+                    }
                 }
             }
             return res;
+        }
+
+        Polygon PolygonHelper::calcPolygon(uint_fast32_t numPoints, int32_t *points, bool textured) {
+            uint_fast32_t numCoords = numPoints * 2;
+            CoordsList pointsList;
+            for(uint_fast32_t i = 0; i < numCoords; i += 2) {
+                DCoords point = {static_cast<double>(points[i]), static_cast<double>(points[i + 1])};
+                pointsList.push_back(point);
+            }
+            bool insideDir = getInsideDir(numPoints, points);
+            delete [] points;
+            return calcPolygon(pointsList, static_cast<int_fast8_t>(insideDir ? -1 : 1), textured);
+        }
+
+        PolylinePolygon PolygonHelper::calcPolylinePolygon(
+                uint_fast32_t numPoints, int32_t *points, uint_fast32_t thickness,
+                bool texturedPolyline, bool texturedPolygon
+        ) {
+            PolylinePolygon res;
+            CoordsList pointsList;
+            _polyline.coords.clear();
+            _polyline.texCoords.clear();
+            _prevTexCrds = genFCoords(0, 0);
+            _texturedPolyline = texturedPolyline;
+            uint_fast32_t size = numPoints * 2;
+
+            bool insideDir = !getInsideDir(numPoints, points);
+
+            bool dontAddFirstLinePoint = false;
+            DCoords prev = genDCoords(points[0], points[1]);
+            for(uint_fast32_t i = 2; i < size; i += 2){
+                DCoords p2 = genDCoords(points[i], points[i + 1]);
+                DCoords p3;
+                if(i == size - 2){
+                    p3.x = points[0];
+                    p3.y = points[1];
+                } else {
+                    p3.x = points[i + 2];
+                    p3.y = points[i + 2 + 1];
+                }
+                TwoLines twoLines = calcTwoLines(
+                        prev, p2, p3, thickness,
+                        i != 2, false, false, false
+                );
+                if(twoLines.needConn) {
+                    if (twoLines.intersectionInside ^ insideDir) {
+                        if (i != 2 && !dontAddFirstLinePoint) {
+                            pointsList.push_back(genDCoords(twoLines.lineFirst[1]));
+                        }
+                    } else {
+                        if (i != 2 && !dontAddFirstLinePoint) {
+                            pointsList.push_back(genDCoords(twoLines.lineFirst[0]));
+                        }
+                        pointsList.push_back(genDCoords(twoLines.intFirst[2]));
+                        pointsList.push_back(genDCoords(twoLines.intFirst[3]));
+                        pointsList.push_back(genDCoords(twoLines.intSecond[1]));
+                    }
+                    dontAddFirstLinePoint = false;
+                } else {
+                    if(i != 2) {
+                        if (twoLines.intersectionInside ^ insideDir) {
+                            pointsList.push_back(genDCoords(twoLines.lineFirst[1]));
+                        } else {
+                            pointsList.push_back(genDCoords(twoLines.lineFirst[0]));
+                        }
+                    }
+                }
+                addToPolylineRes(
+                        prev, p2, p3,
+                        twoLines,
+                        i != 2,
+                        i == 2,
+                        false,
+                        false
+                );
+                prev = twoLines.newLineStart;
+            }
+
+            DCoords p2 = genDCoords(points[0], points[1]);
+            DCoords p3 = genDCoords(points[2], points[3]);
+            TwoLines twoLines = calcTwoLines(
+                    prev, p2, p3, thickness, true, false, false, false
+            );
+            addToPolylineRes(
+                    prev, p2, p3,
+                    twoLines,
+                    true, false, false, true
+            );
+            if(twoLines.needConn) {
+                if (twoLines.intersectionInside ^ insideDir) {
+                    pointsList.push_back(genDCoords(twoLines.lineFirst[1]));
+                    pointsList.push_back(genDCoords(twoLines.lineFirst[3]));
+                } else {
+                    pointsList.push_back(genDCoords(twoLines.lineFirst[0]));
+                    pointsList.push_back(genDCoords(twoLines.lineFirst[2]));
+                    pointsList.push_back(genDCoords(twoLines.intFirst[2]));
+                    pointsList.push_back(genDCoords(twoLines.intFirst[3]));
+                    pointsList.push_back(genDCoords(twoLines.intSecond[1]));
+                }
+            } else {
+                if(twoLines.intersectionInside ^ insideDir){
+                    pointsList.push_back(genDCoords(twoLines.lineFirst[1]));
+                    pointsList.push_back(genDCoords(twoLines.lineFirst[3]));
+                } else {
+                    pointsList.push_back(genDCoords(twoLines.lineFirst[0]));
+                    pointsList.push_back(genDCoords(twoLines.lineFirst[2]));
+                }
+            }
+            res.polyline = _polyline;
+            res.polygon = calcPolygon(pointsList, static_cast<int_fast8_t>(!insideDir ? -1 : 1), texturedPolygon);
+            delete [] points;
+            return res;
+        }
+
+        bool PolygonHelper::getInsideDir(uint_fast32_t numPoints, int32_t *points) {
+            uint_fast32_t size = numPoints * 2;
+            uint_fast32_t minInd = 0;
+            for(uint_fast32_t i = 2; i < size; i += 2){
+                if(points[minInd] > points[i] || (points[minInd] == points[i] && points[minInd + 1] > points[i + 1])){
+                    minInd = i;
+                }
+            }
+            uint_fast32_t nextInd = (minInd == size - 2) ? 0 : minInd + 2;
+            uint_fast32_t prevInd = (minInd == 0) ? size - 2 : minInd - 2;
+            return ((points[prevInd] - points[minInd]) * (points[nextInd + 1] - points[minInd + 1]) -
+                    (points[prevInd + 1] - points[minInd + 1]) * (points[nextInd] - points[minInd])) < 0;
         }
 
         bool PolygonHelper::isPointInsideTriangle(const DCoords &p1, const DCoords &p2, const DCoords &p3,
