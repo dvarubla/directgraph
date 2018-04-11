@@ -412,5 +412,24 @@ namespace directgraph {
             }
             return vertices;
         }
+
+        void *
+        SimplePrimHelper::genFillCol2Triangles(void *verticesVoid, const CoordVect &points, const CoordVect &texCoords,
+                                               float z, uint_fast32_t color1, uint_fast32_t color2) {
+            Color2Vertex *vertices = static_cast<Color2Vertex*>(verticesVoid);
+            for(CoordVect::const_iterator it = points.begin(); it != points.end(); ++it){
+                *vertices = VertexCreator::create<Color2Vertex>(
+                        it->x,
+                        it->y,
+                        z,
+                        static_cast<DWORD>(swap_color_transp(color1)),
+                        static_cast<DWORD>(swap_color_transp(color2)),
+                        texCoords[it - points.begin()].x,
+                        texCoords[it - points.begin()].y
+                );
+                vertices++;
+            }
+            return vertices;
+        }
     }
 }

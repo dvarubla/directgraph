@@ -70,9 +70,9 @@ namespace directgraph {
             NumVertices res;
             res.degenerate = (isFirst) ? 0u : 2u;
             if(_curStage == FILL_STAGE || !_haveOutline){
-                res.primitive = _polygon.coords.size();
+                res.primitive = static_cast<uint_fast32_t>(_polygon.coords.size());
             } else {
-                res.primitive = _polyline.coords.size();
+                res.primitive = static_cast<uint_fast32_t>(_polyline.coords.size());
             }
             return res;
         }
@@ -87,9 +87,26 @@ namespace directgraph {
 
         void PolygonDrawer::processDrawItem(void *&curVertMem, uint_fast32_t &, float curZ) {
             if(_curStage == FILL_STAGE || !_haveOutline) {
-                curVertMem = _simplePrimHelper->genTriangles(
-                        curVertMem, _polygon.coords, curZ, _stateHelper->getFillColor()
-                );
+                if (_stateHelper->fillTextureUsed(_curState)) {
+                    if(_bufPrepParams->supportsTexturedBar()){
+                        curVertMem = _simplePrimHelper->genFillCol2Triangles(curVertMem,
+                                                                        _polygon.coords, _polygon.texCoords,
+                                                                        curZ,
+                                                                        _stateHelper->getLastState().fillColor,
+                                                                        _stateHelper->getLastState().bgColor
+                        );
+                    } else {
+                        curVertMem = _simplePrimHelper->genTexTriangles(curVertMem,
+                                                                        _polygon.coords, _polygon.texCoords,
+                                                                        curZ,
+                                                                        _stateHelper->getLastState().fillColor
+                        );
+                    }
+                } else {
+                    curVertMem = _simplePrimHelper->genTriangles(
+                            curVertMem, _polygon.coords, curZ, _stateHelper->getFillColor()
+                    );
+                }
             } else {
                 if (_stateHelper->lineTextureUsed(_curState)) {
                     if (_bufPrepParams->supportsTexturedLine()) {
@@ -130,9 +147,22 @@ namespace directgraph {
         void
         PolygonDrawer::genDegenerates(void *&curVertMem, const FCoords &startCrds, const FCoords &endCrds, float curZ) {
             if(_curStage == FILL_STAGE || !_haveOutline) {
-                curVertMem = _degenerateHelper->genDegenerate(
-                        curVertMem, startCrds, endCrds, curZ
-                );
+                if (_stateHelper->fillTextureUsed(_curState)) {
+                    if (_bufPrepParams->supportsTexturedBar()) {
+                        curVertMem = _degenerateHelper->genTexCol2Degenerate(
+                                curVertMem, startCrds, endCrds,
+                                curZ
+                        );
+                    } else {
+                        curVertMem = _degenerateHelper->genTexDegenerate(
+                                curVertMem, startCrds, endCrds, curZ
+                        );
+                    }
+                } else {
+                    curVertMem = _degenerateHelper->genDegenerate(
+                            curVertMem, startCrds, endCrds, curZ
+                    );
+                }
             } else {
                 if (_stateHelper->lineTextureUsed(_curState)) {
                     if (_bufPrepParams->supportsTexturedLine()) {
@@ -223,10 +253,10 @@ namespace directgraph {
         uint_fast32_t PolygonDrawer::getTotalSize() {
             uint_fast32_t size = 0;
             if(_haveOutline){
-                size += (_polyline.coords.size() + 2) * _outlineTypeSize.sizeMult;
+                size += (static_cast<uint_fast32_t>(_polyline.coords.size()) + 2) * _outlineTypeSize.sizeMult;
             }
             if(_haveFill){
-                size += (_polygon.coords.size() + 2) * _fillTypeSize.sizeMult;
+                size += (static_cast<uint_fast32_t>(_polygon.coords.size()) + 2) * _fillTypeSize.sizeMult;
             }
             return size;
         }

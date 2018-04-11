@@ -40,8 +40,8 @@ namespace directgraph{
         ) {
             if (_stateHelper->fillTextureUsed(_curState)) {
                 TextureCoords barCoords = _texCrdCalc->calcBarCoords(
-                        genCoords(_curItem.data.bar.left, _curItem.data.bar.top),
-                        genCoords(_curItem.data.bar.right, _curItem.data.bar.bottom)
+                        genDCoords(_curItem.data.bar.left, _curItem.data.bar.top),
+                        genDCoords(_curItem.data.bar.right, _curItem.data.bar.bottom)
                 );
                 if(_bufPrepParams->supportsTexturedBar()){
                     curVertMem = _simplePrimHelper->genFillCol2Quad(curVertMem,

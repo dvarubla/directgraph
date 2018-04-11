@@ -66,6 +66,13 @@ namespace directgraph {
                     float z
             );
 
+            void *genFillCol2Triangles(
+                    void *verticesVoid,
+                    const CoordVect &points, const CoordVect &texCoords,
+                    float z,
+                    uint_fast32_t color1, uint_fast32_t color2
+            );
+
             void *genQuad(void *verticesVoid, const QuadPointsArr &points, float z, uint_fast32_t color);
 
             void *genTexColorQuad(void *verticesVoid, const QuadPointsArr &points, float z, uint_fast32_t color,

@@ -419,9 +419,21 @@ namespace directgraph{
 
         }
 
-        Polygon PolygonHelper::calcPolygon(PolygonHelper::CoordsList &pointsList, int_fast8_t sign, bool) {
+        Polygon PolygonHelper::calcPolygon(PolygonHelper::CoordsList &pointsList, int_fast8_t sign, bool textured) {
             Polygon res;
-
+            DCoords minCrds;
+            if(textured) {
+                minCrds.x = pointsList.begin()->x;
+                minCrds.y = pointsList.begin()->y;
+                for(PolygonHelper::CoordsList::iterator it = pointsList.begin(); it != pointsList.end(); ++it) {
+                    if(it->x < minCrds.x){
+                        minCrds.x = it->x;
+                    }
+                    if(it->y < minCrds.y){
+                        minCrds.y = it->y;
+                    }
+                }
+            }
             CoordsList::iterator curEl = pointsList.begin(), it;
 
             enum TrianglesShareEdge{
@@ -454,11 +466,17 @@ namespace directgraph{
                         int_fast8_t offset;
                         if(trianglesShareEdge != NO_SHARE){
                             if(trianglesShareEdge == SHARE1){
+                                if(textured) {
+                                    res.texCoords.push_back(_texCrdCalc->addOffset(_texCrdCalc->calcBarCoords(minCrds, *curEl).end));
+                                }
                                 res.coords.push_back(genFCoords(*curEl));
                                 prevPnt = *curEl;
                                 trianglesShareEdge = SHARE2;
                                 offset = 0;
                             } else {
+                                if(textured) {
+                                    res.texCoords.push_back(_texCrdCalc->addOffset(_texCrdCalc->calcBarCoords(minCrds, *curEl3).end));
+                                }
                                 res.coords.push_back(genFCoords(*curEl3));
                                 prevPnt = *curEl3;
                                 offset = -1;
@@ -468,10 +486,19 @@ namespace directgraph{
                             if(res.coords.size() != 0){
                                 res.coords.push_back(genFCoords(prevPnt));
                                 res.coords.push_back(genFCoords(*curEl2));
+                                if(textured) {
+                                    res.texCoords.push_back(_texCrdCalc->addOffset(_texCrdCalc->calcBarCoords(minCrds, prevPnt).end));
+                                    res.texCoords.push_back(_texCrdCalc->addOffset(_texCrdCalc->calcBarCoords(minCrds, *curEl2).end));
+                                }
                             }
                             res.coords.push_back(genFCoords(*curEl2));
                             res.coords.push_back(genFCoords(*curEl));
                             res.coords.push_back(genFCoords(*curEl3));
+                            if(textured) {
+                                res.texCoords.push_back(_texCrdCalc->addOffset(_texCrdCalc->calcBarCoords(minCrds, *curEl2).end));
+                                res.texCoords.push_back(_texCrdCalc->addOffset(_texCrdCalc->calcBarCoords(minCrds, *curEl).end));
+                                res.texCoords.push_back(_texCrdCalc->addOffset(_texCrdCalc->calcBarCoords(minCrds, *curEl3).end));
+                            }
                             prevPnt = *curEl3;
                             offset = -1;
                             trianglesShareEdge = SHARE1;
@@ -503,7 +530,10 @@ namespace directgraph{
             uint_fast32_t numCoords = (numPoints - ((haveExtraPoint) ? 1 : 0)) * 2;
             CoordsList pointsList;
             for(uint_fast32_t i = 0; i < numCoords; i += 2) {
-                DCoords point = {static_cast<double>(points[i]), static_cast<double>(points[i + 1])};
+                DCoords point = {
+                        addCorrOffset(static_cast<float>(points[i])),
+                        addCorrOffset(static_cast<float>(points[i + 1]))
+                };
                 pointsList.push_back(point);
             }
             bool insideDir = getInsideDir(numPoints, points, haveExtraPoint);

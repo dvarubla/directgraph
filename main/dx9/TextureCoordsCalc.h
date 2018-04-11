@@ -21,7 +21,7 @@ namespace directgraph {
             FCoords addOffset(const FCoords &coords);
 
             TextureCoords calcBarCoords(
-                    const Coords &start, const Coords &end
+                    const DCoords &start, const DCoords &end
             );
         };
     }

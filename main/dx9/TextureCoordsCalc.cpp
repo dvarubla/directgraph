@@ -20,7 +20,7 @@ namespace directgraph{
             return res;
         }
 
-        TextureCoords TextureCoordsCalc::calcBarCoords(const Coords &start, const Coords &end) {
+        TextureCoords TextureCoordsCalc::calcBarCoords(const DCoords &start, const DCoords &end) {
             TextureCoords res = {
                     genFCoords(0, 0), genFCoords(1.0f * (end.x - start.x) / FPATTERN_SIZE, 1.0f * (end.y - start.y) / FPATTERN_SIZE)
             };
