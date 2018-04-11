@@ -499,30 +499,36 @@ namespace directgraph{
         }
 
         Polygon PolygonHelper::calcPolygon(uint_fast32_t numPoints, int32_t *points, bool textured) {
-            uint_fast32_t numCoords = numPoints * 2;
+            bool haveExtraPoint = checkHaveExtraPoint(numPoints, points);
+            uint_fast32_t numCoords = (numPoints - ((haveExtraPoint) ? 1 : 0)) * 2;
             CoordsList pointsList;
             for(uint_fast32_t i = 0; i < numCoords; i += 2) {
                 DCoords point = {static_cast<double>(points[i]), static_cast<double>(points[i + 1])};
                 pointsList.push_back(point);
             }
-            bool insideDir = getInsideDir(numPoints, points);
+            bool insideDir = getInsideDir(numPoints, points, haveExtraPoint);
             delete [] points;
             return calcPolygon(pointsList, static_cast<int_fast8_t>(insideDir ? -1 : 1), textured);
+        }
+
+        bool PolygonHelper::checkHaveExtraPoint(uint_fast32_t numPoints, int32_t *points) {
+            return (points[0] == points[numPoints * 2 - 2] && points[1] == points[numPoints * 2 - 1]);
         }
 
         PolylinePolygon PolygonHelper::calcPolylinePolygon(
                 uint_fast32_t numPoints, int32_t *points, uint_fast32_t thickness,
                 bool texturedPolyline, bool texturedPolygon
         ) {
+            bool haveExtraPoint = checkHaveExtraPoint(numPoints, points);
             PolylinePolygon res;
             CoordsList pointsList;
             _polyline.coords.clear();
             _polyline.texCoords.clear();
             _prevTexCrds = genFCoords(0, 0);
             _texturedPolyline = texturedPolyline;
-            uint_fast32_t size = numPoints * 2;
+            uint_fast32_t size = (numPoints - ((haveExtraPoint) ? 1 : 0)) * 2;
 
-            bool insideDir = !getInsideDir(numPoints, points);
+            bool insideDir = !getInsideDir(numPoints, points, haveExtraPoint);
 
             bool dontAddFirstLinePoint = false;
             DCoords prev = genDCoords(points[0], points[1]);
@@ -610,8 +616,8 @@ namespace directgraph{
             return res;
         }
 
-        bool PolygonHelper::getInsideDir(uint_fast32_t numPoints, int32_t *points) {
-            uint_fast32_t size = numPoints * 2;
+        bool PolygonHelper::getInsideDir(uint_fast32_t numPoints, int32_t *points, bool haveExtraPoint) {
+            uint_fast32_t size = (numPoints - ((haveExtraPoint) ? 1 : 0)) * 2;
             uint_fast32_t minInd = 0;
             for(uint_fast32_t i = 2; i < size; i += 2){
                 if(points[minInd] > points[i] || (points[minInd] == points[i] && points[minInd + 1] > points[i + 1])){

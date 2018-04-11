@@ -47,7 +47,8 @@ namespace directgraph {
                     const CoordsList::iterator &it, int_fast32_t offset, CoordsList &list
             );
             Polygon calcPolygon(PolygonHelper::CoordsList &pointsList, int_fast8_t sign, bool textured);
-            bool getInsideDir(uint_fast32_t numPoints, int32_t *points);
+            bool getInsideDir(uint_fast32_t numPoints, int32_t *points, bool haveExtraPoint);
+            bool checkHaveExtraPoint(uint_fast32_t numPoints, int32_t *points);
         public:
             PolygonHelper(LineHelper *lineHelper, TextureCoordsCalc *texCrdCalc);
             Polyline calcPolyline(

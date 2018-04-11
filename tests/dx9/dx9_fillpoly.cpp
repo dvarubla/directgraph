@@ -145,6 +145,19 @@ IMG_TEST_F(DX9FillPolyTest, SolidLineQuad){
     return afterTestSimple(win, &_readerStub);
 }
 
+IMG_TEST_F(DX9FillPolyTest, SolidLineQuadExtraPoint){
+    int32_t points[] = {100, 100, 100, 50, 150, 50, 150, 100, 100, 100};
+    QueueItem items[] = {
+            QueueItemCreator::create<QueueItem::CLEAR>(),
+            QueueItemCreator::create<QueueItem::COLOR>(0xFF0000),
+            QueueItemCreator::create<QueueItem::SETLINESTYLE>(SOLID_LINE, 0, 13),
+            QueueItemCreator::create<QueueItem::SETFILLSTYLE>(SOLID_FILL, 0x0000FF),
+            QueueItemCreator::create<QueueItem::FILLPOLY>(sizeof(points) / sizeof(int32_t) / 2, points)
+    };
+    _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
+    return afterTestSimple(win, &_readerStub);
+}
+
 IMG_TEST_F(DX9FillPolyTest, SolidLine7Points){
     int32_t points[] = {50, 100,
                         0, 100,
