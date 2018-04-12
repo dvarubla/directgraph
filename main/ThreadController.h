@@ -37,6 +37,7 @@ namespace directgraph {
         void repaintThread();
         void stopRepaintThread();
         void writeItemHelper(const QueueItem &item);
+        void writeItemHelperNoLock(const QueueItem &item);
         void checkGrow();
         void sendPrepareMsg();
     public:

@@ -54,13 +54,17 @@ namespace directgraph{
 
     void ThreadController::writeItemHelper(const QueueItem &item) {
         EnterCriticalSection(&_addCS);
+        writeItemHelperNoLock(item);
+    }
+    
+    void ThreadController::writeItemHelperNoLock(const QueueItem &item) {
         flushPixels();
         checkGrow();
         _queue.writeItem(item);
         LeaveCriticalSection(&_addCS);
         sendPrepareMsg();
     }
-
+    
     void ThreadController::clear() {
         QueueItem item = QueueItemCreator::create<QueueItem::CLEAR>();
         writeItemHelper(item);
@@ -76,13 +80,14 @@ namespace directgraph{
 
     void ThreadController::setlinestyle(uint_fast8_t linestyle, uint_fast16_t pattern, uint_fast32_t thickness) {
         _paramsChecker.checkLineStyle(linestyle);
+        EnterCriticalSection(&_addCS);
         EnterCriticalSection(&_propsCS);
         _currentProps.lineStyle = linestyle;
         _currentProps.userLinePattern = pattern;
         _currentProps.lineThickness = thickness;
         LeaveCriticalSection(&_propsCS);
         QueueItem item = QueueItemCreator::create<QueueItem::SETLINESTYLE>(linestyle, pattern, thickness);
-        writeItemHelper(item);
+        writeItemHelperNoLock(item);
     }
 
     void ThreadController::bar(int_fast32_t left, int_fast32_t top, int_fast32_t right, int_fast32_t bottom) {
@@ -121,38 +126,42 @@ namespace directgraph{
 
     void ThreadController::setfillstyle(uint_fast8_t fillStyle, uint_fast32_t color) {
         _paramsChecker.checkFillStyle(fillStyle);
+        EnterCriticalSection(&_addCS);
         EnterCriticalSection(&_propsCS);
         _currentProps.fillStyle = fillStyle;
         _currentProps.fillColor = color;
         LeaveCriticalSection(&_propsCS);
         QueueItem item = QueueItemCreator::create<QueueItem::SETFILLSTYLE>(fillStyle, color);
-        writeItemHelper(item);
+        writeItemHelperNoLock(item);
     }
 
     void ThreadController::setbgcolor(uint_fast32_t color) {
+        EnterCriticalSection(&_addCS);
         EnterCriticalSection(&_propsCS);
         _currentProps.bgColor = color;
         LeaveCriticalSection(&_propsCS);
         QueueItem item = QueueItemCreator::create<QueueItem::BGCOLOR>(color);
-        writeItemHelper(item);
+        writeItemHelperNoLock(item);
     }
 
     void ThreadController::setcolor(uint_fast32_t color) {
+        EnterCriticalSection(&_addCS);
         EnterCriticalSection(&_propsCS);
         _currentProps.drawColor = color;
         LeaveCriticalSection(&_propsCS);
         QueueItem item = QueueItemCreator::create<QueueItem::COLOR>(color);
-        writeItemHelper(item);
+        writeItemHelperNoLock(item);
     }
 
     void ThreadController::setfillpattern(const char *fillpattern, uint_fast32_t color) {
+        EnterCriticalSection(&_addCS);
         EnterCriticalSection(&_propsCS);
         std::copy(fillpattern, fillpattern + FPATTERN_SIZE, _currentProps.userFillPattern);
         _currentProps.fillStyle = USER_FILL;
         _currentProps.fillColor = color;
         LeaveCriticalSection(&_propsCS);
         QueueItem item = QueueItemCreator::create<QueueItem::SETFILLPATTERN>(fillpattern, color);
-        writeItemHelper(item);
+        writeItemHelperNoLock(item);
     }
 
     void ThreadController::rectangle(int_fast32_t left, int_fast32_t top, int_fast32_t right, int_fast32_t bottom){
@@ -314,7 +323,8 @@ namespace directgraph{
         writeItemHelper(item);
     }
 
-    void ThreadController::lineto(int_fast32_t x, int_fast32_t y) {
+    void ThreadController::lineto(int_fast32_t x, int_fast32_t y){
+        EnterCriticalSection(&_addCS);
         EnterCriticalSection(&_propsCS);
         int_fast32_t lastx = _currentProps.curPos.x;
         int_fast32_t lasty = _currentProps.curPos.y;
@@ -322,10 +332,11 @@ namespace directgraph{
         _currentProps.curPos.y = y;
         LeaveCriticalSection(&_propsCS);
         QueueItem item = QueueItemCreator::create<QueueItem::LINE>(lastx, lasty, x, y);
-        writeItemHelper(item);
+        writeItemHelperNoLock(item);
     }
 
     void ThreadController::linerel(int_fast32_t x, int_fast32_t y) {
+        EnterCriticalSection(&_addCS);
         EnterCriticalSection(&_propsCS);
         int_fast32_t lastx = _currentProps.curPos.x;
         int_fast32_t lasty = _currentProps.curPos.y;
@@ -333,7 +344,7 @@ namespace directgraph{
         _currentProps.curPos.y += y;
         LeaveCriticalSection(&_propsCS);
         QueueItem item = QueueItemCreator::create<QueueItem::LINE>(lastx, lasty, lastx + x, lasty + y);
-        writeItemHelper(item);
+        writeItemHelperNoLock(item);
     }
 
     void ThreadController::moveto(int_fast32_t x, int_fast32_t y) {
