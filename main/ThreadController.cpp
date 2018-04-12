@@ -56,7 +56,7 @@ namespace directgraph{
         EnterCriticalSection(&_addCS);
         writeItemHelperNoLock(item);
     }
-    
+
     void ThreadController::writeItemHelperNoLock(const QueueItem &item) {
         flushPixels();
         checkGrow();
@@ -64,7 +64,7 @@ namespace directgraph{
         LeaveCriticalSection(&_addCS);
         sendPrepareMsg();
     }
-    
+
     void ThreadController::clear() {
         QueueItem item = QueueItemCreator::create<QueueItem::CLEAR>();
         writeItemHelper(item);
@@ -101,6 +101,12 @@ namespace directgraph{
     }
 
     void ThreadController::drawpoly(uint_fast32_t numPoints, const int32_t *points) {
+        EnterCriticalSection(&_propsCS);
+        if(_currentProps.lineStyle == NULL_LINE){
+            LeaveCriticalSection(&_propsCS);
+            return;
+        }
+        LeaveCriticalSection(&_propsCS);
         if(numPoints <= 1){
             return;
         }
@@ -319,6 +325,12 @@ namespace directgraph{
     }
 
     void ThreadController::line(int_fast32_t startx, int_fast32_t starty, int_fast32_t endx, int_fast32_t endy) {
+        EnterCriticalSection(&_propsCS);
+        if(_currentProps.lineStyle == NULL_LINE){
+            LeaveCriticalSection(&_propsCS);
+            return;
+        }
+        LeaveCriticalSection(&_propsCS);
         QueueItem item = QueueItemCreator::create<QueueItem::LINE>(startx, starty, endx, endy);
         writeItemHelper(item);
     }
@@ -326,6 +338,11 @@ namespace directgraph{
     void ThreadController::lineto(int_fast32_t x, int_fast32_t y){
         EnterCriticalSection(&_addCS);
         EnterCriticalSection(&_propsCS);
+        if(_currentProps.lineStyle == NULL_LINE){
+            LeaveCriticalSection(&_propsCS);
+            LeaveCriticalSection(&_addCS);
+            return;
+        }
         int_fast32_t lastx = _currentProps.curPos.x;
         int_fast32_t lasty = _currentProps.curPos.y;
         _currentProps.curPos.x = x;
@@ -338,6 +355,11 @@ namespace directgraph{
     void ThreadController::linerel(int_fast32_t x, int_fast32_t y) {
         EnterCriticalSection(&_addCS);
         EnterCriticalSection(&_propsCS);
+        if(_currentProps.lineStyle == NULL_LINE){
+            LeaveCriticalSection(&_propsCS);
+            LeaveCriticalSection(&_addCS);
+            return;
+        }
         int_fast32_t lastx = _currentProps.curPos.x;
         int_fast32_t lasty = _currentProps.curPos.y;
         _currentProps.curPos.x += x;
