@@ -27,6 +27,8 @@ namespace directgraph{
         virtual void linerel(int_fast32_t x, int_fast32_t y) = 0;
         virtual void moveto(int_fast32_t x, int_fast32_t y) = 0;
         virtual void moverel(int_fast32_t x, int_fast32_t y) = 0;
+        virtual void drawpoly(uint_fast32_t numPoints, const int32_t *points) = 0;
+        virtual void fillpoly(uint_fast32_t numPoints, const int32_t *points) = 0;
         virtual int_fast32_t getx() = 0;
         virtual int_fast32_t gety() = 0;
         virtual void repaint() = 0;

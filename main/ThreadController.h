@@ -63,6 +63,9 @@ namespace directgraph {
         void moverel(int_fast32_t x, int_fast32_t y);
         int_fast32_t getx();
         int_fast32_t gety();
+        void drawpoly(uint_fast32_t numPoints, const int32_t *points);
+        void fillpoly(uint_fast32_t numPoints, const int32_t *points);
+
 
         void putpixel(int_fast32_t x, int_fast32_t y, uint_fast32_t color);
         void repaint();

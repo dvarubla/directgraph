@@ -29,6 +29,8 @@ namespace directgraph{
         MOCK_METHOD2(moverel, void(int_fast32_t x, int_fast32_t y));
         MOCK_METHOD0(getx, int_fast32_t());
         MOCK_METHOD0(gety, int_fast32_t());
+        MOCK_METHOD2(drawpoly, void(uint_fast32_t numPoints, const int32_t *points));
+        MOCK_METHOD2(fillpoly, void(uint_fast32_t numPoints, const int32_t *points));
     };
 }
 

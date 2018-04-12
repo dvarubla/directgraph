@@ -119,7 +119,7 @@ namespace directgraph{
     }
 
     template<>
-    QueueItem QueueItemCreator::create<QueueItem::DRAWPOLY>(uint32_t numPoints, int32_t *points) {
+    QueueItem QueueItemCreator::create<QueueItem::DRAWPOLY>(uint_fast32_t numPoints, const int32_t *points) {
         QueueItem item;
         item.type = QueueItem::DRAWPOLY;
         item.data.drawPoly.numPoints = numPoints;
@@ -129,7 +129,7 @@ namespace directgraph{
     }
 
     template<>
-    QueueItem QueueItemCreator::create<QueueItem::FILLPOLY>(uint32_t numPoints, int32_t *points) {
+    QueueItem QueueItemCreator::create<QueueItem::FILLPOLY>(uint_fast32_t numPoints, const int32_t *points) {
         QueueItem item;
         item.type = QueueItem::FILLPOLY;
         item.data.drawPoly.numPoints = numPoints;

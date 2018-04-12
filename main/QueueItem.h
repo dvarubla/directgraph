@@ -81,6 +81,6 @@ namespace directgraph{
         template <QueueItem::QueueItemType T>
         static QueueItem create(IPixelContainer *pixelContainer);
         template <QueueItem::QueueItemType T>
-        static QueueItem create(uint32_t numPoints, int32_t *points);
+        static QueueItem create(uint_fast32_t numPoints, const int32_t *points);
     };
 }

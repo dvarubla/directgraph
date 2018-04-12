@@ -24,6 +24,20 @@ void DIRECTGRAPH_EXPORT rectangle(int32_t left, int32_t top, int32_t right, int3
 
 void DIRECTGRAPH_EXPORT putpixel(int32_t x, int32_t y, uint32_t color);
 
+void DIRECTGRAPH_EXPORT line(int32_t startx, int32_t starty, int32_t endx, int32_t endy);
+
+void DIRECTGRAPH_EXPORT lineto(int32_t x, int32_t y);
+
+void DIRECTGRAPH_EXPORT linerel(int32_t x, int32_t y);
+
+void DIRECTGRAPH_EXPORT moveto(int32_t x, int32_t y);
+
+void DIRECTGRAPH_EXPORT moverel(int32_t x, int32_t y);
+
+void DIRECTGRAPH_EXPORT drawpoly(uint32_t numPoints, int32_t *points);
+
+void DIRECTGRAPH_EXPORT fillpoly(uint32_t numPoints, int32_t *points);
+
 void DIRECTGRAPH_EXPORT setcolor(uint32_t color);
 
 void DIRECTGRAPH_EXPORT setfillstyle(fill_patterns pattern, uint32_t color);
@@ -54,6 +68,20 @@ void DIRECTGRAPH_EXPORT barw(DirectgraphWinIndex index, int32_t left, int32_t to
 void DIRECTGRAPH_EXPORT rectanglew(DirectgraphWinIndex index, int32_t left, int32_t top, int32_t right, int32_t bottom);
 
 void DIRECTGRAPH_EXPORT putpixelw(DirectgraphWinIndex index, int32_t x, int32_t y, uint32_t color);
+
+void DIRECTGRAPH_EXPORT linew(DirectgraphWinIndex index, int32_t startx, int32_t starty, int32_t endx, int32_t endy);
+
+void DIRECTGRAPH_EXPORT linetow(DirectgraphWinIndex index, int32_t x, int32_t y);
+
+void DIRECTGRAPH_EXPORT linerelw(DirectgraphWinIndex index, int32_t x, int32_t y);
+
+void DIRECTGRAPH_EXPORT movetow(DirectgraphWinIndex index, int32_t x, int32_t y);
+
+void DIRECTGRAPH_EXPORT moverelw(DirectgraphWinIndex index, int32_t x, int32_t y);
+
+void DIRECTGRAPH_EXPORT drawpolyw(DirectgraphWinIndex index, uint32_t numPoints, int32_t *points);
+
+void DIRECTGRAPH_EXPORT fillpolyw(DirectgraphWinIndex index, uint32_t numPoints, int32_t *points);
 
 void DIRECTGRAPH_EXPORT setcolorw(DirectgraphWinIndex index, uint32_t color);
 

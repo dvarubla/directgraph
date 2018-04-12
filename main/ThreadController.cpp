@@ -95,6 +95,30 @@ namespace directgraph{
         writeItemHelper(item);
     }
 
+    void ThreadController::drawpoly(uint_fast32_t numPoints, const int32_t *points) {
+        if(numPoints <= 1){
+            return;
+        }
+        if(numPoints == 2){
+            line(points[0], points[1], points[2], points[3]);
+            return;
+        }
+        QueueItem item = QueueItemCreator::create<QueueItem::DRAWPOLY>(numPoints, points);
+        writeItemHelper(item);
+    }
+
+    void ThreadController::fillpoly(uint_fast32_t numPoints, const int32_t *points) {
+        if(numPoints <= 1){
+            return;
+        }
+        if(numPoints == 2){
+            line(points[0], points[1], points[2], points[3]);
+            return;
+        }
+        QueueItem item = QueueItemCreator::create<QueueItem::FILLPOLY>(numPoints, points);
+        writeItemHelper(item);
+    }
+
     void ThreadController::setfillstyle(uint_fast8_t fillStyle, uint_fast32_t color) {
         _paramsChecker.checkFillStyle(fillStyle);
         EnterCriticalSection(&_propsCS);
