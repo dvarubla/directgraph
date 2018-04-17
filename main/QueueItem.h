@@ -49,6 +49,7 @@ namespace directgraph{
             struct FillEllipseItem{
                 int32_t x, y;
                 uint32_t xradius, yradius;
+                uint8_t startAngle, endAngle;
             } fillellipse;
             struct SinglePixelItem{
                 uint32_t x, y;
@@ -76,6 +77,12 @@ namespace directgraph{
         static QueueItem create(int_fast32_t, int_fast32_t, int_fast32_t, int_fast32_t);
         template <QueueItem::QueueItemType T>
         static QueueItem create(int_fast32_t, int_fast32_t, uint_fast32_t, uint_fast32_t);
+        template <QueueItem::QueueItemType T>
+        static QueueItem create(
+                int_fast32_t, int_fast32_t,
+                uint_fast32_t, uint_fast32_t,
+                uint_fast32_t, uint_fast32_t
+        );
         template <QueueItem::QueueItemType T>
         static QueueItem create(uint_fast32_t, uint_fast32_t , uint_fast32_t );
         template <QueueItem::QueueItemType T>
