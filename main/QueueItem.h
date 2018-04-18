@@ -17,6 +17,7 @@ namespace directgraph{
             SETFILLPATTERN,
             SETLINESTYLE,
             FILLELLIPSE,
+            ELLIPSE,
             LINE,
             DRAWPOLY,
             FILLPOLY
@@ -46,11 +47,11 @@ namespace directgraph{
             struct RectangleItem{
                 int32_t left, top, right, bottom;
             } rectangle;
-            struct FillEllipseItem{
+            struct EllipseItem{
                 int32_t x, y;
                 uint32_t xradius, yradius;
                 uint16_t startAngle, endAngle;
-            } fillellipse;
+            } ellipse;
             struct SinglePixelItem{
                 uint32_t x, y;
                 uint32_t color;

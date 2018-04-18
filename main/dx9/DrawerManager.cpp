@@ -59,7 +59,7 @@ namespace directgraph{
                 case QueueItem::RECTANGLE:
                     _activeDrawer = RECTANGLE_DRAWER;
                     break;
-                case QueueItem::FILLELLIPSE:
+                case QueueItem::FILLELLIPSE: case QueueItem::ELLIPSE:
                     _activeDrawer = ELLIPSE_DRAWER;
                     break;
                 case QueueItem::PIXEL_CONTAINER:

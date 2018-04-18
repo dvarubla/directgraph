@@ -54,12 +54,29 @@ namespace directgraph{
     ) {
         QueueItem item;
         item.type = QueueItem::FILLELLIPSE;
-        item.data.fillellipse.x = x;
-        item.data.fillellipse.y = y;
-        item.data.fillellipse.xradius = xradius;
-        item.data.fillellipse.yradius = yradius;
-        item.data.fillellipse.startAngle = static_cast<uint_fast8_t>(startAngle);
-        item.data.fillellipse.endAngle = static_cast<uint_fast8_t>(endAngle);
+        item.data.ellipse.x = x;
+        item.data.ellipse.y = y;
+        item.data.ellipse.xradius = xradius;
+        item.data.ellipse.yradius = yradius;
+        item.data.ellipse.startAngle = static_cast<uint_fast8_t>(startAngle);
+        item.data.ellipse.endAngle = static_cast<uint_fast8_t>(endAngle);
+        return item;
+    }
+
+    template<>
+    QueueItem QueueItemCreator::create<QueueItem::ELLIPSE>(
+            int_fast32_t x, int_fast32_t y,
+            uint_fast32_t xradius, uint_fast32_t yradius,
+            uint_fast32_t startAngle, uint_fast32_t endAngle
+    ) {
+        QueueItem item;
+        item.type = QueueItem::ELLIPSE;
+        item.data.ellipse.x = x;
+        item.data.ellipse.y = y;
+        item.data.ellipse.xradius = xradius;
+        item.data.ellipse.yradius = yradius;
+        item.data.ellipse.startAngle = static_cast<uint_fast8_t>(startAngle);
+        item.data.ellipse.endAngle = static_cast<uint_fast8_t>(endAngle);
         return item;
     }
 
@@ -70,12 +87,28 @@ namespace directgraph{
     ) {
         QueueItem item;
         item.type = QueueItem::FILLELLIPSE;
-        item.data.fillellipse.x = x;
-        item.data.fillellipse.y = y;
-        item.data.fillellipse.xradius = xradius;
-        item.data.fillellipse.yradius = yradius;
-        item.data.fillellipse.startAngle = 0;
-        item.data.fillellipse.endAngle = 360;
+        item.data.ellipse.x = x;
+        item.data.ellipse.y = y;
+        item.data.ellipse.xradius = xradius;
+        item.data.ellipse.yradius = yradius;
+        item.data.ellipse.startAngle = 0;
+        item.data.ellipse.endAngle = 360;
+        return item;
+    }
+
+    template<>
+    QueueItem QueueItemCreator::create<QueueItem::ELLIPSE>(
+            int_fast32_t x, int_fast32_t y,
+            uint_fast32_t xradius, uint_fast32_t yradius
+    ) {
+        QueueItem item;
+        item.type = QueueItem::ELLIPSE;
+        item.data.ellipse.x = x;
+        item.data.ellipse.y = y;
+        item.data.ellipse.xradius = xradius;
+        item.data.ellipse.yradius = yradius;
+        item.data.ellipse.startAngle = 0;
+        item.data.ellipse.endAngle = 360;
         return item;
     }
 

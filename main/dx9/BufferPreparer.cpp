@@ -31,6 +31,7 @@ namespace directgraph{
                         item.type == QueueItem::CLEAR ||
                         item.type == QueueItem::PIXEL_CONTAINER ||
                         item.type == QueueItem::FILLELLIPSE ||
+                        item.type == QueueItem::ELLIPSE ||
                         item.type == QueueItem::RECTANGLE ||
                         item.type == QueueItem::LINE ||
                         item.type == QueueItem::DRAWPOLY ||

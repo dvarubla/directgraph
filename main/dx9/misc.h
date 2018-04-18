@@ -36,6 +36,10 @@ namespace directgraph {
             CoordVect texCoords;
         } Polyline, Polygon, Ellipse;
 
+        struct EllipseOutline{
+            CoordVect coords;
+        };
+
         struct PolylinePolygon{
             Polyline polyline;
             Polygon polygon;

@@ -21,6 +21,25 @@ namespace directgraph {
             QueueItem _curItem;
             ItemState _curState;
             Ellipse _ellipse;
+            EllipseOutline _ellipseOutline;
+            TypeSize _outlineTypeSize;
+            TypeSize _fillTypeSize;
+            bool _haveOutline;
+            bool _haveFill;
+            ItemState _fillState;
+            ItemState _outlineState;
+
+            enum PolyStage{
+                OUTLINE_STAGE = 0,
+                FILL_STAGE
+            } _curStage;
+
+            void createFillState();
+            void createOutlineState();
+            void createOutlineTypeSize();
+            void createFillTypeSize();
+            uint_fast32_t getNumFillVertices();
+            uint_fast32_t getNumOutlineVertices();
         public:
             EllipseDrawer(
                     DrawStateHelper *drawStateHelper,
@@ -52,6 +71,12 @@ namespace directgraph {
 
             void setItemState(const ItemState &state);
             void setItem(const QueueItem &item);
+
+            uint_fast8_t getNumStages();
+
+            void setStage(uint_fast8_t stage);
+
+            uint_fast32_t getTotalSize();
         };
     }
 }
