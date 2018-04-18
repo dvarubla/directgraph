@@ -1,3 +1,6 @@
+#include <main/QueueItem.h>
+#include <misc.h>
+#include "VertexCreator.h"
 #include "EllipseDrawer.h"
 
 namespace directgraph{
@@ -26,12 +29,7 @@ namespace directgraph{
             res.degenerate = (isFirst) ? 0 : 2;
             if((_stateHelper->fillTextureUsed(_curState) && !_bufPrepParams->supportsTexturedEllipse()) ||
                (!_stateHelper->fillTextureUsed(_curState) && !_bufPrepParams->supportsEllipse())){
-                res.primitive = _ellipseHelper->getNumEllipseVertices(
-                        genUCoords(
-                                _curItem.data.fillellipse.xradius,
-                                _curItem.data.fillellipse.yradius
-                        )
-                );
+                res.primitive = _ellipse.coords.size();
                 return res;
             }
             res.primitive = VERTICES_IN_QUAD;
@@ -90,20 +88,15 @@ namespace directgraph{
                     );
                 }
             } else {
-                curVertMem = _ellipseHelper->genEllipse(
-                        curVertMem,
-                        genCoords(
-                                _curItem.data.fillellipse.x,
-                                _curItem.data.fillellipse.y
-                        ),
-                        genUCoords(
-                                _curItem.data.fillellipse.xradius,
-                                _curItem.data.fillellipse.yradius
-                        ),
-                        curZ,
-                        _stateHelper->getLastState().fillColor,
-                        _stateHelper->fillTextureUsed(_curState)
-                );
+                if(_stateHelper->fillTextureUsed(_curState)) {
+                    curVertMem = _simplePrimHelper->genTexTriangles(
+                            curVertMem, _ellipse.coords, _ellipse.texCoords, curZ, _stateHelper->getLastState().fillColor
+                    );
+                } else {
+                    curVertMem = _simplePrimHelper->genTriangles(
+                            curVertMem, _ellipse.coords, curZ, _stateHelper->getFillColor()
+                    );
+                }
             }
         }
 
@@ -122,10 +115,8 @@ namespace directgraph{
                         _curItem.data.fillellipse.y + _curItem.data.fillellipse.yradius - CORR_OFFSET
                 );
             } else {
-                res.start = res.end = genFCoords(
-                        _curItem.data.fillellipse.x,
-                        _curItem.data.fillellipse.y - _curItem.data.fillellipse.yradius + CORR_OFFSET
-                );
+                res.start = _ellipse.coords.front();
+                res.end = _ellipse.coords.back();
             }
             return res;
         }
@@ -165,6 +156,16 @@ namespace directgraph{
 
         void EllipseDrawer::setItemState(const ItemState &state) {
             _curState = state;
+            _ellipse = _ellipseHelper->genEllipse(
+                    genCoords(_curItem.data.fillellipse.x, _curItem.data.fillellipse.y),
+                    genUCoords(
+                            _curItem.data.fillellipse.xradius,
+                            _curItem.data.fillellipse.yradius
+                    ),
+                    _curItem.data.fillellipse.startAngle,
+                    _curItem.data.fillellipse.endAngle,
+                    _stateHelper->fillTextureUsed(_curState)
+            );
         }
 
         void EllipseDrawer::setItem(const QueueItem &item) {

@@ -74,7 +74,7 @@ namespace directgraph{
         if(!_paramsChecker.checkEllipse(x, y, xradius, yradius)){
             return;
         }
-        QueueItem item = QueueItemCreator::create<QueueItem::FILLELLIPSE>(x, y, xradius, yradius, 0, 360);
+        QueueItem item = QueueItemCreator::create<QueueItem::FILLELLIPSE>(x, y, xradius, yradius);
         writeItemHelper(item);
     }
 

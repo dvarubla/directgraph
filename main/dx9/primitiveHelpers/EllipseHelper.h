@@ -2,30 +2,61 @@
 
 #include <stdint.h>
 #include <main/util.h>
-#include "VertexCreator.h"
+#include <TextureCoordsCalc.h>
 
 namespace directgraph {
     namespace dx9 {
         class EllipseHelper {
         private:
-            uint_fast32_t _color;
-            float _z;
-            double _minX;
-            double _minY;
-            ColorVertex createVertex(double x, double y);
-            TexturedColorVertex createTexturedVertex(double x, double y);
-            void createVertices(void *memory, double x, double y, uint_fast32_t index, bool textured);
-        public:
-            EllipseHelper();
-            uint_fast32_t getNumEllipseVertices(
-                    const UCoords & radiusCrds
+            struct FullRect{
+                int_fast32_t x;
+                int_fast32_t y1;
+                int_fast32_t y2;
+            };
+            struct PartRect{
+                int_fast32_t x1;
+                int_fast32_t x2;
+                int_fast32_t y1;
+                int_fast32_t y2;
+            };
+            enum QuadrantStatus{
+                NOTHING,
+                INSIDE,
+                START,
+                END,
+                BOTH
+            };
+            const static int NUM_QUADRANTS = 4;
+            void genQuadrantData(
+                    uint_fast16_t startAngle, uint_fast16_t endAngle, EllipseHelper::QuadrantStatus (&qs)[NUM_QUADRANTS],
+                    bool swapAngles
             );
-            void* genEllipse(
-                    void *memoryVoid,
+            ICoordVect getEllipsePixels(const UCoords &radiusCoords);
+            std::vector<FullRect> genEllipseRects(const ICoordVect &pixels);
+            void genRectPoints(int_fast32_t x1, int_fast32_t y1, int_fast32_t x2, int_fast32_t y2);
+            void drawFullRect(uint_fast8_t quadrNum,
+                              int_fast32_t x1, int_fast32_t y1, int_fast32_t y2,
+                              const Coords &centerCrds);
+            void drawRects(
+                    const std::vector<PartRect> &partRects,
+                    const std::vector<FullRect> &fullRects,
+                    const Coords & centerCrds,
+                    const QuadrantStatus (&qs)[NUM_QUADRANTS]
+            );
+
+            TextureCoordsCalc *_texCrdCalc;
+
+            CoordVect _coordVect;
+            CoordVect _texCoordVect;
+            DCoords _minCoords;
+            bool _textured;
+            bool _swap;
+        public:
+            EllipseHelper(TextureCoordsCalc *texCrdCalc);
+            Ellipse genEllipse(
                     const Coords & centerCrds,
                     const UCoords & radiusCrds,
-                    float z,
-                    uint_fast32_t color,
+                    uint_fast16_t startAngle, uint_fast16_t endAngle,
                     bool textured
             );
         };

@@ -14,8 +14,8 @@ namespace directgraph{
                 StateHelper *stateHelper,
                 BufferPreparerParams *bufPrepParams,
                 PropertyManager *propMan
-        ) : _drawStateHelper(stateHelper, propMan),
-            _rectangleHelper(&_simplePrimHelper, &_texCrdsCalc), _polygonHelper(&_lineHelper, &_texCrdCalc) {
+        ) : _drawStateHelper(stateHelper, propMan), _rectangleHelper(&_simplePrimHelper, &_texCrdsCalc),
+            _ellipseHelper(&_texCrdsCalc), _polygonHelper(&_lineHelper, &_texCrdCalc) {
             _drawers[CLEARER] = new Clearer(
                     bufPrepParams, propMan, &_simplePrimHelper, &_degenerateHelper
             );

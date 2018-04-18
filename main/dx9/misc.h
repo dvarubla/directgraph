@@ -29,11 +29,12 @@ namespace directgraph {
         typedef std::array<FCoords, VERTICES_IN_QUAD> QuadPointsArr;
 
         typedef std::vector<FCoords> CoordVect;
+        typedef std::vector<Coords> ICoordVect;
 
         typedef struct{
             CoordVect coords;
             CoordVect texCoords;
-        } Polyline, Polygon;
+        } Polyline, Polygon, Ellipse;
 
         struct PolylinePolygon{
             Polyline polyline;

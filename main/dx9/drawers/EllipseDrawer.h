@@ -20,6 +20,7 @@ namespace directgraph {
             DegenerateHelper *_degenerateHelper;
             QueueItem _curItem;
             ItemState _curState;
+            Ellipse _ellipse;
         public:
             EllipseDrawer(
                     DrawStateHelper *drawStateHelper,

@@ -8,6 +8,7 @@
 #include "PatternTexturesHelper.h"
 #include "BufferPreparer.h"
 #include "DrawOpCreator.h"
+#include "VertexCreator.h"
 #include <algorithm>
 
 #undef max

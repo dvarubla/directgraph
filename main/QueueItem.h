@@ -49,7 +49,7 @@ namespace directgraph{
             struct FillEllipseItem{
                 int32_t x, y;
                 uint32_t xradius, yradius;
-                uint8_t startAngle, endAngle;
+                uint16_t startAngle, endAngle;
             } fillellipse;
             struct SinglePixelItem{
                 uint32_t x, y;

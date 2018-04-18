@@ -64,6 +64,22 @@ namespace directgraph{
     }
 
     template<>
+    QueueItem QueueItemCreator::create<QueueItem::FILLELLIPSE>(
+            int_fast32_t x, int_fast32_t y,
+            uint_fast32_t xradius, uint_fast32_t yradius
+    ) {
+        QueueItem item;
+        item.type = QueueItem::FILLELLIPSE;
+        item.data.fillellipse.x = x;
+        item.data.fillellipse.y = y;
+        item.data.fillellipse.xradius = xradius;
+        item.data.fillellipse.yradius = yradius;
+        item.data.fillellipse.startAngle = 0;
+        item.data.fillellipse.endAngle = 360;
+        return item;
+    }
+
+    template<>
     QueueItem QueueItemCreator::create<QueueItem::SINGLE_PIXEL>(uint_fast32_t x, uint_fast32_t y, uint_fast32_t color) {
         QueueItem item;
         item.type = QueueItem::SINGLE_PIXEL;
