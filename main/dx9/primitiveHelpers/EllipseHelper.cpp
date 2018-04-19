@@ -11,7 +11,6 @@
 namespace directgraph{
     namespace dx9{
         Ellipse EllipseHelper::genEllipse(const Coords &centerCrds, const UCoords &radiusCrds,
-                                          uint_fast16_t startAngle, uint_fast16_t endAngle,
                                           bool textured) {
             _coordVect.clear();
             _textured = textured;
@@ -22,17 +21,15 @@ namespace directgraph{
                         centerCrds.y - static_cast<uint_fast32_t>(radiusCrds.y)
                 );
             }
-            QuadrantStatus qs[NUM_QUADRANTS];
             _swap = radiusCrds.y > radiusCrds.x;
             UCoords actRadiusCrds = radiusCrds;
             if(_swap){
                 std::swap(actRadiusCrds.x, actRadiusCrds.y);
             }
-            genQuadrantData(startAngle, endAngle, qs, false);
             ICoordVect ellipsePixels = getEllipsePixels(actRadiusCrds);
             std::vector<FullRect> ellipseRects = genEllipseRects(ellipsePixels);
             std::vector<PartRect> partRects;
-            drawRects(partRects, ellipseRects, centerCrds, qs);
+            drawRects(partRects, ellipseRects, centerCrds);
 
             Ellipse res;
             res.coords = _coordVect;
@@ -43,23 +40,20 @@ namespace directgraph{
         }
 
         EllipseOutline
-        EllipseHelper::genOutline(const Coords &centerCrds, const UCoords &radiusCrds, uint_fast16_t startAngle,
-                                  uint_fast16_t endAngle, uint_fast32_t thickness) {
+        EllipseHelper::genOutline(const Coords &centerCrds, const UCoords &radiusCrds, uint_fast32_t thickness) {
             _coordVect.clear();
             _textured = false;
-            QuadrantStatus qs[NUM_QUADRANTS];
             _swap = radiusCrds.y > radiusCrds.x;
             UCoords actRadiusCrds = radiusCrds;
             if(_swap){
                 std::swap(actRadiusCrds.x, actRadiusCrds.y);
             }
-            genQuadrantData(startAngle, endAngle, qs, false);
 
             ICoordVect insidePixels, outsidePixels;
             uint_fast32_t maxY;
             genOutlinePixels(thickness, actRadiusCrds, insidePixels, outsidePixels, maxY);
             Rects rects = genOutlineRects(insidePixels, outsidePixels, maxY);
-            drawRects(rects.partRects, rects.fullRects, centerCrds, qs);
+            drawRects(rects.partRects, rects.fullRects, centerCrds);
 
             EllipseOutline res;
             res.coords = _coordVect;
@@ -67,23 +61,20 @@ namespace directgraph{
         }
 
         FullEllipse
-        EllipseHelper::genFullEllipse(const Coords &centerCrds, const UCoords &radiusCrds, uint_fast16_t startAngle,
-                                      uint_fast16_t endAngle, uint_fast32_t thickness, bool texturedEllipse) {
+        EllipseHelper::genFullEllipse(const Coords &centerCrds, const UCoords &radiusCrds, uint_fast32_t thickness, bool texturedEllipse) {
             _coordVect.clear();
             _textured = false;
-            QuadrantStatus qs[NUM_QUADRANTS];
             _swap = radiusCrds.y > radiusCrds.x;
             UCoords actRadiusCrds = radiusCrds;
             if(_swap){
                 std::swap(actRadiusCrds.x, actRadiusCrds.y);
             }
-            genQuadrantData(startAngle, endAngle, qs, false);
 
             ICoordVect insidePixels, outsidePixels;
             uint_fast32_t maxY;
             genOutlinePixels(thickness, actRadiusCrds, insidePixels, outsidePixels, maxY);
             Rects rects = genOutlineRects(insidePixels, outsidePixels, maxY);
-            drawRects(rects.partRects, rects.fullRects, centerCrds, qs);
+            drawRects(rects.partRects, rects.fullRects, centerCrds);
 
             FullEllipse res;
             res.outline.coords = _coordVect;
@@ -100,7 +91,7 @@ namespace directgraph{
             if(maxY != 0) {
                 std::vector<PartRect> partRects;
                 std::vector<FullRect> ellipseRects = genEllipseRects(insidePixels);
-                drawRects(partRects, ellipseRects, centerCrds, qs);
+                drawRects(partRects, ellipseRects, centerCrds);
                 res.ellipse.coords = _coordVect;
                 if(_textured){
                     res.ellipse.texCoords = _texCoordVect;
@@ -336,8 +327,7 @@ namespace directgraph{
 
         void EllipseHelper::drawRects(
                 const std::vector<PartRect> &partRects,
-                const std::vector<FullRect> &fullRects, const Coords &centerCrds,
-                const EllipseHelper::QuadrantStatus (&qs)[NUM_QUADRANTS]) {
+                const std::vector<FullRect> &fullRects, const Coords &centerCrds) {
             uint_fast32_t partRSize = partRects.size();
             uint_fast32_t fullRSize = fullRects.size();
 
@@ -347,21 +337,17 @@ namespace directgraph{
                     if ((m == 0 || m == 2) && i == 0) {
                         curY2++;
                     }
-                    if (qs[m] == INSIDE) {
-                        drawPartRect(m, partRects[i].x1, partRects[i].y1, partRects[i].x2, curY2, centerCrds);
-                    }
+                    drawPartRect(m, partRects[i].x1, partRects[i].y1, partRects[i].x2, curY2, centerCrds);
                 }
             }
 
             for(uint_fast32_t i = 0; i < fullRSize; i++) {
                 for (uint_fast8_t m = 0; m < NUM_QUADRANTS; m += 2) {
-                    if (qs[m] == INSIDE && qs[m + 1] == INSIDE) {
-                        int_fast32_t curY2 = fullRects[i].y2;
-                        if (partRSize == 0 && m == 0 && i == 0) {
-                            curY2++;
-                        }
-                        drawFullRect(m, fullRects[i].x, fullRects[i].y1, curY2, centerCrds);
+                    int_fast32_t curY2 = fullRects[i].y2;
+                    if (partRSize == 0 && m == 0 && i == 0) {
+                        curY2++;
                     }
+                    drawFullRect(m, fullRects[i].x, fullRects[i].y1, curY2, centerCrds);
                 }
             }
         }
@@ -427,47 +413,6 @@ namespace directgraph{
                     genRectPoints(centerCrds.x + y2, centerCrds.y - x1, centerCrds.x + y1 + 1, centerCrds.y + x1 + 1);
                 } else {
                     genRectPoints(centerCrds.x - x1, centerCrds.y + y2, centerCrds.x + x1 + 1, centerCrds.y + y1 + 1);
-                }
-            }
-        }
-
-        void EllipseHelper::genQuadrantData(
-                uint_fast16_t startAngle, uint_fast16_t endAngle, EllipseHelper::QuadrantStatus (&qs)[NUM_QUADRANTS],
-                bool swapAngles
-        ) {
-            uint_fast16_t realSAngle = std::min(startAngle, endAngle);
-            uint_fast16_t realEAngle = std::max(startAngle, endAngle);
-            uint_fast8_t sQ = static_cast<uint_fast8_t>(realSAngle / 90);
-            uint_fast8_t eQ = static_cast<uint_fast8_t>(realEAngle / 90);
-            if(realEAngle % 90 == 0){
-                eQ--;
-            }
-            for(uint_fast8_t i = 0; i < NUM_QUADRANTS; i++){
-                if(i >= sQ && i <= eQ){
-                    qs[i] = INSIDE;
-                    if(i == sQ && realSAngle % 90 != 0){
-                        qs[i] = START;
-                    }
-                    if(i == eQ && realEAngle % 90 != 0){
-                        if(qs[i] == START){
-                            qs[i] = BOTH;
-                        } else {
-                            qs[i] = END;
-                        }
-                    }
-                } else {
-                    qs[i] = NOTHING;
-                }
-                if(swapAngles){
-                    if(qs[i] == NOTHING){
-                        qs[i] = INSIDE;
-                    } else if(qs[i] == INSIDE){
-                        qs[i] = NOTHING;
-                    } else if(qs[i] == START){
-                        qs[i] = END;
-                    } else if(qs[i] == END){
-                        qs[i] = START;
-                    }
                 }
             }
         }

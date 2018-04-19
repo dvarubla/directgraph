@@ -29,7 +29,7 @@ namespace directgraph {
             ItemState _fillState;
             ItemState _outlineState;
 
-            enum PolyStage{
+            enum EllipseStage{
                 OUTLINE_STAGE = 0,
                 FILL_STAGE
             } _curStage;

@@ -23,18 +23,7 @@ namespace directgraph {
                 std::vector<PartRect> partRects;
                 std::vector<FullRect> fullRects;
             };
-            enum QuadrantStatus{
-                NOTHING,
-                INSIDE,
-                START,
-                END,
-                BOTH
-            };
             const static int NUM_QUADRANTS = 4;
-            void genQuadrantData(
-                    uint_fast16_t startAngle, uint_fast16_t endAngle, EllipseHelper::QuadrantStatus (&qs)[NUM_QUADRANTS],
-                    bool swapAngles
-            );
             ICoordVect getEllipsePixels(const UCoords &radiusCoords);
             ICoordVect getOutsidePixels(const UCoords &radiusCoords, uint_fast32_t h);
             ICoordVect getInsidePixels(const UCoords &radiusCoords, uint_fast32_t h, uint_fast32_t &maxY);
@@ -52,8 +41,7 @@ namespace directgraph {
             void drawRects(
                     const std::vector<PartRect> &partRects,
                     const std::vector<FullRect> &fullRects,
-                    const Coords & centerCrds,
-                    const QuadrantStatus (&qs)[NUM_QUADRANTS]
+                    const Coords & centerCrds
             );
 
             double calcEquidistant(double x, double y, uint_fast32_t a, uint_fast32_t b, uint_fast32_t h);
@@ -70,20 +58,17 @@ namespace directgraph {
             Ellipse genEllipse(
                     const Coords & centerCrds,
                     const UCoords & radiusCrds,
-                    uint_fast16_t startAngle, uint_fast16_t endAngle,
                     bool textured
             );
             EllipseOutline genOutline(
                     const Coords & centerCrds,
                     const UCoords & radiusCrds,
-                    uint_fast16_t startAngle, uint_fast16_t endAngle,
                     uint_fast32_t thickness
             );
 
             FullEllipse genFullEllipse(
                     const Coords & centerCrds,
                     const UCoords & radiusCrds,
-                    uint_fast16_t startAngle, uint_fast16_t endAngle,
                     uint_fast32_t thickness,
                     bool texturedEllipse
             );

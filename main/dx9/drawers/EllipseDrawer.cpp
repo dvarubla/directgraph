@@ -217,8 +217,6 @@ namespace directgraph{
                                 _curItem.data.ellipse.xradius,
                                 _curItem.data.ellipse.yradius
                         ),
-                        _curItem.data.ellipse.startAngle,
-                        _curItem.data.ellipse.endAngle,
                         _stateHelper->fillTextureUsed(_fillState)
                 );
             } else if(_haveOutline && !_haveFill){
@@ -228,8 +226,6 @@ namespace directgraph{
                                 _curItem.data.ellipse.xradius,
                                 _curItem.data.ellipse.yradius
                         ),
-                        _curItem.data.ellipse.startAngle,
-                        _curItem.data.ellipse.endAngle,
                         _stateHelper->getLastState().lineThickness
                 );
             } else {
@@ -239,8 +235,6 @@ namespace directgraph{
                                 _curItem.data.ellipse.xradius,
                                 _curItem.data.ellipse.yradius
                         ),
-                        _curItem.data.ellipse.startAngle,
-                        _curItem.data.ellipse.endAngle,
                         _stateHelper->getLastState().lineThickness,
                         _stateHelper->fillTextureUsed(_fillState)
                 );
@@ -268,7 +262,7 @@ namespace directgraph{
         }
 
         void EllipseDrawer::setStage(uint_fast8_t stage) {
-            _curStage = static_cast<PolyStage>(stage);
+            _curStage = static_cast<EllipseStage>(stage);
         }
 
         uint_fast32_t EllipseDrawer::getTotalSize() {
