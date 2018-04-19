@@ -54,29 +54,59 @@ namespace directgraph{
                 std::swap(actRadiusCrds.x, actRadiusCrds.y);
             }
             genQuadrantData(startAngle, endAngle, qs, false);
-            thickness--;
-            uint_fast32_t curTh = thickness / 2;
+
             ICoordVect insidePixels, outsidePixels;
             uint_fast32_t maxY;
-            if(curTh == 0){
-                insidePixels = getEllipsePixels(actRadiusCrds);
-                maxY = actRadiusCrds.y;
-            } else {
-                insidePixels = getInsidePixels(actRadiusCrds, curTh, maxY);
-            }
-
-            curTh += thickness % 2;
-            if(curTh == 0){
-                outsidePixels = insidePixels;
-            } else {
-                outsidePixels = getOutsidePixels(actRadiusCrds, curTh);
-            }
-
+            genOutlinePixels(thickness, actRadiusCrds, insidePixels, outsidePixels, maxY);
             Rects rects = genOutlineRects(insidePixels, outsidePixels, maxY);
             drawRects(rects.partRects, rects.fullRects, centerCrds, qs);
 
             EllipseOutline res;
             res.coords = _coordVect;
+            return res;
+        }
+
+        FullEllipse
+        EllipseHelper::genFullEllipse(const Coords &centerCrds, const UCoords &radiusCrds, uint_fast16_t startAngle,
+                                      uint_fast16_t endAngle, uint_fast32_t thickness, bool texturedEllipse) {
+            _coordVect.clear();
+            _textured = false;
+            QuadrantStatus qs[NUM_QUADRANTS];
+            _swap = radiusCrds.y > radiusCrds.x;
+            UCoords actRadiusCrds = radiusCrds;
+            if(_swap){
+                std::swap(actRadiusCrds.x, actRadiusCrds.y);
+            }
+            genQuadrantData(startAngle, endAngle, qs, false);
+
+            ICoordVect insidePixels, outsidePixels;
+            uint_fast32_t maxY;
+            genOutlinePixels(thickness, actRadiusCrds, insidePixels, outsidePixels, maxY);
+            Rects rects = genOutlineRects(insidePixels, outsidePixels, maxY);
+            drawRects(rects.partRects, rects.fullRects, centerCrds, qs);
+
+            FullEllipse res;
+            res.outline.coords = _coordVect;
+
+            _coordVect.clear();
+            _textured = texturedEllipse;
+            if(texturedEllipse) {
+                _texCoordVect.clear();
+                _minCoords = genDCoords(
+                        centerCrds.x - static_cast<uint_fast32_t>(radiusCrds.x),
+                        centerCrds.y - static_cast<uint_fast32_t>(radiusCrds.y)
+                );
+            }
+            if(maxY != 0) {
+                std::vector<PartRect> partRects;
+                std::vector<FullRect> ellipseRects = genEllipseRects(insidePixels);
+                drawRects(partRects, ellipseRects, centerCrds, qs);
+                res.ellipse.coords = _coordVect;
+                if(_textured){
+                    res.ellipse.texCoords = _texCoordVect;
+                }
+            }
+
             return res;
         }
 
@@ -453,6 +483,26 @@ namespace directgraph{
 
             double a312 = a3 / a1 / a2;
             return 1 - 4 * a2 / a1 / a1 - 4 * a1 * a3 / a2 / a2 + 18 * a312 - 27 * a312 * a312;
+        }
+
+        void
+        EllipseHelper::genOutlinePixels(uint_fast32_t thickness, const UCoords &radiusCrds, ICoordVect &insidePixels,
+                                        ICoordVect &outsidePixels, uint_fast32_t &maxY) {
+            thickness--;
+            uint_fast32_t curTh = thickness / 2;
+            if(curTh == 0){
+                insidePixels = getEllipsePixels(radiusCrds);
+                maxY = radiusCrds.y;
+            } else {
+                insidePixels = getInsidePixels(radiusCrds, curTh, maxY);
+            }
+
+            curTh += thickness % 2;
+            if(curTh == 0){
+                outsidePixels = insidePixels;
+            } else {
+                outsidePixels = getOutsidePixels(radiusCrds, curTh);
+            }
         }
     }
 }

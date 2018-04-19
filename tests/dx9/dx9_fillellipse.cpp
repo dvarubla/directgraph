@@ -38,6 +38,18 @@ IMG_TEST_F(DX9FillEllipseTest, SimpleEllipse){
     return afterTestSimple(win, &_readerStub);
 }
 
+IMG_TEST_F(DX9FillEllipseTest, SimpleEllipseSolid1px){
+    QueueItem items[] = {
+            QueueItemCreator::create<QueueItem::CLEAR>(),
+            QueueItemCreator::create<QueueItem::COLOR>(0x00FF00),
+            QueueItemCreator::create<QueueItem::SETLINESTYLE>(SOLID_LINE, 0, 1),
+            QueueItemCreator::create<QueueItem::SETFILLSTYLE>(SOLID_FILL, 0x00BBFF),
+            QueueItemCreator::create<QueueItem::FILLELLIPSE>(WIDTH/4, HEIGHT/2, static_cast<uint32_t>(WIDTH/4), static_cast<uint32_t>(HEIGHT/2))
+    };
+    _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
+    return afterTestSimple(win, &_readerStub);
+}
+
 IMG_TEST_F(DX9FillEllipseTest, Ellipse4){
     QueueItem items[] = {
             QueueItemCreator::create<QueueItem::CLEAR>(),
@@ -103,6 +115,57 @@ IMG_TEST_F(DX9FillEllipseTest, Ellipse2px){
             QueueItemCreator::create<QueueItem::SETLINESTYLE>(NULL_LINE, 0, 0),
             QueueItemCreator::create<QueueItem::SETFILLSTYLE>(SOLID_FILL, 0x00BBFF),
             QueueItemCreator::create<QueueItem::FILLELLIPSE>(WIDTH/2, HEIGHT/2, static_cast<uint32_t>(2), static_cast<uint32_t>(2))
+    };
+    _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
+    return afterTestSimple(win, &_readerStub);
+}
+
+IMG_TEST_F(DX9FillEllipseTest, SimpleEllipseSolid5px){
+    QueueItem items[] = {
+            QueueItemCreator::create<QueueItem::CLEAR>(),
+            QueueItemCreator::create<QueueItem::COLOR>(0x00FF00),
+            QueueItemCreator::create<QueueItem::SETLINESTYLE>(SOLID_LINE, 0, 5),
+            QueueItemCreator::create<QueueItem::SETFILLSTYLE>(SOLID_FILL, 0x00BBFF),
+            QueueItemCreator::create<QueueItem::FILLELLIPSE>(30, 50, 10u, 20u)
+    };
+    _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
+    return afterTestSimple(win, &_readerStub);
+}
+
+IMG_TEST_F(DX9FillEllipseTest, SimpleEllipseSolid20px){
+    QueueItem items[] = {
+            QueueItemCreator::create<QueueItem::CLEAR>(),
+            QueueItemCreator::create<QueueItem::COLOR>(0x7F00FF00),
+            QueueItemCreator::create<QueueItem::SETLINESTYLE>(SOLID_LINE, 0, 20),
+            QueueItemCreator::create<QueueItem::SETFILLSTYLE>(SOLID_FILL, 0x7F00BBFF),
+            QueueItemCreator::create<QueueItem::FILLELLIPSE>(30, 50, 10u, 20u)
+    };
+    _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
+    return afterTestSimple(win, &_readerStub);
+}
+
+IMG_TEST_F(DX9FillEllipseTest, SimpleEllipseSolid25px){
+    QueueItem items[] = {
+            QueueItemCreator::create<QueueItem::CLEAR>(),
+            QueueItemCreator::create<QueueItem::COLOR>(0x7F00FF00),
+            QueueItemCreator::create<QueueItem::SETLINESTYLE>(SOLID_LINE, 0, 25),
+            QueueItemCreator::create<QueueItem::SETFILLSTYLE>(SOLID_FILL, 0x7F00BBFF),
+            QueueItemCreator::create<QueueItem::FILLELLIPSE>(30, 50, 10u, 20u)
+    };
+    _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
+    return afterTestSimple(win, &_readerStub);
+}
+
+IMG_TEST_F(DX9FillEllipseTest, SimpleEllipseSolid25pxThenNull){
+    QueueItem items[] = {
+            QueueItemCreator::create<QueueItem::CLEAR>(),
+            QueueItemCreator::create<QueueItem::COLOR>(0x7F00FF00),
+            QueueItemCreator::create<QueueItem::SETLINESTYLE>(SOLID_LINE, 0, 11),
+            QueueItemCreator::create<QueueItem::SETFILLSTYLE>(SOLID_FILL, 0x7F00BBFF),
+            QueueItemCreator::create<QueueItem::FILLELLIPSE>(30, 50, 10u, 20u),
+            QueueItemCreator::create<QueueItem::SETLINESTYLE>(NULL_LINE, 0, 25),
+            QueueItemCreator::create<QueueItem::SETFILLSTYLE>(SOLID_FILL, 0x00BBFF),
+            QueueItemCreator::create<QueueItem::FILLELLIPSE>(20, 20, 10u, 20u)
     };
     _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
     return afterTestSimple(win, &_readerStub);

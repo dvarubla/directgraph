@@ -39,6 +39,8 @@ namespace directgraph {
             ICoordVect getOutsidePixels(const UCoords &radiusCoords, uint_fast32_t h);
             ICoordVect getInsidePixels(const UCoords &radiusCoords, uint_fast32_t h, uint_fast32_t &maxY);
             std::vector<FullRect> genEllipseRects(const ICoordVect &pixels);
+            void genOutlinePixels(uint_fast32_t thickness, const UCoords &radiusCrds,
+                                  ICoordVect &insidePixels, ICoordVect &outsidePixels, uint_fast32_t &maxY);
             Rects genOutlineRects(const ICoordVect &insidePixels, const ICoordVect &outsidePixels, uint_fast32_t maxY);
             void genRectPoints(int_fast32_t x1, int_fast32_t y1, int_fast32_t x2, int_fast32_t y2);
             void drawPartRect(uint_fast8_t quadrNum,
@@ -76,6 +78,14 @@ namespace directgraph {
                     const UCoords & radiusCrds,
                     uint_fast16_t startAngle, uint_fast16_t endAngle,
                     uint_fast32_t thickness
+            );
+
+            FullEllipse genFullEllipse(
+                    const Coords & centerCrds,
+                    const UCoords & radiusCrds,
+                    uint_fast16_t startAngle, uint_fast16_t endAngle,
+                    uint_fast32_t thickness,
+                    bool texturedEllipse
             );
         };
     }

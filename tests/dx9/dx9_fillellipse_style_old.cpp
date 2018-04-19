@@ -95,3 +95,42 @@ IMG_TEST_F(DX9FillEllipseStyleOldTest, EllipsesDifferentFillAndSolid){
     _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
     return afterTestSimple(win, &_readerStub);
 }
+
+IMG_TEST_F(DX9FillEllipseStyleOldTest, SimpleEllipseHatchSolid){
+    QueueItem items[] = {
+            QueueItemCreator::create<QueueItem::CLEAR>(),
+            QueueItemCreator::create<QueueItem::COLOR>(0x7F00FF00),
+            QueueItemCreator::create<QueueItem::SETLINESTYLE>(SOLID_LINE, 0, 11),
+            QueueItemCreator::create<QueueItem::SETFILLSTYLE>(HATCH_FILL, 0x0000FF),
+            QueueItemCreator::create<QueueItem::FILLELLIPSE>(WIDTH/2, HEIGHT/2, 50u, 15u)
+    };
+    _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
+    return afterTestSimple(win, &_readerStub);
+}
+
+IMG_TEST_F(DX9FillEllipseStyleOldTest, SimpleEllipseHatchSolidThenNull){
+    QueueItem items[] = {
+            QueueItemCreator::create<QueueItem::CLEAR>(),
+            QueueItemCreator::create<QueueItem::COLOR>(0x7F00FF00),
+            QueueItemCreator::create<QueueItem::SETLINESTYLE>(SOLID_LINE, 0, 11),
+            QueueItemCreator::create<QueueItem::SETFILLSTYLE>(HATCH_FILL, 0x0000FF),
+            QueueItemCreator::create<QueueItem::FILLELLIPSE>(WIDTH/2, HEIGHT/2, 50u, 15u),
+            QueueItemCreator::create<QueueItem::SETLINESTYLE>(NULL_LINE, 0, 0),
+            QueueItemCreator::create<QueueItem::SETFILLSTYLE>(XHATCH_FILL, 0x3300DD),
+            QueueItemCreator::create<QueueItem::FILLELLIPSE>(WIDTH/4, HEIGHT/3, 20u, 14u)
+    };
+    _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
+    return afterTestSimple(win, &_readerStub);
+}
+
+IMG_TEST_F(DX9FillEllipseStyleOldTest, SimpleEllipseHatchSolidTooThick){
+    QueueItem items[] = {
+            QueueItemCreator::create<QueueItem::CLEAR>(),
+            QueueItemCreator::create<QueueItem::COLOR>(0x7F00FF00),
+            QueueItemCreator::create<QueueItem::SETLINESTYLE>(SOLID_LINE, 0, 22),
+            QueueItemCreator::create<QueueItem::SETFILLSTYLE>(HATCH_FILL, 0x0000FF),
+            QueueItemCreator::create<QueueItem::FILLELLIPSE>(WIDTH/2, HEIGHT/2, 50u, 10u)
+    };
+    _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
+    return afterTestSimple(win, &_readerStub);
+}

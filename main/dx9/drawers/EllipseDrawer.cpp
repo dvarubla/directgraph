@@ -108,9 +108,10 @@ namespace directgraph{
             StartEndCoords res;
             if(_curStage == FILL_STAGE || !_haveOutline) {
                 if (
-                        _haveOutline ||
-                        (_stateHelper->fillTextureUsed(_curState) && _bufPrepParams->supportsTexturedEllipse()) ||
-                        (!_stateHelper->fillTextureUsed(_curState) && _bufPrepParams->supportsEllipse())
+                        !_haveOutline && (
+                            (_stateHelper->fillTextureUsed(_curState) && _bufPrepParams->supportsTexturedEllipse()) ||
+                            (!_stateHelper->fillTextureUsed(_curState) && _bufPrepParams->supportsEllipse())
+                        )
                 ) {
                     res.start = genFCoords(
                             _curItem.data.ellipse.x - _curItem.data.ellipse.xradius + CORR_OFFSET,
@@ -231,6 +232,23 @@ namespace directgraph{
                         _curItem.data.ellipse.endAngle,
                         _stateHelper->getLastState().lineThickness
                 );
+            } else {
+                FullEllipse fEll = _ellipseHelper->genFullEllipse(
+                        genCoords(_curItem.data.ellipse.x, _curItem.data.ellipse.y),
+                        genUCoords(
+                                _curItem.data.ellipse.xradius,
+                                _curItem.data.ellipse.yradius
+                        ),
+                        _curItem.data.ellipse.startAngle,
+                        _curItem.data.ellipse.endAngle,
+                        _stateHelper->getLastState().lineThickness,
+                        _stateHelper->fillTextureUsed(_fillState)
+                );
+                _ellipseOutline = fEll.outline;
+                _ellipse = fEll.ellipse;
+                if(_ellipse.coords.empty()){
+                    _haveFill = false;
+                }
             }
         }
 

@@ -40,6 +40,11 @@ namespace directgraph {
             CoordVect coords;
         };
 
+        struct FullEllipse{
+            Ellipse ellipse;
+            EllipseOutline outline;
+        };
+
         struct PolylinePolygon{
             Polyline polyline;
             Polygon polygon;
