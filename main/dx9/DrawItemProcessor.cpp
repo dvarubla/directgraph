@@ -10,7 +10,7 @@ namespace directgraph {
         ) {
             ItemStateDiff stateDiff = _propMan->getItemStateDiff(statePrev, stateCur);
             bool isFirst = false;
-            if(addedOrChanged(stateDiff[PropertyName::SHADER_TYPE])){
+            if(addedOrChanged(stateDiff[PropertyName::SHADER_TYPE]) || stateDiff[PropertyName::SHADER_TYPE].removed){
                 isFirst = true;
             }
             if(stateDiff[PropertyName::TEXTURE_STATE].removed){
