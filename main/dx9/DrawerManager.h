@@ -10,6 +10,7 @@
 #include "primitiveHelpers/LineHelper.h"
 #include "primitiveHelpers/PolygonHelper.h"
 #include <array>
+#include <primitiveHelpers/Bar3DHelper.h>
 
 namespace directgraph {
     namespace dx9 {
@@ -24,6 +25,7 @@ namespace directgraph {
                 SINGLE_PIXEL_DRAWER,
                 LINE_DRAWER,
                 POLYGON_DRAWER,
+                BAR3D_DRAWER,
                 NUM_DRAWERS
             };
             SimplePrimHelper _simplePrimHelper;
@@ -35,6 +37,7 @@ namespace directgraph {
             EllipseHelper _ellipseHelper;
             LineHelper _lineHelper;
             PolygonHelper _polygonHelper;
+            Bar3DHelper _bar3DHelper;
 
             std::array<IDrawer*, NUM_DRAWERS> _drawers;
             DrawerType _activeDrawer;

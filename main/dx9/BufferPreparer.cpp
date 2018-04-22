@@ -35,7 +35,8 @@ namespace directgraph{
                         item.type == QueueItem::RECTANGLE ||
                         item.type == QueueItem::LINE ||
                         item.type == QueueItem::DRAWPOLY ||
-                        item.type == QueueItem::FILLPOLY
+                        item.type == QueueItem::FILLPOLY ||
+                        item.type == QueueItem::BAR3D
                 ) {
                     _drawerManager.setActiveDrawerType(item);
                     IDrawer *curDrawer = _drawerManager.getActiveDrawer();

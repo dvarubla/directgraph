@@ -20,7 +20,8 @@ namespace directgraph{
             ELLIPSE,
             LINE,
             DRAWPOLY,
-            FILLPOLY
+            FILLPOLY,
+            BAR3D
         } type;
         union{
             uint32_t color;
@@ -60,6 +61,11 @@ namespace directgraph{
                 uint32_t numPoints;
                 int32_t *points;
             } drawPoly;
+            struct Bar3DItem{
+                int32_t left, top, right, bottom;
+                uint32_t depth;
+                bool haveTop;
+            } bar3D;
             IPixelContainer *pixelContainer;
         } data;
     };
@@ -78,6 +84,8 @@ namespace directgraph{
         static QueueItem create(int_fast32_t, int_fast32_t, int_fast32_t, int_fast32_t);
         template <QueueItem::QueueItemType T>
         static QueueItem create(int_fast32_t, int_fast32_t, uint_fast32_t, uint_fast32_t);
+        template <QueueItem::QueueItemType T>
+        static QueueItem create(int_fast32_t, int_fast32_t, int_fast32_t, int_fast32_t, uint_fast32_t, bool);
         template <QueueItem::QueueItemType T>
         static QueueItem create(
                 int_fast32_t, int_fast32_t,

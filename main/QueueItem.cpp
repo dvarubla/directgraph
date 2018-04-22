@@ -184,6 +184,21 @@ namespace directgraph{
     }
 
     template<>
+    QueueItem QueueItemCreator::create<QueueItem::BAR3D>(
+            int_fast32_t left, int_fast32_t top, int_fast32_t right, int_fast32_t bottom, uint_fast32_t depth, bool haveTop
+    ) {
+        QueueItem item;
+        item.type = QueueItem::BAR3D;
+        item.data.bar3D.top = top;
+        item.data.bar3D.bottom = bottom;
+        item.data.bar3D.left = left;
+        item.data.bar3D.right = right;
+        item.data.bar3D.depth = depth;
+        item.data.bar3D.haveTop = haveTop;
+        return item;
+    }
+
+    template<>
     QueueItem QueueItemCreator::create<QueueItem::FILLPOLY>(uint_fast32_t numPoints, const int32_t *points) {
         QueueItem item;
         item.type = QueueItem::FILLPOLY;

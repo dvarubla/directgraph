@@ -6,6 +6,7 @@
 #include <drawers/SinglePixelDrawer.h>
 #include <drawers/LineDrawer.h>
 #include <drawers/PolygonDrawer.h>
+#include <drawers/Bar3DDrawer.h>
 #include "DrawerManager.h"
 
 namespace directgraph{
@@ -15,18 +16,21 @@ namespace directgraph{
                 BufferPreparerParams *bufPrepParams,
                 PropertyManager *propMan
         ) : _drawStateHelper(stateHelper, propMan), _rectangleHelper(&_simplePrimHelper, &_texCrdsCalc),
-            _ellipseHelper(&_texCrdsCalc), _polygonHelper(&_lineHelper, &_texCrdCalc) {
+            _ellipseHelper(&_texCrdsCalc), _polygonHelper(&_lineHelper, &_texCrdCalc),
+            _bar3DHelper(&_simplePrimHelper, &_degenerateHelper, &_texCrdCalc) {
             _drawers[CLEARER] = new Clearer(
                     bufPrepParams, propMan, &_simplePrimHelper, &_degenerateHelper
             );
-            _drawers[BAR_DRAWER] = new BarDrawer(
-                &_drawStateHelper, stateHelper, bufPrepParams, propMan,
-                &_simplePrimHelper, &_degenerateHelper, &_texCrdCalc
+            BarDrawer *barDrawer = new BarDrawer(
+                    &_drawStateHelper, stateHelper, bufPrepParams, propMan,
+                    &_simplePrimHelper, &_degenerateHelper, &_texCrdCalc
             );
-            _drawers[RECTANGLE_DRAWER] = new RectangleDrawer(
+            _drawers[BAR_DRAWER] = barDrawer;
+            RectangleDrawer *rectangleDrawer = new RectangleDrawer(
                     &_drawStateHelper, stateHelper, bufPrepParams, propMan,
                     &_simplePrimHelper, &_degenerateHelper, &_rectangleHelper
             );
+            _drawers[RECTANGLE_DRAWER] = rectangleDrawer;
             _drawers[ELLIPSE_DRAWER] = new EllipseDrawer(
                     &_drawStateHelper, stateHelper, bufPrepParams, propMan,
                     &_simplePrimHelper, &_ellipseHelper, &_degenerateHelper
@@ -45,6 +49,11 @@ namespace directgraph{
             _drawers[POLYGON_DRAWER] = new PolygonDrawer(
                     &_drawStateHelper, stateHelper, bufPrepParams, propMan,
                     &_simplePrimHelper, &_degenerateHelper, &_texCrdCalc, &_polygonHelper
+            );
+            _drawers[BAR3D_DRAWER] = new Bar3DDrawer(
+                    &_drawStateHelper, stateHelper, bufPrepParams, propMan,
+                    &_simplePrimHelper, &_degenerateHelper, &_bar3DHelper, &_texCrdCalc,
+                    barDrawer, rectangleDrawer
             );
         }
 
@@ -73,6 +82,9 @@ namespace directgraph{
                     break;
                 case QueueItem::DRAWPOLY: case QueueItem::FILLPOLY:
                     _activeDrawer = POLYGON_DRAWER;
+                    break;
+                case QueueItem::BAR3D:
+                    _activeDrawer = BAR3D_DRAWER;
                     break;
                 default: break;
             }
