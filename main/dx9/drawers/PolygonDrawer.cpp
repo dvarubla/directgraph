@@ -54,7 +54,7 @@ namespace directgraph {
         void PolygonDrawer::createFillTypeSize() {
             if (_stateHelper->fillTextureUsed(_fillState)) {
                 if(_bufPrepParams->supportsTexturedBar()){
-                    _fillTypeSize.sizeMult = sizeof(Color2Vertex);
+                    _fillTypeSize.sizeMult = sizeof(Color2VertexNoRHW);
                     _fillTypeSize.drawDataType = DrawDataType::COLOR2_VERTEX;
                 } else {
                     _fillTypeSize.sizeMult = sizeof(TexturedColorVertex);

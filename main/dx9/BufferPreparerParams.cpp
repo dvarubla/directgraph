@@ -27,6 +27,18 @@ namespace directgraph{
             return _shaderMan->supportsTexturedLine();
         }
 
+        bool BufferPreparerParams::supportsEllipseOutline() {
+            return _shaderMan->supportsEllipseOutline();
+        }
+
+        bool BufferPreparerParams::supportsEllipseWithOutline() {
+            return _shaderMan->supportsEllipseWithOutline();
+        }
+
+        bool BufferPreparerParams::supportsTexturedEllipseWithOutline() {
+            return _shaderMan->supportsTexturedEllipseWithOutline();
+        }
+
         bool BufferPreparerParams::needRecreateTexture() {
             return _needRecreateTexture;
         }

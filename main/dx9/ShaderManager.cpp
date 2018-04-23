@@ -55,6 +55,15 @@ namespace directgraph {
                     _shaders[id].pixelShaderVer = tPixelVer;
                     break;
                 }
+                case TEXTURED_ELLIPSE_WITH_OUTLINE_P3_0_SHADER:
+                case ELLIPSE_WITH_OUTLINE_P3_0_SHADER:
+                case ELLIPSE_OUTLINE_P3_0_SHADER: {
+                    IFeatures::ShaderVersion tVertexVer = {1, 1};
+                    IFeatures::ShaderVersion tPixelVer = {3, 0};
+                    _shaders[id].vertexShaderVer = tVertexVer;
+                    _shaders[id].pixelShaderVer = tPixelVer;
+                    break;
+                }
             }
             if (_shaders[id].vertexShaderVer <= vertexVer && _shaders[id].pixelShaderVer <= pixelVer) {
                 _shaders[id].haveSupport = true;
@@ -159,6 +168,57 @@ namespace directgraph {
                         }
                         break;
                     }
+                    case ELLIPSE_OUTLINE_P3_0_SHADER: {
+                        D3DVERTEXELEMENT9 decl[] = {
+                                {0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+                                {0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0},
+                                {0, 20, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
+                                D3DDECL_END()
+                        };
+                        if (_device->CreateVertexDeclaration(decl, &_shaders[id].vertexDecl) != D3D_OK) {
+                            THROW_EXC_CODE(
+                                    Exception,
+                                    DX9_CANT_CREATE_VDECL,
+                                    L"Can't create ellipse outline vertex declaration"
+                            );
+                        }
+                        break;
+                    }
+                    case ELLIPSE_WITH_OUTLINE_P3_0_SHADER: {
+                        D3DVERTEXELEMENT9 decl[] = {
+                                {0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+                                {0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0},
+                                {0, 20, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 1},
+                                {0, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
+                                D3DDECL_END()
+                        };
+                        if (_device->CreateVertexDeclaration(decl, &_shaders[id].vertexDecl) != D3D_OK) {
+                            THROW_EXC_CODE(
+                                    Exception,
+                                    DX9_CANT_CREATE_VDECL,
+                                    L"Can't create ellipse with outline vertex declaration"
+                            );
+                        }
+                        break;
+                    }
+                    case TEXTURED_ELLIPSE_WITH_OUTLINE_P3_0_SHADER: {
+                        D3DVERTEXELEMENT9 decl[] = {
+                                {0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+                                {0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0},
+                                {0, 20, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 1},
+                                {0, 24, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 2},
+                                {0, 28, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
+                                D3DDECL_END()
+                        };
+                        if (_device->CreateVertexDeclaration(decl, &_shaders[id].vertexDecl) != D3D_OK) {
+                            THROW_EXC_CODE(
+                                    Exception,
+                                    DX9_CANT_CREATE_VDECL,
+                                    L"Can't create textured ellipse with outline vertex declaration"
+                            );
+                        }
+                        break;
+                    }
                 }
             }
         }
@@ -185,6 +245,18 @@ namespace directgraph {
 
         bool ShaderManager::supportsTexturedLine() {
             return checkSupport(TEXTURED_LINE_P1_4_SHADER);
+        }
+
+        bool ShaderManager::supportsEllipseOutline() {
+            return checkSupport(ELLIPSE_OUTLINE_P3_0_SHADER);
+        }
+
+        bool ShaderManager::supportsEllipseWithOutline() {
+            return checkSupport(ELLIPSE_WITH_OUTLINE_P3_0_SHADER);
+        }
+
+        bool ShaderManager::supportsTexturedEllipseWithOutline() {
+            return checkSupport(TEXTURED_ELLIPSE_WITH_OUTLINE_P3_0_SHADER);
         }
 
         bool ShaderManager::checkSupport(uint_fast16_t id) {
@@ -223,6 +295,18 @@ namespace directgraph {
 
         void ShaderManager::setTexturedLine() {
             setShader(TEXTURED_LINE_P1_4_SHADER);
+        }
+
+        void ShaderManager::setEllipseOutline() {
+            setShader(ELLIPSE_OUTLINE_P3_0_SHADER);
+        }
+
+        void ShaderManager::setEllipseWithOutline() {
+            setShader(ELLIPSE_WITH_OUTLINE_P3_0_SHADER);
+        }
+
+        void ShaderManager::setTexturedEllipseWithOutline() {
+            setShader(TEXTURED_ELLIPSE_WITH_OUTLINE_P3_0_SHADER);
         }
 
         void ShaderManager::removeShaders() {

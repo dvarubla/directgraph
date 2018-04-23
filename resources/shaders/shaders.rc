@@ -17,3 +17,12 @@ RECTANGLE_P1_4 IDR_PIXEL_SHADER "shaders/ps_1_4/rectangle.obj"
 
 TEXTURED_LINE_V1_1 IDR_VERTEX_SHADER "shaders/vs_1_1/textured_line.obj"
 TEXTURED_LINE_P1_4 IDR_PIXEL_SHADER "shaders/ps_1_4/textured_line.obj"
+
+ELLIPSE_OUTLINE_V1_1 IDR_VERTEX_SHADER "shaders/vs_1_1/ellipse_outline.obj"
+ELLIPSE_OUTLINE_P3_0 IDR_PIXEL_SHADER "shaders/ps_3_0/ellipse_outline.obj"
+
+ELLIPSE_WITH_OUTLINE_V1_1 IDR_VERTEX_SHADER "shaders/vs_1_1/ellipse_with_outline.obj"
+ELLIPSE_WITH_OUTLINE_P3_0 IDR_PIXEL_SHADER "shaders/ps_3_0/ellipse_with_outline.obj"
+
+TEXTURED_ELLIPSE_WITH_OUTLINE_V1_1 IDR_VERTEX_SHADER "shaders/vs_1_1/textured_ellipse_with_outline.obj"
+TEXTURED_ELLIPSE_WITH_OUTLINE_P3_0 IDR_PIXEL_SHADER "shaders/ps_3_0/textured_ellipse_with_outline.obj"

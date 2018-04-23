@@ -101,6 +101,18 @@ IMG_TEST_F(DX9FillEllipseStyleTest, SimpleEllipseHatchSolid){
     return afterTestSimple(win, &_readerStub);
 }
 
+IMG_TEST_F(DX9FillEllipseStyleTest, SimpleEllipseHatchSolid1px){
+    QueueItem items[] = {
+            QueueItemCreator::create<QueueItem::CLEAR>(),
+            QueueItemCreator::create<QueueItem::COLOR>(0x7F00FF00),
+            QueueItemCreator::create<QueueItem::SETLINESTYLE>(SOLID_LINE, 0, 1),
+            QueueItemCreator::create<QueueItem::SETFILLSTYLE>(HATCH_FILL, 0x0000FF),
+            QueueItemCreator::create<QueueItem::FILLELLIPSE>(WIDTH/2, HEIGHT/2, 50u, 15u)
+    };
+    _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
+    return afterTestSimple(win, &_readerStub);
+}
+
 IMG_TEST_F(DX9FillEllipseStyleTest, SimpleEllipseHatchSolidThenNull){
     QueueItem items[] = {
             QueueItemCreator::create<QueueItem::CLEAR>(),

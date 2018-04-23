@@ -8,26 +8,26 @@
 
 using testing::NiceMock;
 
-class DX9FillEllipseTest: public ImageTest, public CommonSimple{
+class DX9DrawEllipseTest: public ImageTest, public CommonSimple{
 public:
     NiceMock<QueueReaderStub> _readerStub;
     IMyWindow *win;
     static int32_t WIDTH;
     static int32_t HEIGHT;
 
-    DX9FillEllipseTest() {
+    DX9DrawEllipseTest() {
         win = createWindow(WIDTH, HEIGHT);
         addOnCall(_readerStub);
     }
 
-    virtual ~DX9FillEllipseTest() {
+    virtual ~DX9DrawEllipseTest() {
     }
 };
 
-int32_t DX9FillEllipseTest::WIDTH = 200;
-int32_t DX9FillEllipseTest::HEIGHT = 200;
+int32_t DX9DrawEllipseTest::WIDTH = 200;
+int32_t DX9DrawEllipseTest::HEIGHT = 200;
 
-IMG_TEST_F(DX9FillEllipseTest, SimpleEllipse1px){
+IMG_TEST_F(DX9DrawEllipseTest, SimpleEllipse1px){
     QueueItem items[] = {
             QueueItemCreator::create<QueueItem::CLEAR>(),
             QueueItemCreator::create<QueueItem::SETLINESTYLE>(SOLID_LINE, 0, 1),
@@ -38,7 +38,7 @@ IMG_TEST_F(DX9FillEllipseTest, SimpleEllipse1px){
     return afterTestSimple(win, &_readerStub);
 }
 
-IMG_TEST_F(DX9FillEllipseTest, SimpleEllipse1pxThick){
+IMG_TEST_F(DX9DrawEllipseTest, SimpleEllipse1pxThick){
     QueueItem items[] = {
             QueueItemCreator::create<QueueItem::CLEAR>(),
             QueueItemCreator::create<QueueItem::SETLINESTYLE>(SOLID_LINE, 0, 1),
@@ -49,7 +49,20 @@ IMG_TEST_F(DX9FillEllipseTest, SimpleEllipse1pxThick){
     return afterTestSimple(win, &_readerStub);
 }
 
-IMG_TEST_F(DX9FillEllipseTest, SimpleEllipse1pxThickReverse){
+IMG_TEST_F(DX9DrawEllipseTest, TwoEllipse1pxThick){
+    QueueItem items[] = {
+            QueueItemCreator::create<QueueItem::CLEAR>(),
+            QueueItemCreator::create<QueueItem::SETLINESTYLE>(SOLID_LINE, 0, 1),
+            QueueItemCreator::create<QueueItem::COLOR>(0x7F00BBFF),
+            QueueItemCreator::create<QueueItem::ELLIPSE>(11, 11, 10u, 7u),
+            QueueItemCreator::create<QueueItem::COLOR>(0x7FCC00EE),
+            QueueItemCreator::create<QueueItem::ELLIPSE>(21, 21, 11u, 7u)
+    };
+    _readerStub.addItems(items, sizeof(items) / sizeof(QueueItem));
+    return afterTestSimple(win, &_readerStub);
+}
+
+IMG_TEST_F(DX9DrawEllipseTest, SimpleEllipse1pxThickReverse){
     QueueItem items[] = {
             QueueItemCreator::create<QueueItem::CLEAR>(),
             QueueItemCreator::create<QueueItem::SETLINESTYLE>(SOLID_LINE, 0, 1),
@@ -60,7 +73,7 @@ IMG_TEST_F(DX9FillEllipseTest, SimpleEllipse1pxThickReverse){
     return afterTestSimple(win, &_readerStub);
 }
 
-IMG_TEST_F(DX9FillEllipseTest, Ellipse5pxThick){
+IMG_TEST_F(DX9DrawEllipseTest, Ellipse5pxThick){
     QueueItem items[] = {
             QueueItemCreator::create<QueueItem::CLEAR>(),
             QueueItemCreator::create<QueueItem::SETLINESTYLE>(SOLID_LINE, 0, 5),
@@ -71,7 +84,7 @@ IMG_TEST_F(DX9FillEllipseTest, Ellipse5pxThick){
     return afterTestSimple(win, &_readerStub);
 }
 
-IMG_TEST_F(DX9FillEllipseTest, Ellipse5pxThickLong){
+IMG_TEST_F(DX9DrawEllipseTest, Ellipse5pxThickLong){
     QueueItem items[] = {
             QueueItemCreator::create<QueueItem::CLEAR>(),
             QueueItemCreator::create<QueueItem::SETLINESTYLE>(SOLID_LINE, 0, 5),
@@ -82,7 +95,7 @@ IMG_TEST_F(DX9FillEllipseTest, Ellipse5pxThickLong){
     return afterTestSimple(win, &_readerStub);
 }
 
-IMG_TEST_F(DX9FillEllipseTest, Ellipse1pxLong){
+IMG_TEST_F(DX9DrawEllipseTest, Ellipse1pxLong){
     QueueItem items[] = {
             QueueItemCreator::create<QueueItem::CLEAR>(),
             QueueItemCreator::create<QueueItem::SETLINESTYLE>(SOLID_LINE, 0, 1),
@@ -93,7 +106,7 @@ IMG_TEST_F(DX9FillEllipseTest, Ellipse1pxLong){
     return afterTestSimple(win, &_readerStub);
 }
 
-IMG_TEST_F(DX9FillEllipseTest, Ellipse10pxThick){
+IMG_TEST_F(DX9DrawEllipseTest, Ellipse10pxThick){
     QueueItem items[] = {
             QueueItemCreator::create<QueueItem::CLEAR>(),
             QueueItemCreator::create<QueueItem::SETLINESTYLE>(SOLID_LINE, 0, 10),
@@ -104,7 +117,7 @@ IMG_TEST_F(DX9FillEllipseTest, Ellipse10pxThick){
     return afterTestSimple(win, &_readerStub);
 }
 
-IMG_TEST_F(DX9FillEllipseTest, Ellipse10pxThickReverse){
+IMG_TEST_F(DX9DrawEllipseTest, Ellipse10pxThickReverse){
     QueueItem items[] = {
             QueueItemCreator::create<QueueItem::CLEAR>(),
             QueueItemCreator::create<QueueItem::SETLINESTYLE>(SOLID_LINE, 0, 10),
@@ -115,7 +128,7 @@ IMG_TEST_F(DX9FillEllipseTest, Ellipse10pxThickReverse){
     return afterTestSimple(win, &_readerStub);
 }
 
-IMG_TEST_F(DX9FillEllipseTest, EllipseTooThick){
+IMG_TEST_F(DX9DrawEllipseTest, EllipseTooThick){
     QueueItem items[] = {
             QueueItemCreator::create<QueueItem::CLEAR>(),
             QueueItemCreator::create<QueueItem::SETLINESTYLE>(SOLID_LINE, 0, 30),

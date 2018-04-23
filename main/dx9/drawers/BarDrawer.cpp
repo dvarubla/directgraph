@@ -22,7 +22,7 @@ namespace directgraph{
             TypeSize res;
             if (_stateHelper->fillTextureUsed(_curState)) {
                 if(_bufPrepParams->supportsTexturedBar()){
-                    res.sizeMult = sizeof(Color2Vertex);
+                    res.sizeMult = sizeof(Color2VertexNoRHW);
                     res.drawDataType = DrawDataType::COLOR2_VERTEX;
                 } else {
                     res.sizeMult = sizeof(TexturedColorVertex);
@@ -44,12 +44,12 @@ namespace directgraph{
                         genDCoords(_curItem.data.bar.right, _curItem.data.bar.bottom)
                 );
                 if(_bufPrepParams->supportsTexturedBar()){
-                    curVertMem = _simplePrimHelper->genFillCol2Quad(curVertMem,
-                                                              _coords[0], _coords[1],
-                                                              curZ,
-                                                              _stateHelper->getLastState().fillColor,
-                                                              _stateHelper->getLastState().bgColor,
-                                                              barCoords
+                    curVertMem = _simplePrimHelper->genFillCol2NoRHWQuad(curVertMem,
+                                                                         _coords[0], _coords[1],
+                                                                         curZ,
+                                                                         _stateHelper->getLastState().fillColor,
+                                                                         _stateHelper->getLastState().bgColor,
+                                                                         barCoords
                     );
                 } else {
                     curVertMem = _simplePrimHelper->genTexColorQuad(curVertMem,

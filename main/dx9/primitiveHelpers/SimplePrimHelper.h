@@ -25,7 +25,7 @@ namespace directgraph {
                     bool rotate
             );
 
-            void *genFillCol2Quad(
+            void *genFillCol2NoRHWQuad(
                     void *verticesVoid,
                     const FCoords &startCrds,
                     const FCoords &endCrds,
@@ -56,6 +56,27 @@ namespace directgraph {
                     const FCoords &centerCrds, const FCoords &radiusCrds,
                     float z,
                     uint_fast32_t color1, uint_fast32_t color2
+            );
+
+            void * genOutlineEllipseQuad(
+                    void *verticesVoid,
+                    const FCoords &centerCrds, const FCoords &radiusCrds,
+                    float z,
+                    uint_fast32_t color, uint_fast32_t thickness
+            );
+
+            void * genEllipseWithOutlineQuad(
+                    void *verticesVoid,
+                    const FCoords &centerCrds, const FCoords &radiusCrds,
+                    float z,
+                    uint_fast32_t color1, uint_fast32_t color2, uint_fast32_t thickness
+            );
+
+            void * genTexEllipseWithOutlineQuad(
+                    void *verticesVoid,
+                    const FCoords &centerCrds, const FCoords &radiusCrds,
+                    float z,
+                    uint_fast32_t color1, uint_fast32_t color2, uint_fast32_t color3, uint_fast32_t thickness
             );
 
             void * genTexQuad(

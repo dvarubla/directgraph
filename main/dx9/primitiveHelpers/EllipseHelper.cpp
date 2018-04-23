@@ -222,7 +222,7 @@ namespace directgraph{
             std::vector<FullRect> res;
             uint_fast32_t i = 1;
             Coords prev = pixels[0];
-            uint_fast32_t size = pixels.size();
+            uint_fast32_t size = static_cast<uint_fast32_t>(pixels.size());
             while (true) {
                 if (pixels[i].x != prev.x || pixels[i + 1].y == pixels[i].y) {
                     while (i != size && pixels[i].y == pixels[i - 1].y) {
@@ -248,7 +248,7 @@ namespace directgraph{
             Rects res;
             uint_fast32_t k = 1;
             Coords prevOutside = outsidePixels[0];
-            uint_fast32_t outsideSize = outsidePixels.size();
+            uint_fast32_t outsideSize = static_cast<uint_fast32_t>(outsidePixels.size());
             if(maxY != 0 && insidePixels[0].y != static_cast<int_fast32_t>(maxY)) {
                 uint_fast32_t j = 1;
                 Coords prevInside = insidePixels[0];
@@ -328,8 +328,8 @@ namespace directgraph{
         void EllipseHelper::drawRects(
                 const std::vector<PartRect> &partRects,
                 const std::vector<FullRect> &fullRects, const Coords &centerCrds) {
-            uint_fast32_t partRSize = partRects.size();
-            uint_fast32_t fullRSize = fullRects.size();
+            uint_fast32_t partRSize = static_cast<uint_fast32_t>(partRects.size());
+            uint_fast32_t fullRSize = static_cast<uint_fast32_t>(fullRects.size());
 
             for(uint_fast32_t i = 0; i < partRSize; i++) {
                 for (uint_fast8_t m = 0; m < NUM_QUADRANTS; m++) {

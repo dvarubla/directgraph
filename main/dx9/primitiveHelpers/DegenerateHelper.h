@@ -41,6 +41,12 @@ namespace directgraph {
             void * genTexEllipseDegenerate(
                     void *verticesVoid, const FCoords &startCrds, const FCoords &endCrds, float z
             );
+
+            void * genEllipseWithOutlineDegenerate(
+                    void *verticesVoid, const FCoords &startCrds, const FCoords &endCrds, float z
+            );
+
+            void *genTexEllipseWithOutlineDegenerate(void *verticesVoid, const FCoords &startCrds, const FCoords &endCrds, float z);
         };
     }
 }

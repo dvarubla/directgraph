@@ -251,10 +251,10 @@ namespace directgraph {
                                 stride = sizeof(TexturedColorVertexNoRHW);
                                 break;
                             case DrawDataType::COLOR2_VERTEX:
-                                stride = sizeof(Color2Vertex);
+                                stride = sizeof(Color2VertexNoRHW);
                                 break;
                             case DrawDataType::TEXTURED_ELLIPSE_VERTEX:
-                                stride = sizeof(Color2Vertex);
+                                stride = sizeof(Color2VertexNoRHW);
                                 break;
                             case DrawDataType::TEXTURED_RECTANGLE_VERTEX:
                                 stride = sizeof(TexturedColorVertex);
@@ -264,6 +264,15 @@ namespace directgraph {
                                 break;
                             case DrawDataType::TEXTURED_LINE_VERTEX:
                                 stride = sizeof(ColorVertex);
+                                break;
+                            case DrawDataType::ELLIPSE_OUTLINE_VERTEX:
+                                stride = sizeof(TexturedColorVertex);
+                                break;
+                            case DrawDataType::ELLIPSE_WITH_OUTLINE_VERTEX:
+                                stride = sizeof(Color2Vertex);
+                                break;
+                            case DrawDataType::TEXTURED_ELLIPSE_WITH_OUTLINE_VERTEX:
+                                stride = sizeof(Color3Vertex);
                                 break;
                         }
                         _device->SetStreamSource(
@@ -293,6 +302,15 @@ namespace directgraph {
                                     break;
                                 case DrawDataType::TEXTURED_LINE_VERTEX:
                                     _shaderMan->setTexturedLine();
+                                    break;
+                                case DrawDataType::ELLIPSE_OUTLINE_VERTEX:
+                                    _shaderMan->setEllipseOutline();
+                                    break;
+                                case DrawDataType::ELLIPSE_WITH_OUTLINE_VERTEX:
+                                    _shaderMan->setEllipseWithOutline();
+                                    break;
+                                case DrawDataType::TEXTURED_ELLIPSE_WITH_OUTLINE_VERTEX:
+                                    _shaderMan->setTexturedEllipseWithOutline();
                                     break;
                                 default: break;
                             }

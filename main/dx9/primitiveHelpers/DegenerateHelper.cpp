@@ -55,15 +55,15 @@ namespace directgraph {
                 void *verticesVoid, const FCoords &startCrds, const FCoords &endCrds,
                 float z
         ) {
-            Color2Vertex *vertices = static_cast<Color2Vertex*>(verticesVoid);
-            (*vertices) = VertexCreator::create<Color2Vertex>(
+            Color2VertexNoRHW *vertices = static_cast<Color2VertexNoRHW*>(verticesVoid);
+            (*vertices) = VertexCreator::create<Color2VertexNoRHW>(
                     startCrds.x,
                     startCrds.y,
                     z, 0ul, 0ul,
                     0.0f, 0.0f
             );
             vertices++;
-            *vertices = VertexCreator::create<Color2Vertex>(
+            *vertices = VertexCreator::create<Color2VertexNoRHW>(
                     endCrds.x,
                     endCrds.y,
                     z, 0ul, 0ul,
@@ -114,18 +114,58 @@ namespace directgraph {
         void *
         DegenerateHelper::genTexEllipseDegenerate(void *verticesVoid, const FCoords &startCrds, const FCoords &endCrds,
                                                   float z) {
-            Color2Vertex *vertices = static_cast<Color2Vertex*>(verticesVoid);
-            (*vertices) = VertexCreator::create<Color2Vertex>(
+            Color2VertexNoRHW *vertices = static_cast<Color2VertexNoRHW*>(verticesVoid);
+            (*vertices) = VertexCreator::create<Color2VertexNoRHW>(
                     startCrds.x,
                     startCrds.y,
                     z, 0ul, 0ul,
                     0.0f, 0.0f
             );
             vertices++;
-            *vertices = VertexCreator::create<Color2Vertex>(
+            *vertices = VertexCreator::create<Color2VertexNoRHW>(
                     endCrds.x,
                     endCrds.y,
                     z, 0ul, 0ul, 0.0f, 0.0f
+            );
+            vertices++;
+            return vertices;
+        }
+
+        void *DegenerateHelper::genEllipseWithOutlineDegenerate(void *verticesVoid, const FCoords &startCrds,
+                                                                const FCoords &endCrds, float z) {
+            Color2Vertex *vertices = static_cast<Color2Vertex*>(verticesVoid);
+            (*vertices) = VertexCreator::create<Color2Vertex>(
+                    startCrds.x,
+                    startCrds.y,
+                    z, 0.0, 0ul, 0ul,
+                    0.0f, 0.0f
+            );
+            vertices++;
+            *vertices = VertexCreator::create<Color2Vertex>(
+                    endCrds.x,
+                    endCrds.y,
+                    z, 0.0, 0ul, 0ul,
+                    0.0f, 0.0f
+            );
+            vertices++;
+            return vertices;
+        }
+
+        void *DegenerateHelper::genTexEllipseWithOutlineDegenerate(void *verticesVoid, const FCoords &startCrds,
+                                                                const FCoords &endCrds, float z) {
+            Color3Vertex *vertices = static_cast<Color3Vertex*>(verticesVoid);
+            (*vertices) = VertexCreator::create<Color3Vertex>(
+                    startCrds.x,
+                    startCrds.y,
+                    z, 0.0, 0ul, 0ul, 0ul,
+                    0.0f, 0.0f
+            );
+            vertices++;
+            *vertices = VertexCreator::create<Color3Vertex>(
+                    endCrds.x,
+                    endCrds.y,
+                    z, 0.0, 0ul, 0ul, 0ul,
+                    0.0f, 0.0f
             );
             vertices++;
             return vertices;

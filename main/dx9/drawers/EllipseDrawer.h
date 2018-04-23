@@ -26,18 +26,22 @@ namespace directgraph {
             TypeSize _fillTypeSize;
             bool _haveOutline;
             bool _haveFill;
+            bool _haveOutlineFillShader;
             ItemState _fillState;
             ItemState _outlineState;
+            bool _createShaderOutline;
 
             enum EllipseStage{
                 OUTLINE_STAGE = 0,
-                FILL_STAGE
+                FILL_STAGE,
+                OUTLINE_AND_FILL_STAGE,
             } _curStage;
 
             void createFillState();
             void createOutlineState();
             void createOutlineTypeSize();
             void createFillTypeSize();
+            void createOutlineFillShaderTypeSize();
             uint_fast32_t getNumFillVertices();
             uint_fast32_t getNumOutlineVertices();
         public:

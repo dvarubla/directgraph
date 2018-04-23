@@ -8,10 +8,25 @@ namespace directgraph {
             DWORD color;
         };
 
-        struct Color2Vertex {
+        struct Color2VertexNoRHW {
             float x, y, z;
             DWORD color1;
             DWORD color2;
+            float tu, tv;
+        };
+
+        struct Color2Vertex {
+            float x, y, z, rhw;
+            DWORD color1;
+            DWORD color2;
+            float tu, tv;
+        };
+
+        struct Color3Vertex {
+            float x, y, z, rhw;
+            DWORD color1;
+            DWORD color2;
+            DWORD color3;
             float tu, tv;
         };
 
@@ -42,6 +57,16 @@ namespace directgraph {
             template<typename T>
             static T create(
                     float x, float y, float z, DWORD color1, DWORD color2, float tu, float tv
+            );
+
+            template<typename T>
+            static T create(
+                    float x, float y, float z, float rhw, DWORD color1, DWORD color2, float tu, float tv
+            );
+
+            template<typename T>
+            static T create(
+                    float x, float y, float z, float rhw, DWORD color1, DWORD color2, DWORD color3, float tu, float tv
             );
 
             template<typename T>

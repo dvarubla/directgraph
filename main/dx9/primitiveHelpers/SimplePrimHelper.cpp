@@ -84,13 +84,13 @@ namespace directgraph {
         }
 
         void *
-        SimplePrimHelper::genFillCol2Quad(
+        SimplePrimHelper::genFillCol2NoRHWQuad(
                 void *verticesVoid, const FCoords &startCrds, const FCoords &endCrds, float z,
                 uint_fast32_t color1, uint_fast32_t color2,
                 const TextureCoords &textureCoords
         ) {
-            Color2Vertex *vertices = static_cast<Color2Vertex*>(verticesVoid);
-            *vertices = VertexCreator::create<Color2Vertex>(
+            Color2VertexNoRHW *vertices = static_cast<Color2VertexNoRHW*>(verticesVoid);
+            *vertices = VertexCreator::create<Color2VertexNoRHW>(
                     startCrds.x,
                     startCrds.y,
                     z,
@@ -100,7 +100,7 @@ namespace directgraph {
                     textureCoords.start.y
             );
             vertices++;
-            *vertices = VertexCreator::create<Color2Vertex>(
+            *vertices = VertexCreator::create<Color2VertexNoRHW>(
                     endCrds.x,
                     startCrds.y,
                     z,
@@ -110,7 +110,7 @@ namespace directgraph {
                     textureCoords.start.y
             );
             vertices++;
-            *vertices = VertexCreator::create<Color2Vertex>(
+            *vertices = VertexCreator::create<Color2VertexNoRHW>(
                     startCrds.x,
                     endCrds.y,
                     z,
@@ -120,7 +120,7 @@ namespace directgraph {
                     textureCoords.end.y
             );
             vertices++;
-            *vertices = VertexCreator::create<Color2Vertex>(
+            *vertices = VertexCreator::create<Color2VertexNoRHW>(
                     endCrds.x,
                     endCrds.y,
                     z,
@@ -199,26 +199,26 @@ namespace directgraph {
         void *
         SimplePrimHelper::genTexEllipseQuad(void *verticesVoid, const FCoords &centerCrds, const FCoords &radiusCrds,
                                             float z, uint_fast32_t color1, uint_fast32_t color2) {
-            Color2Vertex *vertices = static_cast<Color2Vertex*>(verticesVoid);
-            *vertices = VertexCreator::create<Color2Vertex>(
+            Color2VertexNoRHW *vertices = static_cast<Color2VertexNoRHW*>(verticesVoid);
+            *vertices = VertexCreator::create<Color2VertexNoRHW>(
                     centerCrds.x, centerCrds.y, z,
                     static_cast<DWORD>(swap_color_transp(color1)), static_cast<DWORD>(swap_color_transp(color2)),
                     -radiusCrds.x, -radiusCrds.y
             );
             vertices++;
-            *vertices = VertexCreator::create<Color2Vertex>(
+            *vertices = VertexCreator::create<Color2VertexNoRHW>(
                     centerCrds.x, centerCrds.y, z,
                     static_cast<DWORD>(swap_color_transp(color1)), static_cast<DWORD>(swap_color_transp(color2)),
                     radiusCrds.x, -radiusCrds.y
             );
             vertices++;
-            *vertices = VertexCreator::create<Color2Vertex>(
+            *vertices = VertexCreator::create<Color2VertexNoRHW>(
                     centerCrds.x, centerCrds.y, z,
                     static_cast<DWORD>(swap_color_transp(color1)), static_cast<DWORD>(swap_color_transp(color2)),
                     -radiusCrds.x, radiusCrds.y
             );
             vertices++;
-            *vertices = VertexCreator::create<Color2Vertex>(
+            *vertices = VertexCreator::create<Color2VertexNoRHW>(
                     centerCrds.x, centerCrds.y, z,
                     static_cast<DWORD>(swap_color_transp(color1)), static_cast<DWORD>(swap_color_transp(color2)),
                     radiusCrds.x, radiusCrds.y
@@ -416,9 +416,9 @@ namespace directgraph {
         void *
         SimplePrimHelper::genFillCol2Triangles(void *verticesVoid, const CoordVect &points, const CoordVect &texCoords,
                                                float z, uint_fast32_t color1, uint_fast32_t color2) {
-            Color2Vertex *vertices = static_cast<Color2Vertex*>(verticesVoid);
+            Color2VertexNoRHW *vertices = static_cast<Color2VertexNoRHW*>(verticesVoid);
             for(CoordVect::const_iterator it = points.begin(); it != points.end(); ++it){
-                *vertices = VertexCreator::create<Color2Vertex>(
+                *vertices = VertexCreator::create<Color2VertexNoRHW>(
                         it->x,
                         it->y,
                         z,
@@ -467,6 +467,124 @@ namespace directgraph {
                     z, 1.0f,
                     static_cast<DWORD>(swap_color_transp(color)),
                     texCoords[3], 0.0f
+            );
+            vertices++;
+            return vertices;
+        }
+        
+        void *SimplePrimHelper::genOutlineEllipseQuad(void *verticesVoid, const FCoords &centerCrds,
+                                                      const FCoords &radiusCrds, float z, uint_fast32_t color,
+                                                      uint_fast32_t thickness) {
+            TexturedColorVertex *vertices = static_cast<TexturedColorVertex*>(verticesVoid);
+            *vertices = VertexCreator::create<TexturedColorVertex>(
+                    centerCrds.x, centerCrds.y, z, static_cast<float>(thickness), static_cast<DWORD>(swap_color_transp(color)),
+                    -radiusCrds.x, -radiusCrds.y
+            );
+            vertices++;
+            *vertices = VertexCreator::create<TexturedColorVertex>(
+                    centerCrds.x, centerCrds.y, z, static_cast<float>(thickness),  static_cast<DWORD>(swap_color_transp(color)),
+                    radiusCrds.x, -radiusCrds.y
+            );
+            vertices++;
+            *vertices = VertexCreator::create<TexturedColorVertex>(
+                    centerCrds.x, centerCrds.y, z, static_cast<float>(thickness),  static_cast<DWORD>(swap_color_transp(color)),
+                    -radiusCrds.x, radiusCrds.y
+            );
+            vertices++;
+            *vertices = VertexCreator::create<TexturedColorVertex>(
+                    centerCrds.x, centerCrds.y, z, static_cast<float>(thickness),  static_cast<DWORD>(swap_color_transp(color)),
+                    radiusCrds.x, radiusCrds.y
+            );
+            vertices++;
+            return vertices;
+        }
+
+        void *SimplePrimHelper::genEllipseWithOutlineQuad(void *verticesVoid, const FCoords &centerCrds,
+                                                          const FCoords &radiusCrds, float z, uint_fast32_t color1,
+                                                          uint_fast32_t color2, uint_fast32_t thickness) {
+            Color2Vertex *vertices = static_cast<Color2Vertex*>(verticesVoid);
+            *vertices = VertexCreator::create<Color2Vertex>(
+                    centerCrds.x,
+                    centerCrds.y,
+                    z, thickness,
+                    static_cast<DWORD>(swap_color_transp(color1)),
+                    static_cast<DWORD>(swap_color_transp(color2)),
+                    -radiusCrds.x, -radiusCrds.y
+            );
+            vertices++;
+            *vertices = VertexCreator::create<Color2Vertex>(
+                    centerCrds.x,
+                    centerCrds.y,
+                    z, thickness,
+                    static_cast<DWORD>(swap_color_transp(color1)),
+                    static_cast<DWORD>(swap_color_transp(color2)),
+                    radiusCrds.x, -radiusCrds.y
+            );
+            vertices++;
+            *vertices = VertexCreator::create<Color2Vertex>(
+                    centerCrds.x,
+                    centerCrds.y,
+                    z, thickness,
+                    static_cast<DWORD>(swap_color_transp(color1)),
+                    static_cast<DWORD>(swap_color_transp(color2)),
+                    -radiusCrds.x, radiusCrds.y
+            );
+            vertices++;
+            *vertices = VertexCreator::create<Color2Vertex>(
+                    centerCrds.x,
+                    centerCrds.y,
+                    z, thickness,
+                    static_cast<DWORD>(swap_color_transp(color1)),
+                    static_cast<DWORD>(swap_color_transp(color2)),
+                    radiusCrds.x, radiusCrds.y
+            );
+            vertices++;
+            return vertices;
+        }
+
+        void *SimplePrimHelper::genTexEllipseWithOutlineQuad(void *verticesVoid, const FCoords &centerCrds,
+                                                             const FCoords &radiusCrds, float z, uint_fast32_t color1,
+                                                             uint_fast32_t color2, uint_fast32_t color3,
+                                                             uint_fast32_t thickness) {
+            Color3Vertex *vertices = static_cast<Color3Vertex*>(verticesVoid);
+            *vertices = VertexCreator::create<Color3Vertex>(
+                    centerCrds.x,
+                    centerCrds.y,
+                    z, thickness,
+                    static_cast<DWORD>(swap_color_transp(color1)),
+                    static_cast<DWORD>(swap_color_transp(color2)),
+                    static_cast<DWORD>(swap_color_transp(color3)),
+                    -radiusCrds.x, -radiusCrds.y
+            );
+            vertices++;
+            *vertices = VertexCreator::create<Color3Vertex>(
+                    centerCrds.x,
+                    centerCrds.y,
+                    z, thickness,
+                    static_cast<DWORD>(swap_color_transp(color1)),
+                    static_cast<DWORD>(swap_color_transp(color2)),
+                    static_cast<DWORD>(swap_color_transp(color3)),
+                    radiusCrds.x, -radiusCrds.y
+            );
+            vertices++;
+            *vertices = VertexCreator::create<Color3Vertex>(
+                    centerCrds.x,
+                    centerCrds.y,
+                    z, thickness,
+                    static_cast<DWORD>(swap_color_transp(color1)),
+                    static_cast<DWORD>(swap_color_transp(color2)),
+                    static_cast<DWORD>(swap_color_transp(color3)),
+                    -radiusCrds.x, radiusCrds.y
+            );
+            vertices++;
+            *vertices = VertexCreator::create<Color3Vertex>(
+                    centerCrds.x,
+                    centerCrds.y,
+                    z, thickness,
+                    static_cast<DWORD>(swap_color_transp(color1)),
+                    static_cast<DWORD>(swap_color_transp(color2)),
+                    static_cast<DWORD>(swap_color_transp(color3)),
+                    radiusCrds.x, radiusCrds.y
             );
             vertices++;
             return vertices;

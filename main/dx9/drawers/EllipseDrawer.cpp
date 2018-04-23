@@ -6,7 +6,7 @@
 namespace directgraph{
     namespace dx9{
         void EllipseDrawer::getItemState(ItemState &state) {
-            if(_curStage == FILL_STAGE || !_haveOutline){
+            if(_curStage == FILL_STAGE || _curStage == OUTLINE_AND_FILL_STAGE){
                 state = _fillState;
             } else {
                 state = _outlineState;
@@ -16,7 +16,9 @@ namespace directgraph{
         NumVertices EllipseDrawer::getNumVertices(bool isFirst) {
             NumVertices res;
             res.degenerate = (isFirst) ? 0 : 2;
-            if(_curStage == FILL_STAGE || !_haveOutline){
+            if(_curStage == OUTLINE_AND_FILL_STAGE){
+                res.primitive = VERTICES_IN_QUAD;
+            } else if(_curStage == FILL_STAGE){
                 res.primitive = getNumFillVertices();
             } else {
                 res.primitive = getNumOutlineVertices();
@@ -25,7 +27,7 @@ namespace directgraph{
         }
 
         TypeSize EllipseDrawer::getTypeSize() {
-            if(_curStage == FILL_STAGE || !_haveOutline){
+            if(_curStage == FILL_STAGE || _curStage == OUTLINE_AND_FILL_STAGE){
                 return _fillTypeSize;
             } else {
                 return _outlineTypeSize;
@@ -33,7 +35,34 @@ namespace directgraph{
         }
 
         void EllipseDrawer::processDrawItem(void *&curVertMem, uint_fast32_t &, float curZ) {
-            if(_curStage == FILL_STAGE || !_haveOutline) {
+            if(_curStage == OUTLINE_AND_FILL_STAGE){
+                if(_stateHelper->fillTextureUsed(_curState)) {
+                    curVertMem = _simplePrimHelper->genTexEllipseWithOutlineQuad(
+                            curVertMem,
+                            genFCoords(_curItem.data.ellipse.x, _curItem.data.ellipse.y),
+                            genFCoords(
+                                    _curItem.data.ellipse.xradius - CORR_OFFSET,
+                                    _curItem.data.ellipse.yradius - CORR_OFFSET
+                            ),
+                            curZ, _stateHelper->getLastState().drawColor,
+                            _stateHelper->getLastState().fillColor,
+                            _stateHelper->getLastState().bgColor,
+                            _stateHelper->getLastState().lineThickness
+                    );
+                } else {
+                    curVertMem = _simplePrimHelper->genEllipseWithOutlineQuad(
+                            curVertMem,
+                            genFCoords(_curItem.data.ellipse.x, _curItem.data.ellipse.y),
+                            genFCoords(
+                                    _curItem.data.ellipse.xradius - CORR_OFFSET,
+                                    _curItem.data.ellipse.yradius - CORR_OFFSET
+                            ),
+                            curZ, _stateHelper->getLastState().drawColor,
+                            _stateHelper->getLastState().fillColor,
+                            _stateHelper->getLastState().lineThickness
+                    );
+                }
+            } else if(_curStage == FILL_STAGE) {
                 if(_haveOutline){
                     if (_stateHelper->fillTextureUsed(_curState)) {
                         if(_bufPrepParams->supportsTexturedBar()){
@@ -98,15 +127,36 @@ namespace directgraph{
                     }
                 }
             } else {
-                curVertMem = _simplePrimHelper->genTriangles(
-                        curVertMem, _ellipseOutline.coords, curZ, _stateHelper->getLastState().drawColor
-                );
+                if(_createShaderOutline) {
+                    curVertMem = _simplePrimHelper->genOutlineEllipseQuad(
+                            curVertMem,
+                            genFCoords(_curItem.data.ellipse.x, _curItem.data.ellipse.y),
+                            genFCoords(
+                                    _curItem.data.ellipse.xradius - CORR_OFFSET,
+                                    _curItem.data.ellipse.yradius - CORR_OFFSET
+                            ),
+                            curZ, _stateHelper->getLastState().drawColor, _stateHelper->getLastState().lineThickness
+                    );
+                } else {
+                    curVertMem = _simplePrimHelper->genTriangles(
+                            curVertMem, _ellipseOutline.coords, curZ, _stateHelper->getLastState().drawColor
+                    );
+                }
             }
         }
 
         StartEndCoords EllipseDrawer::getStartEndCoords() {
             StartEndCoords res;
-            if(_curStage == FILL_STAGE || !_haveOutline) {
+            if(_curStage == OUTLINE_AND_FILL_STAGE){
+                res.start = genFCoords(
+                        _curItem.data.ellipse.x - _curItem.data.ellipse.xradius + CORR_OFFSET,
+                        _curItem.data.ellipse.y - _curItem.data.ellipse.yradius + CORR_OFFSET
+                );
+                res.end = genFCoords(
+                        _curItem.data.ellipse.x + _curItem.data.ellipse.xradius - CORR_OFFSET,
+                        _curItem.data.ellipse.y + _curItem.data.ellipse.yradius - CORR_OFFSET
+                );
+            } else if(_curStage == FILL_STAGE) {
                 if (
                         !_haveOutline && (
                             (_stateHelper->fillTextureUsed(_curState) && _bufPrepParams->supportsTexturedEllipse()) ||
@@ -126,14 +176,35 @@ namespace directgraph{
                     res.end = _ellipse.coords.back();
                 }
             } else {
-                res.start = _ellipseOutline.coords.front();
-                res.end = _ellipseOutline.coords.back();
+                if(_createShaderOutline) {
+                    res.start = genFCoords(
+                            _curItem.data.ellipse.x - _curItem.data.ellipse.xradius + CORR_OFFSET,
+                            _curItem.data.ellipse.y - _curItem.data.ellipse.yradius + CORR_OFFSET
+                    );
+                    res.end = genFCoords(
+                            _curItem.data.ellipse.x + _curItem.data.ellipse.xradius - CORR_OFFSET,
+                            _curItem.data.ellipse.y + _curItem.data.ellipse.yradius - CORR_OFFSET
+                    );
+                } else {
+                    res.start = _ellipseOutline.coords.front();
+                    res.end = _ellipseOutline.coords.back();
+                }
             }
             return res;
         }
 
         void EllipseDrawer::genDegenerates(void *&curVertMem, const FCoords &startCrds, const FCoords &endCrds, float curZ) {
-            if(_curStage == FILL_STAGE || !_haveOutline) {
+            if(_curStage == OUTLINE_AND_FILL_STAGE){
+                if(_stateHelper->fillTextureUsed(_curState)) {
+                    curVertMem = _degenerateHelper->genTexEllipseWithOutlineDegenerate(
+                            curVertMem, startCrds, endCrds, curZ
+                    );
+                } else {
+                    curVertMem = _degenerateHelper->genEllipseWithOutlineDegenerate(
+                            curVertMem, startCrds, endCrds, curZ
+                    );
+                }
+            } else if(_curStage == FILL_STAGE) {
                 if(_haveOutline){
                     if (_stateHelper->fillTextureUsed(_curState)) {
                         if (_bufPrepParams->supportsTexturedBar()) {
@@ -176,14 +247,22 @@ namespace directgraph{
                     }
                 }
             } else {
-                curVertMem = _degenerateHelper->genDegenerate(
-                        curVertMem, startCrds, endCrds, curZ
-                );
+                if(_createShaderOutline) {
+                    curVertMem = _degenerateHelper->genTexDegenerate(
+                            curVertMem, startCrds, endCrds, curZ
+                    );
+                } else {
+                    curVertMem = _degenerateHelper->genDegenerate(
+                            curVertMem, startCrds, endCrds, curZ
+                    );
+                }
             }
         }
 
         bool EllipseDrawer::isSemiTransparent() {
-            if(_curStage == FILL_STAGE || !_haveOutline) {
+            if(_haveOutlineFillShader){
+                return _drawStateHelper->isFillStateTransparent(_curState) || color_has_alpha(_stateHelper->getLastState().drawColor);
+            } else if(_curStage == FILL_STAGE) {
                 return _drawStateHelper->isFillStateTransparent(_curState);
             } else {
                 return color_has_alpha(_stateHelper->getLastState().drawColor);
@@ -202,46 +281,69 @@ namespace directgraph{
             _curItem = item;
             _haveOutline = (_stateHelper->getLastState().lineStyle != NULL_LINE);
             _haveFill = _curItem.type == QueueItem::FILLELLIPSE;
-            if(_haveOutline){
-                createOutlineState();
-                createOutlineTypeSize();
-            }
             if(_haveFill) {
                 createFillState();
-                createFillTypeSize();
             }
-            if(_haveFill && !_haveOutline){
-                _ellipse = _ellipseHelper->genEllipse(
-                        genCoords(_curItem.data.ellipse.x, _curItem.data.ellipse.y),
-                        genUCoords(
-                                _curItem.data.ellipse.xradius,
-                                _curItem.data.ellipse.yradius
-                        ),
-                        _stateHelper->fillTextureUsed(_fillState)
-                );
-            } else if(_haveOutline && !_haveFill){
-                _ellipseOutline = _ellipseHelper->genOutline(
-                        genCoords(_curItem.data.ellipse.x, _curItem.data.ellipse.y),
-                        genUCoords(
-                                _curItem.data.ellipse.xradius,
-                                _curItem.data.ellipse.yradius
-                        ),
-                        _stateHelper->getLastState().lineThickness
-                );
+            _haveOutlineFillShader = _haveOutline && _haveFill &&
+                    (
+                    (!_stateHelper->fillTextureUsed(_fillState) && _bufPrepParams->supportsEllipseWithOutline()) ||
+                    (_stateHelper->fillTextureUsed(_fillState) && _bufPrepParams->supportsTexturedEllipseWithOutline())
+                    );
+            if(_haveOutlineFillShader){
+                createOutlineFillShaderTypeSize();
             } else {
-                FullEllipse fEll = _ellipseHelper->genFullEllipse(
-                        genCoords(_curItem.data.ellipse.x, _curItem.data.ellipse.y),
-                        genUCoords(
-                                _curItem.data.ellipse.xradius,
-                                _curItem.data.ellipse.yradius
-                        ),
-                        _stateHelper->getLastState().lineThickness,
-                        _stateHelper->fillTextureUsed(_fillState)
-                );
-                _ellipseOutline = fEll.outline;
-                _ellipse = fEll.ellipse;
-                if(_ellipse.coords.empty()){
-                    _haveFill = false;
+                if (_haveOutline) {
+                    createOutlineState();
+                }
+                _createShaderOutline = false;
+                if (_haveFill && !_haveOutline) {
+                    if (
+                            (_stateHelper->fillTextureUsed(_fillState) && !_bufPrepParams->supportsTexturedEllipse()) ||
+                            (!_stateHelper->fillTextureUsed(_fillState) && !_bufPrepParams->supportsEllipse())
+                            ) {
+                        _ellipse = _ellipseHelper->genEllipse(
+                                genCoords(_curItem.data.ellipse.x, _curItem.data.ellipse.y),
+                                genUCoords(
+                                        _curItem.data.ellipse.xradius,
+                                        _curItem.data.ellipse.yradius
+                                ),
+                                _stateHelper->fillTextureUsed(_fillState)
+                        );
+                    }
+                } else if (_haveOutline && !_haveFill) {
+                    if (!_bufPrepParams->supportsEllipseOutline()) {
+                        _ellipseOutline = _ellipseHelper->genOutline(
+                                genCoords(_curItem.data.ellipse.x, _curItem.data.ellipse.y),
+                                genUCoords(
+                                        _curItem.data.ellipse.xradius,
+                                        _curItem.data.ellipse.yradius
+                                ),
+                                _stateHelper->getLastState().lineThickness
+                        );
+                    } else {
+                        _createShaderOutline = true;
+                    }
+                } else {
+                    FullEllipse fEll = _ellipseHelper->genFullEllipse(
+                            genCoords(_curItem.data.ellipse.x, _curItem.data.ellipse.y),
+                            genUCoords(
+                                    _curItem.data.ellipse.xradius,
+                                    _curItem.data.ellipse.yradius
+                            ),
+                            _stateHelper->getLastState().lineThickness,
+                            _stateHelper->fillTextureUsed(_fillState)
+                    );
+                    _ellipseOutline = fEll.outline;
+                    _ellipse = fEll.ellipse;
+                    if (_ellipse.coords.empty()) {
+                        _haveFill = false;
+                    }
+                }
+                if (_haveOutline) {
+                    createOutlineTypeSize();
+                }
+                if (_haveFill) {
+                    createFillTypeSize();
                 }
             }
         }
@@ -258,20 +360,35 @@ namespace directgraph{
         }
 
         uint_fast8_t EllipseDrawer::getNumStages() {
+            if(_haveOutlineFillShader){
+                return 1;
+            }
             return static_cast<uint_fast8_t>((_haveFill && _haveOutline) ? 2 : 1);
         }
 
         void EllipseDrawer::setStage(uint_fast8_t stage) {
-            _curStage = static_cast<EllipseStage>(stage);
+            if(_haveOutlineFillShader){
+                _curStage = OUTLINE_AND_FILL_STAGE;
+            } else {
+                if (!_haveOutline) {
+                    _curStage = FILL_STAGE;
+                } else {
+                    _curStage = static_cast<EllipseStage>(stage);
+                }
+            }
         }
 
         uint_fast32_t EllipseDrawer::getTotalSize() {
             uint_fast32_t size = 0;
-            if(_haveFill){
-                size += (getNumFillVertices() + 2) * _fillTypeSize.sizeMult;
-            }
-            if(_haveOutline){
-                size += (getNumOutlineVertices() + 2) * _outlineTypeSize.sizeMult;
+            if(_haveOutlineFillShader){
+                size += (VERTICES_IN_QUAD + 2) * _outlineTypeSize.sizeMult;
+            } else {
+                if (_haveFill) {
+                    size += (getNumFillVertices() + 2) * _fillTypeSize.sizeMult;
+                }
+                if (_haveOutline) {
+                    size += (getNumOutlineVertices() + 2) * _outlineTypeSize.sizeMult;
+                }
             }
             return size;
         }
@@ -297,9 +414,15 @@ namespace directgraph{
                     }
                 }
             } else {
-                if(_stateHelper->fillTextureUsed(_fillState)){
-                    if(_bufPrepParams->supportsTexturedBar()){
-                        _propMan->setProp(_fillState, PropertyName::SHADER_TYPE, ShaderType::TEXTURED_BAR_SHADER);
+                if(_bufPrepParams->supportsEllipseWithOutline() && !_stateHelper->fillTextureUsed(_fillState)){
+                    _propMan->setProp(_fillState, PropertyName::SHADER_TYPE, ShaderType::ELLIPSE_WITH_OUTLINE_SHADER);
+                } else if(_bufPrepParams->supportsTexturedEllipseWithOutline() && _stateHelper->fillTextureUsed(_fillState)) {
+                    _propMan->setProp(_fillState, PropertyName::SHADER_TYPE, ShaderType::TEXTURED_ELLIPSE_WITH_OUTLINE_SHADER);
+                } else {
+                    if (_stateHelper->fillTextureUsed(_fillState)) {
+                        if (_bufPrepParams->supportsTexturedBar()) {
+                            _propMan->setProp(_fillState, PropertyName::SHADER_TYPE, ShaderType::TEXTURED_BAR_SHADER);
+                        }
                     }
                 }
             }
@@ -307,18 +430,26 @@ namespace directgraph{
 
         void EllipseDrawer::createOutlineState() {
             _outlineState = _propMan->getNullState();
+            if(_bufPrepParams->supportsEllipseOutline()){
+                _propMan->setProp(_fillState, PropertyName::SHADER_TYPE, ShaderType::ELLIPSE_OUTLINE_SHADER);
+            }
         }
 
         void EllipseDrawer::createOutlineTypeSize() {
-            _outlineTypeSize.sizeMult = sizeof(ColorVertex);
-            _outlineTypeSize.drawDataType = DrawDataType::COLOR_VERTEX;
+            if(_createShaderOutline){
+                _outlineTypeSize.sizeMult = sizeof(TexturedColorVertex);
+                _outlineTypeSize.drawDataType = DrawDataType::ELLIPSE_OUTLINE_VERTEX;
+            } else {
+                _outlineTypeSize.sizeMult = sizeof(ColorVertex);
+                _outlineTypeSize.drawDataType = DrawDataType::COLOR_VERTEX;
+            }
         }
 
         void EllipseDrawer::createFillTypeSize() {
             if(_haveOutline){
                 if (_stateHelper->fillTextureUsed(_fillState)) {
                     if(_bufPrepParams->supportsTexturedBar()){
-                        _fillTypeSize.sizeMult = sizeof(Color2Vertex);
+                        _fillTypeSize.sizeMult = sizeof(Color2VertexNoRHW);
                         _fillTypeSize.drawDataType = DrawDataType::COLOR2_VERTEX;
                     } else {
                         _fillTypeSize.sizeMult = sizeof(TexturedColorVertex);
@@ -331,7 +462,7 @@ namespace directgraph{
             } else {
                 if (_stateHelper->fillTextureUsed(_fillState)) {
                     if (_bufPrepParams->supportsTexturedEllipse()) {
-                        _fillTypeSize.sizeMult = sizeof(Color2Vertex);
+                        _fillTypeSize.sizeMult = sizeof(Color2VertexNoRHW);
                         _fillTypeSize.drawDataType = DrawDataType::TEXTURED_ELLIPSE_VERTEX;
                     } else {
                         _fillTypeSize.sizeMult = sizeof(TexturedColorVertex);
@@ -352,11 +483,11 @@ namespace directgraph{
         uint_fast32_t EllipseDrawer::getNumFillVertices() {
             uint_fast32_t res;
             if(_haveOutline){
-                res = _ellipse.coords.size();
+                res = static_cast<uint_fast32_t>(_ellipse.coords.size());
             } else {
                 if ((_stateHelper->fillTextureUsed(_curState) && !_bufPrepParams->supportsTexturedEllipse()) ||
                     (!_stateHelper->fillTextureUsed(_curState) && !_bufPrepParams->supportsEllipse())) {
-                    res = _ellipse.coords.size();
+                    res = static_cast<uint_fast32_t>(_ellipse.coords.size());
                 } else {
                     res = VERTICES_IN_QUAD;
                 }
@@ -365,7 +496,21 @@ namespace directgraph{
         }
 
         uint_fast32_t EllipseDrawer::getNumOutlineVertices() {
-            return _ellipseOutline.coords.size();
+            if(_createShaderOutline) {
+                return VERTICES_IN_QUAD;
+            } else {
+                return static_cast<uint_fast32_t>(_ellipseOutline.coords.size());
+            }
+        }
+
+        void EllipseDrawer::createOutlineFillShaderTypeSize() {
+            if (_stateHelper->fillTextureUsed(_fillState)) {
+                _fillTypeSize.sizeMult = sizeof(Color3Vertex);
+                _fillTypeSize.drawDataType = DrawDataType::TEXTURED_ELLIPSE_WITH_OUTLINE_VERTEX;
+            } else {
+                _fillTypeSize.sizeMult = sizeof(Color2Vertex);
+                _fillTypeSize.drawDataType = DrawDataType::ELLIPSE_WITH_OUTLINE_VERTEX;
+            }
         }
     }
 }

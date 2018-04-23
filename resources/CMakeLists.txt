@@ -11,6 +11,9 @@ set(SHADER_SRCS
         shaders/ps_2_0/textured_rectangle.hlsl
         shaders/ps_1_4/rectangle.hlsl
         shaders/ps_1_4/textured_line.hlsl
+        shaders/ps_3_0/ellipse_outline.hlsl
+        shaders/ps_3_0/ellipse_with_outline.hlsl
+        shaders/ps_3_0/textured_ellipse_with_outline.hlsl
 
         shaders/vs_1_1/center_bar.hlsl
         shaders/vs_1_1/textured_bar.hlsl
@@ -18,6 +21,9 @@ set(SHADER_SRCS
         shaders/vs_1_1/textured_center_rectangle.hlsl
         shaders/vs_1_1/center_rectangle.hlsl
         shaders/vs_1_1/textured_line.hlsl
+        shaders/vs_1_1/ellipse_outline.hlsl
+        shaders/vs_1_1/ellipse_with_outline.hlsl
+        shaders/vs_1_1/textured_ellipse_with_outline.hlsl
 )
 
 set(COMMON_SRCS shaders/common/common_vs.hlsl shaders/common/common_ps.hlsl)
