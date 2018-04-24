@@ -506,7 +506,7 @@ namespace directgraph {
             *vertices = VertexCreator::create<Color2Vertex>(
                     centerCrds.x,
                     centerCrds.y,
-                    z, thickness,
+                    z, static_cast<float>(thickness),
                     static_cast<DWORD>(swap_color_transp(color1)),
                     static_cast<DWORD>(swap_color_transp(color2)),
                     -radiusCrds.x, -radiusCrds.y
@@ -515,7 +515,7 @@ namespace directgraph {
             *vertices = VertexCreator::create<Color2Vertex>(
                     centerCrds.x,
                     centerCrds.y,
-                    z, thickness,
+                    z, static_cast<float>(thickness),
                     static_cast<DWORD>(swap_color_transp(color1)),
                     static_cast<DWORD>(swap_color_transp(color2)),
                     radiusCrds.x, -radiusCrds.y
@@ -524,7 +524,7 @@ namespace directgraph {
             *vertices = VertexCreator::create<Color2Vertex>(
                     centerCrds.x,
                     centerCrds.y,
-                    z, thickness,
+                    z, static_cast<float>(thickness),
                     static_cast<DWORD>(swap_color_transp(color1)),
                     static_cast<DWORD>(swap_color_transp(color2)),
                     -radiusCrds.x, radiusCrds.y
@@ -533,7 +533,7 @@ namespace directgraph {
             *vertices = VertexCreator::create<Color2Vertex>(
                     centerCrds.x,
                     centerCrds.y,
-                    z, thickness,
+                    z, static_cast<float>(thickness),
                     static_cast<DWORD>(swap_color_transp(color1)),
                     static_cast<DWORD>(swap_color_transp(color2)),
                     radiusCrds.x, radiusCrds.y
@@ -550,7 +550,7 @@ namespace directgraph {
             *vertices = VertexCreator::create<Color3Vertex>(
                     centerCrds.x,
                     centerCrds.y,
-                    z, thickness,
+                    z, static_cast<float>(thickness),
                     static_cast<DWORD>(swap_color_transp(color1)),
                     static_cast<DWORD>(swap_color_transp(color2)),
                     static_cast<DWORD>(swap_color_transp(color3)),
@@ -560,7 +560,7 @@ namespace directgraph {
             *vertices = VertexCreator::create<Color3Vertex>(
                     centerCrds.x,
                     centerCrds.y,
-                    z, thickness,
+                    z, static_cast<float>(thickness),
                     static_cast<DWORD>(swap_color_transp(color1)),
                     static_cast<DWORD>(swap_color_transp(color2)),
                     static_cast<DWORD>(swap_color_transp(color3)),
@@ -570,7 +570,7 @@ namespace directgraph {
             *vertices = VertexCreator::create<Color3Vertex>(
                     centerCrds.x,
                     centerCrds.y,
-                    z, thickness,
+                    z, static_cast<float>(thickness),
                     static_cast<DWORD>(swap_color_transp(color1)),
                     static_cast<DWORD>(swap_color_transp(color2)),
                     static_cast<DWORD>(swap_color_transp(color3)),
@@ -580,7 +580,7 @@ namespace directgraph {
             *vertices = VertexCreator::create<Color3Vertex>(
                     centerCrds.x,
                     centerCrds.y,
-                    z, thickness,
+                    z, static_cast<float>(thickness),
                     static_cast<DWORD>(swap_color_transp(color1)),
                     static_cast<DWORD>(swap_color_transp(color2)),
                     static_cast<DWORD>(swap_color_transp(color3)),
