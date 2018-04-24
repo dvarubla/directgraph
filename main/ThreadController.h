@@ -5,6 +5,7 @@
 #include "CommonProps.h"
 #include "IController.h"
 #include "ParamsChecker.h"
+#include "PaletteManager.h"
 
 namespace directgraph {
     class ThreadController: public IController{
@@ -30,6 +31,7 @@ namespace directgraph {
         DWORD _drawThreadId;
         HANDLE _drawThread;
         CommonProps _currentProps;
+        PaletteManager _paletteMan;
 
         PixelContainerCreator *_pixContFactory;
 
@@ -66,7 +68,9 @@ namespace directgraph {
         int_fast32_t gety();
         void drawpoly(uint_fast32_t numPoints, const int32_t *points);
         void fillpoly(uint_fast32_t numPoints, const int32_t *points);
-
+        void initpalette(bool havePalette, uint_fast32_t size, bool fillFirstColors);
+        void setpalette(uint_fast32_t index, uint_fast32_t color);
+        void clearpalette();
 
         void putpixel(int_fast32_t x, int_fast32_t y, uint_fast32_t color);
         void repaint();

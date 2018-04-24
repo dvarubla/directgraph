@@ -29,6 +29,9 @@ namespace directgraph{
         virtual void moverel(int_fast32_t x, int_fast32_t y) = 0;
         virtual void drawpoly(uint_fast32_t numPoints, const int32_t *points) = 0;
         virtual void fillpoly(uint_fast32_t numPoints, const int32_t *points) = 0;
+        virtual void initpalette(bool havePalette, uint_fast32_t size, bool fillFirstColors) = 0;
+        virtual void setpalette(uint_fast32_t index, uint_fast32_t color) = 0;
+        virtual void clearpalette() = 0;
         virtual int_fast32_t getx() = 0;
         virtual int_fast32_t gety() = 0;
         virtual void repaint() = 0;

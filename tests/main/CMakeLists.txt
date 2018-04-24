@@ -12,6 +12,8 @@ function(main_test name src)
     add_test(NAME ${name} COMMAND $<TARGET_FILE:${name}> .)
 endfunction()
 
+set(PALETTE_SRC palette.cpp ../stubs/MyWindowStub.cpp ../stubs/MyWindowStub.h ../stubs/RendererStub.cpp ../stubs/RendererStub.h ../stubs/QueueItemUtils.cpp ../stubs/QueueItemUtils.h)
+main_test(palette "${PALETTE_SRC}")
 set(THREADS_SIMPLE_SRC threads_simple.cpp ../stubs/MyWindowStub.cpp ../stubs/MyWindowStub.h ../stubs/RendererStub.cpp ../stubs/RendererStub.h ../stubs/QueueItemUtils.cpp ../stubs/QueueItemUtils.h)
 main_test(threads_simple "${THREADS_SIMPLE_SRC}")
 set(THREADS_GETPROPS_SRC threads_getprops.cpp ../stubs/MyWindowStub.cpp ../stubs/MyWindowStub.h ../stubs/RendererStub.cpp ../stubs/RendererStub.h ../stubs/QueueItemUtils.cpp ../stubs/QueueItemUtils.h)

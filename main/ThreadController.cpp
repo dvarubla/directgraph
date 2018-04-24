@@ -134,6 +134,7 @@ namespace directgraph{
         _paramsChecker.checkFillStyle(fillStyle);
         EnterCriticalSection(&_addCS);
         EnterCriticalSection(&_propsCS);
+        color = _paletteMan.getColor(color);
         _currentProps.fillStyle = fillStyle;
         _currentProps.fillColor = color;
         LeaveCriticalSection(&_propsCS);
@@ -144,6 +145,7 @@ namespace directgraph{
     void ThreadController::setbgcolor(uint_fast32_t color) {
         EnterCriticalSection(&_addCS);
         EnterCriticalSection(&_propsCS);
+        color = _paletteMan.getColor(color);
         _currentProps.bgColor = color;
         LeaveCriticalSection(&_propsCS);
         QueueItem item = QueueItemCreator::create<QueueItem::BGCOLOR>(color);
@@ -153,6 +155,7 @@ namespace directgraph{
     void ThreadController::setcolor(uint_fast32_t color) {
         EnterCriticalSection(&_addCS);
         EnterCriticalSection(&_propsCS);
+        color = _paletteMan.getColor(color);
         _currentProps.drawColor = color;
         LeaveCriticalSection(&_propsCS);
         QueueItem item = QueueItemCreator::create<QueueItem::COLOR>(color);
@@ -164,6 +167,7 @@ namespace directgraph{
         EnterCriticalSection(&_propsCS);
         std::copy(fillpattern, fillpattern + FPATTERN_SIZE, _currentProps.userFillPattern);
         _currentProps.fillStyle = USER_FILL;
+        color = _paletteMan.getColor(color);
         _currentProps.fillColor = color;
         LeaveCriticalSection(&_propsCS);
         QueueItem item = QueueItemCreator::create<QueueItem::SETFILLPATTERN>(fillpattern, color);
@@ -191,8 +195,10 @@ namespace directgraph{
         }
 
         EnterCriticalSection(&_addCS);
+        EnterCriticalSection(&_propsCS);
         _pixContFactory->addPixel(static_cast<uint_fast32_t>(x), static_cast<uint_fast32_t>(y),
-                                  color_remove_alpha(color));
+                                  color_remove_alpha(_paletteMan.getColor(color)));
+        LeaveCriticalSection(&_propsCS);
         LeaveCriticalSection(&_addCS);
     }
 
@@ -395,5 +401,23 @@ namespace directgraph{
         int_fast32_t y = _currentProps.curPos.y;
         LeaveCriticalSection(&_propsCS);
         return y;
+    }
+
+    void ThreadController::initpalette(bool havePalette, uint_fast32_t size, bool fillFirstColors) {
+        EnterCriticalSection(&_propsCS);
+        _paletteMan.initPalette(havePalette, size, fillFirstColors);
+        LeaveCriticalSection(&_propsCS);
+    }
+
+    void ThreadController::setpalette(uint_fast32_t index, uint_fast32_t color) {
+        EnterCriticalSection(&_propsCS);
+        _paletteMan.setColor(index, color);
+        LeaveCriticalSection(&_propsCS);
+    }
+
+    void ThreadController::clearpalette() {
+        EnterCriticalSection(&_propsCS);
+        _paletteMan.clearPalette();
+        LeaveCriticalSection(&_propsCS);
     }
 }
