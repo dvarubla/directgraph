@@ -65,17 +65,39 @@ namespace directgraph{
         sendPrepareMsg();
     }
 
+    void ThreadController::writeItemHelperColor(const QueueItem &item, uint_fast32_t color) {
+        flushPixels();
+        checkGrow();
+        _queue.writeItem(QueueItemCreator::create<QueueItem::COLOR>(_paletteMan.getColor(color)));
+        checkGrow();
+        _queue.writeItem(item);
+        checkGrow();
+        _queue.writeItem(QueueItemCreator::create<QueueItem::COLOR>(_paletteMan.getColor(_currentProps.drawColor)));
+        LeaveCriticalSection(&_propsCS);
+        LeaveCriticalSection(&_addCS);
+        sendPrepareMsg();
+    }
+
     void ThreadController::clear() {
         QueueItem item = QueueItemCreator::create<QueueItem::CLEAR>();
         writeItemHelper(item);
     }
 
-    void ThreadController::fillellipse(int_fast32_t x, int_fast32_t y, uint_fast32_t xradius, uint_fast32_t yradius) {
+    void ThreadController::fillellipse(
+            int_fast32_t x, int_fast32_t y, uint_fast32_t xradius, uint_fast32_t yradius,
+            bool useColor, uint_fast32_t color
+    ) {
         if(!_paramsChecker.checkEllipse(x, y, xradius, yradius)){
             return;
         }
         QueueItem item = QueueItemCreator::create<QueueItem::FILLELLIPSE>(x, y, xradius, yradius);
-        writeItemHelper(item);
+        if(useColor) {
+            EnterCriticalSection(&_addCS);
+            EnterCriticalSection(&_propsCS);
+            writeItemHelperColor(item, color);
+        } else {
+            writeItemHelper(item);
+        }
     }
 
     void ThreadController::setlinestyle(uint_fast8_t linestyle, uint_fast16_t pattern, uint_fast32_t thickness) {
@@ -100,43 +122,62 @@ namespace directgraph{
         writeItemHelper(item);
     }
 
-    void ThreadController::drawpoly(uint_fast32_t numPoints, const int32_t *points) {
+    void ThreadController::drawpoly(
+            uint_fast32_t numPoints, const int32_t *points,
+            bool useColor, uint_fast32_t color
+    ) {
         EnterCriticalSection(&_propsCS);
         if(_currentProps.lineStyle == NULL_LINE){
             LeaveCriticalSection(&_propsCS);
             return;
         }
-        LeaveCriticalSection(&_propsCS);
         if(numPoints <= 1){
+            LeaveCriticalSection(&_propsCS);
             return;
         }
         if(numPoints == 2){
-            line(points[0], points[1], points[2], points[3]);
+            LeaveCriticalSection(&_propsCS);
+            line(points[0], points[1], points[2], points[3], useColor, color);
             return;
         }
         QueueItem item = QueueItemCreator::create<QueueItem::DRAWPOLY>(numPoints, points);
-        writeItemHelper(item);
+        if(useColor){
+            EnterCriticalSection(&_addCS);
+            writeItemHelperColor(item, color);
+        } else {
+            LeaveCriticalSection(&_propsCS);
+            writeItemHelper(item);
+        }
     }
 
-    void ThreadController::fillpoly(uint_fast32_t numPoints, const int32_t *points) {
+    void ThreadController::fillpoly(
+            uint_fast32_t numPoints, const int32_t *points,
+            bool useColor, uint_fast32_t color
+    ) {
         if(numPoints <= 1){
             return;
         }
         if(numPoints == 2){
-            line(points[0], points[1], points[2], points[3]);
+            line(points[0], points[1], points[2], points[3], useColor, color);
             return;
         }
         QueueItem item = QueueItemCreator::create<QueueItem::FILLPOLY>(numPoints, points);
-        writeItemHelper(item);
+        if(useColor){
+            EnterCriticalSection(&_addCS);
+            EnterCriticalSection(&_propsCS);
+            writeItemHelperColor(item, color);
+        } else {
+            writeItemHelper(item);
+        }
     }
 
     void ThreadController::setfillstyle(uint_fast8_t fillStyle, uint_fast32_t color) {
         _paramsChecker.checkFillStyle(fillStyle);
         EnterCriticalSection(&_addCS);
         EnterCriticalSection(&_propsCS);
-        color = _paletteMan.getColor(color);
         _currentProps.fillStyle = fillStyle;
         _currentProps.fillColor = color;
+        color = _paletteMan.getColor(color);
         LeaveCriticalSection(&_propsCS);
         QueueItem item = QueueItemCreator::create<QueueItem::SETFILLSTYLE>(fillStyle, color);
         writeItemHelperNoLock(item);
@@ -145,8 +186,8 @@ namespace directgraph{
     void ThreadController::setbgcolor(uint_fast32_t color) {
         EnterCriticalSection(&_addCS);
         EnterCriticalSection(&_propsCS);
-        color = _paletteMan.getColor(color);
         _currentProps.bgColor = color;
+        color = _paletteMan.getColor(color);
         LeaveCriticalSection(&_propsCS);
         QueueItem item = QueueItemCreator::create<QueueItem::BGCOLOR>(color);
         writeItemHelperNoLock(item);
@@ -155,8 +196,8 @@ namespace directgraph{
     void ThreadController::setcolor(uint_fast32_t color) {
         EnterCriticalSection(&_addCS);
         EnterCriticalSection(&_propsCS);
-        color = _paletteMan.getColor(color);
         _currentProps.drawColor = color;
+        color = _paletteMan.getColor(color);
         LeaveCriticalSection(&_propsCS);
         QueueItem item = QueueItemCreator::create<QueueItem::COLOR>(color);
         writeItemHelperNoLock(item);
@@ -167,14 +208,17 @@ namespace directgraph{
         EnterCriticalSection(&_propsCS);
         std::copy(fillpattern, fillpattern + FPATTERN_SIZE, _currentProps.userFillPattern);
         _currentProps.fillStyle = USER_FILL;
-        color = _paletteMan.getColor(color);
         _currentProps.fillColor = color;
+        color = _paletteMan.getColor(color);
         LeaveCriticalSection(&_propsCS);
         QueueItem item = QueueItemCreator::create<QueueItem::SETFILLPATTERN>(fillpattern, color);
         writeItemHelperNoLock(item);
     }
 
-    void ThreadController::rectangle(int_fast32_t left, int_fast32_t top, int_fast32_t right, int_fast32_t bottom){
+    void ThreadController::rectangle(
+            int_fast32_t left, int_fast32_t top, int_fast32_t right, int_fast32_t bottom,
+            bool useColor, uint_fast32_t color
+    ){
         EnterCriticalSection(&_propsCS);
         if(
                 !_paramsChecker.checkRectangle(left, top, right, bottom, _currentProps.lineStyle)
@@ -182,9 +226,14 @@ namespace directgraph{
             LeaveCriticalSection(&_propsCS);
             return;
         }
-        LeaveCriticalSection(&_propsCS);
         QueueItem item = QueueItemCreator::create<QueueItem::RECTANGLE>(left, top, right, bottom);
-        writeItemHelper(item);
+        if(useColor){
+            EnterCriticalSection(&_addCS);
+            writeItemHelperColor(item, color);
+        } else {
+            LeaveCriticalSection(&_propsCS);
+            writeItemHelper(item);
+        }
     }
 
     void ThreadController::putpixel(int_fast32_t x, int_fast32_t y, uint_fast32_t color) {
@@ -198,6 +247,21 @@ namespace directgraph{
         EnterCriticalSection(&_propsCS);
         _pixContFactory->addPixel(static_cast<uint_fast32_t>(x), static_cast<uint_fast32_t>(y),
                                   color_remove_alpha(_paletteMan.getColor(color)));
+        LeaveCriticalSection(&_propsCS);
+        LeaveCriticalSection(&_addCS);
+    }
+
+    void ThreadController::putpixel(int_fast32_t x, int_fast32_t y) {
+        if(
+                !_paramsChecker.checkPixel(x, y, _pixContFactory->getMaxWidth(), _pixContFactory->getMaxHeight())
+                ){
+            return;
+        }
+
+        EnterCriticalSection(&_addCS);
+        EnterCriticalSection(&_propsCS);
+        _pixContFactory->addPixel(static_cast<uint_fast32_t>(x), static_cast<uint_fast32_t>(y),
+                                  color_remove_alpha(_paletteMan.getColor(_currentProps.drawColor)));
         LeaveCriticalSection(&_propsCS);
         LeaveCriticalSection(&_addCS);
     }
@@ -330,18 +394,29 @@ namespace directgraph{
         LeaveCriticalSection(&_propsCS);
     }
 
-    void ThreadController::line(int_fast32_t startx, int_fast32_t starty, int_fast32_t endx, int_fast32_t endy) {
+    void ThreadController::line(
+            int_fast32_t startx, int_fast32_t starty, int_fast32_t endx, int_fast32_t endy,
+            bool useColor, uint_fast32_t color
+    ) {
         EnterCriticalSection(&_propsCS);
         if(_currentProps.lineStyle == NULL_LINE){
             LeaveCriticalSection(&_propsCS);
             return;
         }
-        LeaveCriticalSection(&_propsCS);
         QueueItem item = QueueItemCreator::create<QueueItem::LINE>(startx, starty, endx, endy);
-        writeItemHelper(item);
+        if(useColor){
+            EnterCriticalSection(&_addCS);
+            writeItemHelperColor(item, color);
+        } else {
+            LeaveCriticalSection(&_propsCS);
+            writeItemHelper(item);
+        }
     }
 
-    void ThreadController::lineto(int_fast32_t x, int_fast32_t y){
+    void ThreadController::lineto(
+            int_fast32_t x, int_fast32_t y,
+            bool useColor, uint_fast32_t color
+    ){
         EnterCriticalSection(&_addCS);
         EnterCriticalSection(&_propsCS);
         if(_currentProps.lineStyle == NULL_LINE){
@@ -353,12 +428,19 @@ namespace directgraph{
         int_fast32_t lasty = _currentProps.curPos.y;
         _currentProps.curPos.x = x;
         _currentProps.curPos.y = y;
-        LeaveCriticalSection(&_propsCS);
         QueueItem item = QueueItemCreator::create<QueueItem::LINE>(lastx, lasty, x, y);
-        writeItemHelperNoLock(item);
+        if(useColor){
+            writeItemHelperColor(item, color);
+        } else {
+            LeaveCriticalSection(&_propsCS);
+            writeItemHelperNoLock(item);
+        }
     }
 
-    void ThreadController::linerel(int_fast32_t x, int_fast32_t y) {
+    void ThreadController::linerel(
+            int_fast32_t x, int_fast32_t y,
+            bool useColor, uint_fast32_t color
+    ) {
         EnterCriticalSection(&_addCS);
         EnterCriticalSection(&_propsCS);
         if(_currentProps.lineStyle == NULL_LINE){
@@ -370,9 +452,13 @@ namespace directgraph{
         int_fast32_t lasty = _currentProps.curPos.y;
         _currentProps.curPos.x += x;
         _currentProps.curPos.y += y;
-        LeaveCriticalSection(&_propsCS);
         QueueItem item = QueueItemCreator::create<QueueItem::LINE>(lastx, lasty, lastx + x, lasty + y);
-        writeItemHelperNoLock(item);
+        if(useColor){
+            writeItemHelperColor(item, color);
+        } else {
+            LeaveCriticalSection(&_propsCS);
+            writeItemHelperNoLock(item);
+        }
     }
 
     void ThreadController::moveto(int_fast32_t x, int_fast32_t y) {

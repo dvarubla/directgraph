@@ -532,3 +532,53 @@ void DIRECTGRAPH_EXPORT fillpolyw(DirectgraphWinIndex index, uint32_t numPoints,
             lock.data.controller->fillpoly(numPoints, points);
     );
 }
+
+
+void DIRECTGRAPH_EXPORT fillellipsec(int32_t x, int32_t y, uint32_t xradius, uint32_t yradius, uint_fast32_t color){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager());
+            lock.data.controller->fillellipse(x, y, xradius, yradius, true, color);
+    );
+}
+
+void DIRECTGRAPH_EXPORT rectanglec(int32_t left, int32_t top, int32_t right, int32_t bottom, uint_fast32_t color){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager());
+            lock.data.controller->rectangle(left, top, right, bottom, true, color);
+    );
+}
+
+void DIRECTGRAPH_EXPORT linec(int32_t startx, int32_t starty, int32_t endx, int32_t endy, uint_fast32_t color){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager());
+            lock.data.controller->line(startx, starty, endx, endy, true, color);
+    );
+}
+
+void DIRECTGRAPH_EXPORT linetoc(int32_t x, int32_t y, uint_fast32_t color){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager());
+            lock.data.controller->lineto(x, y, true, color);
+    );
+}
+
+void DIRECTGRAPH_EXPORT linerelc(int32_t x, int32_t y, uint_fast32_t color){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager());
+            lock.data.controller->linerel(x, y, true, color);
+    );
+}
+
+void DIRECTGRAPH_EXPORT drawpolyc(uint32_t numPoints, int32_t *points, uint_fast32_t color){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager());
+            lock.data.controller->drawpoly(numPoints, points, true, color);
+    );
+}
+
+void DIRECTGRAPH_EXPORT fillpolyc(uint32_t numPoints, int32_t *points, uint_fast32_t color){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager());
+            lock.data.controller->fillpoly(numPoints, points, true, color);
+    );
+}

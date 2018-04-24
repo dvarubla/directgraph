@@ -14,6 +14,21 @@ void DIRECTGRAPH_EXPORT delay(uint32_t msec);
 void DIRECTGRAPH_EXPORT resize(uint32_t width, uint32_t height);
 
 
+void DIRECTGRAPH_EXPORT fillellipsec(int32_t x, int32_t y, uint32_t xradius, uint32_t yradius, uint_fast32_t color);
+
+void DIRECTGRAPH_EXPORT rectanglec(int32_t left, int32_t top, int32_t right, int32_t bottom, uint_fast32_t color);
+
+void DIRECTGRAPH_EXPORT linec(int32_t startx, int32_t starty, int32_t endx, int32_t endy, uint_fast32_t color);
+
+void DIRECTGRAPH_EXPORT linetoc(int32_t x, int32_t y, uint_fast32_t color);
+
+void DIRECTGRAPH_EXPORT linerelc(int32_t x, int32_t y, uint_fast32_t color);
+
+void DIRECTGRAPH_EXPORT drawpolyc(uint32_t numPoints, int32_t *points, uint_fast32_t color);
+
+void DIRECTGRAPH_EXPORT fillpolyc(uint32_t numPoints, int32_t *points, uint_fast32_t color);
+
+
 void DIRECTGRAPH_EXPORT fillellipse(int32_t x, int32_t y, uint32_t xradius, uint32_t yradius);
 
 void DIRECTGRAPH_EXPORT setlinestyle(line_styles linestyle, uint32_t pattern, uint32_t thickness);
@@ -155,6 +170,36 @@ WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine, INT
     CreateThread(NULL, 0, directgraph_thread, NULL, 0, NULL);
     directgraph_mainloop();
     return 0;
+}
+#endif
+
+#ifdef __cplusplus
+static inline void fillellipse(int32_t x, int32_t y, uint32_t xradius, uint32_t yradius, uint_fast32_t color){
+    fillellipsec(x, y, xradius, yradius, color);
+}
+
+static inline void rectangle(int32_t left, int32_t top, int32_t right, int32_t bottom, uint_fast32_t color){
+    rectanglec(left, top, right, bottom, color);
+}
+
+static inline void line(int32_t startx, int32_t starty, int32_t endx, int32_t endy, uint_fast32_t color){
+    linec(startx, starty, endx, endy, color);
+}
+
+static inline void lineto(int32_t x, int32_t y, uint_fast32_t color){
+    linetoc(x, y, color);
+}
+
+static inline void linerel(int32_t x, int32_t y, uint_fast32_t color){
+    linerelc(x, y, color);
+}
+
+static inline void drawpoly(uint32_t numPoints, int32_t *points, uint_fast32_t color){
+    drawpolyc(numPoints, points, color);
+}
+
+static inline void fillpoly(uint32_t numPoints, int32_t *points, uint_fast32_t color){
+    fillpolyc(numPoints, points, color);
 }
 #endif
 
