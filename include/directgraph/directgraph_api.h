@@ -79,6 +79,10 @@ void DIRECTGRAPH_EXPORT setpalette(uint_fast32_t index, uint_fast32_t color);
 
 void DIRECTGRAPH_EXPORT clearpalette();
 
+uint32_t DIRECTGRAPH_EXPORT getmaxx();
+
+uint32_t DIRECTGRAPH_EXPORT getmaxy();
+
 
 void DIRECTGRAPH_EXPORT fillellipsew(DirectgraphWinIndex index, int32_t x, int32_t y, uint32_t xradius, uint32_t yradius);
 
@@ -129,6 +133,10 @@ void DIRECTGRAPH_EXPORT directgraph_initpalettew(DirectgraphWinIndex index, uint
 void DIRECTGRAPH_EXPORT setpalettew(DirectgraphWinIndex index, uint_fast32_t colorIndex, uint_fast32_t color);
 
 void DIRECTGRAPH_EXPORT clearpalettew(DirectgraphWinIndex index);
+
+uint32_t DIRECTGRAPH_EXPORT getmaxxw(DirectgraphWinIndex index);
+
+uint32_t DIRECTGRAPH_EXPORT getmaxyw(DirectgraphWinIndex index);
 
 
 WPARAM DIRECTGRAPH_EXPORT directgraph_mainloop();

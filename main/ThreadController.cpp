@@ -506,4 +506,20 @@ namespace directgraph{
         _paletteMan.clearPalette();
         LeaveCriticalSection(&_propsCS);
     }
+
+    uint_fast32_t ThreadController::getmaxx() {
+        uint_fast32_t width;
+        EnterCriticalSection(&_propsCS);
+        width = _window->getWidth();
+        LeaveCriticalSection(&_propsCS);
+        return width;
+    }
+
+    uint_fast32_t ThreadController::getmaxy() {
+        uint_fast32_t height;
+        EnterCriticalSection(&_propsCS);
+        height = _window->getHeight();
+        LeaveCriticalSection(&_propsCS);
+        return height;
+    }
 }

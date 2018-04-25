@@ -40,7 +40,8 @@ namespace directgraph {
         return DefWindowProcW(hwnd, message, wParam, lParam);
     }
 
-    MyWindow::MyWindow(const wchar_t *name, uint_fast32_t width, uint_fast32_t height) {
+    MyWindow::MyWindow(const wchar_t *name, uint_fast32_t width, uint_fast32_t height)
+            : _width(width), _height(height) {
         RECT rect;
         rect.left = rect.top = 0;
         rect.right = (long)width;
@@ -104,6 +105,14 @@ namespace directgraph {
 
     std::vector<MyWindow::ListenerData>& MyWindow::getListeners() {
         return _listeners;
+    }
+
+    uint_fast32_t MyWindow::getWidth() {
+        return _width;
+    }
+
+    uint_fast32_t MyWindow::getHeight() {
+        return _height;
     }
 
     static volatile LONG canCreateWinClass = 1;

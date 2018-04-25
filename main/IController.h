@@ -61,6 +61,8 @@ namespace directgraph{
         virtual void clearpalette() = 0;
         virtual int_fast32_t getx() = 0;
         virtual int_fast32_t gety() = 0;
+        virtual uint_fast32_t getmaxx() = 0;
+        virtual uint_fast32_t getmaxy() = 0;
         virtual void repaint() = 0;
         virtual ~IController(){};
     };

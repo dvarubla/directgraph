@@ -89,6 +89,8 @@ namespace directgraph {
         void moverel(int_fast32_t x, int_fast32_t y);
         int_fast32_t getx();
         int_fast32_t gety();
+        uint_fast32_t getmaxx();
+        uint_fast32_t getmaxy();
         
         void initpalette(bool havePalette, uint_fast32_t size, bool fillFirstColors);
         void setpalette(uint_fast32_t index, uint_fast32_t color);

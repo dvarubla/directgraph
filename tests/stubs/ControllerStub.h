@@ -35,6 +35,8 @@ namespace directgraph{
         MOCK_METHOD3(initpalette, void (bool havePalette, uint_fast32_t size, bool fillFirstColors));
         MOCK_METHOD2(setpalette, void (uint_fast32_t index, uint_fast32_t color));
         MOCK_METHOD0(clearpalette, void ());
+        MOCK_METHOD0(getmaxx, uint_fast32_t ());
+        MOCK_METHOD0(getmaxy, uint_fast32_t ());
     };
 }
 

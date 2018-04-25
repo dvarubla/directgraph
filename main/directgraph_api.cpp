@@ -431,6 +431,22 @@ void DIRECTGRAPH_EXPORT clearpalette(){
     );
 }
 
+uint32_t DIRECTGRAPH_EXPORT getmaxx(){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager());
+            return lock.data.controller->getmaxx();
+    );
+    return 0;
+}
+
+uint32_t DIRECTGRAPH_EXPORT getmaxy(){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager());
+            return lock.data.controller->getmaxy();
+    );
+    return 0;
+}
+
 void DIRECTGRAPH_EXPORT delay(uint32_t msec){
     Sleep(msec);
     directgraph_repaint();
@@ -619,6 +635,22 @@ void DIRECTGRAPH_EXPORT fillpolyw(DirectgraphWinIndex index, uint32_t numPoints,
             WindowManagerScopedLock lock(getWindowManager(), index);
             lock.data.controller->fillpoly(numPoints, points);
     );
+}
+
+uint32_t DIRECTGRAPH_EXPORT getmaxxw(DirectgraphWinIndex index){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager(), index);
+            return lock.data.controller->getmaxx();
+    );
+    return 0;
+}
+
+uint32_t DIRECTGRAPH_EXPORT getmaxyw(DirectgraphWinIndex index){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager(), index);
+            return lock.data.controller->getmaxy();
+    );
+    return 0;
 }
 
 
