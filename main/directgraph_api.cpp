@@ -19,6 +19,19 @@ struct GetDPIMsg{
     DWORD threadId;
 };
 
+struct DefaultPaletteParams{
+    bool havePalette;
+    uint_fast32_t size;
+    bool fillFirstColors;
+};
+
+struct SetDefaultPaletteParamsMsg{
+    DefaultPaletteParams params;
+    DWORD threadId;
+};
+
+static DefaultPaletteParams defaultPaletteParams = {false, 0, false};
+
 static LONG volatile mainThreadStarted = 0;
 static DWORD mainThreadId = 0;
 
@@ -105,12 +118,40 @@ WPARAM DIRECTGRAPH_EXPORT directgraph_mainloop() {
             if(num_windows == 0){
                 break;
             }
+        } else if(msg.message == DIRECTGRAPH_SET_PALETTE_PARAMS){
+            SetDefaultPaletteParamsMsg *setParamsMsg = reinterpret_cast<SetDefaultPaletteParamsMsg*>(msg.wParam);
+            defaultPaletteParams = setParamsMsg->params;
+            PostThreadMessage(setParamsMsg->threadId, DIRECTGRAPH_REPLY, 0, false);
         } else {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
     }
     return 0;
+}
+
+void DIRECTGRAPH_EXPORT directgraph_initpalette(uint32_t havePalette, uint_fast32_t size, uint32_t fillFirstColors){
+    if(InterlockedCompareExchange(&needCreateWindowManager, 0, 0)){
+        if(InterlockedCompareExchange(&mainThreadStarted, 0, 0)){
+            SetDefaultPaletteParamsMsg paletteParamMsg;
+            paletteParamMsg.threadId = GetCurrentThreadId();
+            paletteParamMsg.params.havePalette = havePalette == 1;
+            paletteParamMsg.params.size = size;
+            paletteParamMsg.params.fillFirstColors = fillFirstColors == 1;
+            PostThreadMessage(mainThreadId, DIRECTGRAPH_SET_PALETTE_PARAMS, reinterpret_cast<WPARAM>(&paletteParamMsg), 0);
+            MSG msg;
+            GetMessage(&msg, NULL, DIRECTGRAPH_REPLY, DIRECTGRAPH_REPLY);
+        } else {
+            defaultPaletteParams.havePalette = havePalette == 1;
+            defaultPaletteParams.size = size;
+            defaultPaletteParams.fillFirstColors = fillFirstColors == 1;
+        }
+    } else {
+        EXC_CALL_WRAP(
+                WindowManagerScopedLock lock(getWindowManager());
+                lock.data.controller->initpalette(havePalette == 1, size, fillFirstColors == 1);
+        )
+    }
 }
 
 DirectgraphWinIndex DIRECTGRAPH_EXPORT directgraph_create_window(const wchar_t *name, uint32_t width, uint32_t height){
@@ -181,6 +222,12 @@ DirectgraphWinIndex DIRECTGRAPH_EXPORT directgraph_create_window_params(const Di
             return WindowManager::NO_CURRENT_WINDOW;
         }
         DirectgraphWinIndex index = static_cast<DirectgraphWinIndex>(msg.wParam);
+        directgraph_initpalettew(
+                index,
+                (defaultPaletteParams.havePalette) ? 1 : 0,
+                defaultPaletteParams.size,
+                (defaultPaletteParams.fillFirstColors) ? 1 : 0
+        );
         directgraph_repaintw(index);
         return index;
     } else {
@@ -188,6 +235,12 @@ DirectgraphWinIndex DIRECTGRAPH_EXPORT directgraph_create_window_params(const Di
         EXC_CALL_WRAP(
                 tryCreateWindowManager();
                 index = createWindow(*params);
+                directgraph_initpalettew(
+                        index,
+                        (defaultPaletteParams.havePalette) ? 1 : 0,
+                        defaultPaletteParams.size,
+                        (defaultPaletteParams.fillFirstColors) ? 1 : 0
+                );
         )
         return index;
     }
@@ -364,6 +417,20 @@ void DIRECTGRAPH_EXPORT fillpoly(uint32_t numPoints, int32_t *points){
     );
 }
 
+void DIRECTGRAPH_EXPORT setpalette(uint_fast32_t index, uint_fast32_t color){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager());
+            lock.data.controller->setpalette(index, color);
+    );
+}
+
+void DIRECTGRAPH_EXPORT clearpalette(){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager());
+            lock.data.controller->clearpalette();
+    );
+}
+
 void DIRECTGRAPH_EXPORT delay(uint32_t msec){
     Sleep(msec);
     directgraph_repaint();
@@ -480,6 +547,27 @@ void DIRECTGRAPH_EXPORT getfillpatternw(DirectgraphWinIndex index, char *pattern
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager(), index);
             lock.data.controller->getfillpattern(pattern);
+    )
+}
+
+void DIRECTGRAPH_EXPORT directgraph_initpalettew(DirectgraphWinIndex index, uint32_t havePalette, uint_fast32_t size, uint32_t fillFirstColors){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager(), index);
+            lock.data.controller->initpalette(havePalette == 1, size, fillFirstColors == 1);
+    )
+}
+
+void DIRECTGRAPH_EXPORT setpalettew(DirectgraphWinIndex index, uint_fast32_t colorIndex, uint_fast32_t color){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager(), index);
+            lock.data.controller->setpalette(colorIndex, color);
+    )
+}
+
+void DIRECTGRAPH_EXPORT clearpalettew(DirectgraphWinIndex index){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager(), index);
+            lock.data.controller->clearpalette();
     )
 }
 

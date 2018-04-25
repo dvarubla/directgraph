@@ -73,6 +73,12 @@ void DIRECTGRAPH_EXPORT getfillsettings(fillsettingstype *fillinfo);
 
 void DIRECTGRAPH_EXPORT getfillpattern(char *pattern);
 
+void DIRECTGRAPH_EXPORT directgraph_initpalette(uint32_t havePalette, uint_fast32_t size, uint32_t fillFirstColors);
+
+void DIRECTGRAPH_EXPORT setpalette(uint_fast32_t index, uint_fast32_t color);
+
+void DIRECTGRAPH_EXPORT clearpalette();
+
 
 void DIRECTGRAPH_EXPORT fillellipsew(DirectgraphWinIndex index, int32_t x, int32_t y, uint32_t xradius, uint32_t yradius);
 
@@ -118,6 +124,12 @@ void DIRECTGRAPH_EXPORT getfillsettingsw(DirectgraphWinIndex index, fillsettings
 
 void DIRECTGRAPH_EXPORT getfillpatternw(DirectgraphWinIndex index, char *pattern);
 
+void DIRECTGRAPH_EXPORT directgraph_initpalettew(DirectgraphWinIndex index, uint32_t havePalette, uint_fast32_t size, uint32_t fillFirstColors);
+
+void DIRECTGRAPH_EXPORT setpalettew(DirectgraphWinIndex index, uint_fast32_t colorIndex, uint_fast32_t color);
+
+void DIRECTGRAPH_EXPORT clearpalettew(DirectgraphWinIndex index);
+
 
 WPARAM DIRECTGRAPH_EXPORT directgraph_mainloop();
 
@@ -152,6 +164,11 @@ extern void mainx();
 DWORD WINAPI directgraph_thread(LPVOID param){
     (void)(param);
     directgraph_wait_for_main_thread();
+#if defined(MAXCOLOR16)
+    directgraph_initpalette(1, 16, 1);
+#elif defined(MAXCOLOR256)
+    directgraph_initpalette(1, 256, 0);
+#endif
     mainx();
     directgraph_repaint();
     return 0;
