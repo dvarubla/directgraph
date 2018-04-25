@@ -48,6 +48,16 @@ typedef enum DirectgraphErrorCode{
 
 typedef uint32_t DirectgraphWinIndex;
 
+enum line_width {
+    NORM_WIDTH = 1, THICK_WIDTH = 3
+};
+
+enum COLORS {
+    BLACK, BLUE, GREEN, CYAN, RED, MAGENTA, BROWN, LIGHTGRAY,
+    DARKGRAY, LIGHTBLUE, LIGHTGREEN, LIGHTCYAN, LIGHTRED,
+    LIGHTMAGENTA, YELLOW, WHITE
+};
+
 typedef enum fill_patterns {
     EMPTY_FILL,      // использовать цвет фона
     SOLID_FILL,      // использовать цвет закраски
