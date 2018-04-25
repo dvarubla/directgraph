@@ -150,6 +150,42 @@ namespace directgraph{
         }
     }
 
+    void ThreadController::ellipse(
+            int_fast32_t x, int_fast32_t y, uint_fast32_t xradius, uint_fast32_t yradius,
+            bool useColor, uint_fast32_t color
+    ) {
+        if(!_paramsChecker.checkEllipse(x, y, xradius, yradius)){
+            return;
+        }
+        QueueItem item = QueueItemCreator::create<QueueItem::ELLIPSE>(x, y, xradius, yradius);
+        if(useColor) {
+            EnterCriticalSection(&_addCS);
+            EnterCriticalSection(&_propsCS);
+            writeItemHelperColor(item, color);
+        } else {
+            writeItemHelper(item);
+        }
+    }
+
+    void ThreadController::bar3d(
+            int_fast32_t left, int_fast32_t top, int_fast32_t right, int_fast32_t bottom,
+            uint_fast32_t depth, bool haveTop, bool useColor, uint_fast32_t color
+    ) {
+        if(
+                !_paramsChecker.checkBar(left, top, right, bottom)
+                ){
+            return;
+        }
+        QueueItem item = QueueItemCreator::create<QueueItem::BAR3D>(left, top, right, bottom, depth, haveTop);
+        if(useColor) {
+            EnterCriticalSection(&_addCS);
+            EnterCriticalSection(&_propsCS);
+            writeItemHelperColor(item, color);
+        } else {
+            writeItemHelper(item);
+        }
+    }
+
     void ThreadController::fillpoly(
             uint_fast32_t numPoints, const int32_t *points,
             bool useColor, uint_fast32_t color

@@ -296,6 +296,28 @@ void DIRECTGRAPH_EXPORT fillellipse(int32_t x, int32_t y, uint32_t xradius, uint
     )
 }
 
+void DIRECTGRAPH_EXPORT ellipse(int32_t x, int32_t y, uint32_t xradius, uint32_t yradius){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager());
+            lock.data.controller->ellipse(x, y, xradius, yradius);
+    )
+}
+
+void DIRECTGRAPH_EXPORT circle(int32_t x, int32_t y, uint32_t radius){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager());
+            lock.data.controller->ellipse(x, y, radius, radius);
+    )
+}
+
+void DIRECTGRAPH_EXPORT bar3d(int32_t left, int32_t top, int32_t right, int32_t bottom, uint32_t depth, uint32_t haveTop){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager());
+            lock.data.controller->bar3d(left, top, right, bottom, depth, haveTop != 0);
+    )
+}
+
+
 void DIRECTGRAPH_EXPORT setcolor(uint32_t color){
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager());
@@ -653,6 +675,27 @@ uint32_t DIRECTGRAPH_EXPORT getmaxyw(DirectgraphWinIndex index){
     return 0;
 }
 
+void DIRECTGRAPH_EXPORT ellipsew(DirectgraphWinIndex index, int32_t x, int32_t y, uint32_t xradius, uint32_t yradius){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager(), index);
+            lock.data.controller->ellipse(x, y, xradius, yradius);
+    );
+}
+
+void DIRECTGRAPH_EXPORT circlew(DirectgraphWinIndex index, int32_t x, int32_t y, uint32_t radius){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager(), index);
+            lock.data.controller->ellipse(x, y, radius, radius);
+    );
+}
+
+void DIRECTGRAPH_EXPORT bar3dw(DirectgraphWinIndex index, int32_t left, int32_t top, int32_t right, int32_t bottom, uint32_t depth, uint32_t haveTop){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager(), index);
+            lock.data.controller->bar3d(left, top, right, bottom, depth, haveTop != 0);
+    );
+}
+
 
 void DIRECTGRAPH_EXPORT fillellipsec(int32_t x, int32_t y, uint32_t xradius, uint32_t yradius, uint_fast32_t color){
     EXC_CALL_WRAP(
@@ -700,5 +743,26 @@ void DIRECTGRAPH_EXPORT fillpolyc(uint32_t numPoints, int32_t *points, uint_fast
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager());
             lock.data.controller->fillpoly(numPoints, points, true, color);
+    );
+}
+
+void DIRECTGRAPH_EXPORT ellipsec(int32_t x, int32_t y, uint32_t xradius, uint32_t yradius, uint_fast32_t color){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager());
+            lock.data.controller->ellipse(x, y, xradius, yradius, true, color);
+    );
+}
+
+void DIRECTGRAPH_EXPORT circlec(int32_t x, int32_t y, uint32_t radius, uint_fast32_t color){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager());
+            lock.data.controller->ellipse(x, y, radius, radius, true, color);
+    );
+}
+
+void DIRECTGRAPH_EXPORT bar3dc(int32_t left, int32_t top, int32_t right, int32_t bottom, uint32_t depth, uint32_t haveTop, uint_fast32_t color){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager());
+            lock.data.controller->bar3d(left, top, right, bottom, depth, haveTop != 0, true, color);
     );
 }

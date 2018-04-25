@@ -17,6 +17,14 @@ namespace directgraph{
                 int_fast32_t x, int_fast32_t y, uint_fast32_t xradius, uint_fast32_t yradius,
                 bool useColor = false, uint_fast32_t color = 0
         ) = 0;
+        virtual void ellipse(
+                int_fast32_t x, int_fast32_t y, uint_fast32_t xradius, uint_fast32_t yradius,
+                bool useColor = false, uint_fast32_t color = 0
+        ) = 0;
+        virtual void bar3d(
+                int_fast32_t left, int_fast32_t top, int_fast32_t right, int_fast32_t bottom,
+                uint_fast32_t depth, bool haveTop, bool useColor = false, uint_fast32_t color = 0
+        ) = 0;
         virtual void line(
                 int_fast32_t startx, int_fast32_t starty, int_fast32_t endx, int_fast32_t endy,
                 bool useColor = false, uint_fast32_t color = 0

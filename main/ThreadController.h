@@ -75,6 +75,14 @@ namespace directgraph {
                 int_fast32_t left, int_fast32_t top, int_fast32_t right, int_fast32_t bottom,
                 bool useColor, uint_fast32_t color
         );
+        void ellipse(
+                int_fast32_t x, int_fast32_t y, uint_fast32_t xradius, uint_fast32_t yradius,
+                bool useColor, uint_fast32_t color
+        );
+        void bar3d(
+                int_fast32_t left, int_fast32_t top, int_fast32_t right, int_fast32_t bottom,
+                uint_fast32_t depth, bool haveTop, bool useColor, uint_fast32_t color
+        );
         void setfillstyle(uint_fast8_t fillStyle, uint_fast32_t color);
         void setlinestyle(uint_fast8_t linestyle, uint_fast16_t pattern, uint_fast32_t thickness);
         void setfillpattern(const char *fillpattern, uint_fast32_t color);

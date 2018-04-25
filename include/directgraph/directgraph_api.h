@@ -28,6 +28,12 @@ void DIRECTGRAPH_EXPORT drawpolyc(uint32_t numPoints, int32_t *points, uint_fast
 
 void DIRECTGRAPH_EXPORT fillpolyc(uint32_t numPoints, int32_t *points, uint_fast32_t color);
 
+void DIRECTGRAPH_EXPORT ellipsec(int32_t x, int32_t y, uint32_t xradius, uint32_t yradius, uint_fast32_t color);
+
+void DIRECTGRAPH_EXPORT circlec(int32_t x, int32_t y, uint32_t radius, uint_fast32_t color);
+
+void DIRECTGRAPH_EXPORT bar3dc(int32_t left, int32_t top, int32_t right, int32_t bottom, uint32_t depth, uint32_t haveTop, uint_fast32_t color);
+
 
 void DIRECTGRAPH_EXPORT fillellipse(int32_t x, int32_t y, uint32_t xradius, uint32_t yradius);
 
@@ -52,6 +58,12 @@ void DIRECTGRAPH_EXPORT moverel(int32_t x, int32_t y);
 void DIRECTGRAPH_EXPORT drawpoly(uint32_t numPoints, int32_t *points);
 
 void DIRECTGRAPH_EXPORT fillpoly(uint32_t numPoints, int32_t *points);
+
+void DIRECTGRAPH_EXPORT ellipse(int32_t x, int32_t y, uint32_t xradius, uint32_t yradius);
+
+void DIRECTGRAPH_EXPORT circle(int32_t x, int32_t y, uint32_t radius);
+
+void DIRECTGRAPH_EXPORT bar3d(int32_t left, int32_t top, int32_t right, int32_t bottom, uint32_t depth, uint32_t haveTop);
 
 void DIRECTGRAPH_EXPORT setcolor(uint32_t color);
 
@@ -137,6 +149,12 @@ void DIRECTGRAPH_EXPORT clearpalettew(DirectgraphWinIndex index);
 uint32_t DIRECTGRAPH_EXPORT getmaxxw(DirectgraphWinIndex index);
 
 uint32_t DIRECTGRAPH_EXPORT getmaxyw(DirectgraphWinIndex index);
+
+void DIRECTGRAPH_EXPORT ellipsew(DirectgraphWinIndex index, int32_t x, int32_t y, uint32_t xradius, uint32_t yradius);
+
+void DIRECTGRAPH_EXPORT circlew(DirectgraphWinIndex index, int32_t x, int32_t y, uint32_t radius);
+
+void DIRECTGRAPH_EXPORT bar3dw(DirectgraphWinIndex index, int32_t left, int32_t top, int32_t right, int32_t bottom, uint32_t depth, uint32_t haveTop);
 
 
 WPARAM DIRECTGRAPH_EXPORT directgraph_mainloop();
@@ -226,6 +244,19 @@ static inline void drawpoly(uint32_t numPoints, int32_t *points, uint_fast32_t c
 static inline void fillpoly(uint32_t numPoints, int32_t *points, uint_fast32_t color){
     fillpolyc(numPoints, points, color);
 }
+
+static inline void ellipse(int32_t x, int32_t y, uint32_t xradius, uint32_t yradius, uint_fast32_t color){
+    ellipsec(x, y, xradius, yradius, color);
+}
+
+static inline void circle(int32_t x, int32_t y, uint32_t radius, uint_fast32_t color){
+    circlec(x, y, radius, color);
+;}
+
+static inline void bar3d(int32_t left, int32_t top, int32_t right, int32_t bottom, uint32_t depth, uint32_t haveTop, uint_fast32_t color){
+    bar3dc(left, top, right, bottom, depth, haveTop, color);
+}
+
 #endif
 
 #endif //DIRECTGRAPH_API_H

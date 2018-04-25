@@ -37,6 +37,14 @@ namespace directgraph{
         MOCK_METHOD0(clearpalette, void ());
         MOCK_METHOD0(getmaxx, uint_fast32_t ());
         MOCK_METHOD0(getmaxy, uint_fast32_t ());
+        MOCK_METHOD6(ellipse, void (
+                int_fast32_t x, int_fast32_t y, uint_fast32_t xradius, uint_fast32_t yradius,
+                bool useColor, uint_fast32_t color
+        ));
+        MOCK_METHOD8(bar3d, void (
+                int_fast32_t left, int_fast32_t top, int_fast32_t right, int_fast32_t bottom,
+                uint_fast32_t depth, bool haveTop, bool useColor, uint_fast32_t color
+        ));
     };
 }
 
