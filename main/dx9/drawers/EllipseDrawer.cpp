@@ -148,13 +148,14 @@ namespace directgraph{
         StartEndCoords EllipseDrawer::getStartEndCoords() {
             StartEndCoords res;
             if(_curStage == OUTLINE_AND_FILL_STAGE){
+                float halfT = _stateHelper->getLastState().lineThickness / 2.f;
                 res.start = genFCoords(
-                        _curItem.data.ellipse.x - _curItem.data.ellipse.xradius + CORR_OFFSET,
-                        _curItem.data.ellipse.y - _curItem.data.ellipse.yradius + CORR_OFFSET
+                        _curItem.data.ellipse.x - _curItem.data.ellipse.xradius + CORR_OFFSET - halfT,
+                        _curItem.data.ellipse.y - _curItem.data.ellipse.yradius + CORR_OFFSET - halfT
                 );
                 res.end = genFCoords(
-                        _curItem.data.ellipse.x + _curItem.data.ellipse.xradius - CORR_OFFSET,
-                        _curItem.data.ellipse.y + _curItem.data.ellipse.yradius - CORR_OFFSET
+                        _curItem.data.ellipse.x + _curItem.data.ellipse.xradius - CORR_OFFSET + halfT,
+                        _curItem.data.ellipse.y + _curItem.data.ellipse.yradius - CORR_OFFSET + halfT
                 );
             } else if(_curStage == FILL_STAGE) {
                 if (
@@ -177,13 +178,14 @@ namespace directgraph{
                 }
             } else {
                 if(_createShaderOutline) {
+                    float halfT = _stateHelper->getLastState().lineThickness / 2.f;
                     res.start = genFCoords(
-                            _curItem.data.ellipse.x - _curItem.data.ellipse.xradius + CORR_OFFSET,
-                            _curItem.data.ellipse.y - _curItem.data.ellipse.yradius + CORR_OFFSET
+                            _curItem.data.ellipse.x - _curItem.data.ellipse.xradius + CORR_OFFSET - halfT,
+                            _curItem.data.ellipse.y - _curItem.data.ellipse.yradius + CORR_OFFSET - halfT
                     );
                     res.end = genFCoords(
-                            _curItem.data.ellipse.x + _curItem.data.ellipse.xradius - CORR_OFFSET,
-                            _curItem.data.ellipse.y + _curItem.data.ellipse.yradius - CORR_OFFSET
+                            _curItem.data.ellipse.x + _curItem.data.ellipse.xradius - CORR_OFFSET + halfT,
+                            _curItem.data.ellipse.y + _curItem.data.ellipse.yradius - CORR_OFFSET + halfT
                     );
                 } else {
                     res.start = _ellipseOutline.coords.front();

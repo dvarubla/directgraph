@@ -51,7 +51,7 @@ float ellipseDistance(float2 p, float2 ab){
         float2 closestPoint = float2( ab.x*co, ab.y*si );
         dist = length(closestPoint - p) * sign(p.y - closestPoint.y);
     } else {
-        dist = ab.x - length(p);
+        dist = length(p) - ab.x;
     }
     return dist;
 }
