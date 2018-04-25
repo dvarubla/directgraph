@@ -8,6 +8,7 @@ namespace directgraph {
     private:
         std::vector<uint_fast32_t> _colors;
         bool _havePalette;
+        void checkIndex(uint_fast32_t index);
     public:
         PaletteManager();
         void initPalette(bool havePalette, uint_fast32_t size, bool fillFirstColors);
