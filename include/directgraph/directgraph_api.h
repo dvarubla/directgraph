@@ -95,6 +95,8 @@ uint32_t DIRECTGRAPH_EXPORT getmaxx();
 
 uint32_t DIRECTGRAPH_EXPORT getmaxy();
 
+void DIRECTGRAPH_EXPORT clear();
+
 
 void DIRECTGRAPH_EXPORT fillellipsew(DirectgraphWinIndex index, int32_t x, int32_t y, uint32_t xradius, uint32_t yradius);
 
@@ -156,6 +158,7 @@ void DIRECTGRAPH_EXPORT circlew(DirectgraphWinIndex index, int32_t x, int32_t y,
 
 void DIRECTGRAPH_EXPORT bar3dw(DirectgraphWinIndex index, int32_t left, int32_t top, int32_t right, int32_t bottom, uint32_t depth, uint32_t haveTop);
 
+void DIRECTGRAPH_EXPORT clearw(DirectgraphWinIndex index);
 
 WPARAM DIRECTGRAPH_EXPORT directgraph_mainloop();
 

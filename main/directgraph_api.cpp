@@ -481,6 +481,14 @@ void DIRECTGRAPH_EXPORT directgraph_repaint(){
     )
 }
 
+void DIRECTGRAPH_EXPORT clear(){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager());
+            lock.data.controller->clearAndReset();
+    )
+}
+
+
 void DIRECTGRAPH_EXPORT fillellipsew(DirectgraphWinIndex index, int32_t x, int32_t y, uint32_t xradius, uint32_t yradius){
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager(), index);
@@ -694,6 +702,13 @@ void DIRECTGRAPH_EXPORT bar3dw(DirectgraphWinIndex index, int32_t left, int32_t 
             WindowManagerScopedLock lock(getWindowManager(), index);
             lock.data.controller->bar3d(left, top, right, bottom, depth, haveTop != 0);
     );
+}
+
+void DIRECTGRAPH_EXPORT clearw(DirectgraphWinIndex index){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager(), index);
+            lock.data.controller->clearAndReset();
+    )
 }
 
 

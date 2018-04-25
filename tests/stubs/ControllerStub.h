@@ -45,6 +45,7 @@ namespace directgraph{
                 int_fast32_t left, int_fast32_t top, int_fast32_t right, int_fast32_t bottom,
                 uint_fast32_t depth, bool haveTop, bool useColor, uint_fast32_t color
         ));
+        MOCK_METHOD0(clearAndReset, void ());
     };
 }
 

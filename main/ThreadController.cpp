@@ -10,6 +10,7 @@ namespace directgraph{
             : _window(window), _queue(), _reader(&_queue, &_queueCS),
               _threadStarted(0), _numDrawMsgs(0), _pixContFactory(_window->getRenderer()->getPixContFactory()) {
         _currentProps = props;
+        _initialProps = props;
         InitializeCriticalSection(&_addCS);
         InitializeCriticalSection(&_queueCS);
         InitializeCriticalSection(&_propsCS);
@@ -76,6 +77,25 @@ namespace directgraph{
         LeaveCriticalSection(&_propsCS);
         LeaveCriticalSection(&_addCS);
         sendPrepareMsg();
+    }
+
+    void ThreadController::clearAndReset() {
+        EnterCriticalSection(&_addCS);
+        EnterCriticalSection(&_propsCS);
+        flushPixels();
+        checkGrow();
+        char *pattern = _currentProps.userFillPattern;
+        _currentProps = _initialProps;
+        _currentProps.userFillPattern = pattern;
+        _queue.writeItem(QueueItemCreator::create<QueueItem::CLEAR>());
+        _queue.writeItem(QueueItemCreator::create<QueueItem::COLOR>(_currentProps.drawColor));
+        _queue.writeItem(QueueItemCreator::create<QueueItem::BGCOLOR>(_currentProps.bgColor));
+        _queue.writeItem(QueueItemCreator::create<QueueItem::SETFILLSTYLE>(_currentProps.fillStyle, _currentProps.fillColor));
+        _queue.writeItem(QueueItemCreator::create<QueueItem::SETLINESTYLE>(
+                _currentProps.lineStyle, _currentProps.userLinePattern, _currentProps.lineThickness)
+        );
+        LeaveCriticalSection(&_propsCS);
+        LeaveCriticalSection(&_addCS);
     }
 
     void ThreadController::clear() {

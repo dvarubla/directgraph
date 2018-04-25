@@ -72,6 +72,7 @@ namespace directgraph{
         virtual uint_fast32_t getmaxx() = 0;
         virtual uint_fast32_t getmaxy() = 0;
         virtual void repaint() = 0;
+        virtual void clearAndReset() = 0;
         virtual ~IController(){};
     };
 }

@@ -31,6 +31,7 @@ namespace directgraph {
         DWORD _drawThreadId;
         HANDLE _drawThread;
         CommonProps _currentProps;
+        CommonProps _initialProps;
         PaletteManager _paletteMan;
 
         PixelContainerCreator *_pixContFactory;
@@ -107,5 +108,6 @@ namespace directgraph {
         void putpixel(int_fast32_t x, int_fast32_t y, uint_fast32_t color);
         void putpixel(int_fast32_t x, int_fast32_t y);
         void repaint();
+        void clearAndReset();
     };
 }
