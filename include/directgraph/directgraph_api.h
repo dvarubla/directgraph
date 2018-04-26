@@ -24,9 +24,9 @@ void DIRECTGRAPH_EXPORT linetoc(int32_t x, int32_t y, uint_fast32_t color);
 
 void DIRECTGRAPH_EXPORT linerelc(int32_t x, int32_t y, uint_fast32_t color);
 
-void DIRECTGRAPH_EXPORT drawpolyc(uint32_t numPoints, int32_t *points, uint_fast32_t color);
+void DIRECTGRAPH_EXPORT drawpolyc(uint32_t numPoints, const int32_t *points, uint_fast32_t color);
 
-void DIRECTGRAPH_EXPORT fillpolyc(uint32_t numPoints, int32_t *points, uint_fast32_t color);
+void DIRECTGRAPH_EXPORT fillpolyc(uint32_t numPoints, const int32_t *points, uint_fast32_t color);
 
 void DIRECTGRAPH_EXPORT ellipsec(int32_t x, int32_t y, uint32_t xradius, uint32_t yradius, uint_fast32_t color);
 
@@ -55,9 +55,9 @@ void DIRECTGRAPH_EXPORT moveto(int32_t x, int32_t y);
 
 void DIRECTGRAPH_EXPORT moverel(int32_t x, int32_t y);
 
-void DIRECTGRAPH_EXPORT drawpoly(uint32_t numPoints, int32_t *points);
+void DIRECTGRAPH_EXPORT drawpoly(uint32_t numPoints, const int32_t *points);
 
-void DIRECTGRAPH_EXPORT fillpoly(uint32_t numPoints, int32_t *points);
+void DIRECTGRAPH_EXPORT fillpoly(uint32_t numPoints, const int32_t *points);
 
 void DIRECTGRAPH_EXPORT ellipse(int32_t x, int32_t y, uint32_t xradius, uint32_t yradius);
 
@@ -91,6 +91,10 @@ void DIRECTGRAPH_EXPORT setpalette(uint_fast32_t index, uint_fast32_t color);
 
 void DIRECTGRAPH_EXPORT clearpalette();
 
+int32_t DIRECTGRAPH_EXPORT getx();
+
+int32_t DIRECTGRAPH_EXPORT gety();
+
 uint32_t DIRECTGRAPH_EXPORT getmaxx();
 
 uint32_t DIRECTGRAPH_EXPORT getmaxy();
@@ -118,9 +122,9 @@ void DIRECTGRAPH_EXPORT movetow(DirectgraphWinIndex index, int32_t x, int32_t y)
 
 void DIRECTGRAPH_EXPORT moverelw(DirectgraphWinIndex index, int32_t x, int32_t y);
 
-void DIRECTGRAPH_EXPORT drawpolyw(DirectgraphWinIndex index, uint32_t numPoints, int32_t *points);
+void DIRECTGRAPH_EXPORT drawpolyw(DirectgraphWinIndex index, uint32_t numPoints, const int32_t *points);
 
-void DIRECTGRAPH_EXPORT fillpolyw(DirectgraphWinIndex index, uint32_t numPoints, int32_t *points);
+void DIRECTGRAPH_EXPORT fillpolyw(DirectgraphWinIndex index, uint32_t numPoints, const int32_t *points);
 
 void DIRECTGRAPH_EXPORT setcolorw(DirectgraphWinIndex index, uint32_t color);
 
@@ -159,6 +163,10 @@ void DIRECTGRAPH_EXPORT circlew(DirectgraphWinIndex index, int32_t x, int32_t y,
 void DIRECTGRAPH_EXPORT bar3dw(DirectgraphWinIndex index, int32_t left, int32_t top, int32_t right, int32_t bottom, uint32_t depth, uint32_t haveTop);
 
 void DIRECTGRAPH_EXPORT clearw(DirectgraphWinIndex index);
+
+int32_t DIRECTGRAPH_EXPORT getxw(DirectgraphWinIndex index);
+
+int32_t DIRECTGRAPH_EXPORT getyw(DirectgraphWinIndex index);
 
 WPARAM DIRECTGRAPH_EXPORT directgraph_mainloop();
 
@@ -240,11 +248,11 @@ static inline void linerel(int32_t x, int32_t y, uint_fast32_t color){
     linerelc(x, y, color);
 }
 
-static inline void drawpoly(uint32_t numPoints, int32_t *points, uint_fast32_t color){
+static inline void drawpoly(uint32_t numPoints, const int32_t *points, uint_fast32_t color){
     drawpolyc(numPoints, points, color);
 }
 
-static inline void fillpoly(uint32_t numPoints, int32_t *points, uint_fast32_t color){
+static inline void fillpoly(uint32_t numPoints, const int32_t *points, uint_fast32_t color){
     fillpolyc(numPoints, points, color);
 }
 

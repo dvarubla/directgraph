@@ -425,14 +425,14 @@ void DIRECTGRAPH_EXPORT moverel(int32_t x, int32_t y){
     );
 }
 
-void DIRECTGRAPH_EXPORT drawpoly(uint32_t numPoints, int32_t *points){
+void DIRECTGRAPH_EXPORT drawpoly(uint32_t numPoints, const int32_t *points){
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager());
             lock.data.controller->drawpoly(numPoints, points);
     );
 }
 
-void DIRECTGRAPH_EXPORT fillpoly(uint32_t numPoints, int32_t *points){
+void DIRECTGRAPH_EXPORT fillpoly(uint32_t numPoints, const int32_t *points){
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager());
             lock.data.controller->fillpoly(numPoints, points);
@@ -451,6 +451,22 @@ void DIRECTGRAPH_EXPORT clearpalette(){
             WindowManagerScopedLock lock(getWindowManager());
             lock.data.controller->clearpalette();
     );
+}
+
+int32_t DIRECTGRAPH_EXPORT getx(){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager());
+            return lock.data.controller->getx();
+    );
+    return 0;
+}
+
+int32_t DIRECTGRAPH_EXPORT gety(){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager());
+            return lock.data.controller->gety();
+    );
+    return 0;
 }
 
 uint32_t DIRECTGRAPH_EXPORT getmaxx(){
@@ -653,14 +669,14 @@ void DIRECTGRAPH_EXPORT moverelw(DirectgraphWinIndex index, int32_t x, int32_t y
     );
 }
 
-void DIRECTGRAPH_EXPORT drawpolyw(DirectgraphWinIndex index, uint32_t numPoints, int32_t *points){
+void DIRECTGRAPH_EXPORT drawpolyw(DirectgraphWinIndex index, uint32_t numPoints, const int32_t *points){
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager(), index);
             lock.data.controller->drawpoly(numPoints, points);
     );
 }
 
-void DIRECTGRAPH_EXPORT fillpolyw(DirectgraphWinIndex index, uint32_t numPoints, int32_t *points){
+void DIRECTGRAPH_EXPORT fillpolyw(DirectgraphWinIndex index, uint32_t numPoints, const int32_t *points){
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager(), index);
             lock.data.controller->fillpoly(numPoints, points);
@@ -711,6 +727,22 @@ void DIRECTGRAPH_EXPORT clearw(DirectgraphWinIndex index){
     )
 }
 
+int32_t DIRECTGRAPH_EXPORT getxw(DirectgraphWinIndex index){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager(), index);
+            return lock.data.controller->getx();
+    );
+    return 0;
+}
+
+int32_t DIRECTGRAPH_EXPORT getyw(DirectgraphWinIndex index){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager(), index);
+            return lock.data.controller->gety();
+    );
+    return 0;
+}
+
 
 void DIRECTGRAPH_EXPORT fillellipsec(int32_t x, int32_t y, uint32_t xradius, uint32_t yradius, uint_fast32_t color){
     EXC_CALL_WRAP(
@@ -747,14 +779,14 @@ void DIRECTGRAPH_EXPORT linerelc(int32_t x, int32_t y, uint_fast32_t color){
     );
 }
 
-void DIRECTGRAPH_EXPORT drawpolyc(uint32_t numPoints, int32_t *points, uint_fast32_t color){
+void DIRECTGRAPH_EXPORT drawpolyc(uint32_t numPoints, const int32_t *points, uint_fast32_t color){
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager());
             lock.data.controller->drawpoly(numPoints, points, true, color);
     );
 }
 
-void DIRECTGRAPH_EXPORT fillpolyc(uint32_t numPoints, int32_t *points, uint_fast32_t color){
+void DIRECTGRAPH_EXPORT fillpolyc(uint32_t numPoints, const int32_t *points, uint_fast32_t color){
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager());
             lock.data.controller->fillpoly(numPoints, points, true, color);
