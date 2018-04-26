@@ -31,7 +31,7 @@ namespace directgraph{
         }
 
         void DrawStateHelper::useLineStyle(ItemState &state, bool useDrawColor) {
-            if(_stateHelper->getLastState().lineStyle != NULL_LINE && _stateHelper->getLastState().lineStyle != SOLID_LINE){
+            if(!_stateHelper->isLineNull() && _stateHelper->getLastState().lineStyle != SOLID_LINE){
                 _propMan->setProp(state, PropertyName::TEXTURE_STATE, TextureState::LINE_TEXTURE);
                 _propMan->setProp(state, PropertyName::LINE_PATTERN, _stateHelper->getLastState().lineStyle);
                 if(useDrawColor){

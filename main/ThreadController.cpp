@@ -20,6 +20,10 @@ namespace directgraph{
         }
     }
 
+    bool ThreadController::isLineNull() {
+        return _currentProps.lineStyle == NULL_LINE || _currentProps.lineThickness == 0;
+    }
+
     void ThreadController::checkGrow() {
         if(_queue.needGrow()) {
             EnterCriticalSection(&_queueCS);
@@ -147,7 +151,7 @@ namespace directgraph{
             bool useColor, uint_fast32_t color
     ) {
         EnterCriticalSection(&_propsCS);
-        if(_currentProps.lineStyle == NULL_LINE){
+        if(isLineNull()){
             LeaveCriticalSection(&_propsCS);
             return;
         }
@@ -277,7 +281,10 @@ namespace directgraph{
     ){
         EnterCriticalSection(&_propsCS);
         if(
-                !_paramsChecker.checkRectangle(left, top, right, bottom, _currentProps.lineStyle)
+                !_paramsChecker.checkRectangle(
+                        left, top, right, bottom,
+                        _currentProps.lineStyle, _currentProps.lineThickness
+                )
         ){
             LeaveCriticalSection(&_propsCS);
             return;
@@ -455,7 +462,7 @@ namespace directgraph{
             bool useColor, uint_fast32_t color
     ) {
         EnterCriticalSection(&_propsCS);
-        if(_currentProps.lineStyle == NULL_LINE){
+        if(isLineNull()){
             LeaveCriticalSection(&_propsCS);
             return;
         }
@@ -475,7 +482,7 @@ namespace directgraph{
     ){
         EnterCriticalSection(&_addCS);
         EnterCriticalSection(&_propsCS);
-        if(_currentProps.lineStyle == NULL_LINE){
+        if(isLineNull()){
             LeaveCriticalSection(&_propsCS);
             LeaveCriticalSection(&_addCS);
             return;
@@ -499,7 +506,7 @@ namespace directgraph{
     ) {
         EnterCriticalSection(&_addCS);
         EnterCriticalSection(&_propsCS);
-        if(_currentProps.lineStyle == NULL_LINE){
+        if(isLineNull()){
             LeaveCriticalSection(&_propsCS);
             LeaveCriticalSection(&_addCS);
             return;

@@ -34,8 +34,11 @@ namespace directgraph{
         }
     }
 
-    bool ParamsChecker::checkRectangle(int_fast32_t &left, int_fast32_t &top, int_fast32_t &right, int_fast32_t &bottom, uint_fast8_t linestyle) {
-        if(linestyle == NULL_LINE){
+    bool ParamsChecker::checkRectangle(
+            int_fast32_t &left, int_fast32_t &top, int_fast32_t &right, int_fast32_t &bottom,
+            uint_fast8_t linestyle, uint_fast32_t thickness
+    ) {
+        if(linestyle == NULL_LINE || thickness == 0){
             return false;
         }
         if(right == left || top == bottom){

@@ -44,6 +44,8 @@ namespace directgraph {
         void writeItemHelperColor(const QueueItem &item, uint_fast32_t color);
         void checkGrow();
         void sendPrepareMsg();
+
+        bool isLineNull();
     public:
         ThreadController(IMyWindow *window, const CommonProps &props);
         ~ThreadController();

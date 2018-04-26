@@ -46,5 +46,9 @@ namespace directgraph {
         ItemState &StateHelper::getCurItemState() {
             return _curItemState;
         }
+
+        bool StateHelper::isLineNull() {
+            return (_lastState.lineStyle == NULL_LINE) || _lastState.lineThickness == 0;
+        }
     }
 }

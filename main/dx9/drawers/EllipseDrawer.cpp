@@ -281,7 +281,7 @@ namespace directgraph{
 
         void EllipseDrawer::setItem(const QueueItem &item) {
             _curItem = item;
-            _haveOutline = (_stateHelper->getLastState().lineStyle != NULL_LINE);
+            _haveOutline = (!_stateHelper->isLineNull());
             _haveFill = _curItem.type == QueueItem::FILLELLIPSE;
             if(_haveFill) {
                 createFillState();

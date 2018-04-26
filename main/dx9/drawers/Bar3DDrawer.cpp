@@ -119,7 +119,7 @@ namespace directgraph{
 
         void Bar3DDrawer::setItem(const QueueItem &item) {
             _curItem = item;
-            _haveLine = (_stateHelper->getLastState().lineStyle != NULL_LINE);
+            _haveLine = (!_stateHelper->isLineNull());
             if(_haveLine){
                 QueueItem rectItem = QueueItemCreator::create<QueueItem::RECTANGLE>(
                         _curItem.data.bar3D.left,
