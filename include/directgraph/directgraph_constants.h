@@ -2,6 +2,7 @@
 #define DIRECTGRAPH_GRAPHICS_CONST_H
 
 #include "directgraph_stdint.h"
+#include "directgraph_pack.h"
 
 typedef struct DirectgraphWinParams DirectgraphWinParams;
 
@@ -90,15 +91,15 @@ typedef void (*DirectgraphErrorHandler)(
         const wchar_t *str
 );
 
-typedef struct linesettingstype {
-    int linestyle;
-    unsigned upattern;
-    int thickness;
-} linesettingstype;
+DIRECTGRAPH_PACK(typedef struct linesettingstype {
+    uint32_t linestyle;
+    uint32_t upattern;
+    uint32_t thickness;
+}) linesettingstype;
 
-typedef struct fillsettingstype {
-    int pattern;
-    int color;
-} fillsettingstype;
+DIRECTGRAPH_PACK(typedef struct fillsettingstype {
+    uint32_t pattern;
+    uint32_t color;
+}) fillsettingstype;
 
 #endif //DIRECTGRAPH_GRAPHICS_CONST_H

@@ -130,7 +130,7 @@ WPARAM DIRECTGRAPH_EXPORT directgraph_mainloop() {
     return 0;
 }
 
-void DIRECTGRAPH_EXPORT directgraph_initpalette(uint32_t havePalette, uint_fast32_t size, uint32_t fillFirstColors){
+void DIRECTGRAPH_EXPORT directgraph_initpalette(uint32_t havePalette, uint32_t size, uint32_t fillFirstColors){
     if(InterlockedCompareExchange(&needCreateWindowManager, 0, 0)){
         if(InterlockedCompareExchange(&mainThreadStarted, 0, 0)){
             SetDefaultPaletteParamsMsg paletteParamMsg;
@@ -325,14 +325,14 @@ void DIRECTGRAPH_EXPORT setcolor(uint32_t color){
     )
 }
 
-void DIRECTGRAPH_EXPORT setlinestyle(line_styles linestyle, uint32_t pattern, uint32_t thickness) {
+void DIRECTGRAPH_EXPORT setlinestyle(uint32_t linestyle, uint32_t pattern, uint32_t thickness) {
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager());
             lock.data.controller->setlinestyle(linestyle, pattern, thickness);
     )
 }
 
-void DIRECTGRAPH_EXPORT setfillstyle(fill_patterns pattern, uint32_t color){
+void DIRECTGRAPH_EXPORT setfillstyle(uint32_t pattern, uint32_t color){
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager());
             lock.data.controller->setfillstyle(pattern, color);
@@ -439,7 +439,7 @@ void DIRECTGRAPH_EXPORT fillpoly(uint32_t numPoints, const int32_t *points){
     );
 }
 
-void DIRECTGRAPH_EXPORT setpalette(uint_fast32_t index, uint_fast32_t color){
+void DIRECTGRAPH_EXPORT setpalette(uint32_t index, uint32_t color){
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager());
             lock.data.controller->setpalette(index, color);
@@ -512,7 +512,7 @@ void DIRECTGRAPH_EXPORT fillellipsew(DirectgraphWinIndex index, int32_t x, int32
     )
 }
 
-void DIRECTGRAPH_EXPORT setlinestylew(DirectgraphWinIndex index, line_styles linestyle, uint32_t pattern, uint32_t thickness){
+void DIRECTGRAPH_EXPORT setlinestylew(DirectgraphWinIndex index, uint32_t linestyle, uint32_t pattern, uint32_t thickness){
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager(), index);
             lock.data.controller->setlinestyle(linestyle, pattern, thickness);
@@ -547,7 +547,7 @@ void DIRECTGRAPH_EXPORT setcolorw(DirectgraphWinIndex index, uint32_t color){
     )
 }
 
-void DIRECTGRAPH_EXPORT setfillstylew(DirectgraphWinIndex index, fill_patterns pattern, uint32_t color){
+void DIRECTGRAPH_EXPORT setfillstylew(DirectgraphWinIndex index, uint32_t pattern, uint32_t color){
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager(), index);
             lock.data.controller->setfillstyle(pattern, color);
@@ -612,14 +612,14 @@ void DIRECTGRAPH_EXPORT getfillpatternw(DirectgraphWinIndex index, char *pattern
     )
 }
 
-void DIRECTGRAPH_EXPORT directgraph_initpalettew(DirectgraphWinIndex index, uint32_t havePalette, uint_fast32_t size, uint32_t fillFirstColors){
+void DIRECTGRAPH_EXPORT directgraph_initpalettew(DirectgraphWinIndex index, uint32_t havePalette, uint32_t size, uint32_t fillFirstColors){
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager(), index);
             lock.data.controller->initpalette(havePalette == 1, size, fillFirstColors == 1);
     )
 }
 
-void DIRECTGRAPH_EXPORT setpalettew(DirectgraphWinIndex index, uint_fast32_t colorIndex, uint_fast32_t color){
+void DIRECTGRAPH_EXPORT setpalettew(DirectgraphWinIndex index, uint32_t colorIndex, uint32_t color){
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager(), index);
             lock.data.controller->setpalette(colorIndex, color);
@@ -744,70 +744,70 @@ int32_t DIRECTGRAPH_EXPORT getyw(DirectgraphWinIndex index){
 }
 
 
-void DIRECTGRAPH_EXPORT fillellipsec(int32_t x, int32_t y, uint32_t xradius, uint32_t yradius, uint_fast32_t color){
+void DIRECTGRAPH_EXPORT fillellipsec(int32_t x, int32_t y, uint32_t xradius, uint32_t yradius, uint32_t color){
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager());
             lock.data.controller->fillellipse(x, y, xradius, yradius, true, color);
     );
 }
 
-void DIRECTGRAPH_EXPORT rectanglec(int32_t left, int32_t top, int32_t right, int32_t bottom, uint_fast32_t color){
+void DIRECTGRAPH_EXPORT rectanglec(int32_t left, int32_t top, int32_t right, int32_t bottom, uint32_t color){
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager());
             lock.data.controller->rectangle(left, top, right, bottom, true, color);
     );
 }
 
-void DIRECTGRAPH_EXPORT linec(int32_t startx, int32_t starty, int32_t endx, int32_t endy, uint_fast32_t color){
+void DIRECTGRAPH_EXPORT linec(int32_t startx, int32_t starty, int32_t endx, int32_t endy, uint32_t color){
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager());
             lock.data.controller->line(startx, starty, endx, endy, true, color);
     );
 }
 
-void DIRECTGRAPH_EXPORT linetoc(int32_t x, int32_t y, uint_fast32_t color){
+void DIRECTGRAPH_EXPORT linetoc(int32_t x, int32_t y, uint32_t color){
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager());
             lock.data.controller->lineto(x, y, true, color);
     );
 }
 
-void DIRECTGRAPH_EXPORT linerelc(int32_t x, int32_t y, uint_fast32_t color){
+void DIRECTGRAPH_EXPORT linerelc(int32_t x, int32_t y, uint32_t color){
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager());
             lock.data.controller->linerel(x, y, true, color);
     );
 }
 
-void DIRECTGRAPH_EXPORT drawpolyc(uint32_t numPoints, const int32_t *points, uint_fast32_t color){
+void DIRECTGRAPH_EXPORT drawpolyc(uint32_t numPoints, const int32_t *points, uint32_t color){
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager());
             lock.data.controller->drawpoly(numPoints, points, true, color);
     );
 }
 
-void DIRECTGRAPH_EXPORT fillpolyc(uint32_t numPoints, const int32_t *points, uint_fast32_t color){
+void DIRECTGRAPH_EXPORT fillpolyc(uint32_t numPoints, const int32_t *points, uint32_t color){
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager());
             lock.data.controller->fillpoly(numPoints, points, true, color);
     );
 }
 
-void DIRECTGRAPH_EXPORT ellipsec(int32_t x, int32_t y, uint32_t xradius, uint32_t yradius, uint_fast32_t color){
+void DIRECTGRAPH_EXPORT ellipsec(int32_t x, int32_t y, uint32_t xradius, uint32_t yradius, uint32_t color){
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager());
             lock.data.controller->ellipse(x, y, xradius, yradius, true, color);
     );
 }
 
-void DIRECTGRAPH_EXPORT circlec(int32_t x, int32_t y, uint32_t radius, uint_fast32_t color){
+void DIRECTGRAPH_EXPORT circlec(int32_t x, int32_t y, uint32_t radius, uint32_t color){
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager());
             lock.data.controller->ellipse(x, y, radius, radius, true, color);
     );
 }
 
-void DIRECTGRAPH_EXPORT bar3dc(int32_t left, int32_t top, int32_t right, int32_t bottom, uint32_t depth, uint32_t haveTop, uint_fast32_t color){
+void DIRECTGRAPH_EXPORT bar3dc(int32_t left, int32_t top, int32_t right, int32_t bottom, uint32_t depth, uint32_t haveTop, uint32_t color){
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager());
             lock.data.controller->bar3d(left, top, right, bottom, depth, haveTop != 0, true, color);

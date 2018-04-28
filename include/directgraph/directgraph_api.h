@@ -14,30 +14,30 @@ void DIRECTGRAPH_EXPORT delay(uint32_t msec);
 void DIRECTGRAPH_EXPORT resize(uint32_t width, uint32_t height);
 
 
-void DIRECTGRAPH_EXPORT fillellipsec(int32_t x, int32_t y, uint32_t xradius, uint32_t yradius, uint_fast32_t color);
+void DIRECTGRAPH_EXPORT fillellipsec(int32_t x, int32_t y, uint32_t xradius, uint32_t yradius, uint32_t color);
 
-void DIRECTGRAPH_EXPORT rectanglec(int32_t left, int32_t top, int32_t right, int32_t bottom, uint_fast32_t color);
+void DIRECTGRAPH_EXPORT rectanglec(int32_t left, int32_t top, int32_t right, int32_t bottom, uint32_t color);
 
-void DIRECTGRAPH_EXPORT linec(int32_t startx, int32_t starty, int32_t endx, int32_t endy, uint_fast32_t color);
+void DIRECTGRAPH_EXPORT linec(int32_t startx, int32_t starty, int32_t endx, int32_t endy, uint32_t color);
 
-void DIRECTGRAPH_EXPORT linetoc(int32_t x, int32_t y, uint_fast32_t color);
+void DIRECTGRAPH_EXPORT linetoc(int32_t x, int32_t y, uint32_t color);
 
-void DIRECTGRAPH_EXPORT linerelc(int32_t x, int32_t y, uint_fast32_t color);
+void DIRECTGRAPH_EXPORT linerelc(int32_t x, int32_t y, uint32_t color);
 
-void DIRECTGRAPH_EXPORT drawpolyc(uint32_t numPoints, const int32_t *points, uint_fast32_t color);
+void DIRECTGRAPH_EXPORT drawpolyc(uint32_t numPoints, const int32_t *points, uint32_t color);
 
-void DIRECTGRAPH_EXPORT fillpolyc(uint32_t numPoints, const int32_t *points, uint_fast32_t color);
+void DIRECTGRAPH_EXPORT fillpolyc(uint32_t numPoints, const int32_t *points, uint32_t color);
 
-void DIRECTGRAPH_EXPORT ellipsec(int32_t x, int32_t y, uint32_t xradius, uint32_t yradius, uint_fast32_t color);
+void DIRECTGRAPH_EXPORT ellipsec(int32_t x, int32_t y, uint32_t xradius, uint32_t yradius, uint32_t color);
 
-void DIRECTGRAPH_EXPORT circlec(int32_t x, int32_t y, uint32_t radius, uint_fast32_t color);
+void DIRECTGRAPH_EXPORT circlec(int32_t x, int32_t y, uint32_t radius, uint32_t color);
 
-void DIRECTGRAPH_EXPORT bar3dc(int32_t left, int32_t top, int32_t right, int32_t bottom, uint32_t depth, uint32_t haveTop, uint_fast32_t color);
+void DIRECTGRAPH_EXPORT bar3dc(int32_t left, int32_t top, int32_t right, int32_t bottom, uint32_t depth, uint32_t haveTop, uint32_t color);
 
 
 void DIRECTGRAPH_EXPORT fillellipse(int32_t x, int32_t y, uint32_t xradius, uint32_t yradius);
 
-void DIRECTGRAPH_EXPORT setlinestyle(line_styles linestyle, uint32_t pattern, uint32_t thickness);
+void DIRECTGRAPH_EXPORT setlinestyle(uint32_t linestyle, uint32_t pattern, uint32_t thickness);
 
 void DIRECTGRAPH_EXPORT bar(int32_t left, int32_t top, int32_t right, int32_t bottom);
 
@@ -67,7 +67,7 @@ void DIRECTGRAPH_EXPORT bar3d(int32_t left, int32_t top, int32_t right, int32_t 
 
 void DIRECTGRAPH_EXPORT setcolor(uint32_t color);
 
-void DIRECTGRAPH_EXPORT setfillstyle(fill_patterns pattern, uint32_t color);
+void DIRECTGRAPH_EXPORT setfillstyle(uint32_t pattern, uint32_t color);
 
 void DIRECTGRAPH_EXPORT setfillpattern(const char *fillpattern, uint32_t color);
 
@@ -85,9 +85,9 @@ void DIRECTGRAPH_EXPORT getfillsettings(fillsettingstype *fillinfo);
 
 void DIRECTGRAPH_EXPORT getfillpattern(char *pattern);
 
-void DIRECTGRAPH_EXPORT directgraph_initpalette(uint32_t havePalette, uint_fast32_t size, uint32_t fillFirstColors);
+void DIRECTGRAPH_EXPORT directgraph_initpalette(uint32_t havePalette, uint32_t size, uint32_t fillFirstColors);
 
-void DIRECTGRAPH_EXPORT setpalette(uint_fast32_t index, uint_fast32_t color);
+void DIRECTGRAPH_EXPORT setpalette(uint32_t index, uint32_t color);
 
 void DIRECTGRAPH_EXPORT clearpalette();
 
@@ -104,7 +104,7 @@ void DIRECTGRAPH_EXPORT clear();
 
 void DIRECTGRAPH_EXPORT fillellipsew(DirectgraphWinIndex index, int32_t x, int32_t y, uint32_t xradius, uint32_t yradius);
 
-void DIRECTGRAPH_EXPORT setlinestylew(DirectgraphWinIndex index, line_styles linestyle, uint32_t pattern, uint32_t thickness);
+void DIRECTGRAPH_EXPORT setlinestylew(DirectgraphWinIndex index, uint32_t linestyle, uint32_t pattern, uint32_t thickness);
 
 void DIRECTGRAPH_EXPORT barw(DirectgraphWinIndex index, int32_t left, int32_t top, int32_t right, int32_t bottom);
 
@@ -128,7 +128,7 @@ void DIRECTGRAPH_EXPORT fillpolyw(DirectgraphWinIndex index, uint32_t numPoints,
 
 void DIRECTGRAPH_EXPORT setcolorw(DirectgraphWinIndex index, uint32_t color);
 
-void DIRECTGRAPH_EXPORT setfillstylew(DirectgraphWinIndex index, fill_patterns pattern, uint32_t color);
+void DIRECTGRAPH_EXPORT setfillstylew(DirectgraphWinIndex index, uint32_t pattern, uint32_t color);
 
 void DIRECTGRAPH_EXPORT setfillpatternw(DirectgraphWinIndex index, const char *fillpattern, uint32_t color);
 
@@ -146,9 +146,9 @@ void DIRECTGRAPH_EXPORT getfillsettingsw(DirectgraphWinIndex index, fillsettings
 
 void DIRECTGRAPH_EXPORT getfillpatternw(DirectgraphWinIndex index, char *pattern);
 
-void DIRECTGRAPH_EXPORT directgraph_initpalettew(DirectgraphWinIndex index, uint32_t havePalette, uint_fast32_t size, uint32_t fillFirstColors);
+void DIRECTGRAPH_EXPORT directgraph_initpalettew(DirectgraphWinIndex index, uint32_t havePalette, uint32_t size, uint32_t fillFirstColors);
 
-void DIRECTGRAPH_EXPORT setpalettew(DirectgraphWinIndex index, uint_fast32_t colorIndex, uint_fast32_t color);
+void DIRECTGRAPH_EXPORT setpalettew(DirectgraphWinIndex index, uint32_t colorIndex, uint32_t color);
 
 void DIRECTGRAPH_EXPORT clearpalettew(DirectgraphWinIndex index);
 
@@ -228,43 +228,43 @@ WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine, INT
 #endif
 
 #ifdef __cplusplus
-static inline void fillellipse(int32_t x, int32_t y, uint32_t xradius, uint32_t yradius, uint_fast32_t color){
+static inline void fillellipse(int32_t x, int32_t y, uint32_t xradius, uint32_t yradius, uint32_t color){
     fillellipsec(x, y, xradius, yradius, color);
 }
 
-static inline void rectangle(int32_t left, int32_t top, int32_t right, int32_t bottom, uint_fast32_t color){
+static inline void rectangle(int32_t left, int32_t top, int32_t right, int32_t bottom, uint32_t color){
     rectanglec(left, top, right, bottom, color);
 }
 
-static inline void line(int32_t startx, int32_t starty, int32_t endx, int32_t endy, uint_fast32_t color){
+static inline void line(int32_t startx, int32_t starty, int32_t endx, int32_t endy, uint32_t color){
     linec(startx, starty, endx, endy, color);
 }
 
-static inline void lineto(int32_t x, int32_t y, uint_fast32_t color){
+static inline void lineto(int32_t x, int32_t y, uint32_t color){
     linetoc(x, y, color);
 }
 
-static inline void linerel(int32_t x, int32_t y, uint_fast32_t color){
+static inline void linerel(int32_t x, int32_t y, uint32_t color){
     linerelc(x, y, color);
 }
 
-static inline void drawpoly(uint32_t numPoints, const int32_t *points, uint_fast32_t color){
+static inline void drawpoly(uint32_t numPoints, const int32_t *points, uint32_t color){
     drawpolyc(numPoints, points, color);
 }
 
-static inline void fillpoly(uint32_t numPoints, const int32_t *points, uint_fast32_t color){
+static inline void fillpoly(uint32_t numPoints, const int32_t *points, uint32_t color){
     fillpolyc(numPoints, points, color);
 }
 
-static inline void ellipse(int32_t x, int32_t y, uint32_t xradius, uint32_t yradius, uint_fast32_t color){
+static inline void ellipse(int32_t x, int32_t y, uint32_t xradius, uint32_t yradius, uint32_t color){
     ellipsec(x, y, xradius, yradius, color);
 }
 
-static inline void circle(int32_t x, int32_t y, uint32_t radius, uint_fast32_t color){
+static inline void circle(int32_t x, int32_t y, uint32_t radius, uint32_t color){
     circlec(x, y, radius, color);
 ;}
 
-static inline void bar3d(int32_t left, int32_t top, int32_t right, int32_t bottom, uint32_t depth, uint32_t haveTop, uint_fast32_t color){
+static inline void bar3d(int32_t left, int32_t top, int32_t right, int32_t bottom, uint32_t depth, uint32_t haveTop, uint32_t color){
     bar3dc(left, top, right, bottom, depth, haveTop, color);
 }
 
