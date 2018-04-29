@@ -34,6 +34,8 @@ void DIRECTGRAPH_EXPORT circlec(int32_t x, int32_t y, uint32_t radius, uint32_t 
 
 void DIRECTGRAPH_EXPORT bar3dc(int32_t left, int32_t top, int32_t right, int32_t bottom, uint32_t depth, uint32_t haveTop, uint32_t color);
 
+void DIRECTGRAPH_EXPORT putpixelnc(int32_t x, int32_t y);
+
 
 void DIRECTGRAPH_EXPORT fillellipse(int32_t x, int32_t y, uint32_t xradius, uint32_t yradius);
 
@@ -168,7 +170,7 @@ int32_t DIRECTGRAPH_EXPORT getxw(DirectgraphWinIndex index);
 
 int32_t DIRECTGRAPH_EXPORT getyw(DirectgraphWinIndex index);
 
-WPARAM DIRECTGRAPH_EXPORT directgraph_mainloop();
+uint32_t DIRECTGRAPH_EXPORT directgraph_mainloop();
 
 
 void DIRECTGRAPH_EXPORT directgraph_get_dpi(float *dpix, float *dpiy);
@@ -266,6 +268,10 @@ static inline void circle(int32_t x, int32_t y, uint32_t radius, uint32_t color)
 
 static inline void bar3d(int32_t left, int32_t top, int32_t right, int32_t bottom, uint32_t depth, uint32_t haveTop, uint32_t color){
     bar3dc(left, top, right, bottom, depth, haveTop, color);
+}
+
+static inline void putpixel(int32_t x, int32_t y){
+    putpixelnc(x, y);
 }
 
 #endif

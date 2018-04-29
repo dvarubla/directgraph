@@ -65,7 +65,7 @@ static DirectgraphWinIndex createWindow(const DirectgraphWinParams &params){
     )->createWindow(params);
 }
 
-WPARAM DIRECTGRAPH_EXPORT directgraph_mainloop() {
+uint32_t DIRECTGRAPH_EXPORT directgraph_mainloop() {
     MSG msg;
     PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE);
     mainThreadId = GetCurrentThreadId();
@@ -811,5 +811,12 @@ void DIRECTGRAPH_EXPORT bar3dc(int32_t left, int32_t top, int32_t right, int32_t
     EXC_CALL_WRAP(
             WindowManagerScopedLock lock(getWindowManager());
             lock.data.controller->bar3d(left, top, right, bottom, depth, haveTop != 0, true, color);
+    );
+}
+
+void DIRECTGRAPH_EXPORT putpixelnc(int32_t x, int32_t y){
+    EXC_CALL_WRAP(
+            WindowManagerScopedLock lock(getWindowManager());
+            lock.data.controller->putpixel(x, y);
     );
 }
