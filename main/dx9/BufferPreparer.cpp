@@ -147,6 +147,9 @@ namespace directgraph{
                         _curUsedSize = _curUsedSize + totalVertices * ts.sizeMult;
                         _drawItemProc.nextItem();
                     }
+                    if(!_canReadMore){
+                        break;
+                    }
                 } else {
                     switch (item.type){
                         case QueueItem::BGCOLOR:

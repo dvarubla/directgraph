@@ -172,3 +172,17 @@ IMG_TEST_F(DX9Int1Test, Star) {
     wman->releaseCurrentWindowLock();
     return afterTestSimple(_curIndex);
 }
+
+IMG_TEST_F(DX9Int1Test, ManyBars) {
+    IController *ctrl = wman->getCurrentWindowAndLock().controller;
+    ctrl->setfillstyle(SOLID_FILL, 0x7F0000FF);
+    for(uint_fast32_t i = 0; i < 50; i++){
+        for(uint_fast32_t j = 0; j < HEIGHT; j++){
+            ctrl->bar(i,j, i+1, j+1);
+        }
+    }
+
+    ctrl->repaint();
+    wman->releaseCurrentWindowLock();
+    return afterTestSimple(_curIndex);
+}
