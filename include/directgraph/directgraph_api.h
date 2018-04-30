@@ -274,6 +274,10 @@ static inline void putpixel(int32_t x, int32_t y){
     putpixelnc(x, y);
 }
 
+static inline void setlinestyle(uint32_t linestyle){
+    setlinestyle(linestyle, 0, 1);
+}
+
 #endif
 
 #endif //DIRECTGRAPH_API_H
