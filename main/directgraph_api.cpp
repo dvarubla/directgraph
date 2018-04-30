@@ -37,6 +37,10 @@ static DWORD mainThreadId = 0;
 
 static PVOID windowManager = NULL;
 static LONG volatile needCreateWindowManager = 1;
+static LONG volatile needImplicitlyCreateWindow = 1;
+
+static const uint_fast32_t INITIAL_WIDTH = 640;
+static const uint_fast32_t INITIAL_HEIGHT = 480;
 
 static void tryCreateWindowManager(){
     if(InterlockedExchange(&needCreateWindowManager, 0)) {
@@ -54,7 +58,18 @@ static WindowManager * getWindowManager(){
             InterlockedCompareExchangePointer(&windowManager, NULL, NULL)
     );
     if(ret == NULL){
-        THROW_EXC_CODE(WinManException, NO_WINDOWS, std::wstring(L"No window manager"));
+        if(InterlockedExchange(&needImplicitlyCreateWindow, 0)) {
+            resize(INITIAL_WIDTH, INITIAL_HEIGHT);
+        } else {
+            while(static_cast<WindowManager *>(
+                    InterlockedCompareExchangePointer(&windowManager, NULL, NULL)
+            ) == NULL){
+                Sleep(5);
+            }
+        }
+        ret = static_cast<WindowManager *>(
+                InterlockedCompareExchangePointer(&windowManager, NULL, NULL)
+        );
     }
     return ret;
 }
