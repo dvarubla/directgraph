@@ -433,7 +433,7 @@ namespace directgraph{
         void EllipseDrawer::createOutlineState() {
             _outlineState = _propMan->getNullState();
             if(_bufPrepParams->supportsEllipseOutline()){
-                _propMan->setProp(_fillState, PropertyName::SHADER_TYPE, ShaderType::ELLIPSE_OUTLINE_SHADER);
+                _propMan->setProp(_outlineState, PropertyName::SHADER_TYPE, ShaderType::ELLIPSE_OUTLINE_SHADER);
             }
         }
 
