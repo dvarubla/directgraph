@@ -33,7 +33,9 @@ build_script:
     - cd build
     - cmake .. %CMAKE_CONFIGURE_FLAGS%
     - cmake --build . %CMAKE_BUILD_FLAGS%
-    - 7z a ..\directgraph-%PLATFORM%.zip directgraph_dx9.dll directgraph_dx9.lib ..\include
+    - cd ..\include
+    - python merge_includes.py
+    - 7z a ..\directgraph-%PLATFORM%.zip ..\build\directgraph_dx9.dll ..\build\directgraph_dx9.lib directgraph.h
 
 test_script:
     - ctest -C %CONFIGURATION% -LE "dx9" --output-on-failure
