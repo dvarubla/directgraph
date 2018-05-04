@@ -141,7 +141,7 @@ namespace directgraph{
             int_fast32_t x = a + h;
             int_fast32_t y = 0;
 
-            double lastX = 1.0 * a * a / std::sqrt(1.0 * a * a + b * b) + h / std::sqrt(2);
+            double lastX = 1.0 * a * a / std::sqrt(1.0 * a * a + b * b) + h / std::sqrt(2.0);
             while (true) {
                 res.push_back(genCoords(x, y));
                 if (calcEquidistant(x - 0.5, y + 1, a, b, h) > 0) {
@@ -176,8 +176,8 @@ namespace directgraph{
             uint_fast32_t b = radiusCoords.y;
             if(h < a && h < b){
                 int_fast32_t x, y;
-                double lastX = 1.0 * a * a / std::sqrt(1.0 * a * a + b * b) - 1.0 * h / std::sqrt(2);
-                double root = (std::sqrt(a*a - b*b) * std::sqrt(b*b - h*h))/b;
+                double lastX = 1.0 * a * a / std::sqrt(1.0 * a * a + b * b) - 1.0 * h / std::sqrt(2.0);
+                double root = (std::sqrt(static_cast<double>(a*a - b*b)) * std::sqrt(static_cast<double>(b*b - h*h)))/b;
                 if(h > b*b / a){
                     x = static_cast<int_fast32_t>(std::ceil(root));
                 } else {
