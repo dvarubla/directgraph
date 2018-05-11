@@ -37,6 +37,8 @@ namespace directgraph {
                 OUTLINE_AND_FILL_STAGE,
             } _curStage;
 
+            void genStartEndCoordsThickness(StartEndCoords &res, uint32_t thickness);
+
             void createFillState();
             void createOutlineState();
             void createOutlineTypeSize();

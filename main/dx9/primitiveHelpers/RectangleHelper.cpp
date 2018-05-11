@@ -113,13 +113,14 @@ namespace directgraph {
         }
 
         StartEndCoords RectangleHelper::getCoords(const Coords &startCrds, const Coords &endCrds, uint_fast32_t thickness) {
+            int_fast32_t thicknessSigned = thickness;
             int_fast32_t leftSepCrd = std::min<int_fast32_t>(
                     (startCrds.y + endCrds.y) / 2 + (startCrds.y + endCrds.y) % 2,
-                    startCrds.y + (thickness / 2 + thickness % 2)
+                    startCrds.y + (thicknessSigned / 2 + thicknessSigned % 2)
             );
             StartEndCoords res;
-            res.start = subtHalfPixel(genFCoords(startCrds.x  - thickness / 2, leftSepCrd));
-            res.end = subtHalfPixel(genFCoords(startCrds.x - thickness / 2, leftSepCrd));
+            res.start = subtHalfPixel(genFCoords(startCrds.x - thicknessSigned / 2, leftSepCrd));
+            res.end = subtHalfPixel(genFCoords(startCrds.x - thicknessSigned / 2, leftSepCrd));
             return res;
         }
 

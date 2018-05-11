@@ -148,15 +148,7 @@ namespace directgraph{
         StartEndCoords EllipseDrawer::getStartEndCoords() {
             StartEndCoords res;
             if(_curStage == OUTLINE_AND_FILL_STAGE){
-                float halfT = _stateHelper->getLastState().lineThickness / 2.f;
-                res.start = genFCoords(
-                        _curItem.data.ellipse.x - _curItem.data.ellipse.xradius + CORR_OFFSET - halfT,
-                        _curItem.data.ellipse.y - _curItem.data.ellipse.yradius + CORR_OFFSET - halfT
-                );
-                res.end = genFCoords(
-                        _curItem.data.ellipse.x + _curItem.data.ellipse.xradius - CORR_OFFSET + halfT,
-                        _curItem.data.ellipse.y + _curItem.data.ellipse.yradius - CORR_OFFSET + halfT
-                );
+                genStartEndCoordsThickness(res, _stateHelper->getLastState().lineThickness);
             } else if(_curStage == FILL_STAGE) {
                 if (
                         !_haveOutline && (
@@ -164,14 +156,7 @@ namespace directgraph{
                             (!_stateHelper->fillTextureUsed(_curState) && _bufPrepParams->supportsEllipse())
                         )
                 ) {
-                    res.start = genFCoords(
-                            _curItem.data.ellipse.x - _curItem.data.ellipse.xradius + CORR_OFFSET,
-                            _curItem.data.ellipse.y - _curItem.data.ellipse.yradius + CORR_OFFSET
-                    );
-                    res.end = genFCoords(
-                            _curItem.data.ellipse.x + _curItem.data.ellipse.xradius - CORR_OFFSET,
-                            _curItem.data.ellipse.y + _curItem.data.ellipse.yradius - CORR_OFFSET
-                    );
+                    genStartEndCoordsThickness(res, 0);
                 } else {
                     res.start = _ellipse.coords.front();
                     res.end = _ellipse.coords.back();
@@ -179,14 +164,7 @@ namespace directgraph{
             } else {
                 if(_createShaderOutline) {
                     float halfT = _stateHelper->getLastState().lineThickness / 2.f;
-                    res.start = genFCoords(
-                            _curItem.data.ellipse.x - _curItem.data.ellipse.xradius + CORR_OFFSET - halfT,
-                            _curItem.data.ellipse.y - _curItem.data.ellipse.yradius + CORR_OFFSET - halfT
-                    );
-                    res.end = genFCoords(
-                            _curItem.data.ellipse.x + _curItem.data.ellipse.xradius - CORR_OFFSET + halfT,
-                            _curItem.data.ellipse.y + _curItem.data.ellipse.yradius - CORR_OFFSET + halfT
-                    );
+                    genStartEndCoordsThickness(res, _stateHelper->getLastState().lineThickness);
                 } else {
                     res.start = _ellipseOutline.coords.front();
                     res.end = _ellipseOutline.coords.back();
@@ -513,6 +491,22 @@ namespace directgraph{
                 _fillTypeSize.sizeMult = sizeof(Color2Vertex);
                 _fillTypeSize.drawDataType = DrawDataType::ELLIPSE_WITH_OUTLINE_VERTEX;
             }
+        }
+
+        void EllipseDrawer::genStartEndCoordsThickness(StartEndCoords &res, uint32_t thickness) {
+            float halfT = thickness / 2.f;
+            res.start = genFCoords(
+                    _curItem.data.ellipse.x - static_cast<int32_t>(_curItem.data.ellipse.xradius) +
+                    CORR_OFFSET - halfT,
+                    _curItem.data.ellipse.y - static_cast<int32_t>(_curItem.data.ellipse.yradius)
+                    + CORR_OFFSET - halfT
+            );
+            res.end = genFCoords(
+                    _curItem.data.ellipse.x + static_cast<int32_t>(_curItem.data.ellipse.xradius) -
+                    CORR_OFFSET + halfT,
+                    _curItem.data.ellipse.y + static_cast<int32_t>(_curItem.data.ellipse.yradius) -
+                    CORR_OFFSET + halfT
+            );
         }
     }
 }
