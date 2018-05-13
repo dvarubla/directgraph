@@ -186,3 +186,89 @@ IMG_TEST_F(DX9Int1Test, ManyBars) {
     wman->releaseCurrentWindowLock();
     return afterTestSimple(_curIndex);
 }
+
+IMG_TEST_F(DX9Int1Test, House) {
+    IController *ctrl = wman->getCurrentWindowAndLock().controller;
+    drawGrid(ctrl);
+
+    //main
+    ctrl->setfillstyle(SOLID_FILL, 0x00FF00);
+    ctrl->bar(80, 168, 241, 251);
+
+    //windows
+    ctrl->setfillstyle(HATCH_FILL, 0x220000);
+    ctrl->setcolor(0x220000);
+    ctrl->setbgcolor(0x00FFFF);
+    ctrl->setlinestyle(SOLID_LINE, 0, 2);
+    ctrl->bar(110, 190, 131, 211);
+    ctrl->rectangle(110, 190, 130, 210);
+    ctrl->bar(190, 190, 211, 211);
+    ctrl->rectangle(190, 190, 210, 210);
+
+    //exit
+    ctrl->setfillstyle(LINE_FILL, 0x008888);
+    ctrl->setcolor(0x220000);
+    ctrl->setbgcolor(0x007755);
+    ctrl->setlinestyle(NULL_LINE, 0, 0);
+    int32_t exitPoints[] = {
+            241, 210, 260, 210, 260, 230,
+            280, 230, 280, 250, 241, 250
+    };
+    ctrl->fillpoly(6, exitPoints);
+
+    ctrl->setfillstyle(XHATCH_FILL, 0x7FAAAAAA);
+    ctrl->setlinestyle(SOLID_LINE, 0, 1);
+    ctrl->setcolor(0);
+    ctrl->setbgcolor(0x6C444444);
+    ctrl->fillellipse(230, 80, 10, 5);
+    ctrl->fillellipse(250, 60, 20, 10);
+
+    //roof
+    ctrl->setlinestyle(DASHED_LINE, 0, 5);
+    ctrl->setcolor(0x2233EE);
+    ctrl->setfillstyle(SLASH_FILL, 0x0000FF);
+    ctrl->setbgcolor(0xAAAAAA);
+    int32_t roofPoints[] = {
+            40, 170, 160, 90, 280, 170
+    };
+    ctrl->fillpoly(3, roofPoints);
+
+    ctrl->setfillstyle(BKSLASH_FILL, 0x0000FF);
+    ctrl->setlinestyle(SOLID_LINE, 0, 2);
+    ctrl->bar3d(200, 90, 220, 150, 0, false, true, 0xAAAAFF);
+
+    //Sun
+    ctrl->setlinestyle(NULL_LINE, 0, 0);
+    ctrl->setfillstyle(SOLID_FILL, 0x00A5FF);
+    ctrl->fillellipse(360, 70, 20, 20);
+    ctrl->setcolor(0x0095EE);
+    ctrl->setlinestyle(SOLID_LINE, 0, 5);
+
+    ctrl->moveto(360, 70);
+    ctrl->moverel(-30, 0);
+    ctrl->linerel(-20, 0);
+    ctrl->moverel(30, -20);
+    ctrl->linerel(-20, -20);
+    ctrl->moverel(40, 10);
+    ctrl->linerel(0, -20);
+    ctrl->moverel(20, 30);
+    ctrl->linerel(20, -20);
+    ctrl->moverel(-10, 40);
+    ctrl->linerel(20, 0);
+    ctrl->moverel(-30, 20);
+    ctrl->linerel(20, 20);
+    ctrl->moverel(-40, -10);
+    ctrl->linerel(0, 20);
+    ctrl->moverel(-20, -30);
+    ctrl->linerel(-20, 20);
+
+    ctrl->setlinestyle(SOLID_LINE, 0, 3);
+    ctrl->setcolor(0x440000);
+    ctrl->setfillstyle(LTSLASH_FILL, 0xFF0000);
+    ctrl->setbgcolor(0xFFAA22);
+    ctrl->fillellipse(390, 250, 60, 30);
+
+    ctrl->repaint();
+    wman->releaseCurrentWindowLock();
+    return afterTestSimple(_curIndex);
+}
